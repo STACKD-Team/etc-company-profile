@@ -197,3 +197,30 @@ body {
     font-size: 13px;
     font-weight: bold;
 }
+
+/* --- baris statistik --- */
+.baris-statistik {
+    background-color: #27171C; 
+    display: flex;
+    justify-content: space-around; 
+    align-items: center;
+    padding: 40px 80px;
+    margin-top: 20px; 
+}
+
+.item-baris {
+    text-align: center;
+    color: #FFFFFF;
+}
+
+.item-baris h3 {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.item-baris p {
+    font-size: 14px;
+    color: #D4D4D8;
+    text-transform: uppercase 
+}

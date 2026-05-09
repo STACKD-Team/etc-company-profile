@@ -98,6 +98,26 @@
         </div>
     </section>
 
+    <!-- bagian statistik -->
+    <section class="baris-statistik">
+        <div class="item-baris">
+            <h3>500+</h3>
+            <p>Siswa Aktif</p>
+        </div>
+        <div class="item-baris">
+            <h3>10</h3>
+            <p>Tahun Pengalaman</p>
+        </div>
+        <div class="item-baris">
+            <h3>3</h3>
+            <p>Program Utama</p>
+        </div>
+        <div class="item-baris">
+            <h3>98%</h3>
+            <p>Kepuasan Siswa</p>
+        </div>
+    </section>
+
 </body>
 
 </html>
