@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ETC Planet - Online Registration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "background": "#fff8f8",
+                        "on-primary-container": "#130006",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "surface-container-highest": "#f9dbe2",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#f9dbe2",
+                        "inverse-on-surface": "#ffecf0",
+                        "surface-bright": "#fff8f8",
+                        "tertiary-fixed-dim": "#6cdf64",
+                        "tertiary-container": "#008a18",
+                        "on-secondary-fixed-variant": "#474747",
+                        "surface-container": "#ffe8ed",
+                        "secondary": "#5f5e5e",
+                        "on-background": "#27171c",
+                        "tertiary-fixed": "#88fc7d",
+                        "primary-fixed": "#ffd9e3",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "on-tertiary-container": "#ffffff",
+                        "on-tertiary-fixed-variant": "#00530a",
+                        "on-tertiary-fixed": "#002202",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#e2bdc7",
+                        "outline": "#8e6f78",
+                        "surface-tint": "#b90065",
+                        "on-surface": "#27171c",
+                        "on-surface-variant": "#5a3f47",
+                        "on-secondary": "#ffffff",
+                        "surface": "#fff8f8",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#656464",
+                        "surface-container-high": "#ffe1e8",
+                        "inverse-surface": "#3e2b31",
+                        "error": "#ba1a1a",
+                        "primary-container": "#e6007f",
+                        "primary": "#b90065",
+                        "tertiary": "#006e11",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#ffb0c9",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#8e004c",
+                        "secondary-container": "#e4e2e1",
+                        "surface-dim": "#f0d3da",
+                        "primary-fixed-dim": "#ffb0c9",
+                        "surface-container-low": "#fff0f2",
+                        "on-primary-fixed": "#3e001e",
+                        "secondary-fixed": "#e4e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-padding": "80px",
+                        "base-unit": "4px",
+                        "margin": "32px",
+                        "gutter": "24px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "h3": ["Plus Jakarta Sans"],
+                        "h1": ["Plus Jakarta Sans"],
+                        "body": ["Work Sans"],
+                        "h2": ["Plus Jakarta Sans"],
+                        "small": ["Work Sans"],
+                        "button": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "h3": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "h1": ["56px", { "lineHeight": "1.1", "fontWeight": "700" }],
+                        "body": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "h2": ["36px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "small": ["13px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "button": ["15px", { "lineHeight": "1", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-[#2D2D2D] dark:bg-zinc-900 font-['Plus_Jakarta_Sans'] text-sm font-medium tracking-wide sticky full-width top-0 z-50 border-b border-white/10 shadow-lg">
+<div class="flex justify-between items-center h-20 px-6 lg:px-12 max-w-[1200px] mx-auto w-full">
+<div class="text-2xl font-black text-white tracking-tighter">ETC Planet</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-zinc-300 hover:text-white hover:bg-white/5 transition-all duration-200 px-3 py-2 rounded-md active:scale-95 transform transition-transform" href="#">Beranda</a>
+<a class="text-[#e6007f] font-bold border-b-2 border-[#e6007f] pb-1 px-3 py-2 rounded-md active:scale-95 transform transition-transform" href="#">Program</a>
+<a class="text-zinc-300 hover:text-white hover:bg-white/5 transition-all duration-200 px-3 py-2 rounded-md active:scale-95 transform transition-transform" href="#">Galeri Reels</a>
+<a class="text-zinc-300 hover:text-white hover:bg-white/5 transition-all duration-200 px-3 py-2 rounded-md active:scale-95 transform transition-transform" href="#">Tentang Kami</a>
+<a class="text-zinc-300 hover:text-white hover:bg-white/5 transition-all duration-200 px-3 py-2 rounded-md active:scale-95 transform transition-transform" href="#">Kontak</a>
+</div>
+<div class="hidden md:flex items-center space-x-4">
+<button class="text-white hover:text-[#e6007f] font-button text-button px-4 py-2 transition-colors">Masuk</button>
+<button class="bg-primary-container text-on-primary font-button text-button px-6 py-3 rounded-full hover:bg-primary transition-colors active:scale-95 transform">Daftar Sekarang</button>
+</div>
+<button class="md:hidden text-white p-2">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-6 py-section-padding relative">
+<!-- Decorative Background Elements -->
+<div class="absolute top-0 right-0 w-96 h-96 bg-primary-fixed rounded-full mix-blend-multiply filter blur-3xl opacity-30 -z-10 translate-x-1/2 -translate-y-1/4"></div>
+<div class="absolute bottom-0 left-0 w-80 h-80 bg-surface-container-highest rounded-full mix-blend-multiply filter blur-3xl opacity-40 -z-10 -translate-x-1/3 translate-y-1/3"></div>
+<div class="mb-12 text-center md:text-left">
+<h1 class="font-h1 text-h1 text-on-background mb-4">Pendaftaran Online</h1>
+<p class="font-body text-body text-on-surface-variant max-w-2xl">Mari mulai perjalanan belajarmu bersama ETC Planet. Isi data dengan lengkap dan benar ya!</p>
+</div>
+<!-- Multi-step Indicator -->
+<div class="w-full max-w-3xl mx-auto mb-16 relative">
+<div class="absolute top-1/2 left-0 w-full h-1 bg-surface-container-highest -z-10 -translate-y-1/2 rounded-full"></div>
+<div class="absolute top-1/2 left-0 w-1/3 h-1 bg-primary-container -z-10 -translate-y-1/2 rounded-full transition-all duration-500"></div>
+<div class="flex justify-between items-center relative z-10">
+<!-- Step 1: Done -->
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold mb-2 shadow-[0_2px_8px_rgba(230,0,127,0.3)]">
+<span class="material-symbols-outlined text-xl" data-icon="check">check</span>
+</div>
+<span class="font-small text-small text-on-background font-semibold hidden md:block">Pilih Program</span>
+</div>
+<!-- Step 2: Active -->
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold mb-2 ring-4 ring-primary-fixed shadow-[0_2px_8px_rgba(230,0,127,0.3)]">
+                        2
+                    </div>
+<span class="font-small text-small text-primary-container font-bold hidden md:block">Data Pribadi</span>
+</div>
+<!-- Step 3: Pending -->
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest border-2 border-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold mb-2">
+                        3
+                    </div>
+<span class="font-small text-small text-on-surface-variant hidden md:block">Pembayaran</span>
+</div>
+<!-- Step 4: Pending -->
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest border-2 border-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold mb-2">
+                        4
+                    </div>
+<span class="font-small text-small text-on-surface-variant hidden md:block">Konfirmasi</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Form -->
+<div class="lg:col-span-8 space-y-8">
+<!-- Group 1: Informasi Dasar -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 md:p-8 shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-surface-container-highest relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed rounded-bl-full opacity-20 -z-0"></div>
+<h2 class="font-h3 text-h3 text-on-background mb-6 flex items-center relative z-10">
+<span class="material-symbols-outlined text-primary-container mr-3" data-icon="person">person</span>
+                        Informasi Dasar
+                    </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10"><div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Nama Lengkap</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="Masukkan nama lengkap" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Email</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="contoh@email.com" type="email"/>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">No. Handphone / WA</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="0812xxxxxx" type="tel"/>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Tempat Lahir</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="Kota Kelahiran" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Tanggal Lahir</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" type="date"/>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Jenis Kelamin</label>
+<div class="flex h-12 items-center space-x-6">
+<label class="flex items-center space-x-2 cursor-pointer">
+<input class="w-5 h-5 text-primary-container focus:ring-primary-fixed" name="gender" type="radio"/>
+<span class="font-body text-body text-on-background">Laki-laki</span>
+</label>
+<label class="flex items-center space-x-2 cursor-pointer">
+<input checked="" class="w-5 h-5 text-primary-container focus:ring-primary-fixed" name="gender" type="radio"/>
+<span class="font-body text-body text-on-background">Perempuan</span>
+</label>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Agama</label>
+<select class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest">
+<option value="islam">Islam</option>
+<option value="kristen">Kristen</option>
+<option value="katolik">Katolik</option>
+<option value="hindu">Hindu</option>
+<option value="buddha">Buddha</option>
+<option value="khonghucu">Khonghucu</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Pekerjaan/Sekolah/Kampus</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="Instansi/Pekerjaan saat ini" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">NISN</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="Nomor Induk Siswa Nasional" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">NIK</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="Nomor Induk Kependudukan" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Penerima KPS</label>
+<select class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest">
+<option value="tidak">Tidak</option>
+<option value="ya">Ya</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">No KPS</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="Isi jika ya" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Layak PIP</label>
+<select class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest">
+<option value="tidak">Tidak</option>
+<option value="ya">Ya</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Alasan Layak PIP</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="Sebutkan alasannya" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">No KIP</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="Nomor Kartu Indonesia Pintar" type="text"/>
+</div></div>
+</div>
+<!-- Group 2: Alamat -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 md:p-8 shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-surface-container-highest">
+<h2 class="font-h3 text-h3 text-on-background mb-6 flex items-center">
+<span class="material-symbols-outlined text-primary-container mr-3" data-icon="location_on">location_on</span>
+                        Alamat
+                    </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="col-span-1 md:col-span-2 space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Alamat Lengkap</label>
+<textarea class="w-full rounded-lg border border-[#BDBDBD] p-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest resize-none" placeholder="Nama jalan, nomor rumah, RT/RW..." rows="3"></textarea>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">RT/RW</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="000/000" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Kode Pos</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="25xxx" type="text"/>
+</div>
+<div class="space-y-2 relative">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Provinsi</label>
+<select class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest appearance-none">
+<option disabled="" selected="" value="">Pilih Provinsi</option>
+<option value="sumbar">Sumatera Barat</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-10 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+<div class="space-y-2 relative">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Kab/Kota</label>
+<select class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest appearance-none">
+<option disabled="" selected="" value="">Pilih Kota</option>
+<option value="padang">Padang</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-10 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+<div class="space-y-2 relative">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Kecamatan</label>
+<select class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest appearance-none">
+<option disabled="" selected="" value="">Pilih Kecamatan</option>
+<option value="padang_utara">Padang Utara</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-10 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+<div class="space-y-2 relative">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Kelurahan</label>
+<select class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest appearance-none">
+<option disabled="" selected="" value="">Pilih Kelurahan</option>
+<option value="alair_jala">Air Tawar Barat</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-10 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+<div class="space-y-2 relative">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Tinggal Bersama</label>
+<select class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest appearance-none">
+<option value="orang_tua">Orang Tua</option>
+<option value="wali">Wali</option>
+<option value="kos">Kos</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-10 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+<div class="space-y-2 relative">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Alat Transportasi</label>
+<select class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest appearance-none">
+<option value="kendaraan_pribadi">Kendaraan Pribadi</option>
+<option value="kendaraan_umum">Kendaraan Umum</option>
+<option value="jalan_kaki">Jalan Kaki</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-10 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div></div>
+</div>
+<!-- Navigation Buttons -->
+<!-- Group 3: Informasi Orang Tua -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 md:p-8 shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-surface-container-highest mb-8">
+<details class="group">
+<summary class="font-h3 text-h3 text-on-background flex items-center justify-between cursor-pointer list-none">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-primary-container mr-3" data-icon="family_restroom">family_restroom</span>
+                Informasi Orang Tua
+            </div>
+<span class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180" data-icon="expand_more">expand_more</span>
+</summary>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Nama Ibu</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="Masukkan nama ibu kandung" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-small text-small text-on-surface-variant font-semibold block">Nama Ayah</label>
+<input class="w-full h-12 rounded-lg border border-[#BDBDBD] px-4 font-body text-body text-on-background focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-fixed transition-all bg-surface-container-lowest" placeholder="Masukkan nama ayah kandung" type="text"/>
+</div>
+</div>
+</details>
+</div><div class="flex justify-between items-center pt-6 border-t border-surface-container-highest">
+<button class="flex items-center text-on-surface-variant hover:text-primary-container font-button text-button transition-colors px-4 py-2 rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined mr-2" data-icon="arrow_back">arrow_back</span>
+                        Kembali
+                    </button>
+<button class="flex items-center bg-primary-container text-on-primary font-button text-button px-8 py-3 rounded-full hover:bg-primary transition-colors shadow-md active:scale-95 transform">
+                        Lanjut ke Pembayaran
+                        <span class="material-symbols-outlined ml-2" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Right Column: Summary & Payment -->
+<div class="lg:col-span-4">
+<div class="sticky top-28 space-y-6">
+<!-- Summary Card -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-surface-container-highest overflow-hidden relative">
+<!-- Diagonal decorative cut -->
+<div class="absolute -top-10 -right-10 w-32 h-32 bg-surface-container rotate-12 -z-0"></div>
+<h3 class="font-h3 text-[20px] font-bold text-on-background mb-4 relative z-10 border-b border-surface-container-highest pb-4">Ringkasan Pendaftaran</h3>
+<div class="space-y-4 relative z-10">
+<div>
+<span class="font-small text-small text-on-surface-variant block mb-1">Program Dipilih</span>
+<div class="font-body text-body font-semibold text-on-background flex items-start">
+<span class="material-symbols-outlined text-primary-container mr-2 text-xl" data-icon="school">school</span>
+                                    Intensive English Preparation Course (IELTS)
+                                </div>
+</div>
+<div>
+<span class="font-small text-small text-on-surface-variant block mb-1">Jadwal</span>
+<div class="font-body text-body font-medium text-on-background flex items-center">
+<span class="material-symbols-outlined text-on-surface-variant mr-2 text-xl" data-icon="calendar_month">calendar_month</span>
+                                    Senin &amp; Rabu, 16:00 WIB
+                                </div>
+</div>
+<div class="pt-4 border-t border-surface-container-highest mt-4">
+<div class="flex justify-between items-center mb-2">
+<span class="font-body text-body text-on-surface-variant">Biaya Pendaftaran</span>
+<span class="font-body text-body font-medium text-on-background">Rp 200.000</span>
+</div>
+<div class="flex justify-between items-center mb-2">
+<span class="font-body text-body text-on-surface-variant">Biaya Program (Bulan 1)</span>
+<span class="font-body text-body font-medium text-on-background">Rp 850.000</span>
+</div>
+<div class="flex justify-between items-center mt-4 pt-4 border-t border-dashed border-surface-container-highest">
+<span class="font-body text-[16px] font-bold text-on-background">Total Pembayaran</span>
+<span class="font-h3 text-[20px] font-bold text-primary-container">Rp 1.050.000</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-[#2D2D2D] dark:bg-zinc-950 font-['Plus_Jakarta_Sans'] text-sm leading-relaxed w-full pt-16 pb-8 border-t border-white/5 mt-auto">
+<div class="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="md:col-span-2">
+<div class="text-xl font-black text-white mb-4">ETC Planet</div>
+<p class="text-zinc-500 max-w-sm">Membuka pintu dunia melalui bahasa. Kami berdedikasi untuk memberikan pengalaman belajar terbaik dengan pengajar profesional.</p>
+<div class="mt-6 text-zinc-500 font-small">
+                    © 2024 ETC Planet. Jl. S. Parman No. 202B, Padang.
+                </div>
+</div>
+<div>
+<h4 class="text-white font-bold mb-4">Tautan Penting</h4>
+<ul class="space-y-3">
+<li><a class="text-zinc-500 hover:text-[#e6007f] hover:underline decoration-[#e6007f] transition-all duration-200 block" href="#">Kebijakan Privasi</a></li>
+<li><a class="text-zinc-500 hover:text-[#e6007f] hover:underline decoration-[#e6007f] transition-all duration-200 block" href="#">Syarat &amp; Ketentuan</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-bold mb-4">Dukungan</h4>
+<ul class="space-y-3">
+<li><a class="text-zinc-500 hover:text-[#e6007f] hover:underline decoration-[#e6007f] transition-all duration-200 block" href="#">FAQ</a></li>
+<li><a class="text-zinc-500 hover:text-[#e6007f] hover:underline decoration-[#e6007f] transition-all duration-200 block" href="#">Karir</a></li>
+</ul>
+</div>
+</div>
+</footer>
+</body></html>
