@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ETC Planet - Pembayaran</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&amp;family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e6007f",
+                        "primary-hover": "#c4006c",
+                        "primary-light": "#ffb0c9",
+                        "primary-fixed": "#ffd9e3",
+                        "background": "#F5F5F5",
+                        "surface": "#ffffff",
+                        "on-surface": "#2D2D2D",
+                        "on-surface-variant": "#5a5a5a",
+                        "outline": "#e4e2e1",
+                    },
+                    fontFamily: {
+                        "h1": ["Nunito", "sans-serif"],
+                        "h2": ["Nunito", "sans-serif"],
+                        "h3": ["Nunito", "sans-serif"],
+                        "body": ["DM Sans", "sans-serif"],
+                        "button": ["Nunito", "sans-serif"],
+                        "small": ["DM Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "card": "16px",
+                        "button": "24px",
+                    },
+                    boxShadow: {
+                        "card": "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)",
+                        "card-hover": "0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface min-h-screen font-body text-base flex flex-col">
+<!-- Top Navigation -->
+<header class="shadow-card sticky top-0 z-50 bg-[#2D2D2D]">
+<div class="max-w-[1200px] mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-8">
+<a class="font-h1 font-black text-2xl tracking-tight text-white" href="#">ETC Planet.</a>
+<nav class="hidden md:flex items-center gap-6">
+<a class="font-medium hover:text-primary transition-colors text-white" href="#">Program</a>
+<a class="font-medium hover:text-primary transition-colors text-white" href="#">Testimoni</a>
+<a class="font-medium hover:text-primary transition-colors text-white" href="#">FAQ</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="hidden md:flex items-center gap-2 font-button font-bold hover:text-primary transition-colors text-white">
+                    Masuk
+                </button>
+<button class="bg-primary text-white px-6 py-2.5 rounded-button font-button font-bold hover:bg-primary-hover transition-colors shadow-md">
+                    Daftar Sekarang
+                </button>
+</div>
+</div>
+</header>
+<main class="flex-grow max-w-[1200px] mx-auto px-6 py-12 md:py-16 w-full relative">
+<!-- Header area -->
+<div class="text-center mb-12">
+<h1 class="font-h1 text-4xl md:text-5xl font-extrabold text-on-surface mb-4">Pendaftaran ETC Planet</h1>
+<p class="text-on-surface-variant font-body max-w-2xl mx-auto text-lg">Selesaikan langkah terakhir untuk memulai perjalanan belajarmu.</p>
+</div>
+<!-- Multi-step Indicator -->
+<div class="max-w-4xl mx-auto mb-16 px-4">
+<div class="flex items-center justify-between relative">
+<!-- Connecting lines -->
+<div class="absolute top-1/2 left-0 w-full h-1.5 bg-outline -translate-y-1/2 z-0 rounded-full"></div>
+<div class="absolute top-1/2 left-0 w-[66%] h-1.5 bg-primary -translate-y-1/2 z-0 rounded-full transition-all duration-500"></div>
+<!-- Step 1 -->
+<div class="relative z-10 flex flex-col items-center group">
+<div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold shadow-md transition-transform group-hover:scale-105">
+<span class="material-symbols-outlined font-bold text-xl" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="mt-3 text-sm font-body text-primary font-bold">Pilih Program</span>
+</div>
+<!-- Step 2 -->
+<div class="relative z-10 flex flex-col items-center group">
+<div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold shadow-md transition-transform group-hover:scale-105">
+<span class="material-symbols-outlined font-bold text-xl" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="mt-3 text-sm font-body text-primary font-bold">Data Pribadi</span>
+</div>
+<!-- Step 3 (Active) -->
+<div class="relative z-10 flex flex-col items-center group">
+<div class="w-14 h-14 rounded-full bg-surface border-4 border-primary text-primary flex items-center justify-center font-h3 font-extrabold text-xl shadow-lg ring-4 ring-primary-fixed transition-all">
+                        3
+                    </div>
+<span class="mt-3 text-sm font-body text-primary font-extrabold">Pembayaran</span>
+</div>
+<!-- Step 4 -->
+<div class="relative z-10 flex flex-col items-center group">
+<div class="w-12 h-12 rounded-full bg-surface border-2 border-outline text-on-surface-variant flex items-center justify-center font-h3 font-bold text-lg shadow-sm transition-colors">
+                        4
+                    </div>
+<span class="mt-3 text-sm font-body text-on-surface-variant font-medium">Konfirmasi</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left Column: Order Summary -->
+<div class="lg:col-span-4 w-full order-2 lg:order-1">
+<div class="bg-surface rounded-card shadow-card hover:shadow-card-hover transition-shadow p-6 border border-outline sticky top-28">
+<h2 class="font-h3 text-xl font-bold text-on-surface mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+                        Ringkasan Pesanan
+                    </h2>
+<div class="bg-background p-4 rounded-xl mb-6">
+<p class="text-xs font-small text-on-surface-variant uppercase tracking-wider font-bold mb-1">Program</p>
+<p class="font-h3 text-base font-bold text-on-surface">General English - Reguler</p>
+</div>
+<div class="space-y-4 font-body">
+<div class="flex justify-between items-center text-on-surface-variant">
+<span>Biaya Pendaftaran</span>
+<span class="font-bold text-on-surface">Rp 200.000</span>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span>Biaya SPP (Bulan 1)</span>
+<span class="font-bold text-on-surface">Rp 0</span>
+</div>
+</div>
+<div class="border-t border-outline my-6"></div>
+<div class="flex justify-between items-center mb-6">
+<span class="font-h3 text-xl font-bold text-on-surface">Total</span>
+<span class="font-h2 text-3xl font-extrabold text-primary">Rp 200.000</span>
+</div>
+<div class="bg-primary-fixed/50 p-4 rounded-xl border border-primary-light/30 flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5 text-xl">info</span>
+<p class="text-sm font-body text-on-surface-variant leading-relaxed">Pastikan nominal transfer sesuai hingga 3 digit terakhir untuk memudahkan verifikasi otomatis.</p>
+</div>
+</div>
+</div>
+<!-- Right Column: Payment Methods & Action -->
+<div class="lg:col-span-8 w-full space-y-8 order-1 lg:order-2">
+<!-- Payment Methods Section -->
+<div>
+<h3 class="font-h3 text-2xl font-bold text-on-surface mb-6">Pilih Metode Pembayaran</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<!-- QRIS Selected Card -->
+<label class="cursor-pointer">
+<input checked="" class="peer sr-only" name="payment_method" type="radio"/>
+<div class="bg-surface p-6 rounded-card shadow-card border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary-fixed/10 hover:shadow-card-hover transition-all h-full flex flex-col relative overflow-hidden group">
+<!-- Selection Indicator -->
+<div class="absolute top-5 right-5 w-6 h-6 rounded-full border-2 border-outline flex items-center justify-center peer-checked:border-primary peer-checked:bg-primary transition-colors">
+<span class="material-symbols-outlined text-white text-sm opacity-0 peer-checked:opacity-100" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="flex items-center gap-4 mb-6">
+<div class="w-14 h-14 bg-primary-fixed rounded-2xl flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">qr_code_scanner</span>
+</div>
+<div>
+<h4 class="font-h3 text-lg font-bold text-on-surface">QRIS</h4>
+<p class="text-sm font-body text-on-surface-variant">Scan dengan e-Wallet/M-Banking</p>
+</div>
+</div>
+<!-- QR Content -->
+<div class="mt-auto bg-white p-5 rounded-xl border border-outline flex flex-col items-center justify-center">
+<img alt="QRIS Code Placeholder" class="w-36 h-36 object-contain mb-4 rounded-lg" data-alt="A stylized placeholder image representing a square QR code. The image has a vibrant magenta pink background with white geometric patterns mimicking a scannable QR code structure. The style is modern, clean, and professional, fitting within a bright, light-mode e-learning platform interface. Soft ambient lighting highlights the crisp contrast between the pink and white elements." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDulRRMKpGLyO6ohAS66J8fmPxj0vQmBCUQwCGM6oj9gFz4qrWZgarMMBCqRK6B2zO2N9dSZ0DmZdFZjqPHXXBkoElu5G5h8ITnzQH57nG5ipTmN2aXNfvlnKA8Z4HLWjULz_fpB-np3gMfgOfk10YJnqlZIEGX53P7A_POTfMfc0_iD4f5Y2A6dY2Ht06sX-mzR6PL31nqlKdilgSeHswmy1Am0-7sw6Z_65ccpgUlsswPJan7PJN_3WWb9eVTQtM5pPXWC8rSDBY"/>
+<div class="flex items-center gap-2 bg-primary-fixed/50 py-1.5 px-4 rounded-full">
+<span class="material-symbols-outlined text-primary text-sm">timer</span>
+<span class="text-sm font-h3 font-bold text-primary">05:00</span>
+</div>
+</div>
+</div>
+</label>
+<!-- Transfer Bank Card -->
+<label class="cursor-pointer">
+<input class="peer sr-only" name="payment_method" type="radio"/>
+<div class="bg-surface p-6 rounded-card shadow-card border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary-fixed/10 hover:shadow-card-hover transition-all h-full flex flex-col relative overflow-hidden group">
+<!-- Selection Indicator -->
+<div class="absolute top-5 right-5 w-6 h-6 rounded-full border-2 border-outline flex items-center justify-center peer-checked:border-primary peer-checked:bg-primary transition-colors">
+<span class="material-symbols-outlined text-white text-sm opacity-0 peer-checked:opacity-100" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="flex items-center gap-4 mb-6">
+<div class="w-14 h-14 bg-background rounded-2xl flex items-center justify-center text-on-surface-variant group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div>
+<h4 class="font-h3 text-lg font-bold text-on-surface">Transfer Bank</h4>
+<p class="text-sm font-body text-on-surface-variant">Transfer manual ke rekening</p>
+</div>
+</div>
+<!-- Bank Details -->
+<div class="mt-auto bg-background p-5 rounded-xl border border-outline space-y-4">
+<div>
+<p class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">Bank</p>
+<p class="font-body font-bold text-on-surface text-lg">BCA</p>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">No. Rekening</p>
+<div class="flex items-center justify-between bg-surface py-2 px-3 rounded-lg border border-outline">
+<p class="font-h3 font-bold text-on-surface text-lg tracking-widest">123-456-7890</p>
+<button class="text-primary hover:bg-primary-fixed p-1.5 rounded-md transition-colors flex items-center justify-center" title="Salin Rekening" type="button">
+<span class="material-symbols-outlined text-xl">content_copy</span>
+</button>
+</div>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant uppercase tracking-wider font-bold mb-1">A.n.</p>
+<p class="font-body font-bold text-on-surface">ETC Planet</p>
+</div>
+</div>
+</div>
+</label>
+</div>
+</div>
+<!-- Upload Section -->
+<div class="bg-surface p-8 rounded-card shadow-card border border-outline">
+<h3 class="font-h3 text-xl font-bold text-on-surface mb-6">Upload Bukti Pembayaran</h3>
+<div class="border-2 border-dashed border-outline rounded-2xl p-10 text-center hover:border-primary/50 hover:bg-primary-fixed/5 transition-all cursor-pointer group mb-6">
+<div class="w-20 h-20 bg-primary-fixed/50 rounded-full mx-auto flex items-center justify-center text-primary mb-5 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-4xl">cloud_upload</span>
+</div>
+<p class="font-h3 font-bold text-lg text-on-surface mb-2">Klik atau tarik file ke sini</p>
+<p class="text-sm font-body text-on-surface-variant mb-6">Mendukung JPG, PNG, atau PDF (Maks. 5MB)</p>
+<button class="px-8 py-2.5 border-2 border-primary text-primary rounded-button font-button font-bold hover:bg-primary hover:text-white transition-colors" type="button">
+                            Pilih File
+                        </button>
+</div>
+<!-- Confirmation Checkbox -->
+<div class="flex items-start gap-4 bg-background p-5 rounded-xl border border-outline">
+<div class="flex items-center h-6 mt-0.5">
+<input class="w-6 h-6 rounded border-outline text-primary focus:ring-primary focus:ring-offset-background cursor-pointer" id="confirm_payment" type="checkbox"/>
+</div>
+<div class="flex flex-col">
+<label class="font-h3 font-bold text-on-surface cursor-pointer select-none text-lg mb-1" for="confirm_payment">Saya sudah membayar</label>
+<p class="text-sm font-body text-on-surface-variant leading-relaxed">Dengan mencentang, saya mengonfirmasi bahwa transfer telah berhasil dilakukan sejumlah tagihan.</p>
+</div>
+</div>
+</div>
+<!-- Primary Action -->
+<div class="pt-4 flex flex-col items-center">
+<button class="w-full max-w-md h-14 bg-primary text-white rounded-button font-button font-extrabold text-lg shadow-lg hover:bg-primary-hover hover:shadow-xl hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2" type="button">
+                        Konfirmasi Pembayaran
+                        <span class="material-symbols-outlined font-bold text-xl">arrow_forward</span>
+</button>
+<button class="w-full max-w-md mt-4 h-12 text-on-surface-variant rounded-button font-button font-bold hover:bg-outline/50 transition-colors flex justify-center items-center" type="button">
+                        Batal
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="border-outline mt-12 pt-16 pb-8 bg-[#2D2D2D]">
+<div class="max-w-[1200px] mx-auto px-6">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+<div class="md:col-span-2">
+<a class="font-h1 font-black text-3xl tracking-tight block mb-6 text-white" href="#">ETC Planet.</a>
+<p class="font-body max-w-md leading-relaxed text-white/80">
+                        Platform e-learning terdepan untuk mengembangkan kemampuan bahasa Inggris Anda dengan kurikulum modern dan interaktif.
+                    </p>
+</div>
+<div>
+<h4 class="font-h3 font-bold mb-6 text-lg text-white">Perusahaan</h4>
+<ul class="space-y-4 font-body">
+<li><a class="hover:text-primary transition-colors text-white/70" href="#">Tentang Kami</a></li>
+<li><a class="hover:text-primary transition-colors text-white/70" href="#">Karir</a></li>
+<li><a class="hover:text-primary transition-colors text-white/70" href="#">Hubungi Kami</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-h3 font-bold mb-6 text-lg text-white">Bantuan</h4>
+<ul class="space-y-4 font-body">
+<li><a class="hover:text-primary transition-colors text-white/70" href="#">Pusat Bantuan</a></li>
+<li><a class="hover:text-primary transition-colors text-white/70" href="#">Syarat &amp; Ketentuan</a></li>
+<li><a class="hover:text-primary transition-colors text-white/70" href="#">Kebijakan Privasi</a></li>
+</ul>
+</div>
+</div>
+<div class="border-t pt-8 flex flex-col md:flex-row items-center justify-between gap-4 border-white/10">
+<p class="text-sm font-body text-white/80">© 2024 ETC Planet. Hak Cipta Dilindungi.</p>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full flex items-center justify-center hover:text-primary hover:bg-primary-fixed transition-colors bg-white/10 text-white" href="#">
+<span class="material-symbols-outlined">language</span>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>
