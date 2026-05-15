@@ -332,6 +332,309 @@
         </div>
     </section>
 
+    <!-- Galeri Keseruan -->
+    <section class="galeri-keseruan">
+        <div class="header-galeri">
+            <div>
+                <h2>Galeri Keseruan</h2>
+                <p>Intip suasana belajar yang asik dan interaktif.</p>
+            </div>
+            <button type="button" class="link-lihat-semua js-buka-reels" data-index="0">
+                Lihat Semua
+                <svg width="16" height="12" viewBox="0 0 16 12" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12.175 7H0V5H12.175L7.575 1.4L9 0L16 6L9 12L7.575 10.6L12.175 7Z" fill="currentColor" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="grid-video">
+            <button type="button" class="kartu-video kartu-video-player js-buka-reels" data-index="0">
+                <video muted preload="metadata" playsinline aria-label="Cover video roleplay interview kerja">
+                    <source src="{{ asset('videos/video1.mp4') }}" type="video/mp4">
+                    Browser kamu tidak mendukung pemutar video.
+                </video>
+                <span class="label-reels">ETC</span>
+                <span class="tombol-play tombol-play-cover" aria-hidden="true">
+                    <svg width="18" height="20" viewBox="0 0 18 20" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M0 1.628C0 0.863 0.829 0.386 1.496 0.76L17.078 9.132C17.79 9.531 17.79 10.469 17.078 10.868L1.496 19.24C0.829 19.614 0 19.137 0 18.372V1.628Z"
+                            fill="currentColor" />
+                    </svg>
+                </span>
+                <div class="overlay-video">
+                    <h3>Roleplay Interview Kerja dalam Bahasa Inggris</h3>
+                    <p>
+                        <svg width="14" height="10" viewBox="0 0 14 10" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M7 0C3.5 0 0.91 2.12 0 5C0.91 7.88 3.5 10 7 10C10.5 10 13.09 7.88 14 5C13.09 2.12 10.5 0 7 0ZM7 8.333C5.16 8.333 3.667 6.84 3.667 5C3.667 3.16 5.16 1.667 7 1.667C8.84 1.667 10.333 3.16 10.333 5C10.333 6.84 8.84 8.333 7 8.333ZM7 3C5.895 3 5 3.895 5 5C5 6.105 5.895 7 7 7C8.105 7 9 6.105 9 5C9 3.895 8.105 3 7 3Z"
+                                fill="currentColor" />
+                        </svg>
+                        1.2K
+                    </p>
+                </div>
+            </button>
+
+            <button type="button" class="kartu-video kartu-video-player js-buka-reels" data-index="1">
+                <video muted preload="metadata" playsinline aria-label="Cover video roleplay interview kerja">
+                    <source src="{{ asset('videos/video2.mp4') }}" type="video/mp4">
+                    Browser kamu tidak mendukung pemutar video.
+                </video>
+                <span class="label-reels">ETC</span>
+                <span class="tombol-play" aria-hidden="true">
+                    <svg width="18" height="20" viewBox="0 0 18 20" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M0 1.628C0 0.863 0.829 0.386 1.496 0.76L17.078 9.132C17.79 9.531 17.79 10.469 17.078 10.868L1.496 19.24C0.829 19.614 0 19.137 0 18.372V1.628Z"
+                            fill="currentColor" />
+                    </svg>
+                </span>
+                <div class="overlay-video">
+                    <h3>Keseruan Kids Class Graduation</h3>
+                    <p>
+                        <svg width="14" height="10" viewBox="0 0 14 10" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M7 0C3.5 0 0.91 2.12 0 5C0.91 7.88 3.5 10 7 10C10.5 10 13.09 7.88 14 5C13.09 2.12 10.5 0 7 0ZM7 8.333C5.16 8.333 3.667 6.84 3.667 5C3.667 3.16 5.16 1.667 7 1.667C8.84 1.667 10.333 3.16 10.333 5C10.333 6.84 8.84 8.333 7 8.333ZM7 3C5.895 3 5 3.895 5 5C5 6.105 5.895 7 7 7C8.105 7 9 6.105 9 5C9 3.895 8.105 3 7 3Z"
+                                fill="currentColor" />
+                        </svg>
+                        3.8K
+                    </p>
+                </div>
+            </button>
+
+            <a href="#" class="kartu-video">
+                <img src="{{ asset('images/hero-img.jpeg') }}" alt="Video outdoor class belajar sambil bermain">
+                <span class="label-reels">ETC</span>
+                <span class="tombol-play" aria-hidden="true">
+                    <svg width="18" height="20" viewBox="0 0 18 20" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M0 1.628C0 0.863 0.829 0.386 1.496 0.76L17.078 9.132C17.79 9.531 17.79 10.469 17.078 10.868L1.496 19.24C0.829 19.614 0 19.137 0 18.372V1.628Z"
+                            fill="currentColor" />
+                    </svg>
+                </span>
+                <div class="overlay-video">
+                    <h3>Outdoor Class: Belajar Sambil Bermain</h3>
+                    <p>
+                        <svg width="14" height="10" viewBox="0 0 14 10" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M7 0C3.5 0 0.91 2.12 0 5C0.91 7.88 3.5 10 7 10C10.5 10 13.09 7.88 14 5C13.09 2.12 10.5 0 7 0ZM7 8.333C5.16 8.333 3.667 6.84 3.667 5C3.667 3.16 5.16 1.667 7 1.667C8.84 1.667 10.333 3.16 10.333 5C10.333 6.84 8.84 8.333 7 8.333ZM7 3C5.895 3 5 3.895 5 5C5 6.105 5.895 7 7 7C8.105 7 9 6.105 9 5C9 3.895 8.105 3 7 3Z"
+                                fill="currentColor" />
+                        </svg>
+                        850
+                    </p>
+                </div>
+            </a>
+
+            <a href="#" class="kartu-video">
+                <img src="{{ asset('images/pu3-img.jpg') }}" alt="Video tips mengerjakan reading section TOEFL">
+                <span class="label-reels">ETC</span>
+                <span class="tombol-play" aria-hidden="true">
+                    <svg width="18" height="20" viewBox="0 0 18 20" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M0 1.628C0 0.863 0.829 0.386 1.496 0.76L17.078 9.132C17.79 9.531 17.79 10.469 17.078 10.868L1.496 19.24C0.829 19.614 0 19.137 0 18.372V1.628Z"
+                            fill="currentColor" />
+                    </svg>
+                </span>
+                <div class="overlay-video">
+                    <h3>Tips Mengerjakan Reading Section TOEFL</h3>
+                    <p>
+                        <svg width="14" height="10" viewBox="0 0 14 10" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M7 0C3.5 0 0.91 2.12 0 5C0.91 7.88 3.5 10 7 10C10.5 10 13.09 7.88 14 5C13.09 2.12 10.5 0 7 0ZM7 8.333C5.16 8.333 3.667 6.84 3.667 5C3.667 3.16 5.16 1.667 7 1.667C8.84 1.667 10.333 3.16 10.333 5C10.333 6.84 8.84 8.333 7 8.333ZM7 3C5.895 3 5 3.895 5 5C5 6.105 5.895 7 7 7C8.105 7 9 6.105 9 5C9 3.895 8.105 3 7 3Z"
+                                fill="currentColor" />
+                        </svg>
+                        2.3K
+                    </p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <div class="modal-reels" id="modalReels" aria-hidden="true">
+        <div class="backdrop-reels js-tutup-reels"></div>
+        <div class="panel-reels" role="dialog" aria-modal="true" aria-label="Pemutar galeri reels">
+            <button type="button" class="tombol-tutup-reels js-tutup-reels" aria-label="Tutup reels">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M2.1 17.25L0.75 15.9L7.65 9L0.75 2.1L2.1 0.75L9 7.65L15.9 0.75L17.25 2.1L10.35 9L17.25 15.9L15.9 17.25L9 10.35L2.1 17.25Z"
+                        fill="currentColor" />
+                </svg>
+            </button>
+
+            <div class="feed-reels" id="feedReels">
+                <article class="slide-reels" data-index="0">
+                    <video controls preload="auto" playsinline>
+                        <source src="{{ asset('videos/video1.mp4') }}" type="video/mp4">
+                        Browser kamu tidak mendukung pemutar video.
+                    </video>
+                    <div class="info-reels">
+                        <span>ETC Planet</span>
+                        <h3>Roleplay Interview Kerja dalam Bahasa Inggris</h3>
+                        <p>1.2K ditonton</p>
+                    </div>
+                </article>
+
+                <article class="slide-reels" data-index="1">
+                    <video controls preload="metadata" playsinline>
+                        <source src="{{ asset('videos/video2.mp4') }}" type="video/mp4">
+                        Browser kamu tidak mendukung pemutar video.
+                    </video>
+                    <div class="info-reels">
+                        <span>ETC Planet</span>
+                        <h3>Keseruan Kids Class Graduation</h3>
+                        <p>3.8K ditonton</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modalReels = document.getElementById('modalReels');
+        const feedReels = document.getElementById('feedReels');
+        const tombolBukaReels = document.querySelectorAll('.js-buka-reels');
+        const tombolTutupReels = document.querySelectorAll('.js-tutup-reels');
+        const videoCoverReels = document.querySelectorAll('.kartu-video-player > video');
+        const slideReels = [...feedReels.querySelectorAll('.slide-reels')];
+        let indexReelsAktif = 0;
+        let frameScrollReels = null;
+
+        videoCoverReels.forEach((video) => {
+            video.addEventListener('loadedmetadata', () => {
+                video.currentTime = Math.min(0.2, video.duration || 0.2);
+            }, {
+                once: true
+            });
+        });
+
+        function putarVideo(video) {
+            if (!video) {
+                return;
+            }
+
+            video.play().catch(() => {
+                video.muted = true;
+                video.play().catch(() => {});
+            });
+        }
+
+        function aturVideoAktif(indexAktif) {
+            if (indexAktif === indexReelsAktif && modalReels.classList.contains('modal-reels-aktif')) {
+                const videoAktif = slideReels[indexAktif]?.querySelector('video');
+
+                if (videoAktif && videoAktif.paused) {
+                    putarVideo(videoAktif);
+                }
+
+                return;
+            }
+
+            indexReelsAktif = indexAktif;
+
+            slideReels.forEach((slide, index) => {
+                const video = slide.querySelector('video');
+
+                if (index === indexAktif) {
+                    video.preload = 'auto';
+                    putarVideo(video);
+                } else {
+                    video.pause();
+                }
+
+                if (index === indexAktif + 1 || index === indexAktif - 1) {
+                    video.preload = 'auto';
+                }
+            });
+        }
+
+        function bukaReels(index) {
+            const indexTujuan = Number(index);
+
+            modalReels.classList.add('modal-reels-aktif');
+            modalReels.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('body-modal-aktif');
+
+            const slideTujuan = feedReels.querySelector(`.slide-reels[data-index="${index}"]`);
+
+            if (slideTujuan) {
+                feedReels.scrollTop = slideTujuan.offsetTop;
+                indexReelsAktif = -1;
+                aturVideoAktif(indexTujuan);
+            }
+        }
+
+        function tutupReels() {
+            modalReels.classList.remove('modal-reels-aktif');
+            modalReels.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('body-modal-aktif');
+            feedReels.querySelectorAll('video').forEach((video) => video.pause());
+        }
+
+        tombolBukaReels.forEach((tombol) => {
+            tombol.addEventListener('click', () => bukaReels(tombol.dataset.index || 0));
+        });
+
+        tombolTutupReels.forEach((tombol) => {
+            tombol.addEventListener('click', tutupReels);
+        });
+
+        if ('IntersectionObserver' in window) {
+            const observerReels = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && modalReels.classList.contains('modal-reels-aktif')) {
+                        aturVideoAktif(Number(entry.target.dataset.index));
+                    }
+                });
+            }, {
+                root: feedReels,
+                threshold: 0.65
+            });
+
+            slideReels.forEach((slide) => observerReels.observe(slide));
+        } else {
+            feedReels.addEventListener('scroll', () => {
+                if (frameScrollReels) {
+                    cancelAnimationFrame(frameScrollReels);
+                }
+
+                frameScrollReels = requestAnimationFrame(() => {
+                    const posisiTengah = feedReels.scrollTop + feedReels.clientHeight / 2;
+
+                    const slideTerdekat = slideReels.reduce((terdekat, slide, index) => {
+                        const tengahSlide = slide.offsetTop + slide.offsetHeight / 2;
+                        const jarak = Math.abs(posisiTengah - tengahSlide);
+
+                        return jarak < terdekat.jarak ? {
+                            index,
+                            jarak
+                        } : terdekat;
+                    }, {
+                        index: 0,
+                        jarak: Infinity
+                    });
+
+                    aturVideoAktif(slideTerdekat.index);
+                });
+            }, {
+                passive: true
+            });
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && modalReels.classList.contains('modal-reels-aktif')) {
+                tutupReels();
+            }
+        });
+    </script>
+
 </body>
 
 </html>
