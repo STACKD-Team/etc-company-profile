@@ -457,6 +457,76 @@
         </div>
     </section>
 
+    <!-- Apa Kata Mereka -->
+    <section class="testimoni">
+        <div class="judul-section judul-testimoni">
+            <h2>Apa Kata Mereka?</h2>
+            <p>Cerita sukses siswa-siswi yang telah belajar bersama ETC Planet.</p>
+        </div>
+
+        <div class="grid-testimoni">
+            <article class="kartu-testimoni">
+                <span class="ikon-kutip">&rdquo;</span>
+                <div class="profil-testimoni">
+                    <img src="{{ asset('images/pu2-img.jpg') }}" alt="Foto Andi Darmawan">
+                    <div>
+                        <h3>Andi Darmawan</h3>
+                        <p>TOEFL Preparation</p>
+                    </div>
+                </div>
+                <div class="rating-testimoni" aria-label="Rating 5 dari 5">
+                    <span>&#9733;</span>
+                    <span>&#9733;</span>
+                    <span>&#9733;</span>
+                    <span>&#9733;</span>
+                    <span>&#9733;</span>
+                </div>
+                <p class="teks-testimoni">"Skor TOEFL saya naik drastis setelah 2 bulan ikut kelas intensif di sini.
+                    Pengajarnya sangat membantu dan memberikan trik-trik jitu menjawab soal."</p>
+            </article>
+
+            <article class="kartu-testimoni">
+                <span class="ikon-kutip">&rdquo;</span>
+                <div class="profil-testimoni">
+                    <img src="{{ asset('images/pu1-img.jpg') }}" alt="Foto Sarah Nabila">
+                    <div>
+                        <h3>Sarah Nabila</h3>
+                        <p>General English</p>
+                    </div>
+                </div>
+                <div class="rating-testimoni" aria-label="Rating 5 dari 5">
+                    <span>&#9733;</span>
+                    <span>&#9733;</span>
+                    <span>&#9733;</span>
+                    <span>&#9733;</span>
+                    <span>&#9733;</span>
+                </div>
+                <p class="teks-testimoni">"Belajar bahasa Inggris di ETC Planet nggak ngebosenin. Metode belajarnya
+                    asik, banyak games dan praktik ngobrol langsung sama teman-teman sekelas."</p>
+            </article>
+
+            <article class="kartu-testimoni">
+                <span class="ikon-kutip">&rdquo;</span>
+                <div class="profil-testimoni">
+                    <img src="{{ asset('images/hero-img.jpeg') }}" alt="Foto Ibu Budi">
+                    <div>
+                        <h3>Ibu Budi</h3>
+                        <p>Orang Tua Siswa Kids Class</p>
+                    </div>
+                </div>
+                <div class="rating-testimoni" aria-label="Rating 5 dari 5">
+                    <span>&#9733;</span>
+                    <span>&#9733;</span>
+                    <span>&#9733;</span>
+                    <span>&#9733;</span>
+                    <span>&#9733;</span>
+                </div>
+                <p class="teks-testimoni">"Anak saya jadi lebih pede ngomong bahasa Inggris setelah ikut Kids Class.
+                    Gurunya sabar dan telaten banget ngajarin anak-anak."</p>
+            </article>
+        </div>
+    </section>
+
     <div class="modal-reels" id="modalReels" aria-hidden="true">
         <div class="backdrop-reels js-tutup-reels"></div>
         <div class="panel-reels" role="dialog" aria-modal="true" aria-label="Pemutar galeri reels">

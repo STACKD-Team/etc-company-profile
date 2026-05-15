@@ -736,6 +736,140 @@ body {
     }
 }
 
+/* --- apa kata mereka --- */
+.testimoni {
+    background-color: #FFFDFD;
+    padding: 92px 80px 96px;
+}
+
+.judul-testimoni {
+    margin-bottom: 48px;
+}
+
+.grid-testimoni {
+    max-width: 1150px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 30px;
+}
+
+.kartu-testimoni {
+    position: relative;
+    min-height: 270px;
+    background-color: #FFFFFF;
+    border: 1px solid #F0D4DC;
+    border-radius: 18px;
+    padding: 34px 28px 30px;
+    box-shadow: 0 12px 30px rgba(39, 23, 28, 0.04);
+}
+
+.ikon-kutip {
+    position: absolute;
+    top: 18px;
+    right: 26px;
+    color: #FFE1E8;
+    font-size: 76px;
+    line-height: 1;
+    font-family: Georgia, serif;
+    font-weight: 800;
+}
+
+.profil-testimoni {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+    padding-right: 58px;
+}
+
+.profil-testimoni img {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #FCEEF2;
+    flex-shrink: 0;
+}
+
+.profil-testimoni h3 {
+    color: #27171C;
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.profil-testimoni p {
+    color: #A1A1AA;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.rating-testimoni {
+    display: flex;
+    gap: 5px;
+    color: #FFC400;
+    font-size: 16px;
+    line-height: 1;
+    margin-bottom: 18px;
+}
+
+.teks-testimoni {
+    color: #5F5559;
+    font-size: 15px;
+    font-style: italic;
+    line-height: 1.7;
+}
+
+@media (max-width: 1000px) {
+    .testimoni {
+        padding: 72px 40px 76px;
+    }
+
+    .grid-testimoni {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .kartu-testimoni:last-child {
+        grid-column: 1 / -1;
+        max-width: 560px;
+        width: 100%;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 620px) {
+    .testimoni {
+        padding: 60px 24px 64px;
+    }
+
+    .judul-testimoni {
+        margin-bottom: 32px;
+    }
+
+    .grid-testimoni {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .kartu-testimoni,
+    .kartu-testimoni:last-child {
+        max-width: 420px;
+        min-height: auto;
+        margin: 0 auto;
+        padding: 28px 24px;
+    }
+
+    .profil-testimoni {
+        padding-right: 48px;
+    }
+
+    .teks-testimoni {
+        font-size: 14px;
+    }
+}
+
 /* --- modal reels --- */
 .body-modal-aktif {
     overflow: hidden;
