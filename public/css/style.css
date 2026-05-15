@@ -409,3 +409,118 @@ body {
     font-size: 12px;
     font-weight: bold;
 }
+
+/* --- alur pendaftaran mudah --- */
+.alur-pendaftaran {
+    background-color: #FFF1F4;
+    padding: 80px 80px 78px;
+}
+
+.judul-alur {
+    margin-bottom: 46px;
+}
+
+.timeline-pendaftaran {
+    max-width: 1150px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: relative;
+}
+
+.garis-timeline {
+    position: absolute;
+    top: 23px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: #E6007F;
+    border-radius: 999px;
+}
+
+.langkah-daftar {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 0 12px;
+}
+
+.ikon-langkah {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background-color: #E6007F;
+    border: 3px solid #E6007F;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 10px #FFF1F4;
+}
+
+.ikon-langkah svg path {
+    fill: #FFFFFF;
+}
+
+.langkah-aktif .ikon-langkah {
+    background-color: #E6007F;
+    border-color: #E6007F;
+    color: #FFFFFF;
+}
+
+.langkah-daftar h3 {
+    color: #27171C;
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.langkah-daftar p {
+    color: #7A7A7A;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 170px;
+    margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+    .alur-pendaftaran {
+        padding: 60px 24px;
+    }
+
+    .timeline-pendaftaran {
+        grid-template-columns: 1fr;
+        gap: 34px;
+        max-width: 420px;
+    }
+
+    .garis-timeline {
+        top: 0;
+        left: 25px;
+        width: 4px;
+        height: 100%;
+    }
+
+    .langkah-daftar {
+        display: grid;
+        grid-template-columns: 52px 1fr;
+        column-gap: 18px;
+        text-align: left;
+        padding: 0;
+    }
+
+    .ikon-langkah {
+        margin: 0;
+    }
+
+    .langkah-daftar h3 {
+        align-self: end;
+    }
+
+    .langkah-daftar p {
+        grid-column: 2;
+        max-width: none;
+        margin: -4px 0 0;
+    }
+}
