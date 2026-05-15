@@ -870,6 +870,96 @@ body {
     }
 }
 
+/* --- pengajar profesional --- */
+.pengajar-profesional {
+    background-color: #FFF1F4;
+    padding: 92px 80px 96px;
+}
+
+.judul-pengajar {
+    margin-bottom: 58px;
+}
+
+.grid-pengajar {
+    max-width: 1050px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 42px;
+    align-items: start;
+}
+
+.kartu-pengajar {
+    text-align: center;
+    color: #27171C;
+}
+
+.kartu-pengajar img {
+    width: 138px;
+    height: 138px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 22px;
+    border: 5px solid #FFFFFF;
+    box-shadow: 0 18px 36px rgba(230, 0, 127, 0.14);
+}
+
+.kartu-pengajar h3 {
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 6px;
+}
+
+.kartu-pengajar p {
+    color: #E6007F;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.35;
+    margin-bottom: 5px;
+}
+
+.kartu-pengajar span {
+    color: #7A7A7A;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+    .pengajar-profesional {
+        padding: 72px 40px 76px;
+    }
+
+    .grid-pengajar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-width: 620px;
+        row-gap: 44px;
+    }
+}
+
+@media (max-width: 520px) {
+    .pengajar-profesional {
+        padding: 60px 24px 64px;
+    }
+
+    .judul-pengajar {
+        margin-bottom: 36px;
+    }
+
+    .grid-pengajar {
+        grid-template-columns: 1fr;
+        gap: 34px;
+    }
+
+    .kartu-pengajar img {
+        width: 128px;
+        height: 128px;
+        margin-bottom: 18px;
+    }
+}
+
 /* --- modal reels --- */
 .body-modal-aktif {
     overflow: hidden;

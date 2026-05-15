@@ -527,6 +527,44 @@
         </div>
     </section>
 
+    <!-- Pengajar Profesional -->
+    <section class="pengajar-profesional">
+        <div class="judul-section judul-pengajar">
+            <h2>Pengajar Profesional</h2>
+            <p>Belajar bersama instruktur berpengalaman, bersertifikasi, dan ramah.</p>
+        </div>
+
+        <div class="grid-pengajar">
+            <article class="kartu-pengajar">
+                <img src="{{ asset('images/Ms. Debby.jpeg') }}" alt="Foto Ms. Debby">
+                <h3>Ms. Debby</h3>
+                <p>Senior English Tutor</p>
+                <span>TOEFL &amp; IELTS Expert</span>
+            </article>
+
+            <article class="kartu-pengajar">
+                <img src="{{ asset('images/Mr. Hafdi.jpeg') }}" alt="Foto Mr. Hafdi">
+                <h3>Mr. Hafdi</h3>
+                <p>Conversation Coach</p>
+                <span>Native-like Fluency</span>
+            </article>
+
+            <article class="kartu-pengajar">
+                <img src="{{ asset('images/Ms. Citra.jpeg') }}" alt="Foto Ms. Citra">
+                <h3>Ms. Citra</h3>
+                <p>Japanese Teacher</p>
+                <span>JLPT N2 Certified</span>
+            </article>
+
+            <article class="kartu-pengajar">
+                <img src="{{ asset('images/Ms. Rere.jpeg') }}" alt="Foto Ms. Rere">
+                <h3>Ms. Rere</h3>
+                <p>Kids Class Specialist</p>
+                <span>Fun Learning Method</span>
+            </article>
+        </div>
+    </section>
+
     <div class="modal-reels" id="modalReels" aria-hidden="true">
         <div class="backdrop-reels js-tutup-reels"></div>
         <div class="panel-reels" role="dialog" aria-modal="true" aria-label="Pemutar galeri reels">
