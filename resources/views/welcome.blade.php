@@ -19,35 +19,35 @@
         </div>
 
         <nav class="menu-tengah">
-            <a href="#" class="menu-aktif">Beranda</a>
-            <a href="#">Program</a>
-            <a href="#">Galeri Reels</a>
-            <a href="#">Tentang Kami</a>
-            <a href="#">Kontak</a>
+            <a href="#beranda" class="menu-aktif">Beranda</a>
+            <a href="#program">Program</a>
+            <a href="#galeri">Galeri Reels</a>
+            <a href="#tentang-kami">Tentang Kami</a>
+            <a href="#kontak">Kontak</a>
         </nav>
 
         <div class="menu-kanan">
             <a href="#" class="link-masuk">Masuk</a>
-            <a href="#" class="tombol-daftar">Daftar Sekarang</a>
+            <a href="#alur-pendaftaran" class="tombol-daftar">Daftar Sekarang</a>
         </div>
     </header>
 
     <!-- bagian hero -->
-    <section class="hero">
+    <section class="hero" id="beranda">
         <div class="hero-kiri">
             <h1>Belajar Lebih Seru,<br>Masa Depan Lebih<br>Cerah! 🌟</h1>
             <p>ETC Planet — Lembaga kursus bahasa terpercaya di Padang. Tingkatkan kemampuan bahasamu dengan metode yang
                 interaktif, asik, dan terbukti efektif untuk segala usia.</p>
 
             <div class="grup-tombol-hero">
-                <a href="#" class="tombol-utama">Daftar Sekarang <svg width="10" height="10"
+                <a href="#alur-pendaftaran" class="tombol-utama">Daftar Sekarang <svg width="10" height="10"
                         viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M7.10208 5.25H0V4.08333H7.10208L3.83542 0.816667L4.66667 0L9.33333 4.66667L4.66667 9.33333L3.83542 8.51667L7.10208 5.25Z"
                             fill="white" />
                     </svg>
                 </a>
-                <a href="#" class="tombol-garis">Lihat Program</a>
+                <a href="#program" class="tombol-garis">Lihat Program</a>
             </div>
 
             <hr class="garis-batas">
@@ -125,7 +125,7 @@
     </section>
 
     <!-- Program Kursus Unggulan -->
-    <section class="program-unggulan">
+    <section class="program-unggulan" id="program">
         <div class="judul-section">
             <h2>Program Kursus Unggulan</h2>
             <p>Pilih program yang sesuai dengan kebutuhan dan target pembelajaranmu. Tersedia<br>kelas untuk berbagai
@@ -245,7 +245,7 @@
         </div>
 
         <div class="aksi-bawah">
-            <a href="#" class="tombol-lihat-semua">Lihat Seluruh Program <span class="ikon-eksternal"><svg
+            <a href="#program" class="tombol-lihat-semua">Lihat Seluruh Program <span class="ikon-eksternal"><svg
                         width="11" height="11" viewBox="0 0 11 11" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -257,7 +257,7 @@
     </section>
 
     <!-- Alur Pendaftaran Mudah -->
-    <section class="alur-pendaftaran">
+    <section class="alur-pendaftaran" id="alur-pendaftaran">
         <div class="judul-section judul-alur">
             <h2>Alur Pendaftaran Mudah</h2>
         </div>
@@ -333,7 +333,7 @@
     </section>
 
     <!-- Galeri Keseruan -->
-    <section class="galeri-keseruan">
+    <section class="galeri-keseruan" id="galeri">
         <div class="header-galeri">
             <div>
                 <h2>Galeri Keseruan</h2>
@@ -528,7 +528,7 @@
     </section>
 
     <!-- Pengajar Profesional -->
-    <section class="pengajar-profesional">
+    <section class="pengajar-profesional" id="tentang-kami">
         <div class="judul-section judul-pengajar">
             <h2>Pengajar Profesional</h2>
             <p>Belajar bersama instruktur berpengalaman, bersertifikasi, dan ramah.</p>
@@ -566,12 +566,12 @@
     </section>
 
     <!-- Footer -->
-    <footer class="footer-utama">
+    <footer class="footer-utama" id="kontak">
         <div class="isi-footer">
             <div class="brand-footer">
                 <h2>ETC Planet</h2>
                 <p>&copy; 2024 ETC Planet.<br>Jl. S. Parman No. 202B, Padang.</p>
-                <a href="#" class="ikon-instagram" aria-label="Instagram ETC Planet">
+                <a href="https://www.instagram.com/etcplanet/" class="ikon-instagram" aria-label="Instagram ETC Planet" target="_blank" rel="noopener noreferrer">
                     <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M8.5 5.667C6.935 5.667 5.667 6.935 5.667 8.5C5.667 10.065 6.935 11.333 8.5 11.333C10.065 11.333 11.333 10.065 11.333 8.5C11.333 6.935 10.065 5.667 8.5 5.667ZM8.5 10.067C7.635 10.067 6.933 9.365 6.933 8.5C6.933 7.635 7.635 6.933 8.5 6.933C9.365 6.933 10.067 7.635 10.067 8.5C10.067 9.365 9.365 10.067 8.5 10.067Z" fill="currentColor"/>
                         <path d="M11.475 0.708H5.525C2.865 0.708 0.708 2.865 0.708 5.525V11.475C0.708 14.135 2.865 16.292 5.525 16.292H11.475C14.135 16.292 16.292 14.135 16.292 11.475V5.525C16.292 2.865 14.135 0.708 11.475 0.708ZM14.875 11.475C14.875 13.35 13.35 14.875 11.475 14.875H5.525C3.65 14.875 2.125 13.35 2.125 11.475V5.525C2.125 3.65 3.65 2.125 5.525 2.125H11.475C13.35 2.125 14.875 3.65 14.875 5.525V11.475Z" fill="currentColor"/>
@@ -589,11 +589,9 @@
         </div>
     </footer>
 
-    <a href="#" class="tombol-floating" aria-label="Daftar sekarang">
-        <svg width="23" height="22" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6.5 9.167H5.583C4.571 9.167 3.75 9.988 3.75 11V16.5C3.75 17.512 4.571 18.333 5.583 18.333H17.417C18.429 18.333 19.25 17.512 19.25 16.5V11C19.25 9.988 18.429 9.167 17.417 9.167H16.5V7.792C16.5 5.031 14.261 2.792 11.5 2.792C8.739 2.792 6.5 5.031 6.5 7.792V9.167ZM8.333 9.167V7.792C8.333 6.044 9.752 4.625 11.5 4.625C13.248 4.625 14.667 6.044 14.667 7.792V9.167H8.333ZM10.583 13.75C10.583 13.244 10.994 12.833 11.5 12.833C12.006 12.833 12.417 13.244 12.417 13.75C12.417 14.256 12.006 14.667 11.5 14.667C10.994 14.667 10.583 14.256 10.583 13.75Z" fill="currentColor"/>
-            <path d="M18.333 1.375L18.792 2.429L19.846 2.887L18.792 3.346L18.333 4.4L17.875 3.346L16.821 2.887L17.875 2.429L18.333 1.375Z" fill="#FFD84D"/>
-            <path d="M20.167 5.5L20.442 6.129L21.071 6.404L20.442 6.679L20.167 7.308L19.892 6.679L19.263 6.404L19.892 6.129L20.167 5.5Z" fill="#FFD84D"/>
+    <a href="#" class="tombol-floating" aria-label="Buka chatbot">
+        <svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 13C2.16667 13 1.45833 12.7083 0.875 12.125C0.291667 11.5417 0 10.8333 0 10C0 9.16667 0.291667 8.45833 0.875 7.875C1.45833 7.29167 2.16667 7 3 7V5C3 4.45 3.19583 3.97917 3.5875 3.5875C3.97917 3.19583 4.45 3 5 3H8C8 2.16667 8.29167 1.45833 8.875 0.875C9.45833 0.291667 10.1667 0 11 0C11.8333 0 12.5417 0.291667 13.125 0.875C13.7083 1.45833 14 2.16667 14 3H17C17.55 3 18.0208 3.19583 18.4125 3.5875C18.8042 3.97917 19 4.45 19 5V7C19.8333 7 20.5417 7.29167 21.125 7.875C21.7083 8.45833 22 9.16667 22 10C22 10.8333 21.7083 11.5417 21.125 12.125C20.5417 12.7083 19.8333 13 19 13V17C19 17.55 18.8042 18.0208 18.4125 18.4125C18.0208 18.8042 17.55 19 17 19H5C4.45 19 3.97917 18.8042 3.5875 18.4125C3.19583 18.0208 3 17.55 3 17V13ZM8 11C8.41667 11 8.77083 10.8542 9.0625 10.5625C9.35417 10.2708 9.5 9.91667 9.5 9.5C9.5 9.08333 9.35417 8.72917 9.0625 8.4375C8.77083 8.14583 8.41667 8 8 8C7.58333 8 7.22917 8.14583 6.9375 8.4375C6.64583 8.72917 6.5 9.08333 6.5 9.5C6.5 9.91667 6.64583 10.2708 6.9375 10.5625C7.22917 10.8542 7.58333 11 8 11ZM14 11C14.4167 11 14.7708 10.8542 15.0625 10.5625C15.3542 10.2708 15.5 9.91667 15.5 9.5C15.5 9.08333 15.3542 8.72917 15.0625 8.4375C14.7708 8.14583 14.4167 8 14 8C13.5833 8 13.2292 8.14583 12.9375 8.4375C12.6458 8.72917 12.5 9.08333 12.5 9.5C12.5 9.91667 12.6458 10.2708 12.9375 10.5625C13.2292 10.8542 13.5833 11 14 11ZM7 15H15V13H7V15Z" fill="white"/>
         </svg>
     </a>
 
@@ -644,8 +642,45 @@
         const tombolTutupReels = document.querySelectorAll('.js-tutup-reels');
         const videoCoverReels = document.querySelectorAll('.kartu-video-player > video');
         const slideReels = [...feedReels.querySelectorAll('.slide-reels')];
+        const menuNavbar = document.querySelectorAll('.menu-tengah a[href^="#"]');
+        const sectionNavbar = [...menuNavbar]
+            .map((menu) => document.querySelector(menu.getAttribute('href')))
+            .filter(Boolean);
         let indexReelsAktif = 0;
         let frameScrollReels = null;
+
+        function aktifkanMenuNavbar(idSection) {
+            menuNavbar.forEach((menu) => {
+                const menuAktif = menu.getAttribute('href') === `#${idSection}`;
+                menu.classList.toggle('menu-aktif', menuAktif);
+            });
+        }
+
+        menuNavbar.forEach((menu) => {
+            menu.addEventListener('click', () => {
+                const idTujuan = menu.getAttribute('href').replace('#', '');
+                aktifkanMenuNavbar(idTujuan);
+            });
+        });
+
+        if (window.location.hash) {
+            aktifkanMenuNavbar(window.location.hash.replace('#', ''));
+        }
+
+        if ('IntersectionObserver' in window) {
+            const observerNavbar = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        aktifkanMenuNavbar(entry.target.id);
+                    }
+                });
+            }, {
+                rootMargin: '-35% 0px -55% 0px',
+                threshold: 0
+            });
+
+            sectionNavbar.forEach((section) => observerNavbar.observe(section));
+        }
 
         videoCoverReels.forEach((video) => {
             video.addEventListener('loadedmetadata', () => {
