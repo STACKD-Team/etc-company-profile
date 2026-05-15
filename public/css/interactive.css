@@ -1,0 +1,122 @@
+:root {
+    --interactive-pink: #e6007e;
+    --interactive-pink-soft: rgba(230, 0, 126, .14);
+    --interactive-shadow: 0 16px 34px rgba(20, 16, 18, .12);
+    --interactive-pink-shadow: 0 16px 28px rgba(230, 0, 126, .24);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    .nav-logo,
+    .footer-logo,
+    .step-circle,
+    .form-card,
+    .parent-card,
+    .summary-card,
+    .method-card,
+    .upload-card,
+    .upload-zone,
+    .detail-card,
+    .info-box,
+    .program-box,
+    .qris-box,
+    .bank-detail,
+    .footer-social span,
+    .contact-item svg,
+    .method-icon,
+    .upload-icon,
+    .success-icon {
+        transition:
+            transform .24s ease,
+            box-shadow .24s ease,
+            border-color .24s ease,
+            background-color .24s ease,
+            color .24s ease,
+            opacity .24s ease;
+    }
+
+    a:hover,
+    .nav-links a:hover,
+    .footer-col a:hover {
+        color: var(--interactive-pink);
+    }
+
+    button:hover,
+    .btn-daftar:hover,
+    .btn-lanjut:hover,
+    .btn-confirm:hover,
+    .btn-dashboard:hover,
+    .btn-upload:hover,
+    .btn-download:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--interactive-pink-shadow);
+    }
+
+    .btn-masuk:hover,
+    .btn-kembali:hover,
+    .btn-cancel:hover {
+        transform: translateY(-1px);
+        color: var(--interactive-pink);
+    }
+
+    .form-card:hover,
+    .parent-card:hover,
+    .summary-card:hover,
+    .method-card:hover,
+    .upload-card:hover,
+    .detail-card:hover,
+    .info-box:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--interactive-shadow);
+    }
+
+    .method-card:hover,
+    .upload-zone:hover,
+    input:hover,
+    select:hover,
+    textarea:hover {
+        border-color: var(--interactive-pink);
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        transform: translateY(-1px);
+        border-color: var(--interactive-pink);
+        box-shadow: 0 0 0 4px var(--interactive-pink-soft);
+        outline: none;
+    }
+
+    .step-circle:hover,
+    .method-icon:hover,
+    .upload-icon:hover,
+    .success-icon:hover,
+    .footer-social span:hover,
+    .contact-item:hover svg {
+        transform: scale(1.08);
+    }
+
+    .upload-zone:hover {
+        background: rgba(230, 0, 126, .035);
+    }
+
+    .nav-logo:hover,
+    .footer-logo:hover {
+        transform: translateY(-1px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+    }
+}
