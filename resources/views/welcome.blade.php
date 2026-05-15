@@ -565,6 +565,38 @@
         </div>
     </section>
 
+    <!-- Footer -->
+    <footer class="footer-utama">
+        <div class="isi-footer">
+            <div class="brand-footer">
+                <h2>ETC Planet</h2>
+                <p>&copy; 2024 ETC Planet.<br>Jl. S. Parman No. 202B, Padang.</p>
+                <a href="#" class="ikon-instagram" aria-label="Instagram ETC Planet">
+                    <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8.5 5.667C6.935 5.667 5.667 6.935 5.667 8.5C5.667 10.065 6.935 11.333 8.5 11.333C10.065 11.333 11.333 10.065 11.333 8.5C11.333 6.935 10.065 5.667 8.5 5.667ZM8.5 10.067C7.635 10.067 6.933 9.365 6.933 8.5C6.933 7.635 7.635 6.933 8.5 6.933C9.365 6.933 10.067 7.635 10.067 8.5C10.067 9.365 9.365 10.067 8.5 10.067Z" fill="currentColor"/>
+                        <path d="M11.475 0.708H5.525C2.865 0.708 0.708 2.865 0.708 5.525V11.475C0.708 14.135 2.865 16.292 5.525 16.292H11.475C14.135 16.292 16.292 14.135 16.292 11.475V5.525C16.292 2.865 14.135 0.708 11.475 0.708ZM14.875 11.475C14.875 13.35 13.35 14.875 11.475 14.875H5.525C3.65 14.875 2.125 13.35 2.125 11.475V5.525C2.125 3.65 3.65 2.125 5.525 2.125H11.475C13.35 2.125 14.875 3.65 14.875 5.525V11.475Z" fill="currentColor"/>
+                        <path d="M12.042 5.95C12.561 5.95 12.983 5.529 12.983 5.009C12.983 4.49 12.561 4.068 12.042 4.068C11.522 4.068 11.1 4.49 11.1 5.009C11.1 5.529 11.522 5.95 12.042 5.95Z" fill="currentColor"/>
+                    </svg>
+                </a>
+            </div>
+
+            <nav class="link-footer" aria-label="Link footer">
+                <a href="#">Kebijakan Privasi</a>
+                <a href="#">Syarat &amp; Ketentuan</a>
+                <a href="#">FAQ</a>
+                <a href="#">Karir</a>
+            </nav>
+        </div>
+    </footer>
+
+    <a href="#" class="tombol-floating" aria-label="Daftar sekarang">
+        <svg width="23" height="22" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.5 9.167H5.583C4.571 9.167 3.75 9.988 3.75 11V16.5C3.75 17.512 4.571 18.333 5.583 18.333H17.417C18.429 18.333 19.25 17.512 19.25 16.5V11C19.25 9.988 18.429 9.167 17.417 9.167H16.5V7.792C16.5 5.031 14.261 2.792 11.5 2.792C8.739 2.792 6.5 5.031 6.5 7.792V9.167ZM8.333 9.167V7.792C8.333 6.044 9.752 4.625 11.5 4.625C13.248 4.625 14.667 6.044 14.667 7.792V9.167H8.333ZM10.583 13.75C10.583 13.244 10.994 12.833 11.5 12.833C12.006 12.833 12.417 13.244 12.417 13.75C12.417 14.256 12.006 14.667 11.5 14.667C10.994 14.667 10.583 14.256 10.583 13.75Z" fill="currentColor"/>
+            <path d="M18.333 1.375L18.792 2.429L19.846 2.887L18.792 3.346L18.333 4.4L17.875 3.346L16.821 2.887L17.875 2.429L18.333 1.375Z" fill="#FFD84D"/>
+            <path d="M20.167 5.5L20.442 6.129L21.071 6.404L20.442 6.679L20.167 7.308L19.892 6.679L19.263 6.404L19.892 6.129L20.167 5.5Z" fill="#FFD84D"/>
+        </svg>
+    </a>
+
     <div class="modal-reels" id="modalReels" aria-hidden="true">
         <div class="backdrop-reels js-tutup-reels"></div>
         <div class="panel-reels" role="dialog" aria-modal="true" aria-label="Pemutar galeri reels">
