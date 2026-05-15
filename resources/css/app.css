@@ -1,0 +1,38 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Work Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-body: 'Work Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+    --color-etc-magenta: #e6007f;
+    --color-etc-primary: #b90065;
+    --color-etc-charcoal: #3a2c33;
+    --color-etc-neutral: #2d2d2d;
+    --color-etc-surface: #fff8f8;
+    --color-etc-surface-low: #fff0f2;
+    --color-etc-surface-container: #ffe8ed;
+    --color-etc-surface-high: #ffe1e8;
+    --color-etc-on-surface: #27171c;
+    --color-etc-on-muted: #5a3f47;
+    --color-etc-outline: #8e6f78;
+    --color-etc-outline-variant: #e2bdc7;
+
+    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-panel: 0 18px 45px rgba(58, 44, 51, 0.12);
+
+    --radius-card: 1rem;
+    --radius-pill: 9999px;
+}
+
+@layer base {
+    body {
+        background: var(--color-etc-surface);
+    }
+}

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ETC Planet - Belajar Lebih Seru</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary": "#ffffff",
+                        "background": "#fff8f8",
+                        "on-primary-container": "#130006",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "surface-container-highest": "#f9dbe2",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#f9dbe2",
+                        "inverse-on-surface": "#ffecf0",
+                        "surface-bright": "#fff8f8",
+                        "tertiary-fixed-dim": "#6cdf64",
+                        "tertiary-container": "#008a18",
+                        "on-secondary-fixed-variant": "#474747",
+                        "surface-container": "#ffe8ed",
+                        "secondary": "#5f5e5e",
+                        "on-background": "#27171c",
+                        "tertiary-fixed": "#88fc7d",
+                        "primary-fixed": "#ffd9e3",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "on-tertiary-container": "#ffffff",
+                        "on-tertiary-fixed-variant": "#00530a",
+                        "on-tertiary-fixed": "#002202",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#e2bdc7",
+                        "outline": "#8e6f78",
+                        "surface-tint": "#b90065",
+                        "on-surface": "#27171c",
+                        "on-surface-variant": "#5a3f47",
+                        "on-secondary": "#ffffff",
+                        "surface": "#fff8f8",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#656464",
+                        "surface-container-high": "#ffe1e8",
+                        "inverse-surface": "#3e2b31",
+                        "error": "#ba1a1a",
+                        "primary-container": "#e6007f",
+                        "primary": "#b90065",
+                        "tertiary": "#006e11",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#ffb0c9",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#8e004c",
+                        "secondary-container": "#e4e2e1",
+                        "surface-dim": "#f0d3da",
+                        "primary-fixed-dim": "#ffb0c9",
+                        "surface-container-low": "#fff0f2",
+                        "on-primary-fixed": "#3e001e",
+                        "secondary-fixed": "#e4e2e1"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "section-padding": "80px",
+                        "base-unit": "4px",
+                        "margin": "32px",
+                        "gutter": "24px",
+                        "container-max": "1200px"
+                    },
+                    fontFamily: {
+                        "h3": ["Plus Jakarta Sans"],
+                        "h1": ["Plus Jakarta Sans"],
+                        "body": ["Work Sans"],
+                        "h2": ["Plus Jakarta Sans"],
+                        "small": ["Work Sans"],
+                        "button": ["Plus Jakarta Sans"]
+                    },
+                    fontSize: {
+                        "h3": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "h1": ["56px", { "lineHeight": "1.1", "fontWeight": "700" }],
+                        "body": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "h2": ["36px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "small": ["13px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "button": ["15px", { "lineHeight": "1", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body antialiased relative selection:bg-primary-container selection:text-on-primary overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="bg-[#2D2D2D] dark:bg-zinc-900 docked full-width top-0 z-50 border-b border-white/10 shadow-lg sticky">
+<div class="flex justify-between items-center h-20 px-6 lg:px-12 max-w-[1200px] mx-auto w-full">
+<div class="text-2xl font-black text-white tracking-tighter">ETC Planet</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-[#e6007f] font-bold border-b-2 border-[#e6007f] pb-1 font-['Plus_Jakarta_Sans'] text-sm tracking-wide hover:bg-white/5 transition-all duration-200 active:scale-95 transform transition-transform" href="#">Beranda</a>
+<a class="text-zinc-300 hover:text-white font-['Plus_Jakarta_Sans'] text-sm font-medium tracking-wide hover:bg-white/5 transition-all duration-200 active:scale-95 transform transition-transform" href="#">Program</a>
+<a class="text-zinc-300 hover:text-white font-['Plus_Jakarta_Sans'] text-sm font-medium tracking-wide hover:bg-white/5 transition-all duration-200 active:scale-95 transform transition-transform" href="#">Galeri Reels</a>
+<a class="text-zinc-300 hover:text-white font-['Plus_Jakarta_Sans'] text-sm font-medium tracking-wide hover:bg-white/5 transition-all duration-200 active:scale-95 transform transition-transform" href="#">Tentang Kami</a>
+<a class="text-zinc-300 hover:text-white font-['Plus_Jakarta_Sans'] text-sm font-medium tracking-wide hover:bg-white/5 transition-all duration-200 active:scale-95 transform transition-transform" href="#">Kontak</a>
+</div>
+<div class="flex items-center space-x-4">
+<button class="hidden md:block text-zinc-300 hover:text-white font-button text-button px-4 py-2 hover:bg-white/5 transition-all duration-200 rounded-full">Masuk</button>
+<button class="bg-[#e6007f] text-white font-button text-button px-6 py-3 rounded-full hover:opacity-90 active:scale-95 transform transition-transform">Daftar Sekarang</button>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<section class="relative bg-[#F5F5F5] overflow-hidden pt-20 pb-32 lg:pt-32 lg:pb-48 -skew-y-3 mt-[-4rem]">
+<div class="skew-y-3 relative z-10 max-w-container-max mx-auto px-6 lg:px-12">
+<!-- Decorative Blobs -->
+<div class="absolute top-0 right-0 w-96 h-96 bg-primary-fixed opacity-50 rounded-full mix-blend-multiply filter blur-3xl transform translate-x-1/2 -translate-y-1/4 animate-pulse"></div>
+<div class="absolute bottom-0 left-0 w-72 h-72 bg-surface-container-high opacity-60 rounded-full mix-blend-multiply filter blur-2xl transform -translate-x-1/3 translate-y-1/3"></div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<div class="flex flex-col space-y-8 z-10">
+<h1 class="font-h1 text-h1 text-on-background leading-tight">
+                        Belajar Lebih Seru, <br/> Masa Depan Lebih Cerah! 🌟
+                    </h1>
+<p class="font-body text-body text-on-surface-variant max-w-xl text-lg">
+                        ETC Planet — Lembaga kursus bahasa terpercaya di Padang. Tingkatkan kemampuan bahasamu dengan metode yang interaktif, asik, dan terbukti efektif untuk segala usia.
+                    </p>
+<div class="flex flex-wrap gap-4 pt-4">
+<button class="bg-primary-container text-on-primary font-button text-button px-8 py-4 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-lg hover:bg-primary transition-all duration-300 flex items-center">
+                            Daftar Sekarang <span class="material-symbols-outlined ml-2 text-sm">arrow_forward</span>
+</button>
+<button class="bg-surface text-on-surface font-button text-button px-8 py-4 rounded-full border-2 border-outline-variant hover:border-primary-container hover:text-primary-container transition-all duration-300">
+                            Lihat Program
+                        </button>
+</div>
+<div class="flex items-center space-x-6 pt-6 border-t border-outline-variant/30">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">groups</span>
+<span class="font-small text-small font-semibold">500+ Siswa</span>
+</div>
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-small text-small font-semibold">10+ Instruktur</span>
+</div>
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">library_books</span>
+<span class="font-small text-small font-semibold">3 Program</span>
+</div>
+</div>
+</div>
+<div class="relative z-10 lg:ml-auto">
+<div class="relative w-full max-w-md aspect-[4/5] rounded-3xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06)] border-4 border-surface border-opacity-50">
+<img alt="Diverse students studying together" class="w-full h-full object-cover" data-alt="A vibrant, high-quality photograph of diverse young students studying together in a brightly lit, modern classroom. The lighting is soft and natural, emphasizing a warm, light-mode aesthetic with subtle pink and white undertones in the background decor. The students look engaged and happy, reflecting a playful yet professional educational environment. The image is crisp, colorful, and highly detailed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAH8bQAwZZjhTcpVq6RFIUHu3bKfTKiyd5JAOVtowu0Jmu-Tw63YuhWfXXOX87ASKxw8J7G0pvF2d2wQ8a1uLe2DBv0LhJUmTraTXR3LEYzsRBSPJ1WGXyid6oP-jzvpmbJbBBr3bPi73f_GHCwRaDcJGOmsiH5OdrMAeRCZHgDBU3UFWHpfA5lVJVEuF-wTAgo0S9Ur4xaEtxJYLjHr_XyVu6cg4OxYzZOkuxvgawnnvumK5iZKS99P92QMe1AFL_LM1GhheDQHhk"/>
+</div>
+<!-- Floating Badge -->
+<div class="absolute -bottom-6 -left-6 bg-surface p-4 rounded-2xl shadow-xl border border-surface-variant flex items-center space-x-3">
+<div class="bg-primary-fixed p-2 rounded-full">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<div>
+<p class="font-button text-button text-on-background">Biaya Pendaftaran</p>
+<p class="font-small text-small text-primary-container font-bold">Hanya Rp 200.000</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats Bar -->
+<section class="bg-[#2D2D2D] py-12 relative z-20">
+<div class="max-w-container-max mx-auto px-6 lg:px-12">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x-0 md:divide-x divide-white/10 text-center">
+<div class="flex flex-col items-center justify-center">
+<span class="font-h2 text-h2 text-white mb-2">500+</span>
+<span class="font-small text-small text-zinc-400 uppercase tracking-wider">Siswa Aktif</span>
+</div>
+<div class="flex flex-col items-center justify-center">
+<span class="font-h2 text-h2 text-white mb-2">10</span>
+<span class="font-small text-small text-zinc-400 uppercase tracking-wider">Tahun Pengalaman</span>
+</div>
+<div class="flex flex-col items-center justify-center">
+<span class="font-h2 text-h2 text-white mb-2">3</span>
+<span class="font-small text-small text-zinc-400 uppercase tracking-wider">Program Utama</span>
+</div>
+<div class="flex flex-col items-center justify-center">
+<span class="font-h2 text-h2 text-white mb-2">98%</span>
+<span class="font-small text-small text-zinc-400 uppercase tracking-wider">Kepuasan Siswa</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Program Kursus Section -->
+<section class="py-24 bg-surface relative">
+<div class="max-w-container-max mx-auto px-6 lg:px-12">
+<div class="text-center max-w-2xl mx-auto mb-16">
+<h2 class="font-h2 text-h2 text-on-background mb-4">Program Kursus Unggulan</h2>
+<p class="font-body text-body text-on-surface-variant">Pilih program yang sesuai dengan kebutuhan dan target pembelajaranmu. Tersedia kelas untuk berbagai usia dan tingkat kemahiran.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Program Card 1 -->
+<div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm border border-outline-variant hover:shadow-xl transition-shadow duration-300 flex flex-col group">
+<div class="relative h-48 overflow-hidden">
+<img alt="Anak-anak belajar bahasa Inggris" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRmb_R41v_WA86iv635NzZ8FoLCd5pfmmxcUG8cFmV1F-a3MulgoxwEJ4Z9f8x0w-yoiV6uvMmYlOOIdgPGLay5AOSGYeRtC3XxrBDD0nBNqQEdnJUrpa7SZpGTKh-3aSbiQVqalvqYuPJcl00JcJWcvUTCnrhpyRkt6FImF6OzaE07UyD6rtWVXjPMq0NdXRqotSG-keqZV_HVmAyc5iG0WJc8ryZT6SIp75wAzqcj4Sa7xdhizxqSksiD9tcQFJvveMWCgo67Z0"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-primary-container text-on-primary text-xs font-bold px-3 py-1 rounded-full">English</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-h3 text-h3 text-on-background">General English</h3>
+<span class="bg-surface-container-high text-on-surface text-xs font-bold px-2 py-1 rounded-md flex items-center"><span class="material-symbols-outlined text-[14px] mr-1">child_care</span> Kids/Teens</span>
+</div>
+<p class="font-body text-body text-on-surface-variant mb-6 text-sm flex-grow">Program bahasa Inggris umum untuk anak dan remaja. Fokus pada percakapan dan tata bahasa dasar.</p>
+<div class="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/30">
+<div class="flex flex-col">
+<span class="text-xs text-on-surface-variant font-medium uppercase tracking-wider">Mulai dari</span>
+<span class="font-h3 text-lg text-primary font-bold">Rp 350K<span class="text-sm font-normal text-on-surface-variant">/bln</span></span>
+</div>
+<button class="text-primary-container hover:bg-primary-fixed p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Program Card 2 -->
+<div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm border border-outline-variant hover:shadow-xl transition-shadow duration-300 flex flex-col group">
+<div class="relative h-48 overflow-hidden">
+<img alt="Persiapan TOEFL" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHWaebyPOS_wL-dKgVH8C91P_lGCiEzw1bstJKHab1C07771I3LCJo7GYIsAxNwoR4Ici8Di_QoTOOMq68OiDNDI0GE5hOetTYErlraN39vro6PhegwtC3tL4O4ki3WWSJXjyclgQe9W4sbwaj3ofmDjc5ZZ1D8v1IloyzJ5I8FV2z7sMfvwGpzkvb_qxtc8A5RpX27BtT5K13FymJ3V2Sh9a_l1MHIZ8pggbigjj1deuBX32iFeCLE4NG-kCNBRxi-MwINQr44RE"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-primary-container text-on-primary text-xs font-bold px-3 py-1 rounded-full">Preparation</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-h3 text-h3 text-on-background">TOEFL Preparation</h3>
+<span class="bg-surface-container-high text-on-surface text-xs font-bold px-2 py-1 rounded-md flex items-center"><span class="material-symbols-outlined text-[14px] mr-1">school</span> Adults</span>
+</div>
+<p class="font-body text-body text-on-surface-variant mb-6 text-sm flex-grow">Program intensif persiapan ujian TOEFL ITP/iBT untuk keperluan akademik atau karir.</p>
+<div class="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/30">
+<div class="flex flex-col">
+<span class="text-xs text-on-surface-variant font-medium uppercase tracking-wider">Mulai dari</span>
+<span class="font-h3 text-lg text-primary font-bold">Rp 600K<span class="text-sm font-normal text-on-surface-variant">/bln</span></span>
+</div>
+<button class="text-primary-container hover:bg-primary-fixed p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Program Card 3 -->
+<div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm border border-outline-variant hover:shadow-xl transition-shadow duration-300 flex flex-col group">
+<div class="relative h-48 overflow-hidden">
+<img alt="Bahasa Asing Lainnya" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4xo3m4p-HksHnN1AyP2Kof4rxGcwNht9rQOuoCZjOe56tGSNK-MPJUPeR1Mz65J20JTcSmgMVcRAf8ddtj7jTNuGcz5PskwvkqoxH__8rW6kAk8X6XxM-EjuOmGRCLTxcAh5AycjC1sIcAG-rES2PkVJN-vmwBJRNDFKqBPaMZEPm1_1lNmrDKXrduIhAC1ejv0vt5NEqhI5NQgJkVcj2SuM8OQcEFJ0L7idyD0hkS7tVuzpWZOpEsUlCUgqWTKGu-mHeYsI6gjs"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-primary-container text-on-primary text-xs font-bold px-3 py-1 rounded-full">B. Jepang/Korea</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-h3 text-h3 text-on-background">Bahasa Asia</h3>
+<span class="bg-surface-container-high text-on-surface text-xs font-bold px-2 py-1 rounded-md flex items-center"><span class="material-symbols-outlined text-[14px] mr-1">public</span> All Ages</span>
+</div>
+<p class="font-body text-body text-on-surface-variant mb-6 text-sm flex-grow">Kelas bahasa Jepang dan Korea tingkat dasar hingga menengah bersama instruktur berpengalaman.</p>
+<div class="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/30">
+<div class="flex flex-col">
+<span class="text-xs text-on-surface-variant font-medium uppercase tracking-wider">Mulai dari</span>
+<span class="font-h3 text-lg text-primary font-bold">Rp 450K<span class="text-sm font-normal text-on-surface-variant">/bln</span></span>
+</div>
+<button class="text-primary-container hover:bg-primary-fixed p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-12 text-center">
+<button class="bg-surface-container text-on-surface font-button text-button px-8 py-3 rounded-full border border-outline-variant hover:bg-surface-container-high transition-colors inline-flex items-center">
+        Lihat Seluruh Program <span class="material-symbols-outlined ml-2 text-sm">open_in_new</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Alur Pendaftaran -->
+<section class="py-20 bg-surface-container-low border-y border-outline-variant/20 overflow-hidden">
+<div class="max-w-container-max mx-auto px-6 lg:px-12 relative">
+<h2 class="font-h2 text-h2 text-on-background mb-12 text-center">Alur Pendaftaran Mudah</h2>
+<div class="relative">
+<!-- Connecting Line (Desktop) -->
+<div class="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-outline-variant/30 -translate-y-1/2 z-0"></div>
+<div class="hidden md:block absolute top-1/2 left-0 w-1/2 h-1 bg-primary-container -translate-y-1/2 z-0"></div>
+<div class="flex flex-col md:flex-row justify-between items-center md:items-start gap-8 md:gap-4 relative z-10">
+<!-- Step 1 -->
+<div class="flex flex-col items-center text-center max-w-[200px]">
+<div class="w-16 h-16 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-lg mb-4">
+<span class="material-symbols-outlined text-3xl">touch_app</span>
+</div>
+<h4 class="font-h3 text-lg mb-2">Pilih Program</h4>
+<p class="font-body text-sm text-on-surface-variant">Tentukan program yang sesuai kebutuhan.</p>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col items-center text-center max-w-[200px]">
+<div class="w-16 h-16 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-lg mb-4">
+<span class="material-symbols-outlined text-3xl">app_registration</span>
+</div>
+<h4 class="font-h3 text-lg mb-2">Isi Formulir</h4>
+<p class="font-body text-sm text-on-surface-variant">Lengkapi data diri secara online.</p>
+</div>
+<!-- Step 3 -->
+<div class="flex flex-col items-center text-center max-w-[200px]">
+<div class="w-16 h-16 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-lg mb-4">
+<span class="material-symbols-outlined text-3xl">payments</span>
+</div>
+<h4 class="font-h3 text-lg mb-2">Pembayaran</h4>
+<p class="font-body text-sm text-on-surface-variant">Selesaikan biaya administrasi.</p>
+</div>
+<!-- Step 4 -->
+<div class="flex flex-col items-center text-center max-w-[200px]">
+<div class="w-16 h-16 rounded-full bg-surface text-on-surface border-2 border-outline-variant flex items-center justify-center shadow-sm mb-4">
+<span class="material-symbols-outlined text-3xl text-on-surface-variant">assignment</span>
+</div>
+<h4 class="font-h3 text-lg mb-2">Placement Test</h4>
+<p class="font-body text-sm text-on-surface-variant">Ikuti tes penempatan level.</p>
+</div>
+<!-- Step 5 -->
+<div class="flex flex-col items-center text-center max-w-[200px]">
+<div class="w-16 h-16 rounded-full bg-surface text-on-surface border-2 border-outline-variant flex items-center justify-center shadow-sm mb-4">
+<span class="material-symbols-outlined text-3xl text-on-surface-variant">school</span>
+</div>
+<h4 class="font-h3 text-lg mb-2">Mulai Belajar</h4>
+<p class="font-body text-sm text-on-surface-variant">Selamat bergabung di ETC Planet!</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Galeri Reels -->
+<section class="bg-[#2D2D2D] py-24 text-white overflow-hidden">
+<div class="max-w-container-max mx-auto px-6 lg:px-12">
+<div class="flex justify-between items-end mb-12">
+<div>
+<h2 class="font-h2 text-h2 text-white mb-2">Galeri Keseruan</h2>
+<p class="font-body text-zinc-400">Intip suasana belajar yang asik dan interaktif.</p>
+</div>
+<button class="hidden md:flex text-zinc-300 hover:text-white items-center text-sm font-bold uppercase tracking-wider group">
+        Lihat Semua <span class="material-symbols-outlined ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+<!-- Reel 1 -->
+<div class="relative aspect-[9/16] rounded-2xl overflow-hidden bg-zinc-800 group cursor-pointer border border-white/10">
+<img alt="Suasana Kelas" class="w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEPexZZEbgdaWo-fMNeD1cECgi9pddWVeocUgPZAah5XOuZ3mvwKomvIdTQkbaleyPOfma3DrL-1yDxuFa1UXtTLFUtdIYV0Gc_IszwV75mhb8yNYLnt-MXWcoqC-enFWPHfdou0n407wZ7BHE7wAKWgEym2H3tRGDRrxKX8B5m0YkZGBEfNin7yiYzK8lVPpIZT-kUduwNQQKXPJCYKjaWzwcNVhv9Mvbkucrmp0XFCw6RhqoNoDbiFEHxKp5rdT6QVYoud-U_4s"/>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 flex flex-col justify-end p-4">
+<p class="text-sm font-bold text-white mb-1 line-clamp-2">Roleplay Interview Kerja dalam Bahasa Inggris</p>
+<div class="flex items-center text-xs text-zinc-300">
+<span class="material-symbols-outlined text-[14px] mr-1">visibility</span> 1.2k
+        </div>
+</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
+<div class="w-12 h-12 rounded-full bg-primary/90 flex items-center justify-center text-white shadow-lg backdrop-blur-sm">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+</div>
+<!-- Reel 2 -->
+<div class="relative aspect-[9/16] rounded-2xl overflow-hidden bg-zinc-800 group cursor-pointer border border-white/10">
+<img alt="Acara Kelulusan" class="w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAkxaCbAHPnxvm6tul6VneJqGRCLgj3tHkr6To4VDUR7FpoA9xyXryKIJWMxQBUQYfJYYou8SuN1DIultV8-2igwE5N2O29h5nUkJkdYrsQcWI8MKQfR8opf-dkLsvbmW93-c9AgwXvTyQ_4RDD3CDwebPdX92lHHOdiiVQ-kpV7NPrpcYDe_7I4053AHUOlgWkfTa8CYHMJ5PZr8EQK7pgLiEWs507_E0i7waxCsvfFIZJC2njVaE5XKiCB_PABc3Ju5g9uRWees"/>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 flex flex-col justify-end p-4">
+<p class="text-sm font-bold text-white mb-1 line-clamp-2">Keseruan Kids Class Graduation 🎉</p>
+<div class="flex items-center text-xs text-zinc-300">
+<span class="material-symbols-outlined text-[14px] mr-1">visibility</span> 3.4k
+        </div>
+</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
+<div class="w-12 h-12 rounded-full bg-primary/90 flex items-center justify-center text-white shadow-lg backdrop-blur-sm">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+</div>
+<!-- Reel 3 -->
+<div class="relative aspect-[9/16] rounded-2xl overflow-hidden bg-zinc-800 group cursor-pointer border border-white/10 hidden md:block">
+<img alt="Belajar Outdoor" class="w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDIuOkGNqjW_EXW2xCgkSbi3erdRPnozz2plejkphIj2gmsqZsBCT9sl-j9_LDXuBqJN5vCHjTtz5Zvjn8SgYcMFr5oEyvsj1ky71-07ESKRw53ppjbgyfgZOiKdGG5GnjFCIzkBnOTeE_jgkV8fry6Y8uu1Ep00EOayV7h_FZOd4F0UghTuw0sgHGWqcfuwJvdongCLmPLmRl5rNrCmmg3ftZSqbQ9vKdo1Iai6YEfP_477kxCd4xe4gQKI-QblET8smicd9PwJM"/>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 flex flex-col justify-end p-4">
+<p class="text-sm font-bold text-white mb-1 line-clamp-2">Outdoor Class: Belajar Sambil Bermain</p>
+<div class="flex items-center text-xs text-zinc-300">
+<span class="material-symbols-outlined text-[14px] mr-1">visibility</span> 850
+        </div>
+</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
+<div class="w-12 h-12 rounded-full bg-primary/90 flex items-center justify-center text-white shadow-lg backdrop-blur-sm">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+</div>
+<!-- Reel 4 -->
+<div class="relative aspect-[9/16] rounded-2xl overflow-hidden bg-zinc-800 group cursor-pointer border border-white/10 hidden md:block">
+<img alt="TOEFL Class" class="w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAgfpvuymsGHfd_Q0-qh7qTf_THVw_vpCs5nz5FHOZSyOhX4VcW6GHh-ISVqrXwbt7Gc_iEAdnzbGDk_rhm9N1W1JqqUa4kPg0X3T9bIIneSJTUPS86hrm0hAX0HM3OqUKNSDpeMEXNZUEY23Cntds9fEtYS2s-Q1hIdjywmjp9j4fthfZVqc4VrCL4cLDrHyP4-5W-Amv1kKXZulu89ocL0dkVVraXki0qmC1uCt7HXFhboqrASI4KWhO4A1oEZHLGrxsQCVMtWQ"/>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 flex flex-col justify-end p-4">
+<p class="text-sm font-bold text-white mb-1 line-clamp-2">Tips Mengerjakan Reading Section TOEFL</p>
+<div class="flex items-center text-xs text-zinc-300">
+<span class="material-symbols-outlined text-[14px] mr-1">visibility</span> 2.1k
+        </div>
+</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
+<div class="w-12 h-12 rounded-full bg-primary/90 flex items-center justify-center text-white shadow-lg backdrop-blur-sm">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+</div>
+</div>
+<button class="md:hidden w-full mt-8 text-zinc-300 hover:text-white flex items-center justify-center text-sm font-bold uppercase tracking-wider py-3 border border-white/20 rounded-full">
+        Lihat Semua <span class="material-symbols-outlined ml-1">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- Testimonials -->
+<section class="py-24 bg-surface">
+<div class="max-w-container-max mx-auto px-6 lg:px-12">
+<div class="text-center mb-16">
+<h2 class="font-h2 text-h2 text-on-background mb-4">Apa Kata Mereka?</h2>
+<p class="font-body text-body text-on-surface-variant">Cerita sukses siswa-siswi yang telah belajar bersama ETC Planet.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Testimonial 1 -->
+<div class="bg-surface-container-lowest p-8 rounded-3xl shadow-sm border border-outline-variant relative">
+<span class="material-symbols-outlined absolute top-6 right-6 text-6xl text-primary-fixed/50 -z-0" style="font-variation-settings: 'FILL' 1;">format_quote</span>
+<div class="flex items-center mb-6 relative z-10">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-lg mr-4">
+            AD
+        </div>
+<div>
+<h4 class="font-h3 text-base font-bold text-on-background">Andi Darmawan</h4>
+<p class="text-xs text-on-surface-variant">TOEFL Preparation</p>
+</div>
+</div>
+<div class="flex text-yellow-400 mb-4 text-lg">
+★ ★ ★ ★ ★
+        </div>
+<p class="font-body text-on-surface-variant italic relative z-10">"Skor TOEFL saya naik drastis setelah 2 bulan ikut kelas intensif di sini. Pengajarnya sangat membantu dan memberikan trik-trik jitu menjawab soal."</p>
+</div>
+<!-- Testimonial 2 -->
+<div class="bg-surface-container-lowest p-8 rounded-3xl shadow-sm border border-outline-variant relative">
+<span class="material-symbols-outlined absolute top-6 right-6 text-6xl text-primary-fixed/50 -z-0" style="font-variation-settings: 'FILL' 1;">format_quote</span>
+<div class="flex items-center mb-6 relative z-10">
+<img alt="Sarah" class="w-12 h-12 rounded-full object-cover mr-4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4TWJt6waME8ee3n1FTjnak6GVRtCyO1TC8Sxu2IifpXWwkcahFlGpTDpFKAMGh4mhhiONdQKOxZrKsKKqz7Eep1ETgj_QdUWUoKJZvOZC-Ufa3FVp4eGLSXisEm4ad31bsNQihIK6x_56wMA7uzyTTkChmeVnpsJeqvRm2PeWEFcTCoYZxerVsP8-jMhy1mM1cMdpKvU1HGl_K6dVbujOAYBvANFRpp68dtJKthSr1RMWaw1oEJcyV59CR_bsnC7WXgzy3bH5p4Y"/>
+<div>
+<h4 class="font-h3 text-base font-bold text-on-background">Sarah Nabila</h4>
+<p class="text-xs text-on-surface-variant">General English</p>
+</div>
+</div>
+<div class="flex text-yellow-400 mb-4 text-lg">
+★ ★ ★ ★ ★
+        </div>
+<p class="font-body text-on-surface-variant italic relative z-10">"Belajar bahasa Inggris di ETC Planet nggak ngebosenin. Metode belajarnya asik, banyak games dan praktik ngobrol langsung sama teman-teman sekelas."</p>
+</div>
+<!-- Testimonial 3 -->
+<div class="bg-surface-container-lowest p-8 rounded-3xl shadow-sm border border-outline-variant relative">
+<span class="material-symbols-outlined absolute top-6 right-6 text-6xl text-primary-fixed/50 -z-0" style="font-variation-settings: 'FILL' 1;">format_quote</span>
+<div class="flex items-center mb-6 relative z-10">
+<div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-lg mr-4">
+            IB
+        </div>
+<div>
+<h4 class="font-h3 text-base font-bold text-on-background">Ibu Budi</h4>
+<p class="text-xs text-on-surface-variant">Orang Tua Siswa Kids Class</p>
+</div>
+</div>
+<div class="flex text-yellow-400 mb-4 text-lg">
+★ ★ ★ ★ ★
+        </div>
+<p class="font-body text-on-surface-variant italic relative z-10">"Anak saya jadi lebih pede ngomong bahasa Inggris setelah ikut Kids Class. Gurunya sabar dan telaten banget ngajarin anak-anak."</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Meet the Team -->
+<section class="py-24 bg-surface-container-low border-t border-outline-variant/20">
+<div class="max-w-container-max mx-auto px-6 lg:px-12">
+<div class="text-center mb-16">
+<h2 class="font-h2 text-h2 text-on-background mb-4">Pengajar Profesional</h2>
+<p class="font-body text-body text-on-surface-variant">Belajar bersama instruktur berpengalaman, bersertifikasi, dan ramah.</p>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+<!-- Instructor 1 -->
+<div class="flex flex-col items-center text-center group">
+<div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-surface shadow-md mb-4 group-hover:border-primary-fixed transition-colors duration-300">
+<img alt="Ms. Dina" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJKOAZjdG8xb1HRykvs8mB9mBGgc1aLe7_cC6Bsq4ZbZCp7WWB4lrV3vnxzoFTcalxLEW838FxtOAfpBeOEfvhRkRvLf3-5VeAHzxz3ItIulAy6bI1Dy_G5CJv3AD0cvEDJYPQJM4AVy1Qzp5V2XT-YGFnRTPQYNLB9UmdjRtENOHO7wVmnpjxbusSJKjW4tuQQnPblmCy5UR8gtg_BJS6igkETeeJq_bU55rDBMwnEQK1_M-sasN6RWjYcqpQdXjf9xQhtnZSNyA"/>
+</div>
+<h4 class="font-h3 text-lg font-bold text-on-background">Ms. Dina</h4>
+<p class="text-sm text-primary font-medium mb-1">Senior English Tutor</p>
+<p class="text-xs text-on-surface-variant">TOEFL &amp; IELTS Expert</p>
+</div>
+<!-- Instructor 2 -->
+<div class="flex flex-col items-center text-center group">
+<div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-surface shadow-md mb-4 group-hover:border-primary-fixed transition-colors duration-300">
+<img alt="Mr. Reza" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiIag0-eVgeA-OkZFTOSlXX1OlUtrylSllQ3PiscUt6uDV_Frh5B3JH4SIVpjYr_oNJqFCkf8FtRE5nju81WeshGujlAvnDQcBrPN6dlWu69FzTCizOzYB363OamTsZ99LnNzztFUsCGmLkC6TdcbazbbQ-EmdTfo9VgAOO-qLCahbAbYziPn1XFgaag9E3eAQ9Pa8j4Vx_qSnh_JWej0wehOnaZqCQ4YUtKd_nd_8VaIBAjE7J8nlLAfH5SGd-WOAumHZsdNMKbE"/>
+</div>
+<h4 class="font-h3 text-lg font-bold text-on-background">Mr. Reza</h4>
+<p class="text-sm text-primary font-medium mb-1">Conversation Coach</p>
+<p class="text-xs text-on-surface-variant">Native-like Fluency</p>
+</div>
+<!-- Instructor 3 -->
+<div class="flex flex-col items-center text-center group">
+<div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-surface shadow-md mb-4 group-hover:border-primary-fixed transition-colors duration-300">
+<img alt="Ms. Yuka" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0O9wecSkQnziOPt1ghgYQIGD34ZcyMFAhLry8fKloUJMROvpqtmAgd2-q-41cDSMYmrEXanBm0jSAUm31w3EsBEA9GoLQWdnx97HVfCAqpQR-kY4uCpsGkLb6HhFE9aWB6-39JVhWZo700cyXqQ-_qJOHgTNOYHt9zzinLfXRY32ED4UjP7c-6WkuDIx25YlJoXkN5h8cZvKEomSKuizOJiNXMJHkH4YzK19BG0OsQL0iRxdMV3IP1Aj-J5YIANRwdWwskwA81Xo"/>
+</div>
+<h4 class="font-h3 text-lg font-bold text-on-background">Ms. Yuka</h4>
+<p class="text-sm text-primary font-medium mb-1">Japanese Teacher</p>
+<p class="text-xs text-on-surface-variant">JLPT N2 Certified</p>
+</div>
+<!-- Instructor 4 -->
+<div class="flex flex-col items-center text-center group">
+<div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-surface shadow-md mb-4 group-hover:border-primary-fixed transition-colors duration-300">
+<img alt="Mr. Kevin" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9YNlShCLA4NKt5eiCPLOfWC3XZO6dO7Wju3cM1Osdes1DUiF0cpyQ5dgouy3qKX4eS0ogpQgZHU4BKMK2aKKHDBs5hjJD7EPp7tdeuWB0Z2SgaftNR_h8AvP7pJ05vUcMmcUkmP5IN-NPRBMCXmn5AAY-7blWvxvNju0qUsrhYA4X_rBiGnWgsbcBibPm8FDfBfvilXt290ouwW9UB2SmUEaSSuxOGSc1OSqpPBuZbCtfGfpQ3UaK5hCjxG7YCNa5013Vawtr_wc"/>
+</div>
+<h4 class="font-h3 text-lg font-bold text-on-background">Mr. Kevin</h4>
+<p class="text-sm text-primary font-medium mb-1">Kids Class Specialist</p>
+<p class="text-xs text-on-surface-variant">Fun Learning Method</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-[#2D2D2D] dark:bg-zinc-950 w-full pt-16 pb-8 border-t border-white/5 relative z-10 pb-24 md:pb-8">
+<div class="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="col-span-1 md:col-span-1 flex flex-col space-y-4">
+<div class="text-xl font-black text-white">ETC Planet</div>
+<p class="font-['Plus_Jakarta_Sans'] text-sm leading-relaxed text-zinc-400">
+                    © 2024 ETC Planet.<br/>Jl. S. Parman No. 202B, Padang.
+                </p>
+<div class="flex space-x-4 mt-4">
+<a class="text-zinc-400 hover:text-[#e6007f] transition-colors" href="#"><span class="material-symbols-outlined">camera_alt</span></a>
+</div>
+</div>
+<div class="flex flex-col space-y-3">
+<a class="font-['Plus_Jakarta_Sans'] text-sm leading-relaxed text-zinc-500 hover:text-[#e6007f] underline decoration-[#e6007f] transition-all duration-200" href="#">Kebijakan Privasi</a>
+<a class="font-['Plus_Jakarta_Sans'] text-sm leading-relaxed text-zinc-500 hover:text-[#e6007f] underline decoration-[#e6007f] transition-all duration-200" href="#">Syarat &amp; Ketentuan</a>
+<a class="font-['Plus_Jakarta_Sans'] text-sm leading-relaxed text-zinc-500 hover:text-[#e6007f] underline decoration-[#e6007f] transition-all duration-200" href="#">FAQ</a>
+<a class="font-['Plus_Jakarta_Sans'] text-sm leading-relaxed text-zinc-500 hover:text-[#e6007f] underline decoration-[#e6007f] transition-all duration-200" href="#">Karir</a>
+</div>
+</div>
+</footer>
+<!-- BottomNavBar (Mobile) -->
+<nav class="bg-[#2D2D2D] dark:bg-zinc-900 docked full-width bottom-0 rounded-t-3xl border-t border-white/10 shadow-[0_-4px_10px_rgba(0,0,0,0.3)] fixed bottom-0 left-0 w-full z-40 flex justify-around items-center px-4 py-3 md:hidden">
+<a class="flex flex-col items-center justify-center text-[#e6007f] bg-white/5 rounded-2xl p-2 font-['Plus_Jakarta_Sans'] text-[10px] font-bold uppercase active:bg-white/10 scale-110 transition-transform" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+            Home
+        </a>
+<a class="flex flex-col items-center justify-center text-zinc-400 font-['Plus_Jakarta_Sans'] text-[10px] font-bold uppercase active:bg-white/10" href="#">
+<span class="material-symbols-outlined mb-1">menu_book</span>
+            Kelas
+        </a>
+<a class="flex flex-col items-center justify-center text-zinc-400 font-['Plus_Jakarta_Sans'] text-[10px] font-bold uppercase active:bg-white/10" href="#">
+<span class="material-symbols-outlined mb-1">assignment_ind</span>
+            Rapor
+        </a>
+<a class="flex flex-col items-center justify-center text-zinc-400 font-['Plus_Jakarta_Sans'] text-[10px] font-bold uppercase active:bg-white/10" href="#">
+<span class="material-symbols-outlined mb-1">account_circle</span>
+            Profil
+        </a>
+</nav>
+<!-- AI Chatbot Widget -->
+<div class="fixed bottom-24 md:bottom-8 right-6 z-50 flex flex-col items-end">
+<!-- Expanded Panel (Hidden by default, shown via peer-checked logic) -->
+<input class="peer hidden" id="chat-toggle" type="checkbox"/>
+<div class="hidden peer-checked:flex flex-col w-[320px] h-[400px] bg-surface rounded-2xl shadow-2xl border border-outline-variant mb-4 overflow-hidden origin-bottom-right transition-transform">
+<!-- Header -->
+<div class="bg-primary-container text-on-primary p-4 flex justify-between items-center">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-bold">ETC Planet Bot</span>
+</div>
+<label class="cursor-pointer hover:text-white/80" for="chat-toggle">
+<span class="material-symbols-outlined">close</span>
+</label>
+</div>
+<!-- Messages -->
+<div class="flex-1 p-4 overflow-y-auto flex flex-col space-y-4 bg-surface-container-lowest">
+<div class="bg-surface-container-high text-on-surface p-3 rounded-2xl rounded-tl-sm max-w-[80%] text-sm">
+        Halo! 👋 Ada yang bisa saya bantu tentang program kursus di ETC Planet?
+    </div>
+</div>
+<!-- Input -->
+<div class="p-3 bg-surface border-t border-outline-variant flex items-center space-x-2">
+<input class="flex-1 bg-surface-container border-none rounded-full text-sm px-4 py-2 focus:ring-1 focus:ring-primary-container outline-none" placeholder="Ketik pesan..." type="text"/>
+<button class="text-primary-container p-2 rounded-full hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+<!-- Toggle Button -->
+<label class="bg-primary-container text-on-primary p-4 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center group cursor-pointer peer-checked:hidden" for="chat-toggle">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="material-symbols-outlined absolute -top-1 -right-1 text-yellow-300 text-sm animate-bounce" style="font-variation-settings: 'FILL' 1;">temp_preferences_custom</span>
+</label>
+</div>
+</body></html>

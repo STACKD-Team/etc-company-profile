@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard Admin - ETC Planet</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary": "#ffffff",
+                      "background": "#fff8f8",
+                      "on-primary-container": "#130006",
+                      "secondary-fixed-dim": "#c8c6c6",
+                      "surface-container-highest": "#f9dbe2",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-variant": "#f9dbe2",
+                      "inverse-on-surface": "#ffecf0",
+                      "surface-bright": "#fff8f8",
+                      "tertiary-fixed-dim": "#6cdf64",
+                      "tertiary-container": "#008a18",
+                      "on-secondary-fixed-variant": "#474747",
+                      "surface-container": "#ffe8ed",
+                      "secondary": "#5f5e5e",
+                      "on-background": "#27171c",
+                      "tertiary-fixed": "#88fc7d",
+                      "primary-fixed": "#ffd9e3",
+                      "on-secondary-fixed": "#1b1c1c",
+                      "on-tertiary-container": "#ffffff",
+                      "on-tertiary-fixed-variant": "#00530a",
+                      "on-tertiary-fixed": "#002202",
+                      "on-error": "#ffffff",
+                      "outline-variant": "#e2bdc7",
+                      "outline": "#8e6f78",
+                      "surface-tint": "#b90065",
+                      "on-surface": "#27171c",
+                      "on-surface-variant": "#5a3f47",
+                      "on-secondary": "#ffffff",
+                      "surface": "#fff8f8",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-container": "#656464",
+                      "surface-container-high": "#ffe1e8",
+                      "inverse-surface": "#3e2b31",
+                      "error": "#ba1a1a",
+                      "primary-container": "#e6007f",
+                      "primary": "#b90065",
+                      "tertiary": "#006e11",
+                      "on-error-container": "#93000a",
+                      "inverse-primary": "#ffb0c9",
+                      "error-container": "#ffdad6",
+                      "on-primary-fixed-variant": "#8e004c",
+                      "secondary-container": "#e4e2e1",
+                      "surface-dim": "#f0d3da",
+                      "primary-fixed-dim": "#ffb0c9",
+                      "surface-container-low": "#fff0f2",
+                      "on-primary-fixed": "#3e001e",
+                      "secondary-fixed": "#e4e2e1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-padding": "80px",
+                      "base-unit": "4px",
+                      "margin": "32px",
+                      "gutter": "24px",
+                      "container-max": "1200px"
+              },
+              "fontFamily": {
+                      "h3": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "h1": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body": [
+                              "Work Sans"
+                      ],
+                      "h2": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "small": [
+                              "Work Sans"
+                      ],
+                      "button": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "h3": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "h1": [
+                              "56px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "h2": [
+                              "36px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "small": [
+                              "13px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "button": [
+                              "15px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .ambient-shadow {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .blob-bg {
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path fill="%23FFE6F3" d="M44.7,-76.4C58.9,-69.2,71.8,-59.1,81.6,-46.3C91.4,-33.5,98.1,-18.1,97.7,-2.8C97.3,12.5,89.8,27.7,80.1,40.6C70.4,53.5,58.5,64.1,44.7,71.9C30.9,79.7,15.4,84.7,0.3,84.2C-14.8,83.7,-29.6,77.7,-43.3,69.7C-57,61.7,-69.5,51.7,-78.6,38.9C-87.7,26.1,-93.4,10.5,-92.3,-4.6C-91.2,-19.7,-83.3,-34.3,-73,-46.3C-62.7,-58.3,-50,-67.7,-36.1,-74.6C-22.2,-81.5,-7.1,-85.9,7.6,-83.2C22.3,-80.5,44.6,-70.7,44.7,-76.4Z" transform="translate(100 100)" /></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+        }
+      </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<aside class="bg-[#2D2D2D] dark:bg-zinc-950 text-[#e6007f] font-['Plus_Jakarta_Sans'] text-base h-screen w-64 border-r border-white/5 shadow-xl hidden md:flex flex-col py-8 px-4 flex-shrink-0 z-10 relative overflow-y-auto">
+<!-- Header -->
+<div class="mb-10 px-4">
+<h1 class="text-xl font-bold text-white mb-2">Student Portal</h1>
+<p class="text-sm text-zinc-400">ETC Planet Learner</p>
+</div>
+<!-- Navigation -->
+<nav class="flex-1 space-y-2">
+<a class="flex items-center px-4 py-3 rounded-lg bg-white/10 text-[#e6007f] border-r-4 border-[#e6007f] font-bold duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center px-4 py-3 rounded-lg text-zinc-400 hover:bg-white/5 hover:translate-x-1 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-3">person</span>
+                Profil Saya
+            </a>
+<a class="flex items-center px-4 py-3 rounded-lg text-zinc-400 hover:bg-white/5 hover:translate-x-1 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-3">school</span>
+                Kelas Saya
+            </a>
+<a class="flex items-center px-4 py-3 rounded-lg text-zinc-400 hover:bg-white/5 hover:translate-x-1 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-3">grade</span>
+                Rapor
+            </a>
+<a class="flex items-center px-4 py-3 rounded-lg text-zinc-400 hover:bg-white/5 hover:translate-x-1 transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined mr-3">payments</span>
+                Riwayat Pembayaran
+            </a>
+</nav>
+<!-- CTA -->
+<div class="mt-8 px-4">
+<button class="w-full py-3 px-4 bg-primary-container text-on-primary font-button rounded-full hover:opacity-90 transition-opacity">
+                Bantuan
+            </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto bg-surface-bright relative">
+<!-- Decorative Blob -->
+<div class="absolute top-[-100px] right-[-100px] w-[400px] h-[400px] blob-bg opacity-40 pointer-events-none"></div>
+<div class="p-8 max-w-container-max mx-auto space-y-8 relative z-10">
+<!-- Header Section -->
+<header class="flex justify-between items-end pb-4 border-b border-outline-variant/30">
+<div>
+<h2 class="font-h2 text-h2 text-on-surface mb-2">Dashboard Admin</h2>
+<p class="font-body text-body text-on-surface-variant">Ringkasan aktivitas dan pendaftaran hari ini.</p>
+</div>
+<div class="flex items-center gap-4">
+<img alt="Admin Profile" class="w-12 h-12 rounded-full object-cover border-2 border-surface-container-highest" data-alt="A close-up, brightly lit portrait of a professional woman with a warm smile, wearing a subtle pink blouse to match the global #e6007f color palette. The background is a clean, modern office with soft white and light pink accents. The overall mood is approachable, trustworthy, and organized, fitting a Playful Professional aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpQB7LnmgKTo13Mrpl3lICLB74TBGw4R1xKPPtJYq8EAiL6mnrQwZh8pDZ4gJC2dcl5XeghtbVhyHzWKkmOPtYrn31SWP7fz5UoPYGz_3K-DGguJ9dzM0Cqqm7NnNXFICPZcxxNLjhGDWyFqb1P3Mb1s3jiILSKKW7g_xgWlKJsM5VT_pECgTHZC0ueiUwrlyxLYQGGvwX374aynr3wkUT7-5ICK2sHiREh6OvKKelfPrdgJM88xlNFWOk8K51PD28fL16JzpMP4E"/>
+</div>
+</header>
+<!-- Stats Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Stat Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 ambient-shadow relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-surface-container rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div>
+<p class="font-small text-small text-on-surface-variant uppercase tracking-wider font-semibold">Total Siswa</p>
+<h3 class="font-h3 text-h3 text-on-surface mt-1">1,248</h3>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">groups</span>
+</div>
+</div>
+<div class="flex items-center text-tertiary-container text-sm font-medium relative z-10">
+<span class="material-symbols-outlined text-sm mr-1">trending_up</span>
+                        +12% bulan ini
+                    </div>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 ambient-shadow relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-surface-container rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div>
+<p class="font-small text-small text-on-surface-variant uppercase tracking-wider font-semibold">Pendaftaran Baru</p>
+<h3 class="font-h3 text-h3 text-on-surface mt-1">84</h3>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">how_to_reg</span>
+</div>
+</div>
+<div class="flex items-center text-tertiary-container text-sm font-medium relative z-10">
+<span class="material-symbols-outlined text-sm mr-1">trending_up</span>
+                        +5% minggu ini
+                    </div>
+</div>
+<!-- Stat Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 ambient-shadow relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-surface-container rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div>
+<p class="font-small text-small text-on-surface-variant uppercase tracking-wider font-semibold">Pendapatan</p>
+<h3 class="font-h3 text-h3 text-on-surface mt-1">Rp 45M</h3>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+</div>
+</div>
+<div class="flex items-center text-tertiary-container text-sm font-medium relative z-10">
+<span class="material-symbols-outlined text-sm mr-1">trending_up</span>
+                        +22% dari target
+                    </div>
+</div>
+<!-- Stat Card 4 -->
+<div class="bg-surface-container-lowest rounded-xl p-6 ambient-shadow relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-surface-container rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div>
+<p class="font-small text-small text-on-surface-variant uppercase tracking-wider font-semibold">Kelas Aktif</p>
+<h3 class="font-h3 text-h3 text-on-surface mt-1">32</h3>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">cast_for_education</span>
+</div>
+</div>
+<div class="flex items-center text-on-surface-variant text-sm font-medium relative z-10">
+<span class="material-symbols-outlined text-sm mr-1">horizontal_rule</span>
+                        Stabil
+                    </div>
+</div>
+</section>
+<!-- Quick Actions -->
+<section class="flex flex-wrap gap-4">
+<button class="h-12 px-6 bg-primary-container text-on-primary font-button rounded-full flex items-center gap-2 hover:bg-primary transition-colors ambient-shadow">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+                    Tambah Siswa
+                </button>
+<button class="h-12 px-6 bg-surface-container-lowest text-on-surface border border-outline-variant font-button rounded-full flex items-center gap-2 hover:bg-surface-container transition-colors ambient-shadow">
+<span class="material-symbols-outlined text-[20px]">video_call</span>
+                    Upload Reels
+                </button>
+<button class="h-12 px-6 bg-surface-container-lowest text-on-surface border border-outline-variant font-button rounded-full flex items-center gap-2 hover:bg-surface-container transition-colors ambient-shadow">
+<span class="material-symbols-outlined text-[20px]">summarize</span>
+                    Generate Rapor
+                </button>
+</section>
+<!-- Registrations Table Container -->
+<section class="bg-surface-container-lowest rounded-xl p-6 ambient-shadow">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-h3 text-[20px] text-on-surface font-bold">Pendaftaran Terbaru</h3>
+<button class="text-primary-container font-button text-sm flex items-center gap-1 hover:underline">
+                        Lihat Semua <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/30 text-on-surface-variant font-small text-small uppercase tracking-wider">
+<th class="pb-3 px-4 font-semibold">No</th>
+<th class="pb-3 px-4 font-semibold">Nama</th>
+<th class="pb-3 px-4 font-semibold">Program</th>
+<th class="pb-3 px-4 font-semibold">Status</th>
+<th class="pb-3 px-4 font-semibold text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="font-body text-sm text-on-surface">
+<tr class="border-b border-outline-variant/10 hover:bg-surface-container-lowest/50 transition-colors">
+<td class="py-4 px-4 text-on-surface-variant">001</td>
+<td class="py-4 px-4 font-medium">Budi Santoso</td>
+<td class="py-4 px-4">
+<span class="inline-block px-3 py-1 bg-[#FFE6F3] text-primary-container text-xs font-semibold rounded-full">Intensive English</span>
+</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-tertiary-fixed text-on-tertiary-fixed">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                                        Lunas
+                                    </span>
+</td>
+<td class="py-4 px-4 text-right space-x-2">
+<button class="text-on-surface-variant hover:text-primary-container transition-colors"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+<button class="text-on-surface-variant hover:text-primary-container transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/10 hover:bg-surface-container-lowest/50 transition-colors">
+<td class="py-4 px-4 text-on-surface-variant">002</td>
+<td class="py-4 px-4 font-medium">Siti Aminah</td>
+<td class="py-4 px-4">
+<span class="inline-block px-3 py-1 bg-[#FFE6F3] text-primary-container text-xs font-semibold rounded-full">TOEFL Prep</span>
+</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#FFF3E0] text-[#E65100]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#FF9800]"></span>
+                                        Pending
+                                    </span>
+</td>
+<td class="py-4 px-4 text-right space-x-2">
+<button class="text-on-surface-variant hover:text-primary-container transition-colors"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+<button class="text-on-surface-variant hover:text-primary-container transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest/50 transition-colors">
+<td class="py-4 px-4 text-on-surface-variant">003</td>
+<td class="py-4 px-4 font-medium">Andi Wijaya</td>
+<td class="py-4 px-4">
+<span class="inline-block px-3 py-1 bg-[#FFE6F3] text-primary-container text-xs font-semibold rounded-full">Kids English</span>
+</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-error-container text-on-error-container">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                                        Dibatalkan
+                                    </span>
+</td>
+<td class="py-4 px-4 text-right space-x-2">
+<button class="text-on-surface-variant hover:text-primary-container transition-colors"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+<button class="text-on-surface-variant hover:text-primary-container transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+</body></html>
