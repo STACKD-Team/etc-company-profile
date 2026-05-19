@@ -7,6 +7,7 @@ use App\Http\Controllers\Public\FacilityController;
 use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\GalleryController;
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\ProgramController;
 use App\Http\Controllers\Public\ReelController;
 use App\Http\Controllers\Public\ReelLikeController;
 use App\Http\Controllers\Public\ReelViewController;
@@ -28,7 +29,6 @@ Route::name('public.')->group(function (): void {
     Route::post('/reels/{reel}/likes', [ReelLikeController::class, 'store'])->middleware('throttle:reels')->name('reels.likes.store');
     Route::get('/reels/{reel}', [ReelController::class, 'show'])->name('reels.show');
 });
-use App\Http\Controllers\Public\ProgramController;
 
 Route::get('/programs', [ProgramController::class, 'index'])
     ->name('public.programs.index');

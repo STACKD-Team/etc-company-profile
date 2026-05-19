@@ -1,7 +1,7 @@
 <x-layouts.public :title="$reel->title">
     @php($assetUrl = static fn (?string $path, string $fallback = 'videos/video1.mp4') => asset($path ?: $fallback))
 
-    <section class="bg-[#111] py-12 text-white md:py-20">
+    <section class="bg-etc-charcoal py-12 text-white md:py-20">
         <div class="mx-auto grid max-w-[1120px] gap-10 px-5 lg:grid-cols-[430px_1fr] lg:px-0">
             <div class="overflow-hidden rounded-[28px] border border-white/15 bg-black shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
                 <video controls autoplay muted playsinline poster="{{ asset($reel->thumbnail_path ?: 'images/pu1-img (3).jpg') }}" class="aspect-[9/14] w-full object-cover" data-view-endpoint="{{ route('public.reels.views.store', $reel) }}">
@@ -11,13 +11,13 @@
             </div>
 
             <div class="flex flex-col justify-center">
-                <a href="{{ route('public.reels.index') }}" class="mb-8 inline-flex items-center gap-2 text-sm font-bold text-zinc-400 hover:text-white">
+                <a href="{{ route('public.reels.index') }}" class="mb-8 inline-flex items-center gap-2 text-sm font-bold text-white/60 hover:text-white">
                     <span class="material-symbols-outlined text-base">arrow_back</span>
                     Kembali ke reels
                 </a>
                 <p class="font-heading text-sm font-black uppercase tracking-[0.18em] text-etc-magenta">{{ $reel->category }}</p>
                 <h1 class="mt-4 font-heading text-[38px] font-black leading-tight md:text-[54px]">{{ $reel->title }}</h1>
-                <p class="mt-6 text-[16px] leading-8 text-zinc-300">{{ $reel->description ?: 'Cuplikan kegiatan ETC Planet.' }}</p>
+                <p class="mt-6 text-[16px] leading-8 text-white/75">{{ $reel->description ?: 'Cuplikan kegiatan ETC Planet.' }}</p>
 
                 <div class="mt-8 flex flex-wrap gap-4">
                     <span class="inline-flex min-h-11 items-center gap-2 rounded-full bg-white/10 px-5 py-2 font-heading text-sm font-bold text-white">

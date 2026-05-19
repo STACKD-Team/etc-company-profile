@@ -80,6 +80,10 @@ function initRegistrationProgramPage() {
                 summaryTotal.textContent = formattedPrice;
             }
 
+            if (continueButton && radio.dataset.contactUrl) {
+                continueButton.href = radio.dataset.contactUrl;
+            }
+
             markSelectedCard(radio);
             flashSummary();
             showToast(`${radio.dataset.name || 'Program'} dipilih.`);
@@ -87,11 +91,9 @@ function initRegistrationProgramPage() {
     });
 
     continueButton?.addEventListener('click', (event) => {
-        event.preventDefault();
-
         const selectedProgram = page.querySelector('[data-program-radio]:checked')?.dataset.name || 'program ini';
         stepperItems[1]?.classList.add('is-preview');
-        showToast(`Lanjut ke data pribadi untuk ${selectedProgram}.`);
+        showToast(`Membuka konsultasi untuk ${selectedProgram}.`);
 
         setTimeout(() => stepperItems[1]?.classList.remove('is-preview'), 1400);
     });
@@ -147,7 +149,86 @@ function initStudentDashboardPage() {
     });
 }
 
+function initPublicChatbot() {
+    const widget = document.querySelector('[data-chatbot-widget]');
+
+    if (!widget) {
+        return;
+    }
+
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const endpoint = widget.dataset.chatbotEndpoint;
+    const toggle = widget.querySelector('[data-chatbot-toggle]');
+    const close = widget.querySelector('[data-chatbot-close]');
+    const panel = widget.querySelector('[data-chatbot-panel]');
+    const form = widget.querySelector('[data-chatbot-form]');
+    const input = form?.querySelector('input[name="message"]');
+    const messages = widget.querySelector('[data-chatbot-messages]');
+    let sessionId = window.localStorage?.getItem('etc_public_chatbot_session') || null;
+
+    const setOpen = (isOpen) => {
+        panel?.classList.toggle('hidden', !isOpen);
+        toggle?.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+        if (isOpen) {
+            input?.focus();
+        }
+    };
+
+    const addMessage = (message, fromUser = false) => {
+        const bubble = document.createElement('p');
+        bubble.className = fromUser
+            ? 'ml-auto max-w-[85%] rounded-2xl rounded-tr-sm bg-etc-magenta px-4 py-3 text-sm leading-6 text-white shadow-soft'
+            : 'max-w-[85%] rounded-2xl rounded-tl-sm bg-white px-4 py-3 text-sm leading-6 text-etc-on-muted shadow-soft';
+        bubble.textContent = message;
+        messages?.appendChild(bubble);
+        messages?.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
+    };
+
+    toggle?.addEventListener('click', () => setOpen(panel?.classList.contains('hidden') ?? true));
+    close?.addEventListener('click', () => setOpen(false));
+
+    form?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const message = input?.value.trim();
+
+        if (!message || !endpoint || !token) {
+            return;
+        }
+
+        input.value = '';
+        addMessage(message, true);
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                },
+                body: JSON.stringify({
+                    message,
+                    session_id: sessionId,
+                }),
+            });
+            const data = response.ok ? await response.json() : null;
+
+            if (data?.session_id) {
+                sessionId = data.session_id;
+                window.localStorage?.setItem('etc_public_chatbot_session', sessionId);
+            }
+
+            addMessage(data?.reply || 'Maaf, jawaban belum tersedia. Silakan hubungi tim ETC melalui halaman kontak.');
+        } catch {
+            addMessage('Koneksi chatbot sedang bermasalah. Silakan coba lagi sebentar lagi.');
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initRegistrationProgramPage();
     initStudentDashboardPage();
+    initPublicChatbot();
 });

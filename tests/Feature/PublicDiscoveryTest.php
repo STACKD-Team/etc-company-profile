@@ -3,6 +3,7 @@
 use App\Models\ChatbotLog;
 use App\Models\ContactMessage;
 use App\Models\Content;
+use App\Models\Program;
 use App\Models\Reel;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -32,8 +33,44 @@ it('renders all Miftah public discovery pages without foundation placeholders', 
         $this->get($uri)
             ->assertOk()
             ->assertDontSee('Fondasi halaman')
-            ->assertDontSee('Implementasi penuh');
+            ->assertDontSee('Implementasi penuh')
+            ->assertSee('data-chatbot-widget', false);
     }
+});
+
+it('connects public program CTAs into detail, picker, and contact consultation', function () {
+    $program = Program::query()->create([
+        'name' => 'General English',
+        'slug' => 'general-english',
+        'category' => 'english',
+        'type' => 'regular',
+        'target_age' => 'teen',
+        'description' => 'Program komunikasi bahasa Inggris.',
+        'duration_meetings' => 20,
+        'max_students' => 12,
+        'price' => 1500000,
+        'registration_fee' => 200000,
+        'is_active' => true,
+    ]);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee(route('registrations.programs.index'), false)
+        ->assertSee(route('public.programs.show', $program), false);
+
+    $this->get(route('public.programs.show', $program))
+        ->assertOk()
+        ->assertSee(route('registrations.programs.index', ['program' => $program->id]), false);
+
+    $this->get(route('registrations.programs.index', ['program' => $program->id]))
+        ->assertOk()
+        ->assertSee('checked', false)
+        ->assertSee(route('public.contact.index', ['program' => $program->id]), false);
+
+    $this->get(route('public.contact.index', ['program' => $program->id]))
+        ->assertOk()
+        ->assertSee('Konsultasi program General English')
+        ->assertSee('saya ingin konsultasi tentang program General English');
 });
 
 it('stores valid contact messages and rejects invalid contact messages', function () {

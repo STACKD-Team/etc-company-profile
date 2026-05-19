@@ -14,17 +14,18 @@ it('uses the documented public home route', function () {
         ->and($route->getActionName())->toBe('App\Http\Controllers\Public\HomeController@index');
 });
 
-it('does not register routes owned by other teammates', function () {
+it('registers merged sprint route names from all teammates', function () {
     foreach ([
         'auth.login',
-        'registrations.start',
         'student.dashboard',
         'instructor.dashboard',
         'admin.dashboard',
         'public.programs.index',
     ] as $routeName) {
-        expect(Route::has($routeName))->toBeFalse();
+        expect(Route::has($routeName))->toBeTrue($routeName);
     }
+
+    expect(Route::has('registrations.start'))->toBeFalse();
 });
 
 it('keeps admin content routes protected for admins', function () {
@@ -35,7 +36,7 @@ it('keeps admin content routes protected for admins', function () {
         ->and($route->gatherMiddleware())->toContain('role:admin');
 
     $this->get('/admin/reels')
-        ->assertRedirect('/');
+        ->assertRedirect('/login');
 });
 
 it('rejects authenticated users with the wrong role', function () {

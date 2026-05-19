@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Program;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class RegistrationProgramController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $programs = Program::query()
             ->where('is_active', true)
@@ -23,11 +24,13 @@ class RegistrationProgramController extends Controller
                 'registration_fee' => (int) $program->registration_fee,
                 'program_price' => (int) $program->price,
                 'duration_meetings' => $program->duration_meetings,
+                'contact_url' => route('public.contact.index', ['program' => $program->id]),
             ]);
+        $selectedProgram = $programs->firstWhere('id', (int) $request->query('program')) ?? $programs->first();
 
         return view('registration.programs.index', [
             'programs' => $programs,
-            'selectedProgram' => $programs->first(),
+            'selectedProgram' => $selectedProgram,
         ]);
     }
 

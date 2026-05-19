@@ -42,7 +42,7 @@
     })['key'] ?? 'home';
 
     $loginUrl ??= $routeUrl('auth.login', '/login');
-    $registerUrl ??= $routeUrl('registrations.create', '#daftar');
+    $registerUrl ??= $routeUrl('registrations.programs.index', $routeUrl('public.contact.index', '#'));
 @endphp
 
 <header {{ $attributes->class('sticky top-0 z-50 border-b border-white/10 bg-etc-charcoal text-white shadow-[0_12px_32px_rgba(39,23,28,0.18)]') }}>
@@ -59,7 +59,7 @@
                     @class([
                         'px-0 py-2 font-heading text-[13px] font-bold transition duration-200',
                         'text-etc-magenta' => $isActive,
-                        'text-zinc-300 hover:text-white' => ! $isActive,
+                        'text-white/75 hover:text-white' => ! $isActive,
                     ])
                     @if ($isActive) aria-current="page" @endif
                 >
@@ -71,7 +71,7 @@
         </div>
 
         <div class="flex items-center gap-7">
-            <a href="{{ $loginUrl }}" class="hidden rounded-full px-1 py-2 font-heading text-[13px] font-bold text-zinc-300 transition hover:text-white md:inline-flex">
+            <a href="{{ $loginUrl }}" class="hidden rounded-full px-1 py-2 font-heading text-[13px] font-bold text-white/75 transition hover:text-white md:inline-flex">
                 Masuk
             </a>
             <a href="{{ $registerUrl }}" class="inline-flex min-h-11 items-center justify-center rounded-full bg-etc-magenta px-8 py-3 font-heading text-[14px] font-bold text-white shadow-soft transition hover:bg-etc-primary">
@@ -81,7 +81,7 @@
     </nav>
 </header>
 
-<nav aria-label="Navigasi mobile" class="fixed inset-x-0 bottom-0 z-50 flex items-center justify-around rounded-t-3xl border-t border-white/10 bg-[#2b2b2b] px-4 py-3 shadow-[0_-12px_30px_rgba(0,0,0,0.28)] md:hidden">
+<nav aria-label="Navigasi mobile" class="fixed inset-x-0 bottom-0 z-50 flex items-center justify-around rounded-t-3xl border-t border-white/10 bg-etc-charcoal px-4 py-3 shadow-[0_-12px_30px_rgba(0,0,0,0.28)] md:hidden">
     @foreach ($items->take(4) as $item)
         @php($isActive = $currentActive === $item['key'])
         <a
@@ -89,7 +89,7 @@
             @class([
                 'flex w-16 flex-col items-center justify-center gap-1 rounded-2xl p-2 font-heading text-[10px] font-bold uppercase transition',
                 'scale-105 bg-white/5 text-etc-magenta' => $isActive,
-                'text-zinc-400 active:bg-white/10' => ! $isActive,
+                'text-white/60 active:bg-white/10' => ! $isActive,
             ])
             @if ($isActive) aria-current="page" @endif
         >

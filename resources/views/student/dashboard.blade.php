@@ -26,7 +26,7 @@
 
 <x-layouts.dashboard title="Dashboard Siswa" area="student" active="dashboard" :user="$student" :sidebar-items="$sidebarItems">
     <x-slot:sidebarActions>
-        <a href="#" data-dashboard-action="Bantuan sedang disiapkan." class="flex min-h-12 items-center justify-center gap-2 rounded-full border border-zinc-600 px-4 py-3 font-heading text-sm font-bold text-zinc-300 transition hover:border-white hover:text-white">
+        <a href="#" data-dashboard-action="Bantuan sedang disiapkan." class="flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 font-heading text-sm font-bold text-white/75 transition hover:border-white hover:text-white">
             <x-ui.icon name="help" class="h-4 w-4" />
             Bantuan
         </a>
@@ -35,7 +35,7 @@
     <div data-student-dashboard-page class="space-y-6">
         <section class="rounded-card bg-etc-charcoal p-6 text-white shadow-panel md:p-8">
             <h2 class="font-heading text-3xl font-black">Halo, {{ $displayName }}!</h2>
-            <p class="mt-2 max-w-2xl text-sm leading-6 text-zinc-300">Selamat datang kembali di ETC Planet. Mari lanjutkan progres belajarmu hari ini.</p>
+            <p class="mt-2 max-w-2xl text-sm leading-6 text-white/75">Selamat datang kembali di ETC Planet. Mari lanjutkan progres belajarmu hari ini.</p>
         </section>
 
         <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Ringkasan progres belajar">

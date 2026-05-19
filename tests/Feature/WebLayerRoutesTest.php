@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 uses(RefreshDatabase::class);
 
-it('registers only the implemented Rasky web route names', function () {
+it('registers the implemented Rasky web route names after sprint merge', function () {
     $expectedRoutes = [
         'public.programs.show',
         'auth.login',
@@ -44,8 +44,8 @@ it('registers only the implemented Rasky web route names', function () {
         expect(Route::has($routeName))->toBeTrue($routeName);
     }
 
-    expect(Route::has('public.home'))->toBeFalse()
-        ->and(Route::has('public.programs.index'))->toBeFalse();
+    expect(Route::has('public.home'))->toBeTrue()
+        ->and(Route::has('public.programs.index'))->toBeTrue();
 });
 
 it('resolves public program detail by slug route model binding', function () {

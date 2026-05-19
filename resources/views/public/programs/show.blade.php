@@ -3,9 +3,9 @@
     $trustBadges = $detailContent['trust_badges'] ?? [];
     $aboutHeading = $detailContent['about_heading'] ?? 'Tentang Program';
     $learningHeading = $detailContent['learning_heading'] ?? 'Yang Akan Kamu Pelajari';
-    $registerUrl = \Illuminate\Support\Facades\Route::has('registrations.create')
-        ? route('registrations.create', ['program' => $program])
-        : '#';
+    $registerUrl = \Illuminate\Support\Facades\Route::has('registrations.programs.index')
+        ? route('registrations.programs.index', ['program' => $program->id])
+        : route('public.contact.index', ['program' => $program->id]);
     $categoryLabel = str($program->category)->replace('_', ' ')->headline()->toString();
     $typeLabel = str($program->type)->replace('_', ' ')->headline()->toString();
     $targetAgeLabel = str($program->target_age)->replace('_', ' ')->headline()->toString();

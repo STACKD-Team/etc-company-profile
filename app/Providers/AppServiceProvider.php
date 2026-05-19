@@ -39,6 +39,8 @@ class AppServiceProvider extends ServiceProvider
             'contact' => 5,
             'chatbot' => 20,
             'reels' => 60,
+            'login' => 5,
+            'password' => 5,
         ];
     }
 }

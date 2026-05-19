@@ -1,11 +1,4 @@
 @php
-    $navbarItems = [
-        ['label' => 'Beranda', 'url' => '#', 'key' => 'home', 'icon' => 'home'],
-        ['label' => 'Program', 'route' => 'registrations.programs.index', 'url' => '#program', 'key' => 'program', 'icon' => 'school'],
-        ['label' => 'Tentang Kami', 'url' => '#', 'key' => 'about', 'icon' => 'groups'],
-        ['label' => 'Testimoni', 'url' => '#', 'key' => 'testimonials', 'icon' => 'reviews'],
-    ];
-
     $footerLinkGroups = [
         'ETC Planet' => [
             ['label' => 'Beranda', 'url' => '#'],
@@ -25,9 +18,10 @@
     $formatRupiah = static fn (int $value): string => 'Rp '.number_format($value, 0, ',', '.');
     $selectedProgram ??= $programs->first();
     $selectedIcon = $selectedProgram ? ($iconMap[$selectedProgram['icon']] ?? 'program-general') : 'program-general';
+    $selectedContactUrl = $selectedProgram['contact_url'] ?? route('public.contact.index');
 @endphp
 
-<x-layouts.public title="Pilih Program" :navbar-items="$navbarItems" :footer-link-groups="$footerLinkGroups">
+<x-layouts.public title="Pilih Program" :footer-link-groups="$footerLinkGroups">
     <section class="bg-etc-surface py-10 md:py-14" data-registration-program-page>
         <div class="mx-auto max-w-[1200px] px-6 lg:px-8">
             <ol class="grid grid-cols-2 gap-3 rounded-card bg-white p-3 shadow-soft md:grid-cols-4" aria-label="Tahapan pendaftaran">
@@ -84,6 +78,7 @@
                                             data-icon="{{ $program['icon'] }}"
                                             data-tone="{{ $program['tone'] }}"
                                             data-price="{{ $program['registration_fee'] }}"
+                                            data-contact-url="{{ $program['contact_url'] }}"
                                             @checked($isSelected)
                                         >
                                         <span class="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full border border-etc-outline-variant bg-white text-etc-magenta transition group-has-[:checked]:border-etc-magenta group-has-[:checked]:bg-etc-magenta group-has-[:checked]:text-white">
@@ -107,7 +102,7 @@
 
                     @if ($selectedProgram)
                         <div class="mt-8">
-                            <p class="text-xs font-bold uppercase text-zinc-400">Program Terpilih</p>
+                            <p class="text-xs font-bold uppercase text-white/60">Program Terpilih</p>
                             <div class="mt-4 flex items-center gap-4">
                                 <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white" id="summary-icon-wrap" data-summary-icon>
                                     <x-ui.icon :name="$selectedIcon" class="h-7 w-7" />
@@ -118,25 +113,25 @@
                             <div class="my-6 h-px bg-white/10"></div>
 
                             <div class="flex items-center justify-between gap-4 text-sm">
-                                <span class="text-zinc-300">Biaya Pendaftaran</span>
+                                <span class="text-white/75">Biaya Pendaftaran</span>
                                 <strong id="summary-price" class="font-heading">{{ $formatRupiah($selectedProgram['registration_fee']) }}</strong>
                             </div>
-                            <p class="mt-2 text-xs text-zinc-400">Biaya program akan diinformasikan pada langkah berikutnya.</p>
+                            <p class="mt-2 text-xs text-white/60">Biaya program akan diinformasikan pada langkah berikutnya.</p>
 
                             <div class="my-6 h-px bg-white/10"></div>
 
                             <div class="flex items-center justify-between gap-4">
-                                <span class="text-sm text-zinc-300">Total Sementara</span>
+                                <span class="text-sm text-white/75">Total Sementara</span>
                                 <strong id="summary-total" class="font-heading text-xl text-etc-magenta">{{ $formatRupiah($selectedProgram['registration_fee']) }}</strong>
                             </div>
 
-                            <a href="#" data-registration-continue class="mt-8 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-pill bg-etc-magenta px-5 py-3 font-heading text-sm font-bold text-white transition hover:bg-etc-primary">
+                            <a href="{{ $selectedContactUrl }}" data-registration-continue class="mt-8 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-pill bg-etc-magenta px-5 py-3 font-heading text-sm font-bold text-white transition hover:bg-etc-primary">
                                 Lanjut ke Data Pribadi
                                 <span class="material-symbols-outlined text-lg">arrow_forward</span>
                             </a>
                         </div>
                     @else
-                        <p class="mt-6 text-sm leading-6 text-zinc-300">Pilih program aktif setelah tersedia untuk melihat ringkasannya.</p>
+                        <p class="mt-6 text-sm leading-6 text-white/75">Pilih program aktif setelah tersedia untuk melihat ringkasannya.</p>
                     @endif
                 </aside>
             </div>

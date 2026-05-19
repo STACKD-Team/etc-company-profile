@@ -1,11 +1,4 @@
 @php
-    $navbarItems = [
-        ['label' => 'Beranda', 'url' => '#', 'key' => 'home', 'icon' => 'home'],
-        ['label' => 'Program', 'route' => 'public.programs.index', 'key' => 'program', 'icon' => 'school'],
-        ['label' => 'Tentang Kami', 'url' => '#', 'key' => 'about', 'icon' => 'groups'],
-        ['label' => 'Testimoni', 'url' => '#', 'key' => 'testimonials', 'icon' => 'reviews'],
-    ];
-
     $categoryLabels = [
         'english' => 'English',
         'mandarin' => 'Mandarin',
@@ -33,7 +26,7 @@
     $formatRupiah = static fn ($value): string => 'Rp '.number_format((int) $value, 0, ',', '.');
 @endphp
 
-<x-layouts.public title="Program" :navbar-items="$navbarItems">
+<x-layouts.public title="Program">
     <section class="bg-etc-surface py-12 md:py-16">
         <div class="mx-auto max-w-[1200px] px-6 lg:px-8">
             <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -73,7 +66,7 @@
                                 <img src="{{ $thumbnailUrl }}" alt="{{ $program->name }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
                                 <div class="absolute inset-0 bg-gradient-to-t from-etc-charcoal/65 via-transparent to-transparent"></div>
                             @else
-                                <div class="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,#ffe1e8_0,#ffe1e8_28%,transparent_29%),linear-gradient(135deg,#3a2c33_0%,#5a3f47_48%,#e6007f_100%)]">
+                                <div class="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,#ffe1e8_0,#ffe1e8_28%,transparent_29%),linear-gradient(135deg,#27171c_0%,#5a3f47_48%,#e6007f_100%)]">
                                     <div class="rounded-3xl bg-white/12 px-5 py-4 text-center backdrop-blur-sm">
                                         <span class="material-symbols-outlined text-4xl text-white">school</span>
                                         <p class="mt-2 font-heading text-sm font-black uppercase tracking-wide text-white">ETC Planet</p>
@@ -120,8 +113,8 @@
                                 </div>
                             </div>
 
-                            <a href="{{ route('registrations.programs.index') }}" class="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-pill bg-etc-magenta px-5 py-3 font-heading text-sm font-bold text-white transition hover:bg-etc-primary">
-                                Daftar Program
+                            <a href="{{ route('public.programs.show', $program) }}" class="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-pill bg-etc-magenta px-5 py-3 font-heading text-sm font-bold text-white transition hover:bg-etc-primary">
+                                Lihat Detail
                                 <span class="material-symbols-outlined text-lg">arrow_forward</span>
                             </a>
                         </div>

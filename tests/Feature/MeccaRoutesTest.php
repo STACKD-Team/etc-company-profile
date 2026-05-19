@@ -82,7 +82,7 @@ test('public programs page renders active programs with discovery details', func
         ->assertSee('Rp 1.500.000')
         ->assertSee('Biaya pendaftaran')
         ->assertSee('Rp 200.000')
-        ->assertSee('Daftar Program')
+        ->assertSee('Lihat Detail')
         ->assertDontSee('Inactive Program');
 });
 

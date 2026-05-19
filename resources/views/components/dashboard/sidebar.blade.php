@@ -77,7 +77,7 @@
             </div>
             <div class="min-w-0">
                 <p class="truncate font-heading text-sm font-bold text-white">{{ $displayName }}</p>
-                <p class="text-xs text-zinc-400">{{ $displayRole }}</p>
+                <p class="text-xs text-white/60">{{ $displayRole }}</p>
             </div>
         </div>
     </div>
@@ -90,7 +90,7 @@
                 @class([
                     'flex items-center gap-3 rounded-lg px-4 py-3 font-heading text-sm font-bold transition duration-200',
                     'border-r-4 border-etc-magenta bg-white/10 text-etc-magenta' => $isActive,
-                    'text-zinc-400 hover:translate-x-1 hover:bg-white/5 hover:text-white' => ! $isActive,
+                    'text-white/60 hover:translate-x-1 hover:bg-white/5 hover:text-white' => ! $isActive,
                 ])
                 @if ($isActive) aria-current="page" @endif
             >
@@ -108,7 +108,7 @@
         @isset($actions)
             {{ $actions }}
         @else
-            <a href="{{ $helpUrl }}" class="flex min-h-12 items-center justify-center gap-2 rounded-full border border-zinc-600 px-4 py-3 font-heading text-sm font-bold text-zinc-300 transition hover:border-white hover:text-white">
+            <a href="{{ $helpUrl }}" class="flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 font-heading text-sm font-bold text-white/75 transition hover:border-white hover:text-white">
                 <x-ui.icon name="help" class="h-4 w-4" />
                 Bantuan
             </a>
@@ -116,7 +116,7 @@
             @if (\Illuminate\Support\Facades\Route::has('auth.logout'))
                 <form method="POST" action="{{ route('auth.logout') }}">
                     @csrf
-                    <button type="submit" class="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-white/5 px-4 py-3 font-heading text-sm font-bold text-zinc-300 transition hover:bg-white/10 hover:text-white">
+                    <button type="submit" class="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-white/5 px-4 py-3 font-heading text-sm font-bold text-white/75 transition hover:bg-white/10 hover:text-white">
                         <span class="material-symbols-outlined text-lg">logout</span>
                         Keluar
                     </button>
@@ -134,7 +134,7 @@
             @class([
                 'flex w-16 flex-col items-center justify-center gap-1 rounded-2xl p-2 font-heading text-[10px] font-bold uppercase transition',
                 'scale-105 bg-white/5 text-etc-magenta' => $isActive,
-                'text-zinc-400 active:bg-white/10' => ! $isActive,
+                'text-white/60 active:bg-white/10' => ! $isActive,
             ])
             @if ($isActive) aria-current="page" @endif
         >
