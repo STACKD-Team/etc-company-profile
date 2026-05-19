@@ -33,8 +33,9 @@
     ];
 
     $socialLinks = $socialLinks ?? [
-        ['label' => 'Instagram', 'url' => '#', 'icon' => 'photo_camera'],
-        ['label' => 'WhatsApp', 'url' => '#', 'icon' => 'chat'],
+        ['label' => 'Website', 'url' => '#', 'svg' => 'footer-globe'],
+        ['label' => 'Bagikan', 'url' => '#', 'svg' => 'footer-share'],
+        ['label' => 'Pesan', 'url' => '#', 'svg' => 'footer-chat'],
     ];
 
     $contact = $contact ?? [
@@ -57,7 +58,11 @@
             <div class="flex gap-3">
                 @foreach ($socialLinks as $link)
                     <a href="{{ $link['url'] ?? '#' }}" aria-label="{{ $link['label'] ?? 'Social link' }}" class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-zinc-300 transition hover:bg-etc-magenta hover:text-white">
-                        <span class="material-symbols-outlined text-xl">{{ $link['icon'] ?? 'link' }}</span>
+                        @if ($link['svg'] ?? null)
+                            <x-ui.icon :name="$link['svg']" class="h-5 w-5" />
+                        @else
+                            <span class="material-symbols-outlined text-xl">{{ $link['icon'] ?? 'link' }}</span>
+                        @endif
                     </a>
                 @endforeach
             </div>
@@ -82,16 +87,16 @@
             <h2 class="font-heading text-sm font-bold uppercase text-white">Kontak</h2>
             <ul class="mt-4 space-y-3 text-sm text-zinc-400">
                 <li class="flex gap-3">
-                    <span class="material-symbols-outlined text-lg text-etc-magenta">call</span>
+                    <x-ui.icon name="contact-location" class="h-5 w-5 shrink-0" />
+                    <span>{{ $address }}</span>
+                </li>
+                <li class="flex gap-3">
+                    <x-ui.icon name="contact-phone" class="h-5 w-5 shrink-0" />
                     <span>{{ $contact['phone'] ?? '-' }}</span>
                 </li>
                 <li class="flex gap-3">
-                    <span class="material-symbols-outlined text-lg text-etc-magenta">mail</span>
+                    <x-ui.icon name="contact-mail" class="h-5 w-5 shrink-0" />
                     <span>{{ $contact['email'] ?? '-' }}</span>
-                </li>
-                <li class="flex gap-3">
-                    <span class="material-symbols-outlined text-lg text-etc-magenta">schedule</span>
-                    <span>{{ $contact['hours'] ?? '-' }}</span>
                 </li>
             </ul>
         </div>
