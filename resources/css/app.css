@@ -93,3 +93,68 @@
         }
     }
 }
+
+@layer components {
+    .registration-program-card.is-selected {
+        transform: translateY(-2px);
+    }
+
+    .registration-summary.is-updated {
+        animation: summaryPulse 420ms ease;
+    }
+
+    .registration-toast,
+    .dashboard-toast {
+        position: fixed;
+        right: 1.5rem;
+        bottom: 1.5rem;
+        z-index: 80;
+        max-width: min(24rem, calc(100vw - 3rem));
+        transform: translateY(1rem);
+        border-radius: var(--radius-pill);
+        background: var(--color-etc-charcoal);
+        color: white;
+        opacity: 0;
+        padding: 0.85rem 1.1rem;
+        box-shadow: var(--shadow-panel);
+        pointer-events: none;
+        transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .registration-toast.is-visible,
+    .dashboard-toast.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .student-stat-card {
+        opacity: 0;
+        transform: translateY(0.75rem);
+        transition: opacity 260ms ease, transform 260ms ease;
+    }
+
+    .student-stat-card.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .student-progress-bar {
+        width: 0;
+        transition: width 720ms ease;
+    }
+
+    .stepper-item.is-preview {
+        box-shadow: inset 0 0 0 2px var(--color-etc-magenta);
+    }
+}
+
+@keyframes summaryPulse {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.015);
+    }
+}

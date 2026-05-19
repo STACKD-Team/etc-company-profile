@@ -28,3 +28,7 @@ Route::name('public.')->group(function (): void {
     Route::post('/reels/{reel}/likes', [ReelLikeController::class, 'store'])->middleware('throttle:reels')->name('reels.likes.store');
     Route::get('/reels/{reel}', [ReelController::class, 'show'])->name('reels.show');
 });
+use App\Http\Controllers\Public\ProgramController;
+
+Route::get('/programs', [ProgramController::class, 'index'])
+    ->name('public.programs.index');

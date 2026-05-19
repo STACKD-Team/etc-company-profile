@@ -33,8 +33,9 @@
     ];
 
     $socialLinks = $socialLinks ?? [
-        ['label' => 'Instagram', 'url' => '#', 'icon' => 'photo_camera'],
-        ['label' => 'WhatsApp', 'url' => '#', 'icon' => 'chat'],
+        ['label' => 'Website', 'url' => '#', 'svg' => 'footer-globe'],
+        ['label' => 'Bagikan', 'url' => '#', 'svg' => 'footer-share'],
+        ['label' => 'Pesan', 'url' => '#', 'svg' => 'footer-chat'],
     ];
 
     $contact = $contact ?? [

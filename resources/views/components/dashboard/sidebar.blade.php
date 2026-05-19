@@ -19,9 +19,19 @@
         'admin' => [
             ['label' => 'Reels', 'route' => 'admin.reels.index', 'url' => '#', 'key' => 'reels', 'icon' => 'smart_display'],
             ['label' => 'CMS Konten', 'route' => 'admin.contents.index', 'url' => '#', 'key' => 'contents', 'icon' => 'dashboard_customize'],
-            ['label' => 'Pesan Kontak', 'route' => 'admin.contact-messages.index', 'url' => '#', 'key' => 'contact-messages', 'icon' => 'mail'],
-            ['label' => 'Chatbot Logs', 'route' => 'admin.chatbot-logs.index', 'url' => '#', 'key' => 'chatbot-logs', 'icon' => 'forum'],
-            ['label' => 'Settings', 'route' => 'admin.settings.index', 'url' => '#', 'key' => 'settings', 'icon' => 'settings'],
+        ],
+        'student' => [
+            ['label' => 'Dashboard', 'route' => 'student.dashboard', 'url' => '#', 'key' => 'dashboard', 'icon' => 'dashboard'],
+            ['label' => 'Profil Saya', 'route' => 'student.profile.show', 'url' => '#', 'key' => 'profile', 'icon' => 'person'],
+            ['label' => 'Kelas Saya', 'route' => 'student.classes.index', 'url' => '#', 'key' => 'classes', 'icon' => 'school'],
+            ['label' => 'Rapor', 'route' => 'student.report-cards.index', 'url' => '#', 'key' => 'reports', 'icon' => 'grade'],
+            ['label' => 'Riwayat Pembayaran', 'route' => 'student.payments.index', 'url' => '#', 'key' => 'payments', 'icon' => 'payments'],
+        ],
+        'instructor' => [
+            ['label' => 'Dashboard', 'route' => 'instructor.dashboard', 'url' => '#', 'key' => 'dashboard', 'icon' => 'dashboard'],
+            ['label' => 'Kelas Mengajar', 'route' => 'instructor.classes.index', 'url' => '#', 'key' => 'classes', 'icon' => 'school'],
+            ['label' => 'Siswa', 'route' => 'instructor.students.index', 'url' => '#', 'key' => 'students', 'icon' => 'groups'],
+            ['label' => 'Rapor', 'route' => 'instructor.report-cards.index', 'url' => '#', 'key' => 'reports', 'icon' => 'description'],
         ],
     ];
 
@@ -48,7 +58,7 @@
     $displayRole = str($area)->headline()->toString();
     $avatar = $user?->avatar ?? null;
     $initial = str($displayName)->trim()->substr(0, 1)->upper()->toString();
-    $helpUrl ??= '#';
+    $helpUrl ??= $routeUrl($area === 'student' ? 'student.help.index' : null, '#');
 @endphp
 
 <aside {{ $attributes->class('hidden h-screen w-64 flex-shrink-0 flex-col overflow-y-auto border-r border-white/5 bg-etc-charcoal px-4 py-8 text-white shadow-xl md:flex') }}>
@@ -84,7 +94,11 @@
                 ])
                 @if ($isActive) aria-current="page" @endif
             >
-                <span class="material-symbols-outlined text-xl" @if ($isActive) style="font-variation-settings: 'FILL' 1;" @endif>{{ $item['icon'] }}</span>
+                @if ($item['svg'] ?? null)
+                    <x-ui.icon :name="$item['svg']" class="h-5 w-5 shrink-0" />
+                @else
+                    <span class="material-symbols-outlined text-xl" @if ($isActive) style="font-variation-settings: 'FILL' 1;" @endif>{{ $item['icon'] }}</span>
+                @endif
                 <span>{{ $item['label'] }}</span>
             </a>
         @endforeach
@@ -95,7 +109,7 @@
             {{ $actions }}
         @else
             <a href="{{ $helpUrl }}" class="flex min-h-12 items-center justify-center gap-2 rounded-full border border-zinc-600 px-4 py-3 font-heading text-sm font-bold text-zinc-300 transition hover:border-white hover:text-white">
-                <span class="material-symbols-outlined text-lg">help</span>
+                <x-ui.icon name="help" class="h-4 w-4" />
                 Bantuan
             </a>
 
@@ -124,7 +138,11 @@
             ])
             @if ($isActive) aria-current="page" @endif
         >
-            <span class="material-symbols-outlined text-xl" @if ($isActive) style="font-variation-settings: 'FILL' 1;" @endif>{{ $item['icon'] }}</span>
+            @if ($item['svg'] ?? null)
+                <x-ui.icon :name="$item['svg']" class="h-5 w-5 shrink-0" />
+            @else
+                <span class="material-symbols-outlined text-xl" @if ($isActive) style="font-variation-settings: 'FILL' 1;" @endif>{{ $item['icon'] }}</span>
+            @endif
             <span>{{ str($item['label'])->words(1, '')->toString() }}</span>
         </a>
     @endforeach
