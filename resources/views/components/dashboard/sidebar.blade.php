@@ -17,33 +17,15 @@
 
     $defaultItems = [
         'admin' => [
-            ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'url' => '#', 'key' => 'dashboard', 'icon' => 'dashboard'],
-            ['label' => 'Pendaftaran', 'route' => 'admin.registrations.index', 'url' => '#', 'key' => 'registrations', 'icon' => 'how_to_reg'],
-            ['label' => 'Pembayaran', 'route' => 'admin.payments.index', 'url' => '#', 'key' => 'payments', 'icon' => 'payments'],
-            ['label' => 'Placement Test', 'route' => 'admin.placement-tests.index', 'url' => '#', 'key' => 'placement', 'icon' => 'assignment'],
-            ['label' => 'Data Siswa', 'route' => 'admin.students.index', 'url' => '#', 'key' => 'students', 'icon' => 'groups'],
-            ['label' => 'Program', 'route' => 'admin.programs.index', 'url' => '#', 'key' => 'programs', 'icon' => 'school'],
-            ['label' => 'Kelas', 'route' => 'admin.classes.index', 'url' => '#', 'key' => 'classes', 'icon' => 'meeting_room'],
-            ['label' => 'Rapor', 'route' => 'admin.report-cards.index', 'url' => '#', 'key' => 'reports', 'icon' => 'description'],
             ['label' => 'Reels', 'route' => 'admin.reels.index', 'url' => '#', 'key' => 'reels', 'icon' => 'smart_display'],
             ['label' => 'CMS Konten', 'route' => 'admin.contents.index', 'url' => '#', 'key' => 'contents', 'icon' => 'dashboard_customize'],
-        ],
-        'student' => [
-            ['label' => 'Dashboard', 'route' => 'student.dashboard', 'url' => '#', 'key' => 'dashboard', 'icon' => 'dashboard'],
-            ['label' => 'Profil Saya', 'route' => 'student.profile', 'url' => '#', 'key' => 'profile', 'icon' => 'person'],
-            ['label' => 'Kelas Saya', 'route' => 'student.classes.index', 'url' => '#', 'key' => 'classes', 'icon' => 'school'],
-            ['label' => 'Rapor', 'route' => 'student.report-cards.index', 'url' => '#', 'key' => 'reports', 'icon' => 'grade'],
-            ['label' => 'Riwayat Pembayaran', 'route' => 'student.payments.index', 'url' => '#', 'key' => 'payments', 'icon' => 'payments'],
-        ],
-        'instructor' => [
-            ['label' => 'Dashboard', 'route' => 'instructor.dashboard', 'url' => '#', 'key' => 'dashboard', 'icon' => 'dashboard'],
-            ['label' => 'Kelas Mengajar', 'route' => 'instructor.classes.index', 'url' => '#', 'key' => 'classes', 'icon' => 'school'],
-            ['label' => 'Siswa', 'route' => 'instructor.students.index', 'url' => '#', 'key' => 'students', 'icon' => 'groups'],
-            ['label' => 'Rapor', 'route' => 'instructor.report-cards.index', 'url' => '#', 'key' => 'reports', 'icon' => 'description'],
+            ['label' => 'Pesan Kontak', 'route' => 'admin.contact-messages.index', 'url' => '#', 'key' => 'contact-messages', 'icon' => 'mail'],
+            ['label' => 'Chatbot Logs', 'route' => 'admin.chatbot-logs.index', 'url' => '#', 'key' => 'chatbot-logs', 'icon' => 'forum'],
+            ['label' => 'Settings', 'route' => 'admin.settings.index', 'url' => '#', 'key' => 'settings', 'icon' => 'settings'],
         ],
     ];
 
-    $items = collect($items ?? $defaultItems[$area] ?? $defaultItems['student'])->map(function (array $item) use ($routeUrl) {
+    $items = collect($items ?? $defaultItems[$area] ?? $defaultItems['admin'])->map(function (array $item) use ($routeUrl) {
         $item['key'] ??= str($item['label'] ?? 'item')->slug()->toString();
         $item['url'] = $routeUrl($item['route'] ?? null, $item['url'] ?? '#');
         $item['icon'] ??= 'circle';
@@ -66,12 +48,12 @@
     $displayRole = str($area)->headline()->toString();
     $avatar = $user?->avatar ?? null;
     $initial = str($displayName)->trim()->substr(0, 1)->upper()->toString();
-    $helpUrl ??= $routeUrl('help', '#');
+    $helpUrl ??= '#';
 @endphp
 
 <aside {{ $attributes->class('hidden h-screen w-64 flex-shrink-0 flex-col overflow-y-auto border-r border-white/5 bg-etc-charcoal px-4 py-8 text-white shadow-xl md:flex') }}>
     <div class="mb-10 px-4">
-        <a href="{{ $routeUrl('home', '/') }}" class="font-heading text-xl font-black tracking-normal text-white">
+        <a href="{{ $routeUrl('public.home', '/') }}" class="font-heading text-xl font-black tracking-normal text-white">
             ETC Planet
         </a>
 
@@ -117,8 +99,8 @@
                 Bantuan
             </a>
 
-            @if (\Illuminate\Support\Facades\Route::has('logout'))
-                <form method="POST" action="{{ route('logout') }}">
+            @if (\Illuminate\Support\Facades\Route::has('auth.logout'))
+                <form method="POST" action="{{ route('auth.logout') }}">
                     @csrf
                     <button type="submit" class="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-white/5 px-4 py-3 font-heading text-sm font-bold text-zinc-300 transition hover:bg-white/10 hover:text-white">
                         <span class="material-symbols-outlined text-lg">logout</span>

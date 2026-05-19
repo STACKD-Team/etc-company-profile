@@ -23,6 +23,7 @@
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
+        @stack('styles')
     </head>
     <body class="h-screen overflow-hidden bg-etc-surface font-body text-etc-on-surface antialiased">
         <div class="flex h-screen">
@@ -57,5 +58,6 @@
                 </main>
             </div>
         </div>
+        @stack('scripts')
     </body>
 </html>

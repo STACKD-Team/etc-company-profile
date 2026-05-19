@@ -35,4 +35,61 @@
     body {
         background: var(--color-etc-surface);
     }
+
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [role='button'] {
+        transition-duration: 220ms;
+        transition-property: background-color, border-color, box-shadow, color, opacity, transform;
+        transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+}
+
+@layer components {
+    article,
+    video,
+    img,
+    .material-symbols-outlined,
+    svg {
+        transition-duration: 240ms;
+        transition-property: box-shadow, filter, opacity, transform;
+        transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        a:hover,
+        button:hover,
+        [role='button']:hover {
+            transform: translateY(-1px);
+        }
+
+        article:hover {
+            transform: translateY(-4px);
+        }
+
+        article:hover img,
+        a:hover img {
+            transform: scale(1.025);
+        }
+
+        a:hover .material-symbols-outlined,
+        button:hover .material-symbols-outlined,
+        a:hover svg,
+        button:hover svg {
+            transform: translateX(2px);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            scroll-behavior: auto !important;
+            transition-duration: 1ms !important;
+        }
+    }
 }

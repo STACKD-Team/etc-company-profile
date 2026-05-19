@@ -11,7 +11,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'role' => \App\Http\Middleware\EnsureUserHasRole::class,
+            'signed.optional' => \App\Http\Middleware\OptionalSigned::class,
+        ]);
+
+        $middleware->redirectGuestsTo(fn () => route('public.home'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

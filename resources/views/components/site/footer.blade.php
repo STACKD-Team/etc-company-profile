@@ -19,10 +19,10 @@
 
     $linkGroups = $linkGroups ?? [
         'Navigasi' => [
-            ['label' => 'Beranda', 'route' => 'home', 'url' => '/'],
-            ['label' => 'Program', 'route' => 'programs.index', 'url' => '#program'],
-            ['label' => 'Reels', 'route' => 'reels.index', 'url' => '#reels'],
-            ['label' => 'Tentang Kami', 'route' => 'about', 'url' => '#tentang'],
+            ['label' => 'Beranda', 'route' => 'public.home', 'url' => '/'],
+            ['label' => 'Program', 'url' => '/#program'],
+            ['label' => 'Reels', 'route' => 'public.reels.index', 'url' => '#reels'],
+            ['label' => 'Tentang Kami', 'route' => 'public.about', 'url' => '#tentang'],
         ],
         'Program' => [
             ['label' => 'English for Kids', 'url' => '#program'],
@@ -44,60 +44,42 @@
     ];
 @endphp
 
-<footer {{ $attributes->class('bg-etc-charcoal pb-24 pt-16 text-white md:pb-8') }}>
-    <div class="mx-auto grid max-w-[1200px] grid-cols-1 gap-10 px-6 md:grid-cols-4 lg:px-8">
-        <div class="space-y-4">
-            <div class="font-heading text-2xl font-black">{{ $brand }}</div>
-            <p class="max-w-xs text-sm leading-6 text-zinc-400">
-                Lembaga kursus bahasa terpercaya di Padang dengan pengalaman belajar yang ramah, interaktif, dan profesional.
-            </p>
-            <p class="text-sm leading-6 text-zinc-400">
+<footer {{ $attributes->class('relative bg-[#2b2b2b] pb-24 pt-16 text-white md:pb-16') }}>
+    <div class="mx-auto grid max-w-[1120px] grid-cols-1 gap-12 px-5 md:grid-cols-[260px_1fr] lg:px-0">
+        <div class="space-y-5">
+            <div class="font-heading text-[18px] font-black">{{ $brand }}</div>
+            <p class="text-[13px] leading-7 text-zinc-400">
+                &copy; {{ now()->year }} ETC Planet.<br>
                 {{ $address }}
             </p>
-            <div class="flex gap-3">
-                @foreach ($socialLinks as $link)
-                    <a href="{{ $link['url'] ?? '#' }}" aria-label="{{ $link['label'] ?? 'Social link' }}" class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-zinc-300 transition hover:bg-etc-magenta hover:text-white">
-                        <span class="material-symbols-outlined text-xl">{{ $link['icon'] ?? 'link' }}</span>
-                    </a>
-                @endforeach
-            </div>
+            <a href="https://www.instagram.com/etcplanet/" aria-label="Instagram ETC Planet" class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-600 text-zinc-300 transition hover:border-etc-magenta hover:text-etc-magenta">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2Zm0 2A3.75 3.75 0 0 0 4 7.75v8.5A3.75 3.75 0 0 0 7.75 20h8.5A3.75 3.75 0 0 0 20 16.25v-8.5A3.75 3.75 0 0 0 16.25 4h-8.5Z" fill="currentColor"/>
+                    <path d="M12 7.25A4.75 4.75 0 1 1 12 16.75 4.75 4.75 0 0 1 12 7.25Zm0 2A2.75 2.75 0 1 0 12 14.75 2.75 2.75 0 0 0 12 9.25Z" fill="currentColor"/>
+                    <path d="M17.25 6.75a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" fill="currentColor"/>
+                </svg>
+            </a>
         </div>
 
-        @foreach ($linkGroups as $heading => $links)
-            <div>
-                <h2 class="font-heading text-sm font-bold uppercase text-white">{{ $heading }}</h2>
-                <ul class="mt-4 space-y-3">
-                    @foreach ($links as $link)
-                        <li>
-                            <a href="{{ $linkUrl($link) }}" class="text-sm text-zinc-400 transition hover:text-etc-magenta">
-                                {{ $link['label'] }}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-        @endforeach
-
-        <div>
-            <h2 class="font-heading text-sm font-bold uppercase text-white">Kontak</h2>
-            <ul class="mt-4 space-y-3 text-sm text-zinc-400">
-                <li class="flex gap-3">
-                    <span class="material-symbols-outlined text-lg text-etc-magenta">call</span>
-                    <span>{{ $contact['phone'] ?? '-' }}</span>
-                </li>
-                <li class="flex gap-3">
-                    <span class="material-symbols-outlined text-lg text-etc-magenta">mail</span>
-                    <span>{{ $contact['email'] ?? '-' }}</span>
-                </li>
-                <li class="flex gap-3">
-                    <span class="material-symbols-outlined text-lg text-etc-magenta">schedule</span>
-                    <span>{{ $contact['hours'] ?? '-' }}</span>
-                </li>
+        <div class="pt-1 md:pl-20">
+            <ul class="space-y-5 text-[13px]">
+                @foreach ([
+                    ['label' => 'Kebijakan Privasi', 'url' => '#'],
+                    ['label' => 'Syarat & Ketentuan', 'url' => '#'],
+                    ['label' => 'FAQ', 'route' => 'public.faq.index', 'url' => '#'],
+                    ['label' => 'Karir', 'url' => '#'],
+                ] as $link)
+                    <li>
+                        <a href="{{ $linkUrl($link) }}" class="text-zinc-500 underline decoration-etc-magenta/60 underline-offset-4 transition hover:text-etc-magenta">
+                            {{ $link['label'] }}
+                        </a>
+                    </li>
+                @endforeach
             </ul>
         </div>
     </div>
 
-    <div class="mx-auto mt-12 max-w-[1200px] border-t border-white/10 px-6 pt-6 text-sm text-zinc-500 lg:px-8">
-        &copy; {{ now()->year }} {{ $brand }}. All rights reserved.
-    </div>
+    <a href="{{ route('public.contact.index') }}" aria-label="Buka chatbot" class="fixed bottom-7 right-7 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-etc-magenta text-white shadow-[0_12px_28px_rgba(230,0,127,0.35)] transition hover:bg-etc-primary">
+        <span class="material-symbols-outlined text-2xl">smart_toy</span>
+    </a>
 </footer>

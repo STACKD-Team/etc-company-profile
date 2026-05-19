@@ -91,6 +91,19 @@ class ReelService extends BaseCrudService
         });
     }
 
+    public function decrementLikes(Reel $reel): Reel
+    {
+        return DB::transaction(function () use ($reel) {
+            $reel->refresh();
+
+            if ((int) $reel->likes_count > 0) {
+                $reel->decrement('likes_count');
+            }
+
+            return $reel->refresh();
+        });
+    }
+
     public function forceDelete(Model $model): bool
     {
         /** @var Reel $model */
