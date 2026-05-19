@@ -22,6 +22,22 @@ Dokumen ini adalah blueprint route halaman web ETC Planet. Route aktual di `rout
 | Mecca | `dashboard_siswa_etc_planet`, `pilih_program_etc_planet` | Program discovery, student dashboard, student profile/class/report pages, admin academic master data |
 | Mia | `pembayaran_etc_planet`, `pendaftaran_online_lengkap_etc_planet`, `konfirmasi_pendaftaran_etc_planet` | Registration flow, payment flow, admin registration/payment verification |
 
+## Sprint Implementation Plan
+
+Sprint grouping ini hanya untuk urutan eksekusi. Ownership route, URI, route name, controller action, middleware, layout, dan notes tetap mengikuti **Route Table** sebagai kontrak utama.
+
+Saat mengerjakan satu sprint, developer hanya boleh mengubah halaman, route, controller, service, request, view, dan komponen yang dimiliki owner/modul pada sprint tersebut. Shared dependency boleh disentuh hanya jika dependency itu eksplisit masuk scope sprint atau dibutuhkan langsung oleh modul sprint yang sedang dikerjakan.
+
+| Sprint | Fokus | Owner dan Modul | Catatan |
+| --- | --- | --- | --- |
+| Sprint 0 - Foundation | Struktur dasar aplikasi | Shared: route file split structure, layout public/dashboard, auth/role middleware, shared components, base models/services | Tidak mengubah ownership halaman bisnis |
+| Sprint 1 - Public Discovery | Halaman public dan discovery program | Miftah: home, about, team, facilities, gallery, contact, FAQ, chatbot public, reels public. Mecca: `/programs`. Rasky: `/programs/{program}` | Prioritaskan halaman yang menjadi pintu masuk calon siswa |
+| Sprint 2 - Auth, Registration, Payment | Login dan alur pendaftaran sampai konfirmasi | Rasky: login, logout, forgot/reset password. Mecca: registration program picker. Mia: registration start, form, store, payment, proof upload, confirmation, receipt | Flow pendaftaran tidak boleh mengubah halaman public milik sprint 1 kecuali link/CTA |
+| Sprint 3 - Admin Intake Workflow | Admin memproses pendaftar sampai enrollment | Rasky: admin dashboard, placement test schedule/result. Mia: admin registrations dan payment verification. Mecca: admin students/instructors/programs/classes/enrollments | Fokus pada workflow setelah pembayaran diverifikasi |
+| Sprint 4 - Student Dashboard | Area siswa setelah login | Mecca: student dashboard, profile, classes, learning history, report cards, help. Mia: student payment history/detail | Student hanya boleh melihat data miliknya sendiri |
+| Sprint 5 - Report Cards And Exports | Rapor, publish, export, dan instructor v1 | Rasky: admin report cards, publish workflow, student/report export routes, instructor dashboard/classes/students/report cards | Output dokumen wajib mengikuti template context |
+| Sprint 6 - CMS, Reels, Settings Polish | CMS admin, manajemen reels, setting, dan verifikasi akhir | Miftah: admin reels, contents, contact messages, chatbot logs, settings. Shared: final route/list verification dan responsive UI consistency pass | Jalankan `php artisan route:list`; jalankan `php artisan test` untuk flow yang disentuh |
+
 ## Route Table
 
 | Owner | Method | URI | Route Name | Controller Action | Middleware | Layout | Reference/Notes |

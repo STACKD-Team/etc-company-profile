@@ -103,7 +103,7 @@ The style is a synthesis of **Minimalism** and **Modern Corporate**, utilizing g
 This design system employs a strict 60-30-10 distribution to ensure visual balance and focus. 
 
 - **Base (60%):** A warm off-white (#F5F5F5) serves as the primary canvas, providing a soft, paper-like background that is easier on the eyes than pure white.
-- **Neutral (30%):** Warm Plum Charcoal (#3A2C33) is used for primary text and structural elements, providing high contrast with a softer, warmer tone that pairs naturally with the Magenta-pink accent.
+- **Neutral (30%):** Warm Plum Charcoal (#27171C) is used for primary text and structural elements, providing high contrast with a softer, warmer tone that pairs naturally with the Magenta-pink accent.
 - **Primary/Accent (10%):** Hot Magenta-pink (#e6007f) is the energetic heart of the brand, reserved for high-priority calls to action, brand highlights, and interactive states.
 
 Supporting tints like Light Pink (#FFE6F3) are utilized for background containers and decorative "blobs" to soften the interface without distracting from the content. Status colors (Success, Warning, Error) follow standard conventions to ensure immediate recognition and accessibility.
@@ -137,7 +137,7 @@ Decorative blobs should be asymmetrical and organic, avoiding perfect circles to
 ## Components
 Consistent component behavior is vital for the trustworthy aspect of the "Playful Professional" style.
 
-- **Buttons:** All buttons must be pill-shaped with a minimum height of 48px to ensure accessibility. Primary buttons use the Magenta-pink (#e6007f) with white text. Secondary buttons use the Warm Plum Charcoal (#3A2C33) or an outline style.
+- **Buttons:** All buttons must be pill-shaped with a minimum height of 48px to ensure accessibility. Primary buttons use the Magenta-pink (#e6007f) with white text. Secondary buttons use the Warm Plum Charcoal (#27171C) or an outline style.
 - **Input Fields:** Use 8px rounded corners with a 1px border (#BDBDBD). On focus, the border should transition to Magenta-pink with a soft glow.
 - **Cards:** Use a 16px radius and the ambient shadow. Content within cards should have a minimum of 24px internal padding.
 - **Chips/Pills:** Used for course categories (e.g., "English," "TOEFL"). These use the 24px radius and the Light Pink background (#FFE6F3).
