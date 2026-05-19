@@ -1,15 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/program', function () {
-    return view('program.program');
-});
-
-Route::get('/dashboard-admin', function () {
-    return view('dashboardAdmin.dashboardA');
-});
+require __DIR__.'/web/public.php';
+require __DIR__.'/web/auth.php';
+require __DIR__.'/web/admin/dashboard.php';
+require __DIR__.'/web/admin/reports.php';
+require __DIR__.'/web/instructor.php';

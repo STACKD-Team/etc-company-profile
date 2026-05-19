@@ -35,6 +35,11 @@ class Program extends Model
         ];
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function classes(): HasMany
     {
         return $this->hasMany(CourseClass::class);

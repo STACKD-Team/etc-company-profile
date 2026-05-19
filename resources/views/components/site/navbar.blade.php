@@ -16,11 +16,11 @@
     };
 
     $items = collect($items ?? [
-        ['label' => 'Beranda', 'route' => 'home', 'url' => '/', 'key' => 'home', 'icon' => 'home'],
-        ['label' => 'Program', 'route' => 'programs.index', 'url' => '#program', 'key' => 'program', 'icon' => 'school'],
-        ['label' => 'Reels', 'route' => 'reels.index', 'url' => '#reels', 'key' => 'reels', 'icon' => 'smart_display'],
-        ['label' => 'Tentang Kami', 'route' => 'about', 'url' => '#tentang', 'key' => 'about', 'icon' => 'groups'],
-        ['label' => 'Kontak', 'route' => 'contact', 'url' => '#kontak', 'key' => 'contact', 'icon' => 'call'],
+        ['label' => 'Beranda', 'route' => 'public.home', 'url' => '/', 'key' => 'home', 'icon' => 'home'],
+        ['label' => 'Program', 'route' => 'public.programs.index', 'url' => '/programs', 'key' => 'program', 'icon' => 'school'],
+        ['label' => 'Reels', 'route' => 'public.reels.index', 'url' => '#reels', 'key' => 'reels', 'icon' => 'smart_display'],
+        ['label' => 'Tentang Kami', 'route' => 'public.about', 'url' => '#tentang', 'key' => 'about', 'icon' => 'groups'],
+        ['label' => 'Kontak', 'route' => 'public.contact.index', 'url' => '#kontak', 'key' => 'contact', 'icon' => 'call'],
     ])->map(function (array $item) use ($routeUrl) {
         $item['key'] ??= str($item['label'] ?? 'item')->slug()->toString();
         $item['url'] = $routeUrl($item['route'] ?? null, $item['url'] ?? '#');
@@ -41,13 +41,13 @@
         return $path !== '' && request()->is($path . '*');
     })['key'] ?? 'home';
 
-    $loginUrl ??= $routeUrl('login');
+    $loginUrl ??= $routeUrl('auth.login', '/login');
     $registerUrl ??= $routeUrl('registrations.create', '#daftar');
 @endphp
 
 <header {{ $attributes->class('sticky top-0 z-50 border-b border-white/10 bg-etc-charcoal text-white shadow-[0_12px_32px_rgba(39,23,28,0.18)]') }}>
     <nav aria-label="Navigasi utama" class="mx-auto flex h-20 max-w-[1200px] items-center justify-between px-6 lg:px-8">
-        <a href="{{ $routeUrl('home', '/') }}" class="font-heading text-2xl font-black tracking-normal text-white">
+        <a href="{{ $routeUrl('public.home', '/') }}" class="font-heading text-2xl font-black tracking-normal text-white">
             {{ $title }}
         </a>
 
