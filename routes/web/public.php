@@ -32,3 +32,7 @@ use App\Http\Controllers\Public\ProgramController;
 
 Route::get('/programs', [ProgramController::class, 'index'])
     ->name('public.programs.index');
+
+Route::prefix('programs')->name('public.programs.')->group(function (): void {
+    Route::get('/{program}', [ProgramController::class, 'show'])->name('show');
+});

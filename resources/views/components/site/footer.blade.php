@@ -20,7 +20,7 @@
     $linkGroups = $linkGroups ?? [
         'Navigasi' => [
             ['label' => 'Beranda', 'route' => 'public.home', 'url' => '/'],
-            ['label' => 'Program', 'url' => '/#program'],
+            ['label' => 'Program', 'route' => 'public.programs.index', 'url' => '/programs'],
             ['label' => 'Reels', 'route' => 'public.reels.index', 'url' => '#reels'],
             ['label' => 'Tentang Kami', 'route' => 'public.about', 'url' => '#tentang'],
         ],

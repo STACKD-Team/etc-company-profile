@@ -13,7 +13,7 @@ class ProgramController extends Controller
     {
         $programs = Program::query()
             ->where('is_active', true)
-            ->when($request->string('category')->toString(), fn ($query, string $category) => $query->where('category', $category))
+            ->when($request->string('category')->toString(), fn($query, string $category) => $query->where('category', $category))
             ->orderBy('name')
             ->get();
 
@@ -21,6 +21,25 @@ class ProgramController extends Controller
             'programs' => $programs,
             'categories' => Program::query()->where('is_active', true)->distinct()->pluck('category')->filter()->values(),
             'selectedCategory' => $request->string('category')->toString(),
+        ]);
+    }
+
+    public function show(Program $program): View
+    {
+        abort_unless($program->is_active, 404);
+
+        $featuredClass = $program->classes()
+            ->with('instructor')
+            ->whereIn('status', ['ongoing', 'upcoming'])
+            ->orderByRaw('CASE WHEN start_date IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('start_date')
+            ->first();
+
+        return view('public.programs.show', [
+            'program' => $program,
+            'detailContent' => config('program_details.programs.' . $program->slug, config('program_details.default')),
+            'featuredClass' => $featuredClass,
+            'featuredInstructor' => $featuredClass?->instructor,
         ]);
     }
 }
