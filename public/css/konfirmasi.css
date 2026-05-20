@@ -35,7 +35,7 @@ button {
     overflow: hidden;
 }
 
-nav {
+.legacy-page-nav {
     height: 64px;
     padding: 0 64px;
     background: var(--dark);
@@ -410,7 +410,7 @@ nav {
     stroke-width: 2.5;
 }
 
-footer {
+.legacy-page-footer {
     background: var(--dark);
     color: #c9c3c7;
     padding: 54px 64px 42px;
@@ -506,7 +506,7 @@ footer {
 }
 
 @media (max-width: 820px) {
-    nav {
+    .legacy-page-nav {
         padding: 0 24px;
         gap: 20px;
     }
@@ -550,7 +550,7 @@ footer {
         grid-template-columns: 1fr;
     }
 
-    footer {
+    .legacy-page-footer {
         padding: 44px 24px 34px;
     }
 }

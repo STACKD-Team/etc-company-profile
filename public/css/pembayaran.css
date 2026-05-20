@@ -29,7 +29,7 @@ input {
     font-family: inherit;
 }
 
-nav {
+.legacy-page-nav {
     height: 76px;
     padding: 0 66px;
     background: var(--dark);
@@ -669,7 +669,7 @@ input[type="file"] {
     cursor: pointer;
 }
 
-footer {
+.legacy-page-footer {
     background: var(--dark);
     color: #bdbdbd;
     padding: 64px 66px 38px;
@@ -748,7 +748,7 @@ footer {
 }
 
 @media (max-width: 960px) {
-    nav {
+    .legacy-page-nav {
         padding: 0 24px;
     }
 
@@ -776,7 +776,7 @@ footer {
 }
 
 @media (max-width: 680px) {
-    nav {
+    .legacy-page-nav {
         height: auto;
         min-height: 68px;
         padding: 14px 18px;
@@ -844,7 +844,7 @@ footer {
         padding: 26px 14px;
     }
 
-    footer {
+    .legacy-page-footer {
         padding: 44px 24px 30px;
     }
 

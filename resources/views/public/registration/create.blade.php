@@ -1,30 +1,8 @@
-﻿<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pendaftaran Online - ETC Planet</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<x-layouts.public title="Pendaftaran Online">
     <link rel="stylesheet" href="{{ asset('css/pendaftaran.css') }}">
     <link rel="stylesheet" href="{{ asset('css/interactive.css') }}">
-</head>
-<body>
-<div class="page-shell">
-    <nav>
-        <div class="nav-logo">ETC Planet</div>
-        <div class="nav-links">
-            <a href="#">Beranda</a>
-            <a href="#" class="nav-active">Program</a>
-            <a href="#">Galeri Reels</a>
-            <a href="#">Tentang Kami</a>
-            <a href="#">Kontak</a>
-        </div>
-        <div class="nav-actions">
-            <button class="btn-masuk" type="button">Masuk</button>
-            <button class="btn-daftar" type="button">Daftar Sekarang</button>
-        </div>
-    </nav>
 
+<div class="page-shell">
     <header class="page-header">
         <h1>Pendaftaran Online</h1>
         <p>Mari mulai perjalanan belajarmu bersama ETC Planet. Isi data dengan lengkap dan benar ya!</p>
@@ -97,6 +75,10 @@
                             <option>Hindu</option>
                             <option>Buddha</option>
                         </select>
+                    </label>
+                    <label class="field">
+                        <span>Kewarganegaraan</span>
+                        <input type="text" name="kewarganegaraan" value="Indonesia" placeholder="Kewarganegaraan">
                     </label>
                     <label class="field">
                         <span>Pekerjaan/Sekolah/Kampus</span>
@@ -194,7 +176,7 @@
                         <span>Alat Transportasi</span>
                         <select>
                             <option>Kendaraan Pribadi</option>
-                            <option>Kendaraan Umun</option>
+                            <option>Kendaraan Umum</option>
                         </select>
                     </label>
                 </div>
@@ -224,7 +206,7 @@
 
             <div class="action-row">
                 <button class="btn-kembali" type="button">Kembali</button>
-                <button class="btn-lanjut" type="button" onclick="window.location.href='{{ route('pembayaran') }}'">
+                <button class="btn-lanjut" type="button" onclick="window.location.href='{{ route('registrations.payment.show', ['registration' => $registrationReference ?? 'demo']) }}'">
                     Lanjut ke Pembayaran
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </button>
@@ -238,7 +220,7 @@
                 <span>Program Dipilih</span>
                 <strong class="program-name">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg>
-                    Intensive English Preparation Course (IELTS)
+                    {{ $selectedProgram }}
                 </strong>
             </div>
 
@@ -246,43 +228,25 @@
                 <span>Jadwal</span>
                 <strong class="schedule">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    Senin &amp; Rabu, 16:00 WIB
+                    {{ $selectedSchedule }}
                 </strong>
             </div>
 
             <div class="summary-divider"></div>
 
-            <div class="summary-row"><span>Biaya Pendaftaran</span><strong>Rp 200.000</strong></div>
-            <div class="summary-row"><span>Biaya Program (Bulan 1)</span><strong>Rp 850.000</strong></div>
+            <div class="summary-row"><span>Biaya Pendaftaran</span><strong>{{ $fees['registration'] }}</strong></div>
+            <div class="summary-row"><span>Biaya Program (Bulan 1)</span><strong>{{ $fees['program'] }}</strong></div>
 
             <div class="summary-total">
                 <strong>Total Pembayaran</strong>
-                <span>Rp 1.050.000</span>
+                <span>{{ $fees['total'] }}</span>
             </div>
         </aside>
     </main>
 
-    <footer>
-        <div class="footer-grid">
-            <div>
-                <div class="footer-logo">ETC Planet</div>
-                <p class="footer-description">Membuka pintu dunia melalui bahasa. Kami berdedikasi untuk memberikan pengalaman belajar terbaik dengan pengajar profesional.</p>
-                <p class="footer-copy">&copy; 2024 ETC Planet. Jl. S. Parman No. 202B, Padang.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Tautan Penting</h4>
-                <a href="#">Kebijakan Privasi</a>
-                <a href="#">Syarat &amp; Ketentuan</a>
-            </div>
-            <div class="footer-col">
-                <h4>Dukungan</h4>
-                <a href="#">FAQ</a>
-                <a href="#">Karir</a>
-            </div>
-        </div>
-    </footer>
 </div>
 
+@push('scripts')
 <script>
 const wilayahApiBase = 'https://www.emsifa.com/api-wilayah-indonesia/api';
 
@@ -386,5 +350,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-</body>
-</html>
+@endpush
+</x-layouts.public>

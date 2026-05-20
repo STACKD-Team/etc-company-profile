@@ -5,6 +5,27 @@
     --interactive-pink-shadow: 0 16px 28px rgba(230, 0, 126, .24);
 }
 
+.nav-logo,
+.nav-brand,
+.btn-masuk,
+.btn-daftar,
+.btn-lanjut,
+.confirm-button,
+.btn-dashboard,
+.btn-unduh,
+.footer-logo,
+.footer-brand,
+.footer-col a {
+    text-decoration: none;
+}
+
+.btn-masuk,
+.btn-daftar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
     a,
     button,

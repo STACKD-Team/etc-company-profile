@@ -1,26 +1,6 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pembayaran - ETC Planet</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/pembayaran.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/interactive.css') }}">
-</head>
-<body>
-<nav>
-    <div class="nav-logo">ETC Planet.</div>
-    <div class="nav-links">
-        <a href="#">Program</a>
-        <a href="#">Testimoni</a>
-        <a href="#">FAQ</a>
-    </div>
-    <div class="nav-actions">
-        <button class="btn-masuk" type="button">Masuk</button>
-        <button class="btn-daftar" type="button">Daftar Sekarang</button>
-    </div>
-</nav>
+<x-layouts.public title="Pembayaran">
+<link rel="stylesheet" href="{{ asset('css/pembayaran.css') }}">
+<link rel="stylesheet" href="{{ asset('css/interactive.css') }}">
 
 <header class="page-header">
     <h1>Pendaftaran ETC Planet</h1>
@@ -58,15 +38,15 @@
 
         <div class="program-box">
             <span>Program</span>
-            <strong>General English - Reguler</strong>
+            <strong>{{ $paymentSummary['program'] }}</strong>
         </div>
 
-        <div class="summary-row"><span>Biaya Pendaftaran</span><strong>Rp 200.000</strong></div>
-        <div class="summary-row"><span>Biaya SPP (Bulan 1)</span><strong>Rp 0</strong></div>
+        <div class="summary-row"><span>Biaya Pendaftaran</span><strong>{{ $paymentSummary['registrationFee'] }}</strong></div>
+        <div class="summary-row"><span>Biaya SPP (Bulan 1)</span><strong>{{ $paymentSummary['monthlyFee'] }}</strong></div>
 
         <div class="summary-total">
             <strong>Total</strong>
-            <span>Rp 200.000</span>
+            <span>{{ $paymentSummary['total'] }}</span>
         </div>
 
         <div class="summary-note">
@@ -116,17 +96,17 @@
                     <span class="radio-dot"></span>
                 </div>
                 <div class="bank-box">
-                    <div class="bank-line"><span>Bank</span><strong>BCA</strong></div>
+                    <div class="bank-line"><span>Bank</span><strong>{{ $bankAccount['bank'] }}</strong></div>
                     <div class="bank-line">
                         <span>No. Rekening</span>
                         <div class="account-number">
-                            <strong>123-456-7890</strong>
-                            <button type="button" onclick="event.stopPropagation(); copyText('123-456-7890')" aria-label="Salin nomor rekening">
+                            <strong>{{ $bankAccount['number'] }}</strong>
+                            <button type="button" onclick="event.stopPropagation(); copyText('{{ $bankAccount['number'] }}')" aria-label="Salin nomor rekening">
                                 <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                             </button>
                         </div>
                     </div>
-                    <div class="bank-line"><span>A.N.</span><strong>ETC Planet</strong></div>
+                    <div class="bank-line"><span>A.N.</span><strong>{{ $bankAccount['holder'] }}</strong></div>
                 </div>
             </article>
         </div>
@@ -153,7 +133,7 @@
         </section>
 
         <div class="payment-actions">
-            <button class="confirm-button" onclick="window.location.href='{{ route('konfirmasi') }}'">
+            <button class="confirm-button" onclick="window.location.href='{{ route('registrations.confirmation.show', ['registration' => $registrationReference ?? 'demo']) }}'">
                 Konfirmasi Pembayaran
                 <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
             </button>
@@ -162,31 +142,7 @@
     </section>
 </main>
 
-<footer>
-    <div class="footer-grid">
-        <div>
-            <div class="footer-logo">ETC Planet.</div>
-            <p class="footer-description">Platform e-learning terdepan untuk mengembangkan kemampuan bahasa Inggris Anda dengan kurikulum modern dan interaktif.</p>
-        </div>
-        <div class="footer-col">
-            <h4>Perusahaan</h4>
-            <a href="#">Tentang Kami</a>
-            <a href="#">Karir</a>
-            <a href="#">Hubungi Kami</a>
-        </div>
-        <div class="footer-col">
-            <h4>Bantuan</h4>
-            <a href="#">Pusat Bantuan</a>
-            <a href="#">Syarat & Ketentuan</a>
-            <a href="#">Kebijakan Privasi</a>
-        </div>
-    </div>
-    <div class="footer-bottom">
-        <span>&copy; 2024 ETC Planet. Hak Cipta Dilindungi.</span>
-        <span class="globe"></span>
-    </div>
-</footer>
-
+@push('scripts')
 <script>
 function selectMethod(card) {
     document.querySelectorAll('.method-card').forEach(item => item.classList.remove('is-active'));
@@ -206,5 +162,5 @@ function showFileName(input) {
     }
 }
 </script>
-</body>
-</html>
+@endpush
+</x-layouts.public>
