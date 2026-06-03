@@ -33,6 +33,7 @@ class AuthenticatedSessionController extends Controller
 
         return redirect()->intended(match (Auth::user()->role) {
             'admin' => route('admin.dashboard'),
+            'student' => route('student.dashboard'),
             'instructor' => route('instructor.dashboard'),
             default => route('auth.login'),
         });
@@ -45,6 +46,6 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('auth.login');
+        return redirect()->route('public.home');
     }
 }
