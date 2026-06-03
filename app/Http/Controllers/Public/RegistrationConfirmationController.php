@@ -3,18 +3,24 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Registration;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\URL;
 
 class RegistrationConfirmationController extends Controller
 {
-    public function show(string $registration): View
+    public function show(Registration $registration): View
     {
+        $registration->loadMissing('program');
+
         return view('public.registration.confirmation', [
-            'registrationReference' => $registration,
+            'registration' => $registration,
+            'receiptUrl' => URL::signedRoute('registrations.receipt.download', ['registration' => $registration]),
             'registrationDetail' => [
-                'studentName' => 'Budi Santoso',
-                'programName' => 'General English',
-                'registrationCode' => 'ETC-2024-89012A',
+                'studentName' => $registration->applicant_name,
+                'programName' => $registration->program?->name ?? '-',
+                'registrationCode' => $registration->registration_code,
+                'status' => $registration->status,
             ],
         ]);
     }

@@ -4,10 +4,14 @@ namespace App\Services;
 
 use App\Models\CourseClass;
 use App\Models\Enrollment;
+use App\Models\Program;
 use App\Models\Registration;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class RegistrationService extends BaseCrudService
@@ -28,12 +32,41 @@ class RegistrationService extends BaseCrudService
 
     public function createFromOnlineForm(array $applicantData): Registration
     {
-        /** @var Registration $registration */
-        $registration = $this->create($applicantData + [
-            'status' => 'pending_payment',
-        ]);
+        if (! isset($applicantData['full_name'])) {
+            /** @var Registration $registration */
+            $registration = $this->create($applicantData + [
+                'registration_code' => $this->generateRegistrationCode(),
+                'status' => 'pending_payment',
+            ]);
 
-        return $registration;
+            return $registration;
+        }
+
+        return DB::transaction(function () use ($applicantData): Registration {
+            $program = Program::query()->findOrFail($applicantData['program_id']);
+            $user = $this->storeStudentProfile($applicantData);
+
+            /** @var Registration $registration */
+            $registration = Registration::query()->create([
+                'registration_code' => $this->generateRegistrationCode(),
+                'user_id' => $user->id,
+                'program_id' => $program->id,
+                'applicant_name' => $applicantData['full_name'],
+                'applicant_email' => $applicantData['email'],
+                'applicant_phone' => $applicantData['mobile_phone'],
+                'preferred_days' => $applicantData['preferred_days'],
+                'preferred_time' => $applicantData['preferred_time'],
+                'payment_amount' => (float) $program->registration_fee + (float) $program->price,
+                'status' => 'pending_payment',
+                'notes' => json_encode([
+                    'applying_for' => $applicantData['applying_for'],
+                    'submitted_from' => 'online_registration',
+                    'submitted_at' => now()->toIso8601String(),
+                ], JSON_THROW_ON_ERROR),
+            ]);
+
+            return $registration->load($this->defaultWith());
+        });
     }
 
     public function uploadPaymentProof(Registration $registration, UploadedFile $proof): Registration
@@ -44,6 +77,53 @@ class RegistrationService extends BaseCrudService
         ]);
 
         return $registration;
+    }
+
+    public function submitPaymentProof(Registration $registration, UploadedFile $proof, string $paymentMethod): Registration
+    {
+        /** @var Registration $registration */
+        $registration = $this->update($registration, [
+            'payment_method' => $paymentMethod,
+            'payment_proof' => $this->mediaStorage->replace($registration->payment_proof, $proof, 'registrations/payment-proofs'),
+        ]);
+
+        return $registration;
+    }
+
+    public function confirmPaymentSubmission(Registration $registration, string $paymentMethod): Registration
+    {
+        $notes = $this->decodeNotes($registration->notes);
+        $notes['payment_confirmation'] = [
+            'method' => $paymentMethod,
+            'confirmed_by_applicant_at' => now()->toIso8601String(),
+        ];
+
+        /** @var Registration $registration */
+        $registration = $this->update($registration, [
+            'payment_method' => $paymentMethod,
+            'notes' => json_encode($notes, JSON_THROW_ON_ERROR),
+        ]);
+
+        return $registration;
+    }
+
+    public function receiptData(Registration $registration): array
+    {
+        $registration->loadMissing(['user', 'program']);
+
+        return [
+            'code' => $registration->registration_code,
+            'student' => $registration->applicant_name,
+            'email' => $registration->applicant_email,
+            'phone' => $registration->applicant_phone,
+            'program' => $registration->program?->name ?? '-',
+            'preferred_days' => $registration->preferred_days,
+            'preferred_time' => $registration->preferred_time,
+            'payment_method' => $registration->payment_method,
+            'payment_amount' => $registration->payment_amount,
+            'status' => $registration->status,
+            'submitted_at' => $registration->created_at,
+        ];
     }
 
     public function markAsPaid(Registration $registration, ?float $amount = null, ?string $paymentMethod = null, bool $adminOverride = false): Registration
@@ -157,5 +237,78 @@ class RegistrationService extends BaseCrudService
             ->when($filters['class_id'] ?? null, fn (Builder $query, int|string $classId) => $query->where('class_id', $classId));
 
         return $this->whereDateRange($query, 'created_at', $filters, 'created_from', 'created_to');
+    }
+
+    protected function storeStudentProfile(array $data): User
+    {
+        /** @var User|null $user */
+        $user = User::query()->where('email', $data['email'])->first();
+
+        if ($user && $user->role !== 'student') {
+            throw new RuntimeException('Email ini sudah dipakai oleh akun non-siswa.');
+        }
+
+        $profileData = [
+            'name' => $data['full_name'],
+            'email' => $data['email'],
+            'role' => 'student',
+            'is_active' => true,
+            'full_name' => $data['full_name'],
+            'place_of_birth' => $data['place_of_birth'],
+            'date_of_birth' => $data['date_of_birth'],
+            'sex' => $data['sex'],
+            'religion' => $data['religion'],
+            'nationality' => $data['nationality'],
+            'occupation_school' => $data['occupation_school'],
+            'mobile_phone' => $data['mobile_phone'],
+            'nisn' => $data['nisn'] ?? null,
+            'nik' => $data['nik'] ?? null,
+            'kps_receiver' => (bool) $data['kps_receiver'],
+            'no_kps' => $data['no_kps'] ?? null,
+            'worthy_of_pip' => (bool) $data['worthy_of_pip'],
+            'pip_reason' => $data['pip_reason'] ?? null,
+            'no_kip' => $data['no_kip'] ?? null,
+            'address' => $data['address'],
+            'rt_rw' => $data['rt_rw'] ?? null,
+            'postal_code' => $data['postal_code'] ?? null,
+            'village' => $data['village'] ?? null,
+            'sub_district' => $data['sub_district'] ?? null,
+            'district' => $data['district'] ?? null,
+            'province' => $data['province'] ?? null,
+            'living_with' => $data['living_with'] ?? null,
+            'transportation' => $data['transportation'] ?? null,
+            'mother_name' => $data['mother_name'],
+            'father_name' => $data['father_name'],
+        ];
+
+        if (! $user) {
+            $profileData['password'] = Str::password(24);
+
+            return User::query()->create($profileData);
+        }
+
+        $user->update($profileData);
+
+        return $user->refresh();
+    }
+
+    protected function generateRegistrationCode(): string
+    {
+        do {
+            $code = 'REG-'.now()->format('Ymd').'-'.Str::upper(Str::random(6));
+        } while (Registration::query()->where('registration_code', $code)->exists());
+
+        return $code;
+    }
+
+    protected function decodeNotes(?string $notes): array
+    {
+        if (! $notes) {
+            return [];
+        }
+
+        $decoded = json_decode($notes, true);
+
+        return is_array($decoded) ? $decoded : ['legacy_notes' => $notes];
     }
 }

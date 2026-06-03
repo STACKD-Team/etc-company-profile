@@ -1,0 +1,308 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --etc-magenta: #e6007f;
+    --etc-primary: #b90065;
+    --etc-charcoal: #27171c;
+    --etc-surface: #fff8f8;
+    --etc-surface-low: #fff0f2;
+    --etc-surface-container: #ffe8ed;
+    --etc-on-surface: #27171c;
+    --etc-on-muted: #5a3f47;
+    --etc-outline: #e2bdc7;
+    --shadow-soft: 0 2px 8px rgba(0, 0, 0, .06);
+    --shadow-panel: 0 18px 45px rgba(58, 44, 51, .12);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: var(--etc-surface);
+    color: var(--etc-on-surface);
+    font-family: "Work Sans", "Segoe UI", sans-serif;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+svg {
+    max-width: 100%;
+}
+
+header.sticky,
+header[class*="bg-etc-charcoal"] {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--etc-charcoal);
+    color: #fff;
+    box-shadow: 0 12px 32px rgba(39, 23, 28, .18);
+}
+
+header.sticky > nav,
+header[class*="bg-etc-charcoal"] > nav {
+    width: min(1200px, calc(100% - 48px));
+    min-height: 80px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+}
+
+header.sticky nav > a:first-child,
+header[class*="bg-etc-charcoal"] nav > a:first-child {
+    font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+    font-size: 24px;
+    font-weight: 900;
+}
+
+header.sticky nav div,
+header[class*="bg-etc-charcoal"] nav div {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+header.sticky nav a,
+header[class*="bg-etc-charcoal"] nav a {
+    font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+header.sticky a[href*="registration"],
+header[class*="bg-etc-charcoal"] a[href*="registration"] {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--etc-magenta);
+    color: #fff;
+    padding: 10px 28px;
+    box-shadow: var(--shadow-soft);
+}
+
+nav[aria-label="Navigasi mobile"] {
+    display: none;
+}
+
+main {
+    min-height: 50vh;
+}
+
+footer[class*="bg-etc-charcoal"] {
+    background: var(--etc-charcoal);
+    color: #fff;
+    padding: 64px 24px 96px;
+}
+
+footer[class*="bg-etc-charcoal"] > div {
+    width: min(1120px, 100%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 48px;
+}
+
+footer[class*="bg-etc-charcoal"] a {
+    color: rgba(255, 255, 255, .72);
+    text-decoration: underline;
+    text-decoration-color: rgba(230, 0, 127, .6);
+    text-underline-offset: 4px;
+}
+
+[data-registration-program-page] {
+    background: var(--etc-surface);
+    padding: 48px 0 72px;
+}
+
+[data-registration-program-page] > div {
+    width: min(1200px, calc(100% - 48px));
+    margin: 0 auto;
+}
+
+[data-registration-program-page] ol {
+    list-style: none;
+    margin: 0;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: var(--shadow-soft);
+}
+
+[data-registration-program-page] li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 12px;
+    background: var(--etc-surface-low);
+    color: var(--etc-on-muted);
+    padding: 14px 16px;
+    font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+[data-registration-program-page] li:first-child {
+    background: var(--etc-magenta);
+    color: #fff;
+}
+
+[data-registration-program-page] li span:first-child {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .85);
+    color: var(--etc-magenta);
+}
+
+[data-registration-program-page] > div > div {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 32px;
+    align-items: start;
+}
+
+[data-registration-program-page] section[aria-labelledby="page-title"],
+[data-registration-program-page] aside[aria-label] {
+    border-radius: 16px;
+    box-shadow: var(--shadow-panel);
+}
+
+[data-registration-program-page] section[aria-labelledby="page-title"] {
+    background: #fff;
+    padding: 32px;
+}
+
+[data-registration-program-page] aside[aria-label] {
+    background: var(--etc-charcoal);
+    color: #fff;
+    padding: 28px;
+}
+
+[data-registration-program-page] p {
+    color: var(--etc-on-muted);
+    line-height: 1.65;
+}
+
+[data-registration-program-page] h1,
+[data-registration-program-page] h2,
+[data-registration-program-page] strong {
+    font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+}
+
+#page-title {
+    margin: 12px 0 0;
+    font-size: clamp(34px, 4vw, 48px);
+    line-height: 1.12;
+    font-weight: 900;
+}
+
+.registration-program-card {
+    position: relative;
+    display: block;
+    cursor: pointer;
+    border: 1px solid var(--etc-outline);
+    border-radius: 16px;
+    background: #fff;
+    padding: 24px;
+    box-shadow: var(--shadow-soft);
+}
+
+.registration-program-card.is-selected,
+.registration-program-card:hover {
+    border-color: var(--etc-magenta);
+    box-shadow: var(--shadow-panel);
+}
+
+.registration-program-card input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+[data-registration-program-page] form .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+[data-registration-continue] {
+    min-height: 48px;
+    margin-top: 28px;
+    display: inline-flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--etc-magenta);
+    color: #fff;
+    padding: 12px 20px;
+    font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.registration-summary .text-etc-magenta,
+[data-registration-program-page] .text-etc-magenta {
+    color: var(--etc-magenta);
+}
+
+[data-registration-program-page] .border-dashed {
+    border: 1px dashed var(--etc-outline);
+    border-radius: 16px;
+    background: var(--etc-surface-low);
+    padding: 32px;
+    text-align: center;
+}
+
+.material-symbols-outlined {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+}
+
+@media (max-width: 900px) {
+    header.sticky > nav,
+    header[class*="bg-etc-charcoal"] > nav,
+    [data-registration-program-page] > div {
+        width: min(100% - 32px, 720px);
+    }
+
+    header.sticky nav div:nth-of-type(1),
+    header[class*="bg-etc-charcoal"] nav div:nth-of-type(1) {
+        display: none;
+    }
+
+    [data-registration-program-page] ol,
+    [data-registration-program-page] > div > div,
+    [data-registration-program-page] form .grid,
+    footer[class*="bg-etc-charcoal"] > div {
+        grid-template-columns: 1fr;
+    }
+
+    [data-registration-program-page] {
+        padding-bottom: 110px;
+    }
+}

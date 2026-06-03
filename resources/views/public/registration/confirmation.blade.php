@@ -33,8 +33,8 @@
                 <div class="success-icon">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
                 </div>
-                <h1>Pendaftaran Berhasil!</h1>
-                <p>Terima kasih telah mendaftar di ETC Planet. Langkah pertamamu menuju kelancaran berbahasa dimulai di sini.</p>
+                <h1>Pendaftaran Diterima!</h1>
+                <p>Terima kasih telah mendaftar di ETC Planet. Pembayaran kamu akan dicek admin sebelum masuk tahap placement test offline.</p>
             </section>
 
             <section class="detail-card">
@@ -51,6 +51,10 @@
                     <span>ID Pendaftaran</span>
                     <strong><code>{{ $registrationDetail['registrationCode'] }}</code></strong>
                 </div>
+                <div class="detail-row">
+                    <span>Status</span>
+                    <strong>{{ str($registrationDetail['status'])->replace('_', ' ')->title() }}</strong>
+                </div>
             </section>
 
             <section class="info-box">
@@ -64,14 +68,14 @@
             </section>
 
             <div class="action-row">
-                <button class="btn-unduh" type="button">
+                <a class="btn-unduh" href="{{ $receiptUrl }}">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>
                     Unduh Bukti Pendaftaran
-                </button>
-                <button class="btn-dashboard" type="button">
-                    Ke Dashboard
+                </a>
+                <a class="btn-dashboard" href="{{ route('public.home') }}">
+                    Kembali ke Beranda
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-                </button>
+                </a>
             </div>
         </main>
     </div>
