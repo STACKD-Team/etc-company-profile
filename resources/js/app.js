@@ -80,8 +80,8 @@ function initRegistrationProgramPage() {
                 summaryTotal.textContent = formattedPrice;
             }
 
-            if (continueButton && radio.dataset.contactUrl) {
-                continueButton.href = radio.dataset.contactUrl;
+            if (continueButton && radio.dataset.nextUrl) {
+                continueButton.href = radio.dataset.nextUrl;
             }
 
             markSelectedCard(radio);
@@ -93,7 +93,7 @@ function initRegistrationProgramPage() {
     continueButton?.addEventListener('click', (event) => {
         const selectedProgram = page.querySelector('[data-program-radio]:checked')?.dataset.name || 'program ini';
         stepperItems[1]?.classList.add('is-preview');
-        showToast(`Membuka konsultasi untuk ${selectedProgram}.`);
+        showToast(`Membuka form pendaftaran untuk ${selectedProgram}.`);
 
         setTimeout(() => stepperItems[1]?.classList.remove('is-preview'), 1400);
     });

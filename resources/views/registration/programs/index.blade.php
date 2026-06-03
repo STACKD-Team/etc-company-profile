@@ -18,7 +18,7 @@
     $formatRupiah = static fn (int $value): string => 'Rp '.number_format($value, 0, ',', '.');
     $selectedProgram ??= $programs->first();
     $selectedIcon = $selectedProgram ? ($iconMap[$selectedProgram['icon']] ?? 'program-general') : 'program-general';
-    $selectedContactUrl = $selectedProgram['contact_url'] ?? route('public.contact.index');
+    $selectedNextUrl = $selectedProgram['next_url'] ?? '/registration/form';
 @endphp
 
 <x-layouts.public title="Pilih Program" :footer-link-groups="$footerLinkGroups">
@@ -78,7 +78,7 @@
                                             data-icon="{{ $program['icon'] }}"
                                             data-tone="{{ $program['tone'] }}"
                                             data-price="{{ $program['registration_fee'] }}"
-                                            data-contact-url="{{ $program['contact_url'] }}"
+                                            data-next-url="{{ $program['next_url'] }}"
                                             @checked($isSelected)
                                         >
                                         <span class="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full border border-etc-outline-variant bg-white text-etc-magenta transition group-has-[:checked]:border-etc-magenta group-has-[:checked]:bg-etc-magenta group-has-[:checked]:text-white">
@@ -125,7 +125,7 @@
                                 <strong id="summary-total" class="font-heading text-xl text-etc-magenta">{{ $formatRupiah($selectedProgram['registration_fee']) }}</strong>
                             </div>
 
-                            <a href="{{ $selectedContactUrl }}" data-registration-continue class="mt-8 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-pill bg-etc-magenta px-5 py-3 font-heading text-sm font-bold text-white transition hover:bg-etc-primary">
+                            <a href="{{ $selectedNextUrl }}" data-registration-continue class="mt-8 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-pill bg-etc-magenta px-5 py-3 font-heading text-sm font-bold text-white transition hover:bg-etc-primary">
                                 Lanjut ke Data Pribadi
                                 <span class="material-symbols-outlined text-lg">arrow_forward</span>
                             </a>

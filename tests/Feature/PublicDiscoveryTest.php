@@ -38,7 +38,7 @@ it('renders all Miftah public discovery pages without foundation placeholders', 
     }
 });
 
-it('connects public program CTAs into detail, picker, and contact consultation', function () {
+it('connects public program CTAs into detail and the registration picker', function () {
     $program = Program::query()->create([
         'name' => 'General English',
         'slug' => 'general-english',
@@ -65,12 +65,8 @@ it('connects public program CTAs into detail, picker, and contact consultation',
     $this->get(route('registrations.programs.index', ['program' => $program->id]))
         ->assertOk()
         ->assertSee('checked', false)
-        ->assertSee(route('public.contact.index', ['program' => $program->id]), false);
-
-    $this->get(route('public.contact.index', ['program' => $program->id]))
-        ->assertOk()
-        ->assertSee('Konsultasi program General English')
-        ->assertSee('saya ingin konsultasi tentang program General English');
+        ->assertSee('/registration/form/'.$program->id, false)
+        ->assertDontSee(route('public.contact.index', ['program' => $program->id]), false);
 });
 
 it('stores valid contact messages and rejects invalid contact messages', function () {

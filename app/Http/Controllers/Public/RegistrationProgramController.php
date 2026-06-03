@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Program;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 
 class RegistrationProgramController extends Controller
@@ -24,7 +25,7 @@ class RegistrationProgramController extends Controller
                 'registration_fee' => (int) $program->registration_fee,
                 'program_price' => (int) $program->price,
                 'duration_meetings' => $program->duration_meetings,
-                'contact_url' => route('public.contact.index', ['program' => $program->id]),
+                'next_url' => $this->nextUrl($program),
             ]);
         $selectedProgram = $programs->firstWhere('id', (int) $request->query('program')) ?? $programs->first();
 
@@ -44,5 +45,14 @@ class RegistrationProgramController extends Controller
             str_contains($name, 'kids') || $program->target_age === 'kids' => 'kids-english',
             default => 'general-english',
         };
+    }
+
+    private function nextUrl(Program $program): string
+    {
+        if (Route::has('registrations.create')) {
+            return route('registrations.create', ['program' => $program->id]);
+        }
+
+        return '/registration/form/'.$program->id;
     }
 }
