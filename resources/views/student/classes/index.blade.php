@@ -7,7 +7,12 @@
                     <div>
                         <p class="text-xs font-bold uppercase text-etc-magenta">{{ $enrollment->status }}</p>
                         <h2 class="mt-2 font-heading text-xl font-bold text-etc-on-surface">{{ $class?->program?->name }} - {{ $class?->name }}</h2>
-                        <p class="mt-2 text-sm text-etc-on-muted">{{ $class?->schedule_days ?? 'Jadwal belum ditentukan' }} {{ $class?->schedule_time ? '• '.$class->schedule_time : '' }}</p>
+                        <p class="mt-2 text-sm text-etc-on-muted">
+                            {{ $class?->schedule_days ?? 'Jadwal belum ditentukan' }}
+                            @if ($class?->schedule_time)
+                                <span aria-hidden="true">&bull;</span> {{ $class->schedule_time }}
+                            @endif
+                        </p>
                     </div>
                     @if ($class)
                         <a href="{{ route('student.classes.show', $class) }}" class="rounded-pill border border-etc-outline-variant px-4 py-2 font-heading text-sm font-bold text-etc-on-muted hover:border-etc-magenta hover:text-etc-magenta">Detail</a>
