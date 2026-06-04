@@ -3,19 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StorePlacementTestResultRequest;
 use App\Models\Registration;
 use App\Services\RegistrationService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class PlacementTestResultController extends Controller
 {
-    public function store(Request $request, Registration $registration, RegistrationService $registrations): RedirectResponse
+    public function store(StorePlacementTestResultRequest $request, Registration $registration, RegistrationService $registrations): RedirectResponse
     {
-        $validated = $request->validate([
-            'placement_test_result' => ['required', 'string', 'max:5000'],
-            'class_id' => ['nullable', 'integer', 'exists:classes,id'],
-        ]);
+        $validated = $request->validated();
 
         $registrations->update($registration, [
             'placement_test_result' => $validated['placement_test_result'],

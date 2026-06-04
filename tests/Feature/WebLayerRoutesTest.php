@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Program;
+use App\Models\CourseClass;
+use App\Models\Registration;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
@@ -179,6 +181,116 @@ it('allows admin users to open Rasky admin GET pages', function () {
     }
 });
 
+it('renders the Rasky placement detail workflow forms for admin users', function () {
+    $admin = User::factory()->create([
+        'role' => 'admin',
+    ]);
+    [$registration, $courseClass] = createRaskyPlacementFixture();
+
+    $this->actingAs($admin)
+        ->get(route('admin.placement-tests.show', $registration))
+        ->assertOk()
+        ->assertSee('Jadwal Placement Test')
+        ->assertSee('Hasil dan Rekomendasi Kelas')
+        ->assertSee($courseClass->name)
+        ->assertSee(route('admin.placement-tests.schedule', $registration), false)
+        ->assertSee(route('admin.placement-tests.result.store', $registration), false);
+});
+
+it('protects the Rasky placement workflow from guests and non admin users', function () {
+    [$registration] = createRaskyPlacementFixture();
+    $student = User::factory()->create([
+        'role' => 'student',
+    ]);
+
+    $this->get(route('admin.placement-tests.show', $registration))
+        ->assertRedirect(route('auth.login'));
+
+    $this->post(route('admin.placement-tests.schedule', $registration), [
+        'placement_test_at' => '2026-05-20 10:00:00',
+    ])->assertRedirect(route('auth.login'));
+
+    $this->actingAs($student)
+        ->get(route('admin.placement-tests.show', $registration))
+        ->assertForbidden();
+
+    $this->actingAs($student)
+        ->post(route('admin.placement-tests.result.store', $registration), [
+            'placement_test_result' => 'Ready for Teen 4.',
+        ])
+        ->assertForbidden();
+});
+
+it('allows admin users to schedule a placement test', function () {
+    $admin = User::factory()->create([
+        'role' => 'admin',
+    ]);
+    [$registration] = createRaskyPlacementFixture();
+
+    $this->actingAs($admin)
+        ->post(route('admin.placement-tests.schedule', $registration), [
+            'placement_test_at' => '2026-05-20 10:00:00',
+        ])
+        ->assertRedirect(route('admin.placement-tests.show', $registration))
+        ->assertSessionHasNoErrors();
+
+    $registration->refresh();
+
+    expect($registration->status)->toBe('placement_test')
+        ->and($registration->placement_test_at?->format('Y-m-d H:i:s'))->toBe('2026-05-20 10:00:00');
+});
+
+it('validates placement test schedule input', function () {
+    $admin = User::factory()->create([
+        'role' => 'admin',
+    ]);
+    [$registration] = createRaskyPlacementFixture();
+
+    $this->actingAs($admin)
+        ->from(route('admin.placement-tests.show', $registration))
+        ->post(route('admin.placement-tests.schedule', $registration), [])
+        ->assertRedirect(route('admin.placement-tests.show', $registration))
+        ->assertSessionHasErrors(['placement_test_at']);
+});
+
+it('allows admin users to store placement result and assign a class without creating enrollment', function () {
+    $admin = User::factory()->create([
+        'role' => 'admin',
+    ]);
+    [$registration, $courseClass] = createRaskyPlacementFixture();
+
+    $this->actingAs($admin)
+        ->post(route('admin.placement-tests.result.store', $registration), [
+            'placement_test_result' => 'Student is ready for Teen 4.',
+            'class_id' => $courseClass->id,
+        ])
+        ->assertRedirect(route('admin.placement-tests.show', $registration))
+        ->assertSessionHasNoErrors();
+
+    $registration->refresh();
+
+    expect($registration->placement_test_result)->toBe('Student is ready for Teen 4.')
+        ->and($registration->class_id)->toBe($courseClass->id)
+        ->and($registration->status)->toBe('enrolled')
+        ->and(\App\Models\Enrollment::query()->where('user_id', $registration->user_id)->where('class_id', $courseClass->id)->exists())->toBeFalse();
+});
+
+it('validates placement test result input', function () {
+    $admin = User::factory()->create([
+        'role' => 'admin',
+    ]);
+    [$registration] = createRaskyPlacementFixture();
+
+    $this->actingAs($admin)
+        ->from(route('admin.placement-tests.show', $registration))
+        ->post(route('admin.placement-tests.result.store', $registration), [
+            'placement_test_result' => '',
+            'class_id' => 999999,
+        ])
+        ->assertRedirect(route('admin.placement-tests.show', $registration))
+        ->assertSessionHasErrors(['placement_test_result', 'class_id']);
+});
+
 it('allows instructor users to open Rasky instructor GET pages', function () {
     $instructor = User::factory()->create([
         'role' => 'instructor',
@@ -193,3 +305,43 @@ it('allows instructor users to open Rasky instructor GET pages', function () {
         $this->actingAs($instructor)->get($url)->assertOk();
     }
 });
+
+function createRaskyPlacementFixture(): array
+{
+    $student = User::factory()->create([
+        'role' => 'student',
+    ]);
+
+    $program = Program::query()->create([
+        'name' => 'English Conversation Teen',
+        'slug' => 'english-conversation-teen',
+        'category' => 'english',
+        'type' => 'regular',
+        'target_age' => 'teen',
+        'price' => 350000,
+        'registration_fee' => 200000,
+        'is_active' => true,
+    ]);
+
+    $courseClass = CourseClass::query()->create([
+        'program_id' => $program->id,
+        'name' => 'Teen 4',
+        'schedule_days' => 'Tuesday and Thursday',
+        'schedule_time' => '17:30 - 19:00',
+        'status' => 'upcoming',
+    ]);
+
+    $registration = Registration::query()->create([
+        'registration_code' => 'REG-TEST-PLACEMENT',
+        'user_id' => $student->id,
+        'program_id' => $program->id,
+        'applicant_name' => 'Budi Placement',
+        'applicant_email' => 'budi.placement@example.test',
+        'applicant_phone' => '08123456789',
+        'payment_amount' => 550000,
+        'paid_at' => now(),
+        'status' => 'paid',
+    ]);
+
+    return [$registration, $courseClass, $program, $student];
+}
