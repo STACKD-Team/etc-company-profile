@@ -30,6 +30,9 @@
             ['label' => 'Export Rapor', 'route' => 'admin.exports.report-cards', 'url' => '#', 'key' => 'report_exports', 'icon' => 'file_save'],
             ['label' => 'Reels', 'route' => 'admin.reels.index', 'url' => '#', 'key' => 'reels', 'icon' => 'smart_display'],
             ['label' => 'CMS Konten', 'route' => 'admin.contents.index', 'url' => '#', 'key' => 'contents', 'icon' => 'dashboard_customize'],
+            ['label' => 'Pesan Kontak', 'route' => 'admin.contact-messages.index', 'url' => '#', 'key' => 'contact_messages', 'icon' => 'inbox'],
+            ['label' => 'Chatbot Logs', 'route' => 'admin.chatbot-logs.index', 'url' => '#', 'key' => 'chatbot_logs', 'icon' => 'forum'],
+            ['label' => 'Settings', 'route' => 'admin.settings.index', 'url' => '#', 'key' => 'settings', 'icon' => 'settings'],
         ],
         'student' => [
             ['label' => 'Dashboard', 'route' => 'student.dashboard', 'url' => '#', 'key' => 'dashboard', 'icon' => 'dashboard'],

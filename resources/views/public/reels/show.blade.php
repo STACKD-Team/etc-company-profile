@@ -1,10 +1,20 @@
 <x-layouts.public :title="$reel->title">
-    @php($assetUrl = static fn (?string $path, string $fallback = 'videos/video1.mp4') => asset($path ?: $fallback))
+    @php
+        $assetUrl = static function (?string $path, string $fallback = 'videos/video1.mp4'): string {
+            if (! $path) {
+                return asset($fallback);
+            }
+
+            return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://', '/', 'images/', 'videos/', 'storage/'])
+                ? asset(ltrim($path, '/'))
+                : \Illuminate\Support\Facades\Storage::url($path);
+        };
+    @endphp
 
     <section class="bg-etc-charcoal py-12 text-white md:py-20">
         <div class="mx-auto grid max-w-[1120px] gap-10 px-5 lg:grid-cols-[430px_1fr] lg:px-0">
             <div class="overflow-hidden rounded-[28px] border border-white/15 bg-black shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
-                <video controls autoplay muted playsinline poster="{{ asset($reel->thumbnail_path ?: 'images/pu1-img (3).jpg') }}" class="aspect-[9/14] w-full object-cover" data-view-endpoint="{{ route('public.reels.views.store', $reel) }}">
+                <video controls autoplay muted playsinline poster="{{ $assetUrl($reel->thumbnail_path, 'images/pu1-img (3).jpg') }}" class="aspect-[9/14] w-full object-cover" data-view-endpoint="{{ route('public.reels.views.store', $reel) }}">
                     <source src="{{ $assetUrl($reel->video_path) }}" type="video/mp4">
                     Browser kamu tidak mendukung pemutar video.
                 </video>

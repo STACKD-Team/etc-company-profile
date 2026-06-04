@@ -1,5 +1,15 @@
 <x-layouts.public title="Reels">
-    @php($assetUrl = static fn (?string $path, string $fallback = 'videos/video1.mp4') => asset($path ?: $fallback))
+    @php
+        $assetUrl = static function (?string $path, string $fallback = 'videos/video1.mp4'): string {
+            if (! $path) {
+                return asset($fallback);
+            }
+
+            return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://', '/', 'images/', 'videos/', 'storage/'])
+                ? asset(ltrim($path, '/'))
+                : \Illuminate\Support\Facades\Storage::url($path);
+        };
+    @endphp
 
     <section class="bg-etc-charcoal py-20 text-white">
         <div class="mx-auto max-w-[1120px] px-5 lg:px-0">
@@ -16,7 +26,7 @@
                     @foreach ($reels as $reel)
                         <a href="{{ route('public.reels.show', $reel) }}" class="group overflow-hidden rounded-[22px] border border-[#eeb8c9] bg-white shadow-soft">
                             <div class="relative aspect-[9/14] overflow-hidden bg-black">
-                                <video preload="metadata" muted playsinline poster="{{ asset($reel->thumbnail_path ?: 'images/pu1-img (3).jpg') }}" class="h-full w-full object-cover opacity-90">
+                                <video preload="metadata" muted playsinline poster="{{ $assetUrl($reel->thumbnail_path, 'images/pu1-img (3).jpg') }}" class="h-full w-full object-cover opacity-90">
                                     <source src="{{ $assetUrl($reel->video_path) }}" type="video/mp4">
                                 </video>
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent"></div>

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Reel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -18,6 +19,14 @@ class ReelService extends BaseCrudService
     protected function modelClass(): string
     {
         return Reel::class;
+    }
+
+    public function adminPaginate(array $filters = [], int $perPage = 12): LengthAwarePaginator
+    {
+        return $this->query($filters)
+            ->latest('created_at')
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     public function createWithMedia(array $data, UploadedFile $video, ?UploadedFile $thumbnail = null): Reel

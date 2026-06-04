@@ -3,9 +3,12 @@
 namespace App\Services;
 
 use App\Models\Content;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 
 class ContentService extends BaseCrudService
 {
@@ -16,6 +19,64 @@ class ContentService extends BaseCrudService
     protected function modelClass(): string
     {
         return Content::class;
+    }
+
+    public function adminPaginate(array $filters = [], int $perPage = 12): LengthAwarePaginator
+    {
+        return $this->query($filters)
+            ->orderBy('type')
+            ->orderBy('display_order')
+            ->latest('created_at')
+            ->paginate($perPage)
+            ->withQueryString();
+    }
+
+    /**
+     * @param array<int, string> $slugs
+     * @return Collection<int, Content>
+     */
+    public function settings(array $slugs = []): Collection
+    {
+        return Content::query()
+            ->where('type', 'setting')
+            ->when($slugs !== [], fn (Builder $query) => $query->whereIn('slug', $slugs))
+            ->get()
+            ->keyBy('slug');
+    }
+
+    /**
+     * @param array<string, string|null> $values
+     * @param array<string, string> $labels
+     */
+    public function updateSettings(array $values, array $labels, ?UploadedFile $qrisImage = null): void
+    {
+        DB::transaction(function () use ($values, $labels, $qrisImage): void {
+            foreach ($labels as $slug => $title) {
+                $content = Content::query()->firstOrNew([
+                    'type' => 'setting',
+                    'slug' => $slug,
+                ]);
+
+                $content->title = $title;
+                $content->body = null;
+                $content->display_order = array_search($slug, array_keys($labels), true) ?: 0;
+                $content->is_published = true;
+
+                if ($slug === 'qris') {
+                    $content->meta = ['value' => $values[$slug] ?? 'QRIS ETC Planet'];
+
+                    if ($qrisImage !== null) {
+                        $content->image = $content->exists
+                            ? $this->mediaStorage->replace($content->image, $qrisImage, 'settings')
+                            : $this->mediaStorage->putUploadedFile($qrisImage, 'settings');
+                    }
+                } else {
+                    $content->meta = ['value' => $values[$slug] ?? null];
+                }
+
+                $content->save();
+            }
+        });
     }
 
     public function createWithMedia(array $data, ?UploadedFile $image = null, array $images = []): Content

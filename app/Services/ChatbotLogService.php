@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ChatbotLog;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
 class ChatbotLogService extends BaseCrudService
@@ -11,6 +12,14 @@ class ChatbotLogService extends BaseCrudService
     protected function modelClass(): string
     {
         return ChatbotLog::class;
+    }
+
+    public function adminPaginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->query($filters)
+            ->latest('created_at')
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     protected function defaultWith(): array

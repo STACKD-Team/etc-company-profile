@@ -7,6 +7,7 @@ use App\Models\Program;
 use App\Models\Reel;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PublicDiscoveryService
@@ -93,7 +94,12 @@ class PublicDiscoveryService
             ->where('is_published', true)
             ->get()
             ->mapWithKeys(function (Content $content): array {
+                if ($content->slug === 'qris' && $content->image) {
+                    return ['qris' => Storage::url($content->image)];
+                }
+
                 $value = $content->meta['value'] ?? $content->body ?? null;
+                $value ??= $content->image ? Storage::url($content->image) : null;
 
                 return [$content->slug ?: Str::slug($content->title) => $value];
             })

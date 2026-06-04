@@ -1,6 +1,14 @@
 <x-layouts.public title="Beranda">
     @php
-        $assetUrl = static fn (?string $path, string $fallback = 'images/hero-img.jpeg') => asset($path ?: $fallback);
+        $assetUrl = static function (?string $path, string $fallback = 'images/hero-img.jpeg'): string {
+            if (! $path) {
+                return asset($fallback);
+            }
+
+            return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://', '/', 'images/', 'videos/', 'storage/'])
+                ? asset(ltrim($path, '/'))
+                : \Illuminate\Support\Facades\Storage::url($path);
+        };
         $formatMoney = static fn ($value) => 'Rp ' . number_format((float) $value, 0, ',', '.');
     @endphp
 

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ContactMessage;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
 class ContactMessageService extends BaseCrudService
@@ -10,6 +11,14 @@ class ContactMessageService extends BaseCrudService
     protected function modelClass(): string
     {
         return ContactMessage::class;
+    }
+
+    public function adminPaginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->query($filters)
+            ->latest('created_at')
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     public function markAsRead(ContactMessage $message): ContactMessage
