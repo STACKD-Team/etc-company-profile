@@ -282,3 +282,239 @@ test('admin academic mecca pages render for authenticated admin', function () {
     $this->actingAs($admin)->get('/admin/classes/create')->assertOk();
     $this->actingAs($admin)->get('/admin/enrollments')->assertOk();
 });
+
+test('admin academic routes require admin access', function () {
+    $student = User::factory()->create(['role' => 'student']);
+
+    $this->get('/admin/programs')->assertRedirect('/login');
+
+    $this->actingAs($student)
+        ->get('/admin/programs')
+        ->assertForbidden();
+});
+
+test('admin student and instructor pages only expose matching roles', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $student = User::factory()->create([
+        'role' => 'student',
+        'name' => 'Student Account',
+        'full_name' => 'Mecca Student',
+    ]);
+    $instructor = User::factory()->create([
+        'role' => 'instructor',
+        'name' => 'Instructor Account',
+        'full_name' => 'ETC Instructor',
+    ]);
+
+    $this->actingAs($admin)
+        ->get('/admin/students')
+        ->assertOk()
+        ->assertSee('Mecca Student')
+        ->assertDontSee('ETC Instructor');
+
+    $this->actingAs($admin)
+        ->get("/admin/students/{$student->id}")
+        ->assertOk()
+        ->assertSee('Mecca Student');
+
+    $this->actingAs($admin)
+        ->get("/admin/students/{$instructor->id}")
+        ->assertNotFound();
+
+    $this->actingAs($admin)
+        ->get('/admin/instructors')
+        ->assertOk()
+        ->assertSee('ETC Instructor')
+        ->assertDontSee('Mecca Student');
+
+    $this->actingAs($admin)
+        ->get("/admin/instructors/{$instructor->id}")
+        ->assertOk()
+        ->assertSee('ETC Instructor');
+
+    $this->actingAs($admin)
+        ->get("/admin/instructors/{$student->id}")
+        ->assertNotFound();
+});
+
+test('admin can create and update programs', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $this->actingAs($admin)
+        ->post(route('admin.programs.store'), [
+            'name' => 'Academic English',
+            'slug' => 'academic-english',
+            'category' => 'english',
+            'type' => 'regular',
+            'target_age' => 'teen',
+            'description' => 'Program akademik untuk remaja.',
+            'duration_meetings' => 16,
+            'max_students' => 10,
+            'price' => 1250000,
+            'registration_fee' => 200000,
+            'is_active' => '1',
+        ])
+        ->assertRedirect(route('admin.programs.index'));
+
+    $program = Program::query()->where('slug', 'academic-english')->firstOrFail();
+
+    expect($program->is_active)->toBeTrue();
+
+    $this->actingAs($admin)
+        ->put(route('admin.programs.update', $program), [
+            'name' => 'Academic English Updated',
+            'slug' => 'academic-english',
+            'category' => 'test_prep',
+            'type' => 'private',
+            'target_age' => 'university',
+            'description' => 'Program akademik intensif.',
+            'duration_meetings' => 18,
+            'max_students' => 6,
+            'price' => 1750000,
+            'registration_fee' => 250000,
+        ])
+        ->assertRedirect(route('admin.programs.index'));
+
+    $program->refresh();
+
+    expect($program->name)->toBe('Academic English Updated')
+        ->and($program->category)->toBe('test_prep')
+        ->and($program->type)->toBe('private')
+        ->and($program->is_active)->toBeFalse();
+});
+
+test('admin can create and update classes with instructor role validation', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $instructor = User::factory()->create(['role' => 'instructor', 'full_name' => 'ETC Instructor']);
+    $student = User::factory()->create(['role' => 'student', 'full_name' => 'Mecca Student']);
+    $program = Program::query()->create([
+        'name' => 'General English Class Program',
+        'slug' => 'general-english-class-program',
+        'category' => 'english',
+        'type' => 'regular',
+        'target_age' => 'teen',
+        'duration_meetings' => 16,
+        'max_students' => 10,
+        'price' => 1200000,
+        'registration_fee' => 200000,
+        'is_active' => true,
+    ]);
+
+    $classPayload = [
+        'program_id' => $program->id,
+        'instructor_id' => $instructor->id,
+        'name' => 'Teen B1',
+        'schedule_days' => 'Mon-Wed',
+        'schedule_time' => '15.00-16.30',
+        'room' => 'Hard Rock',
+        'start_date' => '2026-06-10',
+        'end_date' => '2026-08-10',
+        'status' => 'upcoming',
+    ];
+
+    $this->actingAs($admin)
+        ->post(route('admin.classes.store'), $classPayload)
+        ->assertRedirect(route('admin.classes.index'));
+
+    $class = CourseClass::query()->where('name', 'Teen B1')->firstOrFail();
+
+    expect($class->instructor_id)->toBe($instructor->id)
+        ->and($class->schedule_days)->toBe('Mon-Wed')
+        ->and($class->status)->toBe('upcoming');
+
+    $this->actingAs($admin)
+        ->put(route('admin.classes.update', $class), array_merge($classPayload, [
+            'name' => 'Teen B2',
+            'status' => 'ongoing',
+        ]))
+        ->assertRedirect(route('admin.classes.index'));
+
+    expect($class->refresh()->name)->toBe('Teen B2')
+        ->and($class->status)->toBe('ongoing');
+
+    $this->actingAs($admin)
+        ->post(route('admin.classes.store'), array_merge($classPayload, [
+            'name' => 'Invalid Instructor Class',
+            'instructor_id' => $student->id,
+        ]))
+        ->assertSessionHasErrors('instructor_id');
+});
+
+test('admin can assign student enrollments and duplicate assignments are rejected', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $student = User::factory()->create(['role' => 'student', 'full_name' => 'Mecca Student']);
+    $instructor = User::factory()->create(['role' => 'instructor', 'full_name' => 'ETC Instructor']);
+    $program = Program::query()->create([
+        'name' => 'Enrollment Program',
+        'slug' => 'enrollment-program',
+        'category' => 'english',
+        'type' => 'regular',
+        'target_age' => 'teen',
+        'duration_meetings' => 16,
+        'max_students' => 10,
+        'price' => 1200000,
+        'registration_fee' => 200000,
+        'is_active' => true,
+    ]);
+    $class = CourseClass::query()->create([
+        'program_id' => $program->id,
+        'instructor_id' => $instructor->id,
+        'name' => 'Enrollment Class',
+        'status' => 'ongoing',
+    ]);
+
+    $payload = [
+        'user_id' => $student->id,
+        'class_id' => $class->id,
+        'enrolled_at' => '2026-06-12',
+        'status' => 'active',
+    ];
+
+    $this->actingAs($admin)
+        ->post(route('admin.enrollments.store'), $payload)
+        ->assertRedirect(route('admin.enrollments.index'));
+
+    $enrollment = Enrollment::query()
+        ->where('user_id', $student->id)
+        ->where('class_id', $class->id)
+        ->firstOrFail();
+
+    expect($enrollment->enrolled_at->toDateString())->toBe('2026-06-12')
+        ->and($enrollment->status)->toBe('active');
+
+    $this->actingAs($admin)
+        ->post(route('admin.enrollments.store'), $payload)
+        ->assertSessionHasErrors('class_id');
+});
+
+test('admin enrollment rejects non student users', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $instructor = User::factory()->create(['role' => 'instructor', 'full_name' => 'ETC Instructor']);
+    $program = Program::query()->create([
+        'name' => 'Role Guard Program',
+        'slug' => 'role-guard-program',
+        'category' => 'english',
+        'type' => 'regular',
+        'target_age' => 'teen',
+        'duration_meetings' => 16,
+        'max_students' => 10,
+        'price' => 1200000,
+        'registration_fee' => 200000,
+        'is_active' => true,
+    ]);
+    $class = CourseClass::query()->create([
+        'program_id' => $program->id,
+        'instructor_id' => $instructor->id,
+        'name' => 'Role Guard Class',
+        'status' => 'ongoing',
+    ]);
+
+    $this->actingAs($admin)
+        ->post(route('admin.enrollments.store'), [
+            'user_id' => $instructor->id,
+            'class_id' => $class->id,
+            'enrolled_at' => '2026-06-12',
+            'status' => 'active',
+        ])
+        ->assertSessionHasErrors('user_id');
+});
