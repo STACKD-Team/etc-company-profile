@@ -122,6 +122,46 @@ it('allows an admin to login and reach the admin dashboard', function () {
         ->assertSee('Dashboard Admin');
 });
 
+it('redirects student users to the student dashboard after login', function () {
+    $student = User::factory()->create([
+        'role' => 'student',
+    ]);
+
+    $this->post(route('auth.login.store'), [
+        'email' => $student->email,
+        'password' => 'password',
+    ])
+        ->assertRedirect(route('student.dashboard'));
+
+    $this->assertAuthenticatedAs($student);
+});
+
+it('redirects instructor users to the instructor dashboard after login', function () {
+    $instructor = User::factory()->create([
+        'role' => 'instructor',
+    ]);
+
+    $this->post(route('auth.login.store'), [
+        'email' => $instructor->email,
+        'password' => 'password',
+    ])
+        ->assertRedirect(route('instructor.dashboard'));
+
+    $this->assertAuthenticatedAs($instructor);
+});
+
+it('logs users out and redirects to the public home page', function () {
+    $user = User::factory()->create([
+        'role' => 'student',
+    ]);
+
+    $this->actingAs($user)
+        ->post(route('auth.logout'))
+        ->assertRedirect(route('public.home'));
+
+    $this->assertGuest();
+});
+
 it('allows admin users to open Rasky admin GET pages', function () {
     $admin = User::factory()->create([
         'role' => 'admin',
