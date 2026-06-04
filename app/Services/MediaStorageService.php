@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Kreait\Firebase\Factory;
 use RuntimeException;
 
 class MediaStorageService
@@ -43,6 +45,22 @@ class MediaStorageService
 
     protected function uploadToFirebase(UploadedFile $file, string $path): void
     {
+        if (! $this->hasFirebaseStorage()) {
+            $stream = fopen($file->getRealPath(), 'r');
+
+            if ($stream === false) {
+                throw new RuntimeException('Unable to open uploaded file for local storage upload.');
+            }
+
+            try {
+                Storage::disk('public')->put($path, $stream);
+            } finally {
+                fclose($stream);
+            }
+
+            return;
+        }
+
         $bucket = $this->bucket();
         $stream = fopen($file->getRealPath(), 'r');
 
@@ -64,6 +82,12 @@ class MediaStorageService
 
     protected function deleteFromFirebase(string $path): void
     {
+        if (! $this->hasFirebaseStorage()) {
+            Storage::disk('public')->delete($path);
+
+            return;
+        }
+
         $object = $this->bucket()->object($path);
 
         if ($object->exists()) {
@@ -73,12 +97,6 @@ class MediaStorageService
 
     protected function bucket(): object
     {
-        $factoryClass = 'Kreait\\Firebase\\Factory';
-
-        if (! class_exists($factoryClass)) {
-            throw new RuntimeException('Firebase Storage requires kreait/laravel-firebase or kreait/firebase-php. Install the package and enable required PHP extensions before using media uploads.');
-        }
-
         $credentials = config('firebase.credentials');
         $bucketName = config('firebase.storage_bucket');
 
@@ -86,8 +104,15 @@ class MediaStorageService
             throw new RuntimeException('Firebase Storage is not configured. Set FIREBASE_CREDENTIALS and FIREBASE_STORAGE_BUCKET.');
         }
 
-        $factory = (new $factoryClass())->withServiceAccount($credentials);
+        $factory = (new Factory)->withServiceAccount($credentials);
 
         return $factory->createStorage()->getBucket($bucketName);
+    }
+
+    protected function hasFirebaseStorage(): bool
+    {
+        return class_exists('Kreait\\Firebase\\Factory')
+            && (bool) config('firebase.credentials')
+            && (bool) config('firebase.storage_bucket');
     }
 }

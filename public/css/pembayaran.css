@@ -29,6 +29,10 @@ input {
     font-family: inherit;
 }
 
+a {
+    text-decoration: none;
+}
+
 .legacy-page-nav {
     height: 76px;
     padding: 0 66px;
@@ -91,6 +95,18 @@ input {
     margin: 0 auto;
     padding: 60px 24px 61px;
     text-align: center;
+}
+
+.payment-alert {
+    width: min(1110px, calc(100% - 48px));
+    margin: -28px auto 30px;
+    border: 1px solid #ffb7d8;
+    border-radius: 12px;
+    background: #ffe5f2;
+    color: var(--text);
+    padding: 14px 18px;
+    font-size: 13px;
+    font-weight: 800;
 }
 
 .page-header h1 {
@@ -580,6 +596,38 @@ input[type="file"] {
     font-size: 13px;
     font-weight: 700;
     margin-top: 12px;
+}
+
+.field-error {
+    display: block;
+    margin-top: 10px;
+    color: #ba1a1a;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.proof-status {
+    margin-top: 18px;
+    border-radius: 10px;
+    background: var(--pink-soft);
+    color: var(--text);
+    padding: 13px 15px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.upload-submit {
+    width: min(320px, 100%);
+    min-height: 48px;
+    margin-top: 24px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--dark);
+    color: var(--white);
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
 }
 
 .confirm-box {

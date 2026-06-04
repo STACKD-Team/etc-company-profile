@@ -4,7 +4,7 @@
 
 <header class="page-header">
     <h1>Pendaftaran ETC Planet</h1>
-    <p>Selesaikan langkah terakhir untuk memulai perjalanan belajarmu.</p>
+    <p>Selesaikan pembayaran awal, upload bukti, lalu konfirmasi agar admin bisa memverifikasi pendaftaran.</p>
 
     <div class="stepper" aria-label="Progress pendaftaran">
         <div class="step done">
@@ -29,6 +29,10 @@
     </div>
 </header>
 
+@if (session('status'))
+    <div class="payment-alert">{{ session('status') }}</div>
+@endif
+
 <main class="payment-layout">
     <aside class="summary-card">
         <h2>
@@ -37,12 +41,17 @@
         </h2>
 
         <div class="program-box">
+            <span>Kode Pendaftaran</span>
+            <strong>{{ $registration->registration_code }}</strong>
+        </div>
+
+        <div class="program-box">
             <span>Program</span>
             <strong>{{ $paymentSummary['program'] }}</strong>
         </div>
 
         <div class="summary-row"><span>Biaya Pendaftaran</span><strong>{{ $paymentSummary['registrationFee'] }}</strong></div>
-        <div class="summary-row"><span>Biaya SPP (Bulan 1)</span><strong>{{ $paymentSummary['monthlyFee'] }}</strong></div>
+        <div class="summary-row"><span>Biaya Program</span><strong>{{ $paymentSummary['programFee'] }}</strong></div>
 
         <div class="summary-total">
             <strong>Total</strong>
@@ -51,7 +60,7 @@
 
         <div class="summary-note">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-            <p>Pastikan nominal transfer sesuai hingga 3 digit terakhir untuk memudahkan verifikasi otomatis.</p>
+            <p>Status akan tetap menunggu verifikasi sampai admin ETC mengecek bukti pembayaran.</p>
         </div>
     </aside>
 
@@ -59,7 +68,7 @@
         <h2 class="section-title">Pilih Metode Pembayaran</h2>
 
         <div class="method-grid">
-            <article class="method-card is-active" onclick="selectMethod(this)">
+            <article class="method-card is-active" data-method="qris" onclick="selectMethod(this)">
                 <div class="method-head">
                     <div class="method-icon qris-icon">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z"/></svg>
@@ -79,12 +88,12 @@
                     </div>
                     <span class="timer">
                         <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>
-                        05:00
+                        Manual Check
                     </span>
                 </div>
             </article>
 
-            <article class="method-card" onclick="selectMethod(this)">
+            <article class="method-card" data-method="bank_transfer" onclick="selectMethod(this)">
                 <div class="method-head">
                     <div class="method-icon bank-icon">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10h18L12 4 3 10Z"/><path d="M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18"/></svg>
@@ -111,7 +120,10 @@
             </article>
         </div>
 
-        <section class="upload-card">
+        <form class="upload-card" method="POST" action="{{ route('registrations.payment.proof.store', ['registration' => $registration]) }}" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="payment_method" class="payment-method-input" value="{{ old('payment_method', $registration->payment_method ?? 'qris') }}">
+
             <h2 class="section-title">Upload Bukti Pembayaran</h2>
             <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
                 <div class="upload-icon">
@@ -121,24 +133,36 @@
                 <span>Mendukung JPG, PNG, atau PDF (Maks. 5MB)</span>
                 <button type="button" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">Pilih File</button>
             </div>
-            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="showFileName(this)">
+            <input type="file" name="payment_proof" id="fileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="showFileName(this)" required>
             <div id="file-name" class="file-name"></div>
+            @error('payment_proof') <small class="field-error">{{ $message }}</small> @enderror
+            @error('payment_method') <small class="field-error">{{ $message }}</small> @enderror
+
+            @if ($registration->payment_proof)
+                <div class="proof-status">Bukti pembayaran sudah tersimpan. Upload ulang jika file sebelumnya salah.</div>
+            @endif
+
+            <button class="upload-submit" type="submit">Upload Bukti Pembayaran</button>
+        </form>
+
+        <form class="payment-actions" method="POST" action="{{ route('registrations.payment.confirm', ['registration' => $registration]) }}">
+            @csrf
+            <input type="hidden" name="payment_method" class="payment-method-input" value="{{ old('payment_method', $registration->payment_method ?? 'qris') }}">
             <label class="confirm-box" for="agree">
-                <input type="checkbox" id="agree">
+                <input type="checkbox" name="payment_confirmed" id="agree" value="1" required>
                 <span>
                     <strong>Saya sudah membayar</strong>
-                    Dengan mencentang, saya mengonfirmasi bahwa transfer telah berhasil dilakukan sejumlah tagihan.
+                    Dengan mencentang, saya mengonfirmasi bahwa pembayaran telah berhasil dilakukan sejumlah tagihan.
                 </span>
             </label>
-        </section>
+            @error('payment_confirmed') <small class="field-error">{{ $message }}</small> @enderror
 
-        <div class="payment-actions">
-            <button class="confirm-button" onclick="window.location.href='{{ route('registrations.confirmation.show', ['registration' => $registrationReference ?? 'demo']) }}'">
+            <button class="confirm-button" type="submit">
                 Konfirmasi Pembayaran
                 <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
             </button>
-            <button class="cancel-button" type="button">Batal</button>
-        </div>
+            <a class="cancel-button" href="{{ route('registrations.create', ['program' => $registration->program?->slug]) }}">Kembali ke Form</a>
+        </form>
     </section>
 </main>
 
@@ -147,6 +171,10 @@
 function selectMethod(card) {
     document.querySelectorAll('.method-card').forEach(item => item.classList.remove('is-active'));
     card.classList.add('is-active');
+
+    document.querySelectorAll('.payment-method-input').forEach((input) => {
+        input.value = card.dataset.method;
+    });
 }
 
 function copyText(text) {
@@ -161,6 +189,15 @@ function showFileName(input) {
         fileName.style.display = 'block';
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const currentMethod = document.querySelector('.payment-method-input')?.value || 'qris';
+    const currentCard = document.querySelector(`.method-card[data-method="${currentMethod}"]`);
+
+    if (currentCard) {
+        selectMethod(currentCard);
+    }
+});
 </script>
 @endpush
 </x-layouts.public>

@@ -25,7 +25,7 @@ it('registers merged sprint route names from all teammates', function () {
         expect(Route::has($routeName))->toBeTrue($routeName);
     }
 
-    expect(Route::has('registrations.start'))->toBeFalse();
+    expect(Route::has('registrations.start'))->toBeTrue();
 });
 
 it('keeps admin content routes protected for admins', function () {

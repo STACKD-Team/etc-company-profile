@@ -6,7 +6,6 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -41,6 +40,9 @@ class AppServiceProvider extends ServiceProvider
             'reels' => 60,
             'login' => 5,
             'password' => 5,
+            'registration' => 8,
+            'upload' => 10,
+            'payment' => 10,
         ];
     }
 }
