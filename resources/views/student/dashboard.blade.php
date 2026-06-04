@@ -26,7 +26,7 @@
 
 <x-layouts.dashboard title="Dashboard Siswa" area="student" active="dashboard" :user="$student" :sidebar-items="$sidebarItems">
     <x-slot:sidebarActions>
-        <a href="#" data-dashboard-action="Bantuan sedang disiapkan." class="flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 font-heading text-sm font-bold text-white/75 transition hover:border-white hover:text-white">
+        <a href="{{ route('student.help.index') }}" class="flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 font-heading text-sm font-bold text-white/75 transition hover:border-white hover:text-white">
             <x-ui.icon name="help" class="h-4 w-4" />
             Bantuan
         </a>
@@ -90,9 +90,11 @@
                                         <x-ui.icon name="course-date" class="h-4 w-4" />
                                         {{ $schedule }}
                                     </p>
-                                    <a href="#" data-dashboard-action="Membuka sesi kelas..." class="inline-flex min-h-11 items-center justify-center rounded-pill bg-etc-magenta px-5 py-3 font-heading text-sm font-bold text-white transition hover:bg-etc-primary">
-                                        Gabung Sesi
-                                    </a>
+                                    @if ($activeCourseClass)
+                                        <a href="{{ route('student.classes.show', $activeCourseClass) }}" class="inline-flex min-h-11 items-center justify-center rounded-pill bg-etc-magenta px-5 py-3 font-heading text-sm font-bold text-white transition hover:bg-etc-primary">
+                                            Detail Kelas
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -113,6 +115,7 @@
 
                 <div class="rounded-card bg-white p-5 shadow-panel">
                     @forelse ($publishedReports as $report)
+                        @php($reportUrl = $report->pdf_path ? route('student.report-cards.download', $report) : route('student.report-cards.show', $report))
                         <div @class(['flex items-center gap-4 py-4', 'border-b border-etc-outline-variant/60' => ! $loop->last])>
                             <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-etc-surface-low">
                                 <x-ui.icon :name="$loop->first ? 'report-primary' : 'report-secondary'" class="h-6 w-6" />
@@ -121,8 +124,8 @@
                                 <strong class="block truncate font-heading text-sm text-etc-on-surface">{{ $report->term ?? 'Rapor Terakhir' }}</strong>
                                 <p class="mt-1 truncate text-sm text-etc-on-muted">{{ $report->enrollment?->courseClass?->program?->name ?? 'Program ETC Planet' }}</p>
                             </div>
-                            <a href="#" data-dashboard-action="Rapor sedang disiapkan." aria-label="Unduh rapor {{ $report->term ?? 'terakhir' }}" class="flex h-10 w-10 items-center justify-center rounded-full bg-etc-surface-low text-etc-magenta transition hover:bg-etc-magenta hover:text-white">
-                                <span class="material-symbols-outlined text-lg">download</span>
+                            <a href="{{ $reportUrl }}" aria-label="{{ $report->pdf_path ? 'Unduh' : 'Lihat' }} rapor {{ $report->term ?? 'terakhir' }}" class="flex h-10 w-10 items-center justify-center rounded-full bg-etc-surface-low text-etc-magenta transition hover:bg-etc-magenta hover:text-white">
+                                <span class="material-symbols-outlined text-lg">{{ $report->pdf_path ? 'download' : 'visibility' }}</span>
                             </a>
                         </div>
                     @empty
@@ -132,7 +135,7 @@
                         </div>
                     @endforelse
 
-                    <a href="#" data-dashboard-action="Halaman semua rapor belum tersedia." class="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-etc-outline-variant px-4 py-3 font-heading text-sm font-bold text-etc-on-muted transition hover:border-etc-magenta hover:text-etc-magenta">
+                    <a href="{{ route('student.report-cards.index') }}" class="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-etc-outline-variant px-4 py-3 font-heading text-sm font-bold text-etc-on-muted transition hover:border-etc-magenta hover:text-etc-magenta">
                         Lihat Semua Rapor
                     </a>
                 </div>
