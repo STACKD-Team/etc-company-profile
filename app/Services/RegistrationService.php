@@ -7,6 +7,7 @@ use App\Models\Enrollment;
 use App\Models\Program;
 use App\Models\Registration;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
@@ -124,6 +125,29 @@ class RegistrationService extends BaseCrudService
             'status' => $registration->status,
             'submitted_at' => $registration->created_at,
         ];
+    }
+
+    public function paginateAdminRegistrations(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->applyFilters($this->baseQuery()->latest(), $filters)
+            ->paginate($perPage)
+            ->withQueryString();
+    }
+
+    public function paginatePaymentVerifications(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        $query = $this->baseQuery()
+            ->where(function (Builder $query): void {
+                $query->whereNotNull('payment_method')
+                    ->orWhereNotNull('payment_proof')
+                    ->orWhereNotNull('payment_gateway_id')
+                    ->orWhere('notes', 'like', '%payment_confirmation%');
+            })
+            ->latest();
+
+        return $this->applyFilters($query, $filters)
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     public function markAsPaid(Registration $registration, ?float $amount = null, ?string $paymentMethod = null, bool $adminOverride = false): Registration

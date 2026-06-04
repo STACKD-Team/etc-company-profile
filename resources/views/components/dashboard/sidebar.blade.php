@@ -17,6 +17,14 @@
 
     $defaultItems = [
         'admin' => [
+            ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'url' => '#', 'key' => 'dashboard', 'icon' => 'dashboard'],
+            ['label' => 'Pendaftaran', 'route' => 'admin.registrations.index', 'url' => '#', 'key' => 'registrations', 'icon' => 'assignment'],
+            ['label' => 'Pembayaran', 'route' => 'admin.payments.index', 'url' => '#', 'key' => 'payments', 'icon' => 'payments'],
+            ['label' => 'Placement', 'route' => 'admin.placement-tests.index', 'url' => '#', 'key' => 'placement', 'icon' => 'event_available'],
+            ['label' => 'Siswa', 'route' => 'admin.students.index', 'url' => '#', 'key' => 'students', 'icon' => 'groups'],
+            ['label' => 'Program', 'route' => 'admin.programs.index', 'url' => '#', 'key' => 'programs', 'icon' => 'school'],
+            ['label' => 'Kelas', 'route' => 'admin.classes.index', 'url' => '#', 'key' => 'classes', 'icon' => 'meeting_room'],
+            ['label' => 'Enrollment', 'route' => 'admin.enrollments.index', 'url' => '#', 'key' => 'enrollments', 'icon' => 'how_to_reg'],
             ['label' => 'Reels', 'route' => 'admin.reels.index', 'url' => '#', 'key' => 'reels', 'icon' => 'smart_display'],
             ['label' => 'CMS Konten', 'route' => 'admin.contents.index', 'url' => '#', 'key' => 'contents', 'icon' => 'dashboard_customize'],
         ],
