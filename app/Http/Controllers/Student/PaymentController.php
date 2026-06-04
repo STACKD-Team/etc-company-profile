@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Http\Controllers\Student;
+
+use App\Http\Controllers\Controller;
+use App\Models\Registration;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class PaymentController extends Controller
+{
+    public function index(Request $request): View
+    {
+        $student = $request->user();
+
+        return view('student.payments.index', [
+            'student' => $student,
+            'payments' => Registration::query()
+                ->with(['program', 'courseClass'])
+                ->where('user_id', $student->id)
+                ->where($this->paymentRelevantFilter())
+                ->latest('created_at')
+                ->paginate(10),
+        ]);
+    }
+
+    public function show(Request $request, Registration $payment): View
+    {
+        abort_unless($payment->user_id === $request->user()->id, 403);
+
+        return view('student.payments.show', [
+            'student' => $request->user(),
+            'payment' => $payment->load(['program', 'courseClass']),
+        ]);
+    }
+
+    protected function paymentRelevantFilter(): callable
+    {
+        return function (Builder $query): void {
+            $query->whereNotNull('payment_amount')
+                ->orWhereNotNull('payment_method')
+                ->orWhereNotNull('payment_proof')
+                ->orWhereNotNull('paid_at')
+                ->orWhereIn('status', ['pending_payment', 'paid', 'placement_test', 'enrolled', 'rejected']);
+        };
+    }
+}

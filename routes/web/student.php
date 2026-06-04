@@ -4,6 +4,7 @@ use App\Http\Controllers\Student\ClassController;
 use App\Http\Controllers\Student\DashboardController;
 use App\Http\Controllers\Student\HelpController;
 use App\Http\Controllers\Student\LearningHistoryController;
+use App\Http\Controllers\Student\PaymentController;
 use App\Http\Controllers\Student\ProfileController;
 use App\Http\Controllers\Student\ReportCardController;
 use App\Http\Controllers\Student\ReportCardDownloadController;
@@ -25,6 +26,10 @@ Route::prefix('student')
             ->name('classes.show');
         Route::get('/learning-history', [LearningHistoryController::class, 'index'])
             ->name('learning-history.index');
+        Route::get('/payments', [PaymentController::class, 'index'])
+            ->name('payments.index');
+        Route::get('/payments/{payment}', [PaymentController::class, 'show'])
+            ->name('payments.show');
         Route::get('/report-cards', [ReportCardController::class, 'index'])
             ->name('report-cards.index');
         Route::get('/report-cards/{reportCard}', [ReportCardController::class, 'show'])
