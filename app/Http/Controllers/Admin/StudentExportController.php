@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CourseClass;
+use App\Models\Program;
+use App\Services\DocumentExportService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
 
@@ -14,11 +18,19 @@ class StudentExportController extends Controller
             'title' => 'Export Rekap Siswa',
             'description' => 'Export wajib memakai template XLSX dari folder context.',
             'action' => route('admin.exports.students.download'),
+            'type' => 'students',
+            'programs' => Program::query()->orderBy('name')->get(),
+            'classes' => CourseClass::query()->orderBy('name')->get(),
         ]);
     }
 
-    public function download(): Response
+    public function download(Request $request, DocumentExportService $documents): Response
     {
-        return response('Template-based XLSX export belum diaktifkan.', 501);
+        $content = $documents->studentWorkbook($request->only(['year', 'status', 'program_id', 'class_id']));
+
+        return response($content, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="rekap-siswa-etc.xlsx"',
+        ]);
     }
 }

@@ -15,7 +15,11 @@ class ReportCardController extends Controller
             'active' => 'reports',
             'items' => ReportCard::query()
                 ->with('enrollment.user', 'enrollment.courseClass')
-                ->where('instructor_id', auth()->id())
+                ->where(function ($query) {
+                    $query
+                        ->where('instructor_id', auth()->id())
+                        ->orWhereHas('enrollment.courseClass', fn ($query) => $query->where('instructor_id', auth()->id()));
+                })
                 ->latest()
                 ->paginate(10),
             'columns' => ['Siswa', 'Kelas', 'Total', 'Status'],

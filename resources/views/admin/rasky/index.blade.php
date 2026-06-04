@@ -4,6 +4,17 @@
     @endif
 
     <section class="rounded-card border border-etc-outline-variant/60 bg-white p-6 shadow-soft">
+        @if (! empty($actions ?? []))
+            <div class="mb-5 flex flex-wrap gap-3">
+                @foreach ($actions as $action)
+                    <a href="{{ route($action['route']) }}" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-etc-outline-variant px-4 py-2 font-heading text-sm font-bold text-etc-on-surface hover:border-etc-magenta hover:text-etc-magenta">
+                        <span class="material-symbols-outlined text-lg">{{ $action['icon'] ?? 'arrow_forward' }}</span>
+                        {{ $action['label'] }}
+                    </a>
+                @endforeach
+            </div>
+        @endif
+
         <div class="overflow-x-auto">
             <table class="w-full min-w-[720px] text-left text-sm">
                 <thead>

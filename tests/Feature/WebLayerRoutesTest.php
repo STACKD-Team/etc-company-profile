@@ -2,6 +2,8 @@
 
 use App\Models\Program;
 use App\Models\CourseClass;
+use App\Models\Enrollment;
+use App\Models\ReportCard;
 use App\Models\Registration;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -306,6 +308,105 @@ it('allows instructor users to open Rasky instructor GET pages', function () {
     }
 });
 
+it('allows admin users to create preview and publish a complete report card', function () {
+    $admin = User::factory()->create([
+        'role' => 'admin',
+    ]);
+    [$reportCardData] = createRaskyReportCardFixture();
+
+    $this->actingAs($admin)
+        ->get(route('admin.report-cards.create'))
+        ->assertOk()
+        ->assertSee('Written Test')
+        ->assertSee('Overall Class Assessment')
+        ->assertSee('Managing Director');
+
+    $response = $this->actingAs($admin)
+        ->post(route('admin.report-cards.store'), $reportCardData)
+        ->assertSessionHasNoErrors();
+
+    $reportCard = ReportCard::query()->firstOrFail();
+
+    $response->assertRedirect(route('admin.report-cards.show', $reportCard));
+
+    $this->actingAs($admin)
+        ->get(route('admin.report-cards.show', $reportCard))
+        ->assertOk()
+        ->assertSee('STUDENT EVALUATION')
+        ->assertSee('WRITTEN TEST')
+        ->assertSee('OVERALL CLASS ASSESMENT')
+        ->assertSee('Publish');
+
+    $this->actingAs($admin)
+        ->post(route('admin.report-cards.publish', $reportCard))
+        ->assertRedirect(route('admin.report-cards.show', $reportCard));
+
+    expect($reportCard->refresh()->is_published)->toBeTrue();
+});
+
+it('validates complete report card input', function () {
+    $admin = User::factory()->create([
+        'role' => 'admin',
+    ]);
+
+    $this->actingAs($admin)
+        ->from(route('admin.report-cards.create'))
+        ->post(route('admin.report-cards.store'), [
+            'score_listening' => 99,
+            'grade_pronunciation' => 'Z',
+        ])
+        ->assertRedirect(route('admin.report-cards.create'))
+        ->assertSessionHasErrors(['enrollment_id', 'score_listening', 'grade_pronunciation']);
+});
+
+it('downloads Rasky student recap export as xlsx content', function () {
+    $admin = User::factory()->create([
+        'role' => 'admin',
+    ]);
+    createRaskyReportCardFixture();
+
+    $response = $this->actingAs($admin)
+        ->post(route('admin.exports.students.download'));
+
+    $response
+        ->assertOk()
+        ->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+    expect($response->getContent())->toStartWith('PK');
+});
+
+it('downloads Rasky report card export as doc content', function () {
+    $admin = User::factory()->create([
+        'role' => 'admin',
+    ]);
+    [, $reportCard] = createRaskyReportCardFixture(persistReportCard: true);
+
+    $response = $this->actingAs($admin)
+        ->post(route('admin.exports.report-cards.download'), [
+            'report_card_id' => $reportCard->id,
+        ]);
+
+    $response
+        ->assertOk()
+        ->assertHeader('Content-Type', 'application/msword; charset=UTF-8');
+
+    expect($response->getContent())->toContain('STUDENT EVALUATION')
+        ->and($response->getContent())->toContain('Budi Report');
+});
+
+it('shows report cards connected to classes taught by the instructor', function () {
+    [, $reportCard, $instructor] = createRaskyReportCardFixture(persistReportCard: true);
+
+    $reportCard->update([
+        'instructor_id' => null,
+    ]);
+
+    $this->actingAs($instructor)
+        ->get(route('instructor.report-cards.index'))
+        ->assertOk()
+        ->assertSee('Budi Report');
+});
+
 function createRaskyPlacementFixture(): array
 {
     $student = User::factory()->create([
@@ -344,4 +445,88 @@ function createRaskyPlacementFixture(): array
     ]);
 
     return [$registration, $courseClass, $program, $student];
+}
+
+function createRaskyReportCardFixture(bool $persistReportCard = false): array
+{
+    $student = User::factory()->create([
+        'role' => 'student',
+        'name' => 'Budi Report',
+        'full_name' => 'Budi Report',
+        'no_induk' => 'ETC-RPT-001',
+        'sex' => 'M',
+        'place_of_birth' => 'Padang',
+        'date_of_birth' => '2010-02-03',
+        'status' => 'Pelajar',
+        'mobile_phone' => '0812345000',
+        'address' => 'Jl. S. Parman',
+    ]);
+    $instructor = User::factory()->create([
+        'role' => 'instructor',
+        'name' => 'Ms Talent',
+    ]);
+    $director = User::factory()->create([
+        'role' => 'admin',
+        'name' => 'Director ETC',
+    ]);
+    $program = Program::query()->create([
+        'name' => 'English Conversation Report',
+        'slug' => 'english-conversation-report',
+        'category' => 'english',
+        'type' => 'regular',
+        'target_age' => 'teen',
+        'price' => 350000,
+        'registration_fee' => 200000,
+        'is_active' => true,
+    ]);
+    $courseClass = CourseClass::query()->create([
+        'program_id' => $program->id,
+        'instructor_id' => $instructor->id,
+        'name' => 'Teen 4 Report',
+        'schedule_days' => 'Tuesday and Thursday',
+        'schedule_time' => '17:30 - 19:00',
+        'status' => 'ongoing',
+    ]);
+    $enrollment = Enrollment::query()->create([
+        'user_id' => $student->id,
+        'class_id' => $courseClass->id,
+        'enrolled_at' => '2026-05-15',
+        'status' => 'active',
+    ]);
+    Registration::query()->create([
+        'registration_code' => 'REG-REPORT-001',
+        'user_id' => $student->id,
+        'program_id' => $program->id,
+        'class_id' => $courseClass->id,
+        'applicant_name' => 'Budi Report',
+        'applicant_email' => 'budi.report@example.test',
+        'applicant_phone' => '0812345000',
+        'status' => 'enrolled',
+    ]);
+
+    $data = [
+        'enrollment_id' => $enrollment->id,
+        'score_listening' => 16,
+        'score_vocabulary' => 15,
+        'score_structure' => 14,
+        'score_reading' => 17,
+        'score_writing' => 16,
+        'grade_pronunciation' => 'A',
+        'grade_sentence_arrangement' => 'B',
+        'grade_class_participation' => 'A',
+        'grade_questioning_skill' => 'B',
+        'grade_analyzing_skill' => 'A',
+        'total_score' => 78,
+        'final_grade' => 'B',
+        'next_class' => 'Teen 5',
+        'comments' => 'Good progress.',
+        'instructor_id' => $instructor->id,
+        'academic_director_id' => $director->id,
+        'managing_director_id' => $director->id,
+        'issued_at' => '2026-06-04',
+    ];
+
+    $reportCard = $persistReportCard ? ReportCard::query()->create($data) : null;
+
+    return [$data, $reportCard, $instructor, $student, $courseClass, $director];
 }
