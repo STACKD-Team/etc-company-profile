@@ -1,58 +1,114 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ETC Planet Company Profile
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Website company profile dan sistem operasional awal untuk LKP ETC / ETC Planet Padang. Aplikasi ini dibangun untuk memperkuat profil lembaga, memudahkan calon siswa melihat program, melakukan pendaftaran online, mengirim bukti pembayaran, serta membantu admin mengelola pendaftaran, kelas, siswa, rapor, reels, CMS, dan laporan.
 
-## About Laravel
+Repository GitHub: https://github.com/STACKD-Team/etc-company-profile
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Deskripsi Proyek
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+ETC Planet masih banyak menjalankan promosi, konsultasi, pendaftaran, dan rekap data melalui kanal manual seperti WhatsApp, Instagram, formulir fisik, dan Excel. Proyek ini mendigitalisasi alur utama tersebut agar informasi program lebih mudah ditemukan, proses pendaftaran lebih tertata, data siswa lebih mudah dipelihara, dan laporan akademik dapat disiapkan dari satu sistem.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Target pengguna:
 
-## Learning Laravel
+- Calon siswa dan orang tua yang ingin melihat informasi program dan mendaftar.
+- Siswa yang ingin melihat profil, kelas, riwayat pembayaran, dan rapor.
+- Admin ETC yang mengelola pendaftaran, pembayaran, kelas, siswa, CMS, reels, dan laporan.
+- Instructor yang membutuhkan akses ringkas ke kelas, siswa, dan rapor terkait.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Features
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Public website: beranda, tentang ETC, program, detail program, team, fasilitas, galeri, FAQ, kontak, reels, dan chatbot.
+- Registration flow: pilih program, form pendaftaran, pembayaran, upload bukti, konfirmasi, dan bukti pendaftaran.
+- Student dashboard: overview, profil, kelas, riwayat pembelajaran, pembayaran, bantuan, dan rapor yang sudah dipublish.
+- Admin dashboard: statistik, pendaftaran, verifikasi pembayaran, placement test, siswa, instructor, program, kelas, enrollment, rapor, export, CMS, reels, pesan kontak, chatbot log, dan setting.
+- Instructor dashboard: kelas yang diajar, siswa, dan report card terkait.
+- Document output: rapor akhir pembelajaran dan export rekap siswa berbasis template dokumen ETC.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Tech Stack
 
-## Agentic Development
+- Laravel 13
+- PHP 8.3
+- MySQL
+- Blade
+- Vite
+- Tailwind CSS 4
+- Composer
+- NPM
+- Pest
+- Laravel Excel (`maatwebsite/excel`)
+- Git dan GitHub
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Instalasi Singkat
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/STACKD-Team/etc-company-profile.git
+cd etc-company-profile
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+npm run build
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Buka aplikasi di:
 
-## Contributing
+```text
+http://127.0.0.1:8000
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Panduan lengkap tersedia di [docs/installation.md](docs/installation.md).
 
-## Code of Conduct
+## Screenshot Proyek
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Screenshot sementara memakai referensi desain dari folder `context/`. Screenshot ini perlu diganti dengan hasil aplikasi aktual saat final.
 
-## Security Vulnerabilities
+| Halaman | Screenshot Referensi |
+| --- | --- |
+| Beranda | `context/stitch_etc_planet_digital_hub/beranda_lengkap_etc_planet/screen.png` |
+| Pilih Program | `context/stitch_etc_planet_digital_hub/pilih_program_etc_planet/screen.png` |
+| Form Pendaftaran | `context/stitch_etc_planet_digital_hub/pendaftaran_online_lengkap_etc_planet/screen.png` |
+| Pembayaran | `context/stitch_etc_planet_digital_hub/pembayaran_etc_planet/screen.png` |
+| Konfirmasi | `context/stitch_etc_planet_digital_hub/konfirmasi_pendaftaran_etc_planet/screen.png` |
+| Dashboard Siswa | `context/stitch_etc_planet_digital_hub/dashboard_siswa_etc_planet/screen.png` |
+| Dashboard Admin | `context/stitch_etc_planet_digital_hub/dashboard_admin_etc_planet/screen.png` |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Dokumentasi
 
-## License
+- [Installation Documentation](docs/installation.md)
+- [Feature Documentation](docs/features.md)
+- [Dependency Documentation](docs/dependency.md)
+- [Refactoring Documentation](docs/refactoring.md)
+- [GitHub Actions Documentation](docs/github-actions.md)
+- [Changelog](CHANGELOG.md)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Tim Pengembang
+
+| Anggota | Fokus Modul |
+| --- | --- |
+| Miftah | Public website, contact, chatbot public, reels public, CMS/content |
+| Mecca | Program discovery, student dashboard, academic master data |
+| Mia | Registration flow, payment flow, admin registration/payment verification |
+| Rasky | Auth, program detail, admin dashboard/workflow, report cards, exports, instructor dashboard |
+
+## Status Dokumentasi
+
+| Dokumen | Target |
+| --- | --- |
+| README | Minggu depan, 15-21 Juni 2026 |
+| Installation Documentation | Minggu depan, 15-21 Juni 2026 |
+| Feature Documentation | Minggu ke-14 |
+| CHANGELOG.md | Diupdate mingguan mulai 15 Juni 2026 |
+| Dependency Documentation | Merapikan dokumentasi tugas 2 minggu terakhir |
+| Refactoring Documentation | Final |
+| GitHub Actions Documentation | Final |
+
+## Referensi Proyek
+
+- `PROJECT_BLUEPRINT_ETC.md`
+- `context/WEB_ROUTES_ETC.md`
+- `context/SKEMA_DATABASE_LENGKAP.md`
+- `context/DEPENDENCY_PACKAGE_5W1H.md`
+- `docs/laporan-praktikum-dependency.md`
+- `context/stitch_etc_planet_digital_hub/`
