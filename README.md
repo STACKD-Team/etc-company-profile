@@ -76,6 +76,7 @@ Screenshot sementara memakai referensi desain dari folder `context/`. Screenshot
 
 ## Dokumentasi
 
+- [Dokumentasi Keseluruhan Project](docs/dokumentasi-proyek.md)
 - [Installation Documentation](docs/installation.md)
 - [Feature Documentation](docs/features.md)
 - [Dependency Documentation](docs/dependency.md)

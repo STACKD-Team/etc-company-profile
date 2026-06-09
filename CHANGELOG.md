@@ -29,6 +29,7 @@ Semua perubahan penting pada proyek ETC Planet dicatat di file ini. Format mengi
 ### Docs
 
 - Menambahkan struktur dokumentasi wajib: `docs/installation.md`, `docs/features.md`, `docs/dependency.md`, `docs/refactoring.md`, dan `docs/github-actions.md`.
+- Menambahkan dokumentasi induk keseluruhan project di `docs/dokumentasi-proyek.md`.
 
 ## Catatan Mingguan
 
