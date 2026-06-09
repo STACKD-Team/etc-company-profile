@@ -25,6 +25,7 @@
         @else
             <link rel="stylesheet" href="{{ asset('css/vite-fallback.css') }}">
         @endif
+        @filamentStyles
         @stack('styles')
     </head>
     <body class="min-h-screen bg-etc-surface font-body text-etc-on-surface antialiased selection:bg-etc-magenta selection:text-white">
@@ -36,6 +37,7 @@
 
         <x-site.footer :brand="$brand" :link-groups="$footerLinkGroups" />
         <x-site.chatbot />
+        @filamentScripts
         @stack('scripts')
     </body>
 </html>
