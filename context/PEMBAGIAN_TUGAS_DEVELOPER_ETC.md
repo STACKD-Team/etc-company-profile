@@ -319,6 +319,11 @@ Miftah:
 - Perbaiki landing page agar CTA `Daftar Sekarang` dan `Lihat Program` jelas.
 - Perbaiki halaman programs agar filter dan card mudah dipahami.
 - Perbaiki detail program agar informasi biaya, jadwal, target usia, dan CTA daftar cepat ditemukan.
+- Tampilkan cover image program pada program card dan detail program.
+- Tampilkan promo aktif pada listing/detail program dengan badge dan harga promo yang mudah dipahami.
+- Tampilkan section `Kerja Sama ETC` pada public discovery jika data partner sudah dipublish dari CMS.
+- Pastikan halaman public gallery menampilkan foto dari CMS `contents.type = gallery`, bukan hardcode.
+- Public gallery harus responsive, mudah discan, punya empty state, dan hanya menampilkan konten gallery yang published/active.
 - Perbaiki FAQ, contact, team, gallery, facilities agar konsisten brand.
 - Rancang ulang reels public menjadi pengalaman vertical video.
 
@@ -363,6 +368,7 @@ Mia sebagai owner utama:
 - Set warna primary Filament ke magenta ETC.
 - Buat resource Filament untuk admin entity prioritas:
   - Programs
+  - Program Promotions
   - Classes
   - Students
   - Instructors
@@ -387,6 +393,12 @@ Mia sebagai owner utama:
   - detail/preview page
   - validation
   - authorization role admin
+- Program Resource wajib mendukung upload cover image memakai Filament file upload dan Cloudinary.
+- Program Resource wajib mendukung pengelolaan promo per program melalui relation/resource `Program Promotions`.
+- CMS wajib punya Gallery management untuk upload satu atau banyak foto gallery memakai Filament file upload.
+- Gallery item wajib mendukung title, caption/deskripsi, image/images, status publish, sort order, dan metadata lain yang diperlukan.
+- CMS wajib punya bagian `Kerja Sama ETC` berbasis content type `partner`, termasuk nama instansi, logo, website/link, deskripsi, kategori/jenis kerja sama, tahun mulai, status publish, dan sort order.
+- Detail siswa di admin wajib menampilkan seluruh histori kelas dari `enrollments`, termasuk program, nama kelas, instructor, tanggal mulai/selesai, status, dan link rapor jika tersedia.
 
 Mecca dan Rasky:
 
@@ -414,11 +426,17 @@ Fitur besar:
 - NVIDIA RAG chatbot.
 - Qdrant vector database.
 - Admin knowledge source upload dan indexing.
+- Foto gallery CMS tersimpan ke Cloudinary lewat `MediaStorageService`.
+- Program cover image dan logo `Kerja Sama ETC` tersimpan ke Cloudinary.
+- Promo program memengaruhi nominal pembayaran Midtrans.
+- Snapshot promo dan harga disimpan saat registrasi dibuat agar audit pembayaran tetap stabil walaupun promo berubah.
 
 Deliverable:
 
 - Pembayaran tidak lagi memakai bukti manual sebagai flow utama.
 - Media disimpan ke Cloudinary.
+- Upload, replace, delete, dan preview foto gallery mengikuti aturan Cloudinary yang sama dengan media lain.
+- Midtrans memakai nominal akhir setelah promo aktif dihitung.
 - Chatbot dapat menjawab berdasarkan knowledge source.
 - Admin dapat upload file knowledge dan melakukan re-index.
 
@@ -431,9 +449,9 @@ Tujuan:
 Flow yang harus matang:
 
 ```text
-visitor sees program
--> visitor registers
--> Midtrans payment
+visitor sees program with cover image and active promo
+-> visitor registers with selected program and promo snapshot
+-> Midtrans payment uses final amount after promo
 -> automatic paid status
 -> admin schedules placement test
 -> admin assigns class
@@ -449,6 +467,7 @@ Deliverable:
 - Workflow berjalan tanpa data manual yang membingungkan.
 - Admin, student, dan instructor punya batas akses jelas.
 - Status setiap tahap mudah dipahami.
+- Student learning history dan detail siswa admin konsisten memakai data `enrollments`.
 
 ### Sprint 5 - Testing, QA, dan Final Polish
 
@@ -489,6 +508,8 @@ Area milik Miftah:
 - Public chatbot UI
 - Public reels
 - Public program discovery UI bersama dengan route existing
+- Public gallery dari CMS content yang sudah publish
+- Public `Kerja Sama ETC` section dari CMS partner yang sudah publish
 
 Route terkait:
 
@@ -512,9 +533,13 @@ Backlog UI/UX:
 
 - Perbaiki landing page agar value proposition ETC jelas dalam first viewport.
 - CTA utama harus jelas: daftar, lihat program, tanya chatbot/kontak.
-- Program cards harus menampilkan nama, kategori, target usia, durasi, harga, registration fee, dan CTA.
+- Program cards harus menampilkan cover image, nama, kategori, target usia, durasi, harga normal, harga promo jika aktif, registration fee, dan CTA.
 - Filter program harus mudah dipahami.
-- Halaman detail program harus menyajikan ringkasan cepat, deskripsi, jadwal, instructor, biaya, dan CTA daftar.
+- Halaman detail program harus menyajikan cover image, ringkasan cepat, deskripsi, jadwal, instructor, biaya, promo aktif, syarat promo, dan CTA daftar.
+- Promo aktif wajib terlihat sebagai badge/harga promo yang jelas, bukan hanya teks kecil.
+- Section `Kerja Sama ETC` menampilkan logo instansi, nama, jenis kerja sama, dan link/detail jika tersedia.
+- Gallery public menampilkan foto dari CMS `contents.type = gallery`, bukan data hardcode.
+- Gallery public hanya menampilkan item yang published/active, punya empty state, dan tetap nyaman di mobile.
 - Contact page harus memudahkan user menemukan alamat, WhatsApp, Instagram, dan map.
 - FAQ harus dibuat mudah discan dan menjadi basis knowledge chatbot.
 - Public chatbot UI harus ringan, jelas, dan tidak mengganggu halaman.
@@ -541,6 +566,9 @@ Backlog aksesibilitas:
 Acceptance criteria Miftah:
 
 - Public discovery mudah dipahami calon siswa/orang tua.
+- Cover image dan promo program terlihat jelas tanpa mengganggu CTA daftar.
+- Public gallery menampilkan foto CMS yang publish dan tetap rapi di mobile/desktop.
+- Section `Kerja Sama ETC` hanya menampilkan partner yang sudah publish/active.
 - Reels terasa seperti vertical short-video app.
 - Semua halaman public responsive.
 - Tidak ada hardcode data bisnis jika data sudah tersedia dari DB/config.
@@ -554,6 +582,9 @@ Area milik Mia:
 - Filament admin resource
 - Dashboard admin
 - CMS/content
+- Gallery CMS
+- Program promotions
+- Kerja Sama ETC/partner CMS
 - Reels management
 - Settings
 - Contact messages
@@ -592,6 +623,23 @@ Backlog Admin UX:
 - Status penting harus terlihat jelas: registration status, payment status, placement status, enrollment status, report published status, content published status, indexing status.
 - Semua form upload harus punya validasi MIME/size dan feedback.
 
+Backlog Program, Promo, Student Detail, dan CMS:
+
+- Program admin form punya upload cover image memakai Filament file upload dan disimpan lewat Cloudinary.
+- Cover image program dipakai sebagai gambar utama untuk listing/detail public, bukan sekadar thumbnail kecil.
+- Admin bisa membuat, mengedit, mengaktifkan/nonaktifkan, dan menjadwalkan promo per program.
+- Promo program memakai pendekatan diskon pembayaran, bukan label marketing saja.
+- Promo aktif ditentukan dari status active dan periode `starts_at` sampai `ends_at`.
+- Admin detail siswa menampilkan histori semua kelas dari `enrollments`.
+- Histori kelas siswa menampilkan program, nama kelas, instructor, tanggal mulai, tanggal selesai, status enrollment, dan link rapor jika tersedia.
+- CMS punya menu `Kerja Sama ETC` untuk mengelola instansi partner.
+- Data `Kerja Sama ETC` minimal memuat nama instansi, logo, website/link, deskripsi, kategori/jenis kerja sama, tahun mulai, status publish, dan sort order.
+- Logo partner wajib memakai upload field yang sama konsistennya dengan media lain.
+- CMS punya menu Gallery untuk admin upload satu atau banyak foto.
+- Gallery CMS memakai `contents.type = gallery`, field `image` untuk gambar utama, dan `images` JSON untuk multiple images.
+- Metadata gallery seperti caption, alt text, kategori, dan sort order disimpan di `meta` atau field yang tersedia.
+- Preview foto gallery wajib tersedia di admin agar admin tahu file yang sudah diupload.
+
 ### 8.1 Midtrans Payment Flow
 
 Keputusan:
@@ -623,6 +671,8 @@ Task Midtrans:
 - Pastikan webhook idempotent.
 - Simpan semua notification ke tabel audit.
 - Update `registrations.status`, `paid_at`, `payment_method`, `payment_gateway_id`, dan `payment_amount` berdasarkan status Midtrans.
+- Hitung nominal akhir dari promo aktif sebelum membuat transaksi Midtrans.
+- Simpan snapshot original amount, discount amount, final amount, dan promo reference/title pada registration/payment.
 - Mapping status Midtrans harus jelas:
   - `settlement` atau `capture` valid -> `paid`
   - `pending` -> tetap menunggu pembayaran
@@ -663,6 +713,8 @@ Acceptance criteria Midtrans:
 - Webhook duplicate tidak membuat data dobel/rusak.
 - Semua payload notification tersimpan untuk audit.
 - Admin bisa melihat status dan riwayat transaksi.
+- Gross amount Midtrans sama dengan final amount setelah promo.
+- Riwayat pembayaran menampilkan promo yang dipakai jika ada.
 
 ### 8.2 Cloudinary Storage
 
@@ -681,8 +733,9 @@ Task Cloudinary:
   - reels video
   - reels thumbnail
   - content image
-  - gallery images
-  - program thumbnail
+  - gallery images dari CMS
+  - program cover image/thumbnail
+  - partner logo untuk `Kerja Sama ETC`
   - user avatar
   - report card document/PDF
   - RAG knowledge source file
@@ -692,6 +745,8 @@ Task Cloudinary:
 Acceptance criteria Cloudinary:
 
 - Upload image/video/document sukses ke Cloudinary.
+- Foto gallery CMS berhasil upload, replace, delete, dan preview dari Cloudinary.
+- Cover image program dan logo partner tersimpan serta bisa dipreview dari Cloudinary.
 - Preview URL dapat ditampilkan di UI.
 - Replace file menghapus file lama jika aman.
 - Delete entity membersihkan file terkait bila sesuai aturan.
@@ -822,7 +877,10 @@ Backlog UI/UX:
 - Data sensitif ditampilkan dengan rapi dan tidak membingungkan.
 - Kelas saya harus membedakan active/completed/dropped.
 - Learning history harus mudah dipahami oleh siswa dan orang tua.
+- Learning history wajib bersumber dari `enrollments` dan menampilkan semua histori kelas yang pernah diikuti siswa.
+- Setiap item histori kelas menampilkan program, nama kelas, instructor, tanggal mulai/selesai, status, dan link rapor published jika tersedia.
 - Payment history harus menampilkan status dari Midtrans.
+- Payment history harus menampilkan nominal asli, potongan promo, nominal akhir, dan nama promo jika transaksi memakai promo.
 - Report cards hanya menampilkan rapor yang sudah publish.
 - Download rapor harus jelas dan aman.
 - Help page bisa memakai chatbot UI yang konsisten dengan public chatbot.
@@ -837,6 +895,7 @@ Backlog integrasi dengan Midtrans:
   - failed/cancelled
 - Tampilkan instruksi jika transaksi belum dibayar.
 - Jika diperlukan, sediakan tombol lanjutkan pembayaran dari token/URL Midtrans yang masih valid.
+- Jika pembayaran memakai promo, tampilkan snapshot promo dari registration/payment, bukan membaca ulang promo aktif saat ini.
 
 Backlog authorization:
 
@@ -847,6 +906,7 @@ Backlog authorization:
 Acceptance criteria Mecca:
 
 - Siswa bisa memahami status belajar dan pembayaran tanpa bertanya admin.
+- Siswa/orang tua bisa melihat seluruh histori kelas yang pernah diikuti.
 - Siswa bisa download rapor yang sudah dipublish.
 - Mobile experience nyaman untuk siswa/orang tua.
 - Semua data yang ditampilkan milik siswa login.
@@ -946,14 +1006,56 @@ CLOUDINARY_SECURE=true
 Migration baru yang direncanakan:
 
 - `create_midtrans_notifications_table`
+- `create_program_promotions_table`
 - `create_rag_knowledge_sources_table`
 - `create_rag_knowledge_chunks_table`
+
+Tabel promo program yang direncanakan:
+
+```text
+program_promotions
+```
+
+Kolom minimum:
+
+- `id`
+- `program_id` FK
+- `title`
+- `description` nullable
+- `discount_type`: `percentage` atau `fixed`
+- `discount_value`
+- `starts_at` nullable
+- `ends_at` nullable
+- `is_active`
+- `badge_label` nullable
+- `terms` nullable
+- timestamps
+
+Perubahan/pemanfaatan yang diperlukan pada `programs`:
+
+- Gunakan field gambar program yang tersedia, seperti `thumbnail`, sebagai cover image program.
+- Jika implementasi saat ini belum punya field gambar, tambahkan field cover image/thumbnail yang menyimpan path atau Cloudinary public id.
+
+Perubahan/pemanfaatan yang diperlukan pada `contents`:
+
+- Gunakan `type = gallery` untuk CMS foto gallery.
+- Gunakan `image` untuk gambar utama gallery.
+- Gunakan `images` JSON untuk multiple gallery images.
+- Gunakan `meta` untuk caption, alt text, kategori, sort order, atau atribut tambahan gallery.
+- Gunakan `type = partner` untuk CMS `Kerja Sama ETC`.
+- Simpan logo pada field image/media yang tersedia.
+- Simpan atribut tambahan seperti website, since/tahun mulai, kategori kerja sama, dan sort order pada kolom/meta yang tersedia.
 
 Perubahan yang mungkin diperlukan pada `registrations`:
 
 - Simpan Midtrans order ID.
 - Simpan Snap token atau redirect URL bila diperlukan.
 - Simpan payment status detail jika enum status utama tidak cukup.
+- Simpan snapshot harga ketika registrasi dibuat:
+  - original amount
+  - discount amount
+  - final amount
+  - program promotion id/title jika promo aktif
 - Pastikan tidak merusak status utama project:
 
 ```text
@@ -965,6 +1067,7 @@ pending_payment -> paid -> placement_test -> enrolled
 Catatan:
 
 - Jika perlu status payment lebih detail, gunakan kolom khusus payment status, bukan memaksakan semua variasi Midtrans ke `registrations.status`.
+- Jangan menghitung ulang promo lama dari data promo aktif saat ini; gunakan snapshot pada registration/payment untuk audit.
 - Jangan menghapus field payment proof sebelum semua flow lama dipastikan tidak dipakai. Tandai deprecated dulu.
 
 ## 13. API, Route, dan Webhook Backlog
@@ -1019,6 +1122,14 @@ Sebuah task dianggap selesai jika:
 Checklist bersama:
 
 - Public pages terlihat rapi di mobile dan desktop.
+- Program card/detail menampilkan cover image dari data program.
+- Promo aktif tampil di public program dan nominal pembayaran Midtrans memakai final amount setelah promo.
+- Snapshot promo/harga tetap benar walaupun promo diubah setelah registration dibuat.
+- Admin bisa upload satu atau banyak foto gallery dari CMS.
+- Foto gallery tersimpan dan bisa dipreview dari Cloudinary.
+- Public gallery menampilkan foto published/active dari CMS.
+- Public gallery tidak menampilkan gallery draft/inactive.
+- Section `Kerja Sama ETC` menampilkan partner publish beserta logo dari Cloudinary.
 - Reels bisa discroll vertical dan video tetap centered.
 - Registration flow masih bisa dimulai dari public page.
 - Midtrans sandbox bisa membuat transaksi.
@@ -1026,11 +1137,15 @@ Checklist bersama:
 - Duplicate notification tidak memproses pembayaran dua kali.
 - Admin payment page menjadi monitoring status, bukan manual verification utama.
 - Cloudinary upload berhasil untuk image, video, dan document.
+- Upload/replace/delete foto gallery berhasil lewat Cloudinary.
+- Upload cover image program dan logo partner berhasil ke Cloudinary.
 - RAG knowledge upload berhasil untuk PDF/DOCX/TXT.
 - RAG indexing menghasilkan chunk dan Qdrant point.
 - Chatbot menjawab berdasarkan knowledge yang diupload.
 - Student hanya melihat pembayaran dan rapor miliknya.
+- Student learning history menampilkan semua histori kelas dari `enrollments`.
 - Student hanya bisa download rapor published.
+- Admin detail siswa menampilkan seluruh histori kelas siswa dari `enrollments`.
 - Instructor hanya melihat kelas dan siswa yang diajar.
 - Admin, student, dan instructor table memakai Filament Table atau shared wrapper berbasis Filament.
 - Admin, student, dan instructor table punya search/filter/sort/pagination/action column/empty state.
