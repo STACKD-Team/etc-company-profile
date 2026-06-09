@@ -1,0 +1,25 @@
+@props([
+    'name',
+    'label' => null,
+    'helper' => null,
+    'required' => false,
+    'disabled' => false,
+    'error' => null,
+    'id' => null,
+    'accept' => null,
+])
+
+@php
+    $id ??= str($name)->replace(['[', ']'], ['_', ''])->toString();
+    $error ??= $errors->first($name);
+@endphp
+
+<label for="{{ $id }}" class="block space-y-2">
+    @if ($label)
+        <span class="font-heading text-sm font-bold text-etc-on-surface">{{ $label }} @if ($required)<span class="text-etc-magenta">*</span>@endif</span>
+    @endif
+    <x-filament::input.wrapper :valid="blank($error)" :disabled="$disabled">
+        <x-filament::input :id="$id" :name="$name" type="file" :accept="$accept" :required="$required" :disabled="$disabled" {{ $attributes }} />
+    </x-filament::input.wrapper>
+    @if ($error)<p class="text-xs font-medium text-red-600">{{ $error }}</p>@elseif ($helper)<p class="text-xs text-etc-on-muted">{{ $helper }}</p>@endif
+</label>

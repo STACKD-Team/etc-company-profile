@@ -25,6 +25,7 @@
         @else
             <link rel="stylesheet" href="{{ asset('css/vite-fallback.css') }}">
         @endif
+        @filamentStyles
         @stack('styles')
     </head>
     <body class="h-screen overflow-hidden bg-etc-surface font-body text-etc-on-surface antialiased">
@@ -60,6 +61,7 @@
                 </main>
             </div>
         </div>
+        @filamentScripts
         @stack('scripts')
     </body>
 </html>
