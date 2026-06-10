@@ -4,6 +4,8 @@
     'label' => null,
     'color' => 'gray',
     'outlined' => false,
+    'iconSize' => null,
+    'size' => 'md',
     'type' => 'button',
     'tag' => null,
     'target' => null,
@@ -19,8 +21,9 @@
     :icon="$icon"
     :label="$label"
     :color="$color"
-    :outlined="$outlined"
+    :icon-size="$iconSize"
+    :size="$size"
     :type="$type"
     :target="$target"
-    {{ $attributes }}
+    {{ $attributes->class(['etc-icon-button-outlined' => $outlined]) }}
 />

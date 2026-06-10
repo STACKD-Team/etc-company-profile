@@ -227,8 +227,42 @@ function initPublicChatbot() {
     });
 }
 
+function initDataTables() {
+    document.querySelectorAll('[data-data-table-form]').forEach((form) => {
+        let debounceTimer;
+
+        const submit = () => {
+            const pageInput = form.querySelector('input[name="page"]');
+
+            if (pageInput) {
+                pageInput.value = '1';
+            }
+
+            form.requestSubmit();
+        };
+
+        form.addEventListener('input', (event) => {
+            if (!event.target.matches('[data-table-filter-debounce]')) {
+                return;
+            }
+
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(submit, 400);
+        });
+
+        form.addEventListener('change', (event) => {
+            if (!event.target.matches('[data-table-filter-immediate]')) {
+                return;
+            }
+
+            submit();
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initRegistrationProgramPage();
     initStudentDashboardPage();
     initPublicChatbot();
+    initDataTables();
 });

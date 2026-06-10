@@ -20,102 +20,215 @@
     $nextDirection = $direction === 'asc' ? 'desc' : 'asc';
     $isLivewireContext = isset($this) && method_exists($this, 'getId');
     $searchValue ??= request($searchName);
+    $tableId = 'data-table-'.substr(md5(($action ?? request()->url()).($rowView ?? '').implode('|', array_keys($columns))), 0, 10);
+    $columnFilters = collect($columns)->mapWithKeys(function ($column, $key) {
+        if (! is_array($column) || empty($column['filter'])) {
+            return [];
+        }
+
+        $filter = is_array($column['filter']) ? $column['filter'] : ['type' => $column['filter']];
+        $filter['name'] ??= $key;
+
+        return [$key => $filter];
+    });
+    $filterNames = $columnFilters->pluck('name')
+        ->when($showSearch, fn ($names) => $names->push($searchName))
+        ->push('page')
+        ->unique();
+    $resetQuery = collect(request()->query())->except($filterNames->all())->all();
+    $resetUrl = url()->current().(count($resetQuery) ? '?'.http_build_query($resetQuery) : '');
 @endphp
 
-<x-filament::section {{ $attributes }}>
-    <form method="{{ $method }}" action="{{ $action }}" class="mb-5 space-y-4">
-        <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-            @if ($showSearch)
-                <div class="min-w-0 flex-1">
-                    <x-filament::input.wrapper>
-                        <x-filament::input
-                            :name="$searchName"
-                            type="search"
-                            :value="$searchValue"
-                            :placeholder="$searchPlaceholder"
-                        />
-                    </x-filament::input.wrapper>
-                </div>
+<form
+    id="{{ $tableId }}"
+    method="{{ $method }}"
+    action="{{ $action }}"
+    data-data-table-form
+>
+    <div class="mb-4 flex items-center gap-3" data-data-table-toolbar>
+        @if ($showSearch)
+            <div class="min-w-0 flex-1">
+                <x-filament::input.wrapper>
+                    <x-filament::input
+                        :name="$searchName"
+                        type="search"
+                        :value="$searchValue"
+                        :placeholder="$searchPlaceholder"
+                        data-table-filter-debounce
+                    />
+                </x-filament::input.wrapper>
+            </div>
+        @endif
+
+        <div class="flex flex-wrap items-center gap-3">
+            @isset($actions)
+                {{ $actions }}
+            @endisset
+
+            @if ($showSearch || $columnFilters->isNotEmpty())
+                <x-ui.button
+                    :href="$resetUrl"
+                    outlined
+                    icon="heroicon-m-arrow-path"
+                >
+                    Reset
+                </x-ui.button>
             @endif
-
-            <div class="flex flex-wrap items-center gap-3">
-                @isset($actions)
-                    {{ $actions }}
-                @endisset
-
-                @if ($showSearch || isset($filters))
-                    <x-filament::button type="submit" icon="heroicon-m-magnifying-glass">
-                        Filter
-                    </x-filament::button>
-                @endif
-            </div>
         </div>
-
-        @isset($filters)
-            <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                {{ $filters }}
-            </div>
-        @endisset
-
-        <input type="hidden" name="sort" value="{{ $sort }}">
-        <input type="hidden" name="direction" value="{{ $direction }}">
-    </form>
-
-    <div class="overflow-x-auto">
-        <table class="w-full min-w-[720px] text-left text-sm">
-            <thead>
-                <tr class="border-b border-etc-outline-variant/60 text-xs uppercase text-etc-on-muted">
-                    @foreach ($columns as $key => $column)
-                        @php
-                            $label = is_array($column) ? ($column['label'] ?? $key) : $column;
-                            $sortable = is_array($column) ? ($column['sortable'] ?? false) : false;
-                            $columnKey = is_array($column) ? ($column['key'] ?? $key) : $key;
-                        @endphp
-                        <th class="py-3 pr-4 font-heading font-bold">
-                            @if ($sortable)
-                                <a
-                                    href="{{ request()->fullUrlWithQuery(['sort' => $columnKey, 'direction' => $sort === $columnKey ? $nextDirection : 'asc']) }}"
-                                    class="inline-flex items-center gap-1 hover:text-etc-magenta"
-                                >
-                                    {{ $label }}
-                                    <span class="text-[10px]">
-                                        {{ $sort === $columnKey ? ($direction === 'asc' ? '^' : 'v') : 'sort' }}
-                                    </span>
-                                </a>
-                            @else
-                                {{ $label }}
-                            @endif
-                        </th>
-                    @endforeach
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-etc-outline-variant/50">
-                @forelse ($rows as $item)
-                    @if ($rowView)
-                        @include($rowView, ['item' => $item])
-                    @else
-                        {{ $slot }}
-                    @endif
-                @empty
-                    <tr>
-                        <td colspan="{{ count($columns) }}" class="py-8">
-                            <x-filament::empty-state :heading="$empty" :description="$emptyDescription" />
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
     </div>
 
-    @if ($isPaginator)
-        <div class="mt-5">
-            @if ($isLivewireContext)
-                <x-filament::pagination :paginator="$items" />
-            @else
-                <x-filament::section compact>
-                    {{ $items->withQueryString()->links() }}
-                </x-filament::section>
-            @endif
+    <input type="hidden" name="sort" value="{{ $sort }}">
+    <input type="hidden" name="direction" value="{{ $direction }}">
+
+    <x-filament::section {{ $attributes->class('etc-data-table') }}>
+        <div class="etc-data-table-scroll overflow-x-auto">
+            <table class="w-full min-w-[720px] text-left text-sm">
+                <thead>
+                    <tr class="text-xs uppercase text-etc-on-muted">
+                        @foreach ($columns as $key => $column)
+                            @php
+                                $label = is_array($column) ? ($column['label'] ?? $key) : $column;
+                                $sortable = is_array($column) ? ($column['sortable'] ?? false) : false;
+                                $columnKey = is_array($column) ? ($column['key'] ?? $key) : $key;
+                                $sortQuery = collect(request()->query())
+                                    ->merge([
+                                        'sort' => $columnKey,
+                                        'direction' => $sort === $columnKey ? $nextDirection : 'asc',
+                                        'page' => 1,
+                                    ])
+                                    ->all();
+                                $sortUrl = url()->current().'?'.http_build_query($sortQuery);
+                            @endphp
+                            <th class="pb-2 pt-1 font-heading font-bold">
+                                @if ($sortable)
+                                    <a
+                                        href="{{ $sortUrl }}"
+                                        class="inline-flex items-center gap-1 hover:text-etc-magenta"
+                                    >
+                                        {{ $label }}
+                                        {{
+                                            \Filament\Support\generate_icon_html(
+                                                $sort === $columnKey
+                                                    ? ($direction === 'asc' ? 'heroicon-m-chevron-up' : 'heroicon-m-chevron-down')
+                                                    : 'heroicon-m-arrows-up-down',
+                                                attributes: new \Illuminate\View\ComponentAttributeBag(['class' => 'shrink-0']),
+                                                size: \Filament\Support\Enums\IconSize::Small,
+                                            )
+                                        }}
+                                    </a>
+                                @else
+                                    {{ $label }}
+                                @endif
+                            </th>
+                        @endforeach
+                    </tr>
+
+                    <tr class="border-b-2 border-etc-outline-variant/60">
+                        @foreach ($columns as $key => $column)
+                            @php
+                                $filter = $columnFilters->get($key);
+                                $filterType = $filter['type'] ?? null;
+                                $filterName = $filter['name'] ?? null;
+                                $filterValue = $filterName ? request($filterName) : null;
+                                $filterPlaceholder = $filter['placeholder'] ?? 'Semua';
+                                $filterWidth = match ($filterType) {
+                                    'number' => 'min-w-32',
+                                    'date', 'select' => 'min-w-44',
+                                    'autocomplete' => 'min-w-56',
+                                    default => 'min-w-48',
+                                };
+                            @endphp
+                            <th class="pb-4 align-top font-normal">
+                                @if ($filter)
+                                    <div class="{{ $filterWidth }}" data-table-column-filter="{{ $key }}">
+                                        @switch($filterType)
+                                            @case('number')
+                                                <x-ui.number-field
+                                                    :name="$filterName"
+                                                    :value="$filterValue"
+                                                    :placeholder="$filterPlaceholder"
+                                                    :min="$filter['min'] ?? null"
+                                                    :max="$filter['max'] ?? null"
+                                                    :step="$filter['step'] ?? 1"
+                                                    data-table-filter-debounce
+                                                />
+                                                @break
+
+                                            @case('date')
+                                                <x-ui.date-picker
+                                                    :name="$filterName"
+                                                    :value="$filterValue"
+                                                    data-table-filter-immediate
+                                                />
+                                                @break
+
+                                            @case('select')
+                                                <x-ui.select
+                                                    :name="$filterName"
+                                                    :value="$filterValue"
+                                                    :placeholder="$filterPlaceholder"
+                                                    :options="$filter['options'] ?? []"
+                                                    data-table-filter-immediate
+                                                />
+                                                @break
+
+                                            @case('autocomplete')
+                                                <x-ui.autocomplete
+                                                    :name="$filterName"
+                                                    :value="$filterValue"
+                                                    :placeholder="$filterPlaceholder"
+                                                    :options="$filter['options'] ?? []"
+                                                />
+                                                @break
+
+                                            @default
+                                                <x-ui.field
+                                                    :name="$filterName"
+                                                    :value="$filterValue"
+                                                    :placeholder="$filterPlaceholder"
+                                                    data-table-filter-debounce
+                                                />
+                                        @endswitch
+                                    </div>
+                                @endif
+                            </th>
+                        @endforeach
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y-2 divide-etc-outline-variant/60">
+                    @forelse ($rows as $item)
+                        @if ($rowView)
+                            @include($rowView, ['item' => $item])
+                        @else
+                            {{ $slot }}
+                        @endif
+                    @empty
+                        <tr>
+                            <td colspan="{{ count($columns) }}" class="py-8">
+                                <x-ui.empty-state
+                                    :heading="$empty"
+                                    :description="$emptyDescription"
+                                    icon="heroicon-o-inbox"
+                                    compact
+                                />
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-    @endif
-</x-filament::section>
+
+        @if ($isPaginator)
+            <div class="mt-5">
+                @if ($isLivewireContext)
+                    <x-filament::pagination :paginator="$items" />
+                @else
+                    <x-filament::section compact>
+                        {{ $items->withQueryString()->links() }}
+                    </x-filament::section>
+                @endif
+            </div>
+        @endif
+    </x-filament::section>
+</form>

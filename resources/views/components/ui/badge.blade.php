@@ -2,6 +2,8 @@
     'status' => null,
     'color' => null,
     'icon' => null,
+    'iconPosition' => 'before',
+    'size' => 'md',
 ])
 
 @php
@@ -15,6 +17,12 @@
     };
 @endphp
 
-<x-filament::badge :color="$color" :icon="$icon" {{ $attributes }}>
+<x-filament::badge
+    :color="$color"
+    :icon="$icon"
+    :icon-position="$iconPosition"
+    :size="$size"
+    {{ $attributes }}
+>
     {{ $slot->isEmpty() ? str($status ?? 'status')->replace('_', ' ')->headline() : $slot }}
 </x-filament::badge>

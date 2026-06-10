@@ -404,7 +404,7 @@ test('student dashboard shows owned learning data and working mecca links', func
         ->assertSee('Mecca Student')
         ->assertSee('Owned Active Class')
         ->assertDontSee('Other Student Class')
-        ->assertSee(route('student.help.index', [], false), false)
+        ->assertDontSee(route('student.help.index', [], false), false)
         ->assertSee(route('student.classes.show', $activeClass, false), false)
         ->assertSee(route('student.report-cards.index', [], false), false)
         ->assertSee(route('student.report-cards.download', $downloadableReport, false), false)
