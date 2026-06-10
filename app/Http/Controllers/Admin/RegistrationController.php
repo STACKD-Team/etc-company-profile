@@ -25,6 +25,8 @@ class RegistrationController extends Controller
                 'payment_method',
                 'created_from',
                 'created_to',
+                'sort',
+                'direction',
             ]), 12),
             'programs' => Program::query()->orderBy('name')->get(),
         ]);

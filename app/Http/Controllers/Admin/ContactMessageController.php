@@ -32,7 +32,7 @@ class ContactMessageController extends Controller
 
     private function filters(Request $request): array
     {
-        $filters = $request->only(['search']);
+        $filters = $request->only(['search', 'sort', 'direction']);
 
         if ($request->filled('is_read')) {
             $filters['is_read'] = $request->boolean('is_read');

@@ -16,8 +16,12 @@ class ChatbotLogService extends BaseCrudService
 
     public function adminPaginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->query($filters)
-            ->latest('created_at')
+        return $this->applySorting($this->query($filters), $filters, [
+            'session_id',
+            'intent',
+            'is_helpful',
+            'created_at',
+        ])
             ->paginate($perPage)
             ->withQueryString();
     }

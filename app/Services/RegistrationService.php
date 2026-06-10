@@ -129,7 +129,16 @@ class RegistrationService extends BaseCrudService
 
     public function paginateAdminRegistrations(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->applyFilters($this->baseQuery()->latest(), $filters)
+        return $this->applySorting($this->applyFilters($this->baseQuery(), $filters), $filters, [
+            'created_at',
+            'registration_code',
+            'applicant_name',
+            'applicant_email',
+            'status',
+            'program_id',
+            'payment_amount',
+            'paid_at',
+        ])
             ->paginate($perPage)
             ->withQueryString();
     }
@@ -142,10 +151,17 @@ class RegistrationService extends BaseCrudService
                     ->orWhereNotNull('payment_proof')
                     ->orWhereNotNull('payment_gateway_id')
                     ->orWhere('notes', 'like', '%payment_confirmation%');
-            })
-            ->latest();
+            });
 
-        return $this->applyFilters($query, $filters)
+        return $this->applySorting($this->applyFilters($query, $filters), $filters, [
+            'created_at',
+            'applicant_name',
+            'status',
+            'program_id',
+            'payment_method',
+            'payment_amount',
+            'paid_at',
+        ])
             ->paginate($perPage)
             ->withQueryString();
     }

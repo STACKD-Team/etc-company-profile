@@ -12,6 +12,7 @@
     'id' => null,
     'prefix' => null,
     'suffix' => null,
+    'size' => 'md',
 ])
 
 @php
@@ -27,7 +28,7 @@
         </span>
     @endif
 
-    <x-filament::input.wrapper :valid="blank($error)" :disabled="$disabled" :prefix="$prefix" :suffix="$suffix">
+    <x-filament::input.wrapper :valid="blank($error)" :disabled="$disabled" :prefix="$prefix" :suffix="$suffix" class="etc-field-size-{{ $size }}">
         <x-filament::input
             :id="$id"
             :name="$name"

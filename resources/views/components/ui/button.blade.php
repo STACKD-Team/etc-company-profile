@@ -3,6 +3,9 @@
     'color' => 'primary',
     'outlined' => false,
     'icon' => null,
+    'iconPosition' => 'before',
+    'iconSize' => null,
+    'size' => 'md',
     'type' => 'button',
     'tag' => null,
     'target' => null,
@@ -18,6 +21,9 @@
     :color="$color"
     :outlined="$outlined"
     :icon="$icon"
+    :icon-position="$iconPosition"
+    :icon-size="$iconSize"
+    :size="$size"
     :type="$type"
     :target="$target"
     {{ $attributes }}

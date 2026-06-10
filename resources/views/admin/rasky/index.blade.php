@@ -7,10 +7,9 @@
         @if (! empty($actions ?? []))
             <div class="mb-5 flex flex-wrap gap-3">
                 @foreach ($actions as $action)
-                    <a href="{{ route($action['route']) }}" class="inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-etc-outline-variant px-4 py-2 font-heading text-sm font-bold text-etc-on-surface hover:border-etc-magenta hover:text-etc-magenta">
-                        <span class="material-symbols-outlined text-lg">{{ $action['icon'] ?? 'arrow_forward' }}</span>
+                    <x-ui.button :href="route($action['route'])" outlined size="sm">
                         {{ $action['label'] }}
-                    </a>
+                    </x-ui.button>
                 @endforeach
             </div>
         @endif
@@ -29,7 +28,9 @@
                         @include($rowView, ['item' => $item])
                     @empty
                         <tr>
-                            <td colspan="{{ count($columns) }}" class="py-8 text-center text-etc-on-muted">{{ $empty }}</td>
+                            <td colspan="{{ count($columns) }}" class="py-8">
+                                <x-ui.empty-state :heading="$empty" description="Data akan tampil setelah workflow terkait tersedia." icon="heroicon-o-archive-box" />
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>

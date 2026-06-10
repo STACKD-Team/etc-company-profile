@@ -19,7 +19,9 @@ class ClassController extends Controller
     public function index(Request $request): View
     {
         return view('admin.classes.index', [
-            'classes' => $this->classService->paginate($request->only(['program_id', 'instructor_id', 'status']), 12),
+            'classes' => $this->classService->paginate($request->only(['search', 'program_id', 'instructor_id', 'status', 'sort', 'direction']), 12),
+            'programs' => Program::query()->orderBy('name')->get(),
+            'instructors' => User::query()->instructors()->orderBy('full_name')->get(),
         ]);
     }
 

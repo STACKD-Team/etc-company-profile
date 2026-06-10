@@ -17,8 +17,14 @@ class ProgramController extends Controller
 
     public function index(Request $request): View
     {
+        $filters = $request->only(['search', 'category', 'type', 'target_age', 'sort', 'direction']);
+
+        if ($request->filled('is_active')) {
+            $filters['is_active'] = $request->boolean('is_active');
+        }
+
         return view('admin.programs.index', [
-            'programs' => $this->programService->paginate($request->only(['search', 'category', 'type']), 12),
+            'programs' => $this->programService->paginate($filters, 12),
         ]);
     }
 

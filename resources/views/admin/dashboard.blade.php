@@ -26,9 +26,9 @@
                 <h2 class="font-heading text-xl font-black text-etc-on-surface">Pendaftaran Terbaru</h2>
                 <p class="mt-1 text-sm text-etc-on-muted">Data diambil dari tabel registrations.</p>
             </div>
-            <a href="{{ \Illuminate\Support\Facades\Route::has('admin.registrations.index') ? route('admin.registrations.index') : '#' }}" class="inline-flex min-h-10 items-center justify-center rounded-full border border-etc-outline-variant px-4 py-2 font-heading text-sm font-bold text-etc-on-surface hover:border-etc-magenta hover:text-etc-magenta">
+            <x-ui.button :href="\Illuminate\Support\Facades\Route::has('admin.registrations.index') ? route('admin.registrations.index') : '#'" outlined size="sm">
                 Lihat Semua
-            </a>
+            </x-ui.button>
         </div>
 
         <div class="overflow-x-auto">
@@ -49,15 +49,19 @@
                             <td class="py-4 pr-4 text-etc-on-surface">{{ $registration->applicant_name }}</td>
                             <td class="py-4 pr-4 text-etc-on-muted">{{ $registration->program?->name ?? '-' }}</td>
                             <td class="py-4 pr-4">
-                                <span class="inline-flex rounded-full bg-etc-surface-container px-3 py-1 font-heading text-xs font-bold text-etc-magenta">
-                                    {{ str($registration->status)->replace('_', ' ')->headline() }}
-                                </span>
+                                <x-ui.badge :status="$registration->status" />
                             </td>
                             <td class="py-4 text-etc-on-muted">{{ $registration->created_at?->format('d M Y') ?? '-' }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-8 text-center text-etc-on-muted">Belum ada pendaftaran.</td>
+                            <td colspan="5" class="py-8">
+                                <x-ui.empty-state
+                                    heading="Belum ada pendaftaran"
+                                    description="Pendaftaran terbaru akan muncul setelah calon siswa mengirim formulir."
+                                    icon="heroicon-o-clipboard-document-list"
+                                />
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>

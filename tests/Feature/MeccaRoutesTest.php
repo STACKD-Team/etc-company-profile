@@ -425,7 +425,7 @@ test('student dashboard shows owned learning data and working mecca links', func
         ->assertSee('Rapor Terbaru')
         ->assertSee('Riwayat Belajar Ringkas')
         ->assertDontSee('Other Student Class')
-        ->assertSee(route('student.help.index', [], false), false)
+        ->assertDontSee(route('student.help.index', [], false), false)
         ->assertSee(route('student.classes.show', $activeClass, false), false)
         ->assertSee(route('student.report-cards.download', $downloadableReport, false), false)
         ->assertSee(route('student.learning-history.index', [], false), false);

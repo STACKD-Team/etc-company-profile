@@ -1,20 +1,32 @@
+@php
+    $categories = ['english' => 'English', 'mandarin' => 'Mandarin', 'japanese' => 'Japanese', 'test_prep' => 'Test Prep', 'soft_skills' => 'Soft Skills', 'other' => 'Other'];
+    $types = ['regular' => 'Regular', 'private' => 'Private', 'one_on_one' => 'One on One'];
+    $targetAges = ['all' => 'All', 'kids' => 'Kids', 'teen' => 'Teen', 'adult' => 'Adult', 'university' => 'University'];
+@endphp
+
 <x-layouts.dashboard title="Master Program" area="admin" active="programs">
-    <section class="rounded-card bg-white p-6 shadow-panel">
-        @if (session('status'))<div class="mb-4 rounded-card bg-green-50 p-3 text-sm font-bold text-green-700">{{ session('status') }}</div>@endif
-        <div class="mb-5 flex items-center justify-between gap-4">
-            <form method="GET" class="flex flex-1 gap-3"><input name="search" value="{{ request('search') }}" placeholder="Cari program" class="min-h-11 flex-1 rounded-xl border border-etc-outline-variant px-4 text-sm"><button class="rounded-pill bg-etc-charcoal px-5 text-sm font-bold text-white">Cari</button></form>
-            <a href="{{ route('admin.programs.create') }}" class="rounded-pill bg-etc-magenta px-5 py-3 text-sm font-bold text-white">Tambah</a>
-        </div>
-        <div class="grid gap-4 md:grid-cols-2">
-            @foreach ($programs as $program)
-                <article class="rounded-card border border-etc-outline-variant p-5">
-                    <p class="text-xs font-bold uppercase text-etc-magenta">{{ $program->category }}</p>
-                    <h2 class="mt-2 font-heading text-lg font-bold">{{ $program->name }}</h2>
-                    <p class="mt-2 text-sm text-etc-on-muted">{{ $program->duration_meetings }} pertemuan • Rp {{ number_format((int) $program->price, 0, ',', '.') }}</p>
-                    <a href="{{ route('admin.programs.edit', $program) }}" class="mt-4 inline-block font-bold text-etc-magenta">Edit</a>
-                </article>
-            @endforeach
-        </div>
-        <div class="mt-5">{{ $programs->links() }}</div>
-    </section>
+    @if (session('status'))
+        <div class="mb-5 rounded-card border border-green-200 bg-green-50 px-5 py-4 font-heading text-sm font-bold text-green-700">{{ session('status') }}</div>
+    @endif
+
+    <x-ui.data-table
+        :items="$programs"
+        :columns="[
+            'name' => ['label' => 'Program', 'sortable' => true],
+            'category' => ['label' => 'Kategori', 'sortable' => true, 'filter' => ['type' => 'select', 'name' => 'category', 'options' => $categories]],
+            'type' => ['label' => 'Tipe', 'sortable' => true, 'filter' => ['type' => 'select', 'name' => 'type', 'options' => $types]],
+            'target_age' => ['label' => 'Target', 'sortable' => true, 'filter' => ['type' => 'select', 'name' => 'target_age', 'options' => $targetAges]],
+            'price' => ['label' => 'Biaya', 'sortable' => true],
+            'is_active' => ['label' => 'Status', 'sortable' => true, 'filter' => ['type' => 'select', 'name' => 'is_active', 'options' => ['1' => 'Aktif', '0' => 'Nonaktif']]],
+            'actions' => 'Aksi',
+        ]"
+        row-view="admin.programs.partials.row"
+        empty="Belum ada program"
+        empty-description="Tambahkan program agar bisa dipilih calon siswa dan dikelola admin."
+        search-placeholder="Cari program atau slug"
+    >
+        <x-slot:actions>
+            <x-ui.button :href="route('admin.programs.create')" icon="heroicon-m-plus">Tambah Program</x-ui.button>
+        </x-slot:actions>
+    </x-ui.data-table>
 </x-layouts.dashboard>

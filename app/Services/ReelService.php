@@ -23,8 +23,16 @@ class ReelService extends BaseCrudService
 
     public function adminPaginate(array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
-        return $this->query($filters)
-            ->latest('created_at')
+        return $this->applySorting($this->query($filters), $filters, [
+            'title',
+            'category',
+            'is_published',
+            'views_count',
+            'likes_count',
+            'duration_seconds',
+            'published_at',
+            'created_at',
+        ])
             ->paginate($perPage)
             ->withQueryString();
     }

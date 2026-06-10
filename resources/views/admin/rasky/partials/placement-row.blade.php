@@ -4,6 +4,6 @@
     </td>
     <td class="py-4 pr-4">{{ $item->applicant_name }}</td>
     <td class="py-4 pr-4 text-etc-on-muted">{{ $item->program?->name ?? '-' }}</td>
-    <td class="py-4 pr-4">{{ str($item->status)->replace('_', ' ')->headline() }}</td>
+    <td class="py-4 pr-4"><x-ui.badge :status="$item->status" /></td>
     <td class="py-4 pr-4 text-etc-on-muted">{{ $item->placement_test_at?->format('d M Y H:i') ?? '-' }}</td>
 </tr>

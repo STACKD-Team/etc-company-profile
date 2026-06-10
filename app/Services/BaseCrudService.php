@@ -26,7 +26,7 @@ abstract class BaseCrudService
 
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->query($filters)->paginate($perPage);
+        return $this->query($filters)->paginate($perPage)->withQueryString();
     }
 
     public function all(array $filters = []): Collection
@@ -128,6 +128,29 @@ abstract class BaseCrudService
         return $query
             ->when($filters[$fromKey] ?? null, fn (Builder $query, string $date) => $query->whereDate($column, '>=', $date))
             ->when($filters[$toKey] ?? null, fn (Builder $query, string $date) => $query->whereDate($column, '<=', $date));
+    }
+
+    /**
+     * @param array<int|string, string> $allowedSorts
+     */
+    protected function applySorting(Builder $query, array $filters, array $allowedSorts, string $defaultSort = 'created_at', string $defaultDirection = 'desc'): Builder
+    {
+        $allowedSorts = collect($allowedSorts)
+            ->mapWithKeys(fn (string $column, int|string $key): array => [is_int($key) ? $column : (string) $key => $column])
+            ->all();
+
+        $sort = (string) ($filters['sort'] ?? $defaultSort);
+        $direction = strtolower((string) ($filters['direction'] ?? $defaultDirection));
+
+        if (! array_key_exists($sort, $allowedSorts)) {
+            $sort = $defaultSort;
+        }
+
+        if (! in_array($direction, ['asc', 'desc'], true)) {
+            $direction = $defaultDirection;
+        }
+
+        return $query->orderBy($allowedSorts[$sort] ?? $allowedSorts[$defaultSort], $direction);
     }
 
     protected function supportsSoftDeletes(): bool

@@ -1,23 +1,28 @@
+@php($statuses = ['upcoming' => 'Upcoming', 'ongoing' => 'Ongoing', 'completed' => 'Completed', 'cancelled' => 'Cancelled'])
+
 <x-layouts.dashboard title="Master Kelas" area="admin" active="classes">
-    <section class="rounded-card bg-white p-6 shadow-panel">
-        @if (session('status'))<div class="mb-4 rounded-card bg-green-50 p-3 text-sm font-bold text-green-700">{{ session('status') }}</div>@endif
-        <div class="mb-5 flex justify-end"><a href="{{ route('admin.classes.create') }}" class="rounded-pill bg-etc-magenta px-5 py-3 text-sm font-bold text-white">Tambah Kelas</a></div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-                <thead class="text-etc-on-muted"><tr><th class="py-3">Kelas</th><th>Program</th><th>Instruktur</th><th>Status</th><th></th></tr></thead>
-                <tbody>
-                    @foreach ($classes as $class)
-                        <tr class="border-t border-etc-outline-variant/60">
-                            <td class="py-3 font-bold">{{ $class->name }}</td>
-                            <td>{{ $class->program?->name }}</td>
-                            <td>{{ $class->instructor?->full_name ?? $class->instructor?->name ?? '-' }}</td>
-                            <td>{{ $class->status }}</td>
-                            <td class="text-right"><a class="font-bold text-etc-magenta" href="{{ route('admin.classes.edit', $class) }}">Edit</a></td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        <div class="mt-5">{{ $classes->links() }}</div>
-    </section>
+    @if (session('status'))
+        <div class="mb-5 rounded-card border border-green-200 bg-green-50 px-5 py-4 font-heading text-sm font-bold text-green-700">{{ session('status') }}</div>
+    @endif
+
+    <x-ui.data-table
+        :items="$classes"
+        :columns="[
+            'name' => ['label' => 'Kelas', 'sortable' => true],
+            'program_id' => ['label' => 'Program', 'sortable' => true, 'filter' => ['type' => 'select', 'name' => 'program_id', 'options' => $programs->pluck('name', 'id')->all()]],
+            'instructor_id' => ['label' => 'Instruktur', 'sortable' => true, 'filter' => ['type' => 'select', 'name' => 'instructor_id', 'options' => $instructors->mapWithKeys(fn ($instructor) => [$instructor->id => $instructor->full_name ?? $instructor->name])->all()]],
+            'schedule' => 'Jadwal',
+            'start_date' => ['label' => 'Mulai', 'sortable' => true],
+            'status' => ['label' => 'Status', 'sortable' => true, 'filter' => ['type' => 'select', 'name' => 'status', 'options' => $statuses]],
+            'actions' => 'Aksi',
+        ]"
+        row-view="admin.classes.partials.row"
+        empty="Belum ada kelas"
+        empty-description="Kelas akan tampil setelah master kelas dibuat."
+        search-placeholder="Cari kelas"
+    >
+        <x-slot:actions>
+            <x-ui.button :href="route('admin.classes.create')" icon="heroicon-m-plus">Tambah Kelas</x-ui.button>
+        </x-slot:actions>
+    </x-ui.data-table>
 </x-layouts.dashboard>

@@ -928,6 +928,23 @@ Route terkait:
 - `instructor.classes.show`
 - `instructor.students.index`
 - `instructor.report-cards.index`
+- `instructor.report-cards.create`
+- `instructor.report-cards.store`
+- `instructor.report-cards.show`
+- `instructor.report-cards.edit`
+- `instructor.report-cards.update`
+
+Route assessment instructor:
+
+- `GET /instructor/enrollments/{enrollment}/report-card/create`
+- `POST /instructor/enrollments/{enrollment}/report-card`
+- `GET /instructor/report-cards/{reportCard}`
+- `GET /instructor/report-cards/{reportCard}/edit`
+- `PUT /instructor/report-cards/{reportCard}`
+
+Instructor hanya dapat membuat dan mengubah draft assessment untuk enrollment
+dari kelas yang diajar. Rapor yang sudah dipublish bersifat read-only dan
+publish/unpublish tetap menjadi kewenangan admin.
 
 Backlog UI/UX:
 
