@@ -38,6 +38,13 @@ class DashboardController extends Controller
             ->where('user_id', $student->id)
             ->whereNotNull('payment_amount')
             ->latest('paid_at')
+            ->latest('created_at')
+            ->get();
+
+        $recentLearningHistory = $student->enrollments()
+            ->with(['courseClass.program', 'courseClass.instructor', 'reportCard'])
+            ->latest('enrolled_at')
+            ->take(3)
             ->get();
 
         $activeCourseClass = $currentEnrollment?->courseClass;
@@ -54,6 +61,9 @@ class DashboardController extends Controller
             'activeProgram' => $activeProgram,
             'publishedReports' => $publishedReports,
             'payments' => $payments,
+            'latestPayment' => $payments->first(),
+            'latestReport' => $publishedReports->first(),
+            'recentLearningHistory' => $recentLearningHistory,
             'stats' => [
                 'active_classes' => $activeEnrollments->count(),
                 'total_meetings' => $activeEnrollments->sum(fn ($enrollment) => (int) ($enrollment->courseClass?->program?->duration_meetings ?? 0)),

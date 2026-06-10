@@ -1,66 +1,62 @@
-@php
-    $statusLabels = [
-        'pending_payment' => 'Menunggu Pembayaran',
-        'paid' => 'Terverifikasi',
-        'placement_test' => 'Placement Test',
-        'enrolled' => 'Enrolled',
-        'rejected' => 'Ditolak',
-        'cancelled' => 'Dibatalkan',
-    ];
-    $methods = [
-        'qris' => 'QRIS',
-        'bank_transfer' => 'Transfer Bank',
-        'virtual_account' => 'Virtual Account',
-        'ewallet' => 'E-Wallet',
-        'manual' => 'Manual',
-    ];
-@endphp
-
 <x-layouts.dashboard title="Riwayat Pembayaran" area="student" active="payments" :user="$student">
-    <section class="rounded-card bg-white p-6 shadow-panel">
-        <div class="mb-6 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-            <div>
-                <p class="font-heading text-xs font-bold uppercase text-etc-magenta">Pembayaran</p>
-                <h2 class="mt-2 font-heading text-2xl font-bold text-etc-on-surface">Riwayat Pembayaran</h2>
-                <p class="mt-1 text-sm text-etc-on-muted">Pantau status pembayaran pendaftaran dan program ETC Planet.</p>
-            </div>
-        </div>
-
+    <x-ui.panel heading="Riwayat Pembayaran" description="Pantau status pembayaran pendaftaran dan program ETC Planet.">
         <div class="grid gap-4">
             @forelse ($payments as $payment)
-                <article class="rounded-card border border-etc-outline-variant bg-white p-5">
-                    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                @php
+                    $originalAmount = (float) ($payment->payment_amount ?? 0);
+                    $discountAmount = 0;
+                    $finalAmount = max($originalAmount - $discountAmount, 0);
+                    $statusLabel = $statusLabels[$payment->status] ?? str($payment->status)->replace('_', ' ')->headline();
+                    $statusColor = $statusColors[$payment->status] ?? 'primary';
+                @endphp
+                <article class="rounded-card border border-etc-outline-variant/70 bg-white p-5">
+                    <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-center">
                         <div class="min-w-0">
-                            <p class="font-heading text-xs font-bold uppercase text-etc-magenta">{{ $payment->registration_code }}</p>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <x-ui.badge :status="$payment->status" :color="$statusColor">{{ $statusLabel }}</x-ui.badge>
+                                <x-ui.badge status="info">{{ $methods[$payment->payment_method] ?? ($payment->payment_method ?? 'Metode belum dipilih') }}</x-ui.badge>
+                            </div>
+                            <p class="mt-3 font-heading text-xs font-bold uppercase text-etc-magenta">{{ $payment->registration_code }}</p>
                             <h3 class="mt-2 truncate font-heading text-xl font-bold text-etc-on-surface">{{ $payment->program?->name ?? 'Program ETC Planet' }}</h3>
-                            <p class="mt-2 text-sm text-etc-on-muted">
-                                {{ $methods[$payment->payment_method] ?? ($payment->payment_method ?? 'Metode belum dipilih') }}
-                                <span class="mx-2">-</span>
-                                {{ $payment->created_at?->format('d M Y') ?? '-' }}
-                            </p>
+                            <p class="mt-1 text-sm text-etc-on-muted">Pendaftar: {{ $payment->applicant_name }} - {{ $payment->created_at?->format('d M Y') ?? '-' }}</p>
                         </div>
 
-                        <div class="flex flex-col gap-3 md:items-end">
-                            <strong class="font-heading text-xl font-bold text-etc-on-surface">
-                                {{ $payment->payment_amount ? 'Rp '.number_format((float) $payment->payment_amount, 0, ',', '.') : '-' }}
-                            </strong>
-                            <span class="w-fit rounded-pill bg-etc-surface-container px-3 py-1 font-heading text-xs font-bold text-etc-on-surface">
-                                {{ $statusLabels[$payment->status] ?? str($payment->status)->replace('_', ' ')->headline() }}
-                            </span>
-                            <a href="{{ route('student.payments.show', ['payment' => $payment]) }}" class="inline-flex min-h-10 items-center justify-center rounded-pill bg-etc-magenta px-5 py-2 font-heading text-sm font-bold text-white">
-                                Detail
-                            </a>
+                        <div class="rounded-card bg-etc-surface-low p-4">
+                            <dl class="space-y-2 text-sm">
+                                <div class="flex justify-between gap-3">
+                                    <dt class="text-etc-on-muted">Nominal asli</dt>
+                                    <dd class="font-semibold text-etc-on-surface">{{ $originalAmount > 0 ? 'Rp '.number_format($originalAmount, 0, ',', '.') : '-' }}</dd>
+                                </div>
+                                <div class="flex justify-between gap-3">
+                                    <dt class="text-etc-on-muted">Promo</dt>
+                                    <dd class="font-semibold text-etc-on-surface">-</dd>
+                                </div>
+                                <div class="flex justify-between gap-3">
+                                    <dt class="text-etc-on-muted">Potongan</dt>
+                                    <dd class="font-semibold text-etc-on-surface">Rp 0</dd>
+                                </div>
+                                <div class="border-t border-etc-outline-variant/60 pt-2">
+                                    <div class="flex justify-between gap-3">
+                                        <dt class="font-heading font-bold text-etc-on-surface">Nominal akhir</dt>
+                                        <dd class="font-heading font-black text-etc-magenta">{{ $finalAmount > 0 ? 'Rp '.number_format($finalAmount, 0, ',', '.') : '-' }}</dd>
+                                    </div>
+                                </div>
+                            </dl>
+                            <x-ui.button :href="route('student.payments.show', ['payment' => $payment])" class="mt-4 w-full" icon="heroicon-m-eye">
+                                Detail Pembayaran
+                            </x-ui.button>
                         </div>
                     </div>
                 </article>
             @empty
-                <div class="rounded-card bg-etc-surface-low p-8 text-center">
-                    <h3 class="font-heading text-xl font-bold text-etc-on-surface">Belum ada riwayat pembayaran.</h3>
-                    <p class="mt-2 text-sm text-etc-on-muted">Pembayaran akan tampil setelah pendaftaran dibuat atau dikonfirmasi.</p>
-                </div>
+                <x-ui.empty-state
+                    heading="Belum ada riwayat pembayaran"
+                    description="Pembayaran akan tampil setelah pendaftaran dibuat atau dikonfirmasi."
+                    icon="heroicon-o-credit-card"
+                />
             @endforelse
         </div>
 
-        <div class="mt-6">{{ $payments->links() }}</div>
-    </section>
+        <div class="mt-6">{{ $payments->withQueryString()->links() }}</div>
+    </x-ui.panel>
 </x-layouts.dashboard>

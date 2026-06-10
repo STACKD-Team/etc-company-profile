@@ -22,6 +22,9 @@ class PaymentController extends Controller
                 ->where($this->paymentRelevantFilter())
                 ->latest('created_at')
                 ->paginate(10),
+            'statusLabels' => $this->statusLabels(),
+            'statusColors' => $this->statusColors(),
+            'methods' => $this->methods(),
         ]);
     }
 
@@ -32,6 +35,9 @@ class PaymentController extends Controller
         return view('student.payments.show', [
             'student' => $request->user(),
             'payment' => $payment->load(['program', 'courseClass']),
+            'statusLabels' => $this->statusLabels(),
+            'statusColors' => $this->statusColors(),
+            'methods' => $this->methods(),
         ]);
     }
 
@@ -42,7 +48,48 @@ class PaymentController extends Controller
                 ->orWhereNotNull('payment_method')
                 ->orWhereNotNull('payment_proof')
                 ->orWhereNotNull('paid_at')
-                ->orWhereIn('status', ['pending_payment', 'paid', 'placement_test', 'enrolled', 'rejected']);
+                ->orWhereIn('status', ['pending_payment', 'paid', 'placement_test', 'enrolled', 'rejected', 'cancelled']);
         };
+    }
+
+    protected function statusLabels(): array
+    {
+        return [
+            'pending_payment' => 'Menunggu Pembayaran',
+            'paid' => 'Lunas',
+            'placement_test' => 'Menunggu Placement Test',
+            'enrolled' => 'Aktif Belajar',
+            'rejected' => 'Ditolak',
+            'cancelled' => 'Dibatalkan',
+            'waiting_payment' => 'Menunggu Pembayaran',
+            'expired' => 'Kedaluwarsa',
+            'failed' => 'Gagal',
+        ];
+    }
+
+    protected function statusColors(): array
+    {
+        return [
+            'pending_payment' => 'warning',
+            'waiting_payment' => 'warning',
+            'paid' => 'success',
+            'placement_test' => 'warning',
+            'enrolled' => 'success',
+            'rejected' => 'danger',
+            'cancelled' => 'danger',
+            'expired' => 'danger',
+            'failed' => 'danger',
+        ];
+    }
+
+    protected function methods(): array
+    {
+        return [
+            'qris' => 'QRIS',
+            'bank_transfer' => 'Transfer Bank',
+            'virtual_account' => 'Virtual Account',
+            'ewallet' => 'E-Wallet',
+            'manual' => 'Manual',
+        ];
     }
 }

@@ -14,7 +14,6 @@ class LearningHistoryController extends Controller
             'student' => $request->user(),
             'enrollments' => $request->user()->enrollments()
                 ->with(['courseClass.program', 'courseClass.instructor', 'reportCard'])
-                ->whereIn('status', ['completed', 'dropped'])
                 ->latest('enrolled_at')
                 ->get(),
         ]);

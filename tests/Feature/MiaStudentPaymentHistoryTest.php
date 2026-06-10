@@ -48,6 +48,10 @@ test('student can only see own payment history in mia sprint four index', functi
         ->assertSee('Riwayat Pembayaran')
         ->assertSee($ownPayment->registration_code)
         ->assertSee('Mia Student')
+        ->assertSee('Nominal asli')
+        ->assertSee('Potongan')
+        ->assertSee('Nominal akhir')
+        ->assertSee('Rp 1.400.000')
         ->assertDontSee('REG-MIA-STUDENT-OTHER')
         ->assertDontSee('Other Student');
 });
@@ -79,7 +83,12 @@ test('student can view own payment detail and cannot view another student paymen
         ->assertSee('Detail Pembayaran')
         ->assertSee('REG-MIA-STUDENT-DETAIL')
         ->assertSee('Transfer Bank')
-        ->assertSee('Rp 1.500.000');
+        ->assertSee('Nominal asli')
+        ->assertSee('Potongan promo')
+        ->assertSee('Nominal akhir')
+        ->assertSee('Rp 1.500.000')
+        ->assertSee('Informasi Legacy')
+        ->assertDontSee('Bukti Pembayaran');
 
     $this->actingAs($student)
         ->get(route('student.payments.show', ['payment' => $otherPayment]))
