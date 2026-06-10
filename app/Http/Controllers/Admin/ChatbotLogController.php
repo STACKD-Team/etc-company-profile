@@ -23,7 +23,7 @@ class ChatbotLogController extends Controller
 
     private function filters(Request $request): array
     {
-        $filters = $request->only(['session_id', 'intent', 'created_from', 'created_to']);
+        $filters = $request->only(['session_id', 'intent', 'created_from', 'created_to', 'sort', 'direction']);
 
         if ($request->filled('is_helpful')) {
             $filters['is_helpful'] = $request->boolean('is_helpful');

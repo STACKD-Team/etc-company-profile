@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Models\Program;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,9 +53,19 @@ it('renders the shared dashboard shell with collapsible sidebar and profile logo
         ->assertSee('data-dashboard-profile-trigger', false)
         ->assertSee('etc-dashboard-sidebar-collapsed', false)
         ->assertSee('Header Profile Instructor')
+        ->assertSee('ETC Padang')
+        ->assertSee('aria-label="ETC Padang"', false)
         ->assertSee('action="'.route('auth.logout').'"', false)
         ->assertSee('id="dashboard-sidebar"', false)
+        ->assertSee('md:w-16 md:px-2', false)
         ->assertSee('x-tooltip=', false)
+        ->assertSee('x-data="{ profileMenuOpen: false }"', false)
+        ->assertSee('x-show="profileMenuOpen"', false)
+        ->assertSee('x-on:click.stop="profileMenuOpen = ! profileMenuOpen"', false)
+        ->assertSee('style="display: none;"', false)
+        ->assertSee('data-dashboard-profile-menu', false)
+        ->assertSee('x-cloak', false)
+        ->assertDontSee('etc-icon-button-outlined', false)
         ->assertDontSee('Navigasi dashboard mobile', false)
         ->assertDontSee('Bantuan')
         ->assertDontSee('ETC Planet</a>', false);
@@ -85,16 +96,21 @@ it('uses the shared three-color component tokens and automatic datatable control
     $css = file_get_contents(resource_path('css/app.css'));
     $design = file_get_contents(base_path('context/stitch_etc_planet_digital_hub/playful_professional_identity/DESIGN.md'));
     $table = file_get_contents(resource_path('views/components/ui/data-table.blade.php'));
+    $pagination = file_get_contents(resource_path('views/components/ui/pagination.blade.php'));
     $javascript = file_get_contents(resource_path('js/app.js'));
 
     expect($css)
         ->toContain('--color-etc-magenta: #e6007f')
         ->toContain('--color-etc-charcoal: #27171c')
         ->toContain('--color-etc-surface: #f5f5f5')
-        ->toContain('--radius-box: 1rem')
-        ->toContain('--radius-field: 2rem')
-        ->toContain('--radius-selector: 1rem')
+        ->toContain('--radius-box: 0.5rem')
+        ->toContain('--radius-field: 0.25rem')
+        ->toContain('--radius-selector: 0.5rem')
+        ->toContain('--etc-size-xs: 16px')
+        ->toContain('--etc-size-md: 24px')
+        ->toContain('--etc-size-xl: 32px')
         ->toContain('--border-component: 2px')
+        ->toContain('var(--shadow-soft)')
         ->toContain('.etc-data-table table > thead > tr > th')
         ->toContain('.etc-data-table-scroll::-webkit-scrollbar-thumb')
         ->toContain('scrollbar-color: rgb(39 23 28 / 28%) transparent')
@@ -103,6 +119,9 @@ it('uses the shared three-color component tokens and automatic datatable control
         ->toContain("base: '#F5F5F5'")
         ->toContain("neutral: '#27171C'")
         ->toContain("accent: '#E6007F'")
+        ->toContain('box: 0.5rem')
+        ->toContain('field: 0.25rem')
+        ->toContain('md: 24px')
         ->toContain('400ms')
         ->and($table)
         ->toContain('data-data-table-toolbar')
@@ -110,8 +129,13 @@ it('uses the shared three-color component tokens and automatic datatable control
         ->toContain('data-table-column-filter')
         ->toContain('data-table-filter-debounce')
         ->toContain('data-table-filter-immediate')
+        ->toContain('x-ui.pagination')
         ->not->toContain('filter_drawer')
         ->not->toContain('slide-over')
+        ->and($pagination)
+        ->toContain('data-pagination')
+        ->toContain('data-pagination-summary')
+        ->toContain('withQueryString()->links()')
         ->and($javascript)
         ->toContain('setTimeout(submit, 400)')
         ->not->toContain('data-open-filter-drawer')
@@ -128,6 +152,8 @@ it('renders the datatable toolbar outside its panel and filters below column hea
         ->get(route('instructor.classes.index'))
         ->assertOk()
         ->assertSee('data-data-table-toolbar', false)
+        ->assertSee('data-pagination', false)
+        ->assertSee('data-pagination-summary', false)
         ->assertSee('data-table-column-filter="name"', false)
         ->assertSee('data-table-column-filter="program"', false)
         ->assertSee('data-table-column-filter="schedule"', false)
@@ -143,4 +169,46 @@ it('renders the datatable toolbar outside its panel and filters below column hea
         ->toBe(5)
         ->and($html)
         ->not->toContain('filter_drawer');
+});
+
+it('renders admin datatable column filters and applies safe filter sort query params', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    Program::query()->create([
+        'name' => 'English Visible Program',
+        'slug' => 'english-visible-program',
+        'category' => 'english',
+        'type' => 'regular',
+        'target_age' => 'teen',
+        'price' => 1200000,
+        'registration_fee' => 200000,
+        'is_active' => true,
+    ]);
+
+    Program::query()->create([
+        'name' => 'Mandarin Hidden Program',
+        'slug' => 'mandarin-hidden-program',
+        'category' => 'mandarin',
+        'type' => 'private',
+        'target_age' => 'adult',
+        'price' => 1400000,
+        'registration_fee' => 200000,
+        'is_active' => false,
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.programs.index', [
+            'search' => 'Visible',
+            'category' => 'english',
+            'is_active' => '1',
+            'sort' => 'name',
+            'direction' => 'desc',
+        ]))
+        ->assertOk()
+        ->assertSee('data-table-column-filter="category"', false)
+        ->assertSee('data-table-column-filter="type"', false)
+        ->assertSee('data-table-column-filter="target_age"', false)
+        ->assertSee('data-table-column-filter="is_active"', false)
+        ->assertSee('English Visible Program')
+        ->assertDontSee('Mandarin Hidden Program');
 });

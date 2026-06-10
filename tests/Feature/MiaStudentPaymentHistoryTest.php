@@ -46,6 +46,8 @@ test('student can only see own payment history in mia sprint four index', functi
         ->get(route('student.payments.index'))
         ->assertOk()
         ->assertSee('Riwayat Pembayaran')
+        ->assertSee('data-pagination', false)
+        ->assertSee('data-pagination-summary', false)
         ->assertSee($ownPayment->registration_code)
         ->assertSee('Mia Student')
         ->assertDontSee('REG-MIA-STUDENT-OTHER')

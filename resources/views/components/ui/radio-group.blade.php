@@ -7,6 +7,7 @@
     'required' => false,
     'disabled' => false,
     'error' => null,
+    'size' => 'md',
 ])
 
 @php
@@ -14,7 +15,7 @@
     $fieldValue = old($name, $value);
 @endphp
 
-<fieldset class="space-y-3">
+<fieldset class="etc-selector-size-{{ $size }} space-y-3">
     @if ($label)
         <legend class="font-heading text-sm font-bold text-etc-on-surface">{{ $label }} @if ($required)<span class="text-etc-magenta">*</span>@endif</legend>
     @endif

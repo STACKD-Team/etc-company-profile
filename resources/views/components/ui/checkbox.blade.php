@@ -7,6 +7,7 @@
     'disabled' => false,
     'error' => null,
     'id' => null,
+    'size' => 'md',
 ])
 
 @php
@@ -15,7 +16,7 @@
     $isChecked = (bool) old($name, $checked);
 @endphp
 
-<div class="space-y-2">
+<div class="etc-selector-size-{{ $size }} space-y-2">
     <label for="{{ $id }}" class="flex items-start gap-3">
         <x-filament::input.checkbox :id="$id" :name="$name" :value="$value" :checked="$isChecked" :disabled="$disabled" :valid="blank($error)" {{ $attributes->class('mt-1') }} />
         <span class="min-w-0 text-sm text-etc-on-surface">

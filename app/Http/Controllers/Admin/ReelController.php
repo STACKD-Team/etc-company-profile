@@ -78,7 +78,7 @@ class ReelController extends Controller
 
     private function filters(Request $request): array
     {
-        $filters = $request->only(['search', 'category']);
+        $filters = $request->only(['search', 'category', 'sort', 'direction']);
 
         if ($request->filled('is_published')) {
             $filters['is_published'] = $request->boolean('is_published');

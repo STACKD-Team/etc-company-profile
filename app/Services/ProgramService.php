@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Program;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
@@ -16,6 +17,22 @@ class ProgramService extends BaseCrudService
     protected function modelClass(): string
     {
         return Program::class;
+    }
+
+    public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        return $this->applySorting($this->query($filters), $filters, [
+            'name',
+            'category',
+            'type',
+            'target_age',
+            'price',
+            'registration_fee',
+            'is_active',
+            'created_at',
+        ], 'name', 'asc')
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     public function createWithThumbnail(array $data, ?UploadedFile $thumbnail = null): Program

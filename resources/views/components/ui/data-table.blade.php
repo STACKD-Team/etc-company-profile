@@ -18,7 +18,6 @@
     $isPaginator = $items instanceof \Illuminate\Contracts\Pagination\Paginator;
     $rows = $isPaginator ? $items->items() : $items;
     $nextDirection = $direction === 'asc' ? 'desc' : 'asc';
-    $isLivewireContext = isset($this) && method_exists($this, 'getId');
     $searchValue ??= request($searchName);
     $tableId = 'data-table-'.substr(md5(($action ?? request()->url()).($rowView ?? '').implode('|', array_keys($columns))), 0, 10);
     $columnFilters = collect($columns)->mapWithKeys(function ($column, $key) {
@@ -48,15 +47,12 @@
     <div class="mb-4 flex items-center gap-3" data-data-table-toolbar>
         @if ($showSearch)
             <div class="min-w-0 flex-1">
-                <x-filament::input.wrapper>
-                    <x-filament::input
-                        :name="$searchName"
-                        type="search"
-                        :value="$searchValue"
-                        :placeholder="$searchPlaceholder"
-                        data-table-filter-debounce
-                    />
-                </x-filament::input.wrapper>
+                <x-ui.search-field
+                    :name="$searchName"
+                    :value="$searchValue"
+                    :placeholder="$searchPlaceholder"
+                    data-table-filter-debounce
+                />
             </div>
         @endif
 
@@ -220,15 +216,7 @@
         </div>
 
         @if ($isPaginator)
-            <div class="mt-5">
-                @if ($isLivewireContext)
-                    <x-filament::pagination :paginator="$items" />
-                @else
-                    <x-filament::section compact>
-                        {{ $items->withQueryString()->links() }}
-                    </x-filament::section>
-                @endif
-            </div>
+            <x-ui.pagination :paginator="$items" class="mt-5" />
         @endif
     </x-filament::section>
 </form>

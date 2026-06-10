@@ -78,50 +78,65 @@
                         <x-ui.icon-button
                             icon="heroicon-m-bars-3"
                             label="Buka atau ringkas sidebar"
-                            outlined
                             x-on:click="toggleSidebar()"
                             aria-controls="dashboard-sidebar"
                             x-bind:aria-expanded="sidebarMobileOpen || ! sidebarCollapsed"
                             data-sidebar-toggle
                         />
 
-                        <x-filament::dropdown placement="bottom-end" teleport width="xs">
-                            <x-slot:trigger>
-                                <button
-                                    type="button"
-                                    class="flex min-h-12 max-w-64 items-center gap-3 rounded-field px-2 py-1.5 text-left transition hover:bg-etc-surface-container"
-                                    aria-label="Buka menu profil"
-                                    data-dashboard-profile-trigger
-                                >
-                                    <span class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-selector bg-etc-magenta font-heading text-sm font-bold text-etc-surface">
-                                        @if ($avatar)
-                                            <img src="{{ \Illuminate\Support\Facades\Storage::url($avatar) }}" alt="{{ $displayName }}" class="h-full w-full object-cover">
-                                        @else
-                                            {{ $initial }}
-                                        @endif
-                                    </span>
-                                    <span class="min-w-0">
-                                        <span class="block truncate font-heading text-sm font-bold text-etc-on-surface">{{ $displayName }}</span>
-                                        <span class="block text-xs text-etc-on-muted">{{ str($area)->headline() }}</span>
-                                    </span>
-                                    {{ \Filament\Support\generate_icon_html('heroicon-m-chevron-down', attributes: new \Illuminate\View\ComponentAttributeBag(['class' => 'shrink-0 text-etc-on-muted'])) }}
-                                </button>
-                            </x-slot:trigger>
+                        <div
+                            class="relative"
+                            x-data="{ profileMenuOpen: false }"
+                            x-on:click.outside="profileMenuOpen = false"
+                            x-on:keydown.escape.window="profileMenuOpen = false"
+                        >
+                            <button
+                                type="button"
+                                class="flex min-h-8 max-w-64 items-center gap-2 rounded-field px-2 py-1 text-left transition hover:bg-etc-surface-container"
+                                aria-label="Buka menu profil"
+                                data-dashboard-profile-trigger
+                                x-on:click.stop="profileMenuOpen = ! profileMenuOpen"
+                                x-bind:aria-expanded="profileMenuOpen"
+                                aria-haspopup="menu"
+                            >
+                                <span class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-selector bg-etc-magenta font-heading text-xs font-bold text-etc-surface">
+                                    @if ($avatar)
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($avatar) }}" alt="{{ $displayName }}" class="h-full w-full object-cover">
+                                    @else
+                                        {{ $initial }}
+                                    @endif
+                                </span>
+                                <span class="hidden min-w-0 sm:block">
+                                    <span class="block truncate font-heading text-sm font-bold text-etc-on-surface">{{ $displayName }}</span>
+                                    <span class="block text-xs text-etc-on-muted">{{ str($area)->headline() }}</span>
+                                </span>
+                                {{ \Filament\Support\generate_icon_html('heroicon-m-chevron-down', attributes: new \Illuminate\View\ComponentAttributeBag(['class' => 'shrink-0 text-etc-on-muted transition', 'x-bind:class' => "profileMenuOpen ? 'rotate-180' : ''"])) }}
+                            </button>
 
-                            <x-filament::dropdown.list>
-                                @if (\Illuminate\Support\Facades\Route::has('auth.logout'))
-                                    <x-filament::dropdown.list.item
-                                        tag="form"
-                                        method="POST"
-                                        :action="route('auth.logout')"
-                                        icon="heroicon-m-arrow-right-start-on-rectangle"
-                                        color="danger"
-                                    >
-                                        Logout
-                                    </x-filament::dropdown.list.item>
-                                @endif
-                            </x-filament::dropdown.list>
-                        </x-filament::dropdown>
+                            @if (\Illuminate\Support\Facades\Route::has('auth.logout'))
+                                <div
+                                    x-cloak
+                                    x-show="profileMenuOpen"
+                                    x-transition.origin.top.right
+                                    style="display: none;"
+                                    class="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-box border-2 border-etc-outline-variant bg-etc-surface shadow-panel"
+                                    role="menu"
+                                    data-dashboard-profile-menu
+                                >
+                                    <form method="POST" action="{{ route('auth.logout') }}">
+                                        @csrf
+                                        <button
+                                            type="submit"
+                                            class="flex min-h-8 w-full items-center gap-2 px-3 py-2 text-left font-heading text-sm font-bold text-red-700 hover:bg-red-50"
+                                            role="menuitem"
+                                        >
+                                            {{ \Filament\Support\generate_icon_html('heroicon-m-arrow-right-start-on-rectangle', attributes: new \Illuminate\View\ComponentAttributeBag(['class' => 'shrink-0'])) }}
+                                            Logout
+                                        </button>
+                                    </form>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 </header>
 

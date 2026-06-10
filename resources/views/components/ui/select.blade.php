@@ -9,6 +9,7 @@
     'disabled' => false,
     'error' => null,
     'id' => null,
+    'size' => 'md',
 ])
 
 @php
@@ -22,7 +23,7 @@
         <span class="font-heading text-sm font-bold text-etc-on-surface">{{ $label }} @if ($required)<span class="text-etc-magenta">*</span>@endif</span>
     @endif
 
-    <x-filament::input.wrapper :valid="blank($error)" :disabled="$disabled">
+    <x-filament::input.wrapper :valid="blank($error)" :disabled="$disabled" class="etc-field-size-{{ $size }}">
         <x-filament::input.select :id="$id" :name="$name" :required="$required" :disabled="$disabled" {{ $attributes }}>
             @if ($placeholder)
                 <option value="">{{ $placeholder }}</option>

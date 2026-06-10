@@ -61,6 +61,6 @@
             @endforelse
         </div>
 
-        <div class="mt-6">{{ $payments->links() }}</div>
+        <x-ui.pagination :paginator="$payments" class="mt-6" />
     </section>
 </x-layouts.dashboard>

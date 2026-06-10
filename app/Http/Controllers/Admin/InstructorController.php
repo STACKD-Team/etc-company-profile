@@ -11,6 +11,15 @@ class InstructorController extends Controller
 {
     public function index(Request $request): View
     {
+        $allowedSorts = [
+            'full_name' => 'full_name',
+            'email' => 'email',
+            'classes_taught_count' => 'classes_taught_count',
+            'created_at' => 'created_at',
+        ];
+        $sort = $allowedSorts[$request->string('sort')->toString()] ?? 'full_name';
+        $direction = $request->string('direction')->lower()->toString() === 'desc' ? 'desc' : 'asc';
+
         $instructors = User::query()
             ->instructors()
             ->withCount('classesTaught')
@@ -19,7 +28,8 @@ class InstructorController extends Controller
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('full_name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")))
-            ->orderBy('full_name')
+            ->when($request->string('specialization')->toString(), fn ($query, string $specialization) => $query->where('instructor_specialization', 'like', "%{$specialization}%"))
+            ->orderBy($sort, $direction)
             ->paginate(12)
             ->withQueryString();
 

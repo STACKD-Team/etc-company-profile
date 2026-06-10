@@ -11,6 +11,7 @@
     'error' => null,
     'id' => null,
     'list' => null,
+    'size' => 'md',
 ])
 
 @php
@@ -57,7 +58,7 @@
         data-table-filter-immediate
     >
 
-    <x-filament::input.wrapper :valid="blank($error)" :disabled="$disabled">
+    <x-filament::input.wrapper :valid="blank($error)" :disabled="$disabled" class="etc-field-size-{{ $size }}">
         <x-filament::input
             :id="$id"
             type="text"

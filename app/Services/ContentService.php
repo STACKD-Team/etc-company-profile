@@ -23,10 +23,14 @@ class ContentService extends BaseCrudService
 
     public function adminPaginate(array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
-        return $this->query($filters)
-            ->orderBy('type')
-            ->orderBy('display_order')
-            ->latest('created_at')
+        return $this->applySorting($this->query($filters), $filters, [
+            'title',
+            'type',
+            'display_order',
+            'is_published',
+            'created_at',
+            'updated_at',
+        ], 'updated_at', 'desc')
             ->paginate($perPage)
             ->withQueryString();
     }

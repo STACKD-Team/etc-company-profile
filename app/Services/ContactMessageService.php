@@ -15,8 +15,14 @@ class ContactMessageService extends BaseCrudService
 
     public function adminPaginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->query($filters)
-            ->latest('created_at')
+        return $this->applySorting($this->query($filters), $filters, [
+            'name',
+            'email',
+            'subject',
+            'is_read',
+            'replied_at',
+            'created_at',
+        ])
             ->paginate($perPage)
             ->withQueryString();
     }

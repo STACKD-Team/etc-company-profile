@@ -66,27 +66,40 @@
 
 <aside
     id="dashboard-sidebar"
-    {{ $attributes->class('fixed inset-y-0 left-0 z-50 flex w-72 flex-shrink-0 -translate-x-full flex-col overflow-y-auto border-r-2 border-etc-surface/10 bg-etc-charcoal px-3 py-5 text-etc-surface shadow-panel transition-[width,transform] duration-300 md:relative md:z-auto md:translate-x-0') }}
+    {{ $attributes->class('fixed inset-y-0 left-0 z-50 flex w-72 flex-shrink-0 -translate-x-full flex-col overflow-y-auto border-r-2 border-etc-outline-variant bg-etc-surface px-3 py-4 text-etc-on-surface shadow-soft transition-[width,transform,padding] duration-300 md:relative md:z-auto md:translate-x-0') }}
     x-bind:class="{
         'translate-x-0': sidebarMobileOpen,
         '-translate-x-full': ! sidebarMobileOpen,
-        'md:w-20': sidebarCollapsed,
+        'md:w-16 md:px-2': sidebarCollapsed,
         'md:w-64': ! sidebarCollapsed,
     }"
     aria-label="Sidebar dashboard"
 >
-    <div class="mb-8 flex items-center justify-between px-2">
+    <div
+        class="mb-6 flex items-center justify-between"
+        x-bind:class="sidebarCollapsed && ! sidebarMobileOpen ? 'md:px-0' : 'px-2'"
+    >
         <a
             href="{{ $routeUrl('public.home', '/') }}"
-            class="flex h-12 w-12 items-center justify-center rounded-selector bg-etc-magenta text-etc-surface"
-            aria-label="ETC Planet"
+            class="flex min-w-0 items-center gap-2 rounded-field text-etc-on-surface transition hover:bg-etc-surface-container"
+            x-bind:class="sidebarCollapsed && ! sidebarMobileOpen ? 'md:w-full md:justify-center md:p-0' : 'p-1 pr-2'"
+            aria-label="ETC Padang"
         >
-            <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">school</span>
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-selector bg-etc-magenta text-etc-surface shadow-soft">
+                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">school</span>
+            </span>
+            <span
+                x-show="! sidebarCollapsed || sidebarMobileOpen"
+                x-transition.opacity
+                class="truncate font-heading text-sm font-bold text-etc-on-surface"
+            >
+                ETC Padang
+            </span>
         </a>
 
         <button
             type="button"
-            class="flex h-10 w-10 items-center justify-center rounded-field text-etc-surface/70 hover:bg-etc-surface/10 hover:text-etc-surface md:hidden"
+            class="flex h-8 w-8 items-center justify-center rounded-field text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-magenta md:hidden"
             x-on:click="closeMobileSidebar()"
             aria-label="Tutup sidebar"
         >
@@ -94,7 +107,7 @@
         </button>
     </div>
 
-    <nav aria-label="Navigasi dashboard" class="flex-1 space-y-2">
+    <nav aria-label="Navigasi dashboard" class="flex-1 space-y-1">
         @foreach ($items as $item)
             @php($isActive = $currentActive === $item['key'])
             <a
@@ -105,18 +118,18 @@
                     theme: $store.theme,
                 }"
                 @class([
-                    'flex min-h-12 items-center gap-3 rounded-field px-3 py-3 font-heading text-sm font-bold transition duration-200',
-                    'border-r-2 border-etc-magenta bg-etc-surface/10 text-etc-magenta' => $isActive,
-                    'text-etc-surface/60 hover:bg-etc-surface/5 hover:text-etc-surface' => ! $isActive,
+                    'flex min-h-8 items-center gap-3 rounded-field px-2.5 py-1.5 font-heading text-sm font-bold transition duration-200',
+                    'bg-etc-surface-container text-etc-magenta shadow-soft ring-1 ring-etc-magenta/20' => $isActive,
+                    'text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-on-surface' => ! $isActive,
                 ])
-                x-bind:class="sidebarCollapsed && ! sidebarMobileOpen ? 'md:justify-center' : ''"
+                x-bind:class="sidebarCollapsed && ! sidebarMobileOpen ? 'md:justify-center md:px-0' : ''"
                 @if ($isActive) aria-current="page" @endif
                 aria-label="{{ $item['label'] }}"
             >
                 @if ($item['svg'] ?? null)
                     <x-ui.icon :name="$item['svg']" class="h-5 w-5 shrink-0" />
                 @else
-                    <span class="material-symbols-outlined shrink-0 text-xl" @if ($isActive) style="font-variation-settings: 'FILL' 1;" @endif>{{ $item['icon'] }}</span>
+                    <span class="material-symbols-outlined shrink-0 text-[20px]" @if ($isActive) style="font-variation-settings: 'FILL' 1;" @endif>{{ $item['icon'] }}</span>
                 @endif
                 <span x-show="! sidebarCollapsed || sidebarMobileOpen" x-transition.opacity class="truncate">{{ $item['label'] }}</span>
             </a>
