@@ -149,6 +149,180 @@ function initStudentDashboardPage() {
     });
 }
 
+function initDashboardShell() {
+    const shell = document.querySelector('[data-dashboard-shell]');
+
+    if (!shell) {
+        return;
+    }
+
+    const sidebar = shell.querySelector('[data-dashboard-sidebar]');
+    const backdrop = shell.querySelector('[data-sidebar-backdrop]');
+    const sidebarToggles = [...shell.querySelectorAll('[data-sidebar-toggle]')];
+    const sidebarLabels = [...shell.querySelectorAll('[data-sidebar-label]')];
+    const sidebarLinks = [...shell.querySelectorAll('[data-sidebar-nav-link]')];
+    const brandRow = shell.querySelector('[data-sidebar-brand-row]');
+    const brandLink = shell.querySelector('[data-sidebar-brand-link]');
+    const toggleIcons = [...shell.querySelectorAll('[data-sidebar-toggle-icon]')];
+    const profileTrigger = shell.querySelector('[data-dashboard-profile-trigger]');
+    const profileMenu = shell.querySelector('[data-dashboard-profile-menu]');
+    const desktopQuery = window.matchMedia('(min-width: 768px)');
+
+    if (!sidebar) {
+        return;
+    }
+
+    let sidebarCollapsed = window.localStorage?.getItem('etc-dashboard-sidebar-collapsed') === '1';
+    let sidebarMobileOpen = false;
+    let profileMenuOpen = false;
+
+    const syncPrePaintState = () => {
+        document.documentElement.dataset.dashboardSidebarCollapsed = sidebarCollapsed ? 'true' : 'false';
+    };
+
+    backdrop?.removeAttribute('x-cloak');
+    profileMenu?.removeAttribute('x-cloak');
+
+    const setElementHidden = (element, hidden) => {
+        if (!element) {
+            return;
+        }
+
+        element.classList.toggle('hidden', hidden);
+        element.style.display = hidden ? 'none' : '';
+    };
+
+    const syncProfileMenu = () => {
+        setElementHidden(profileMenu, !profileMenuOpen);
+        profileTrigger?.setAttribute('aria-expanded', profileMenuOpen ? 'true' : 'false');
+    };
+
+    const closeProfileMenu = () => {
+        profileMenuOpen = false;
+        syncProfileMenu();
+    };
+
+    const syncSidebar = () => {
+        const isDesktop = desktopQuery.matches;
+        const collapsedDesktop = isDesktop && sidebarCollapsed && !sidebarMobileOpen;
+
+        if (isDesktop) {
+            sidebarMobileOpen = false;
+        }
+
+        sidebar.classList.toggle('translate-x-0', sidebarMobileOpen);
+        sidebar.classList.toggle('-translate-x-full', !sidebarMobileOpen);
+        sidebar.classList.toggle('md:w-16', sidebarCollapsed);
+        sidebar.classList.toggle('md:px-2', sidebarCollapsed);
+        sidebar.classList.toggle('md:w-64', !sidebarCollapsed);
+
+        brandRow?.classList.toggle('md:px-0', collapsedDesktop);
+
+        brandLink?.classList.toggle('md:pointer-events-none', collapsedDesktop);
+        brandLink?.classList.toggle('md:w-0', collapsedDesktop);
+        brandLink?.classList.toggle('md:flex-none', collapsedDesktop);
+        brandLink?.classList.toggle('md:overflow-hidden', collapsedDesktop);
+        brandLink?.classList.toggle('md:p-0', collapsedDesktop);
+        brandLink?.classList.toggle('p-1', !collapsedDesktop);
+        brandLink?.classList.toggle('pr-2', !collapsedDesktop);
+
+        sidebarLinks.forEach((link) => {
+            link.classList.toggle('md:justify-center', collapsedDesktop);
+            link.classList.toggle('md:px-0', collapsedDesktop);
+        });
+
+        sidebarLabels.forEach((label) => {
+            label.classList.toggle('hidden', collapsedDesktop);
+        });
+
+        setElementHidden(backdrop, !sidebarMobileOpen || isDesktop);
+
+        sidebarToggles.forEach((toggle) => {
+            toggle.setAttribute('aria-expanded', isDesktop ? String(!sidebarCollapsed) : String(sidebarMobileOpen));
+            toggle.setAttribute(
+                'aria-label',
+                sidebarMobileOpen ? 'Tutup sidebar' : (sidebarCollapsed && isDesktop ? 'Buka sidebar' : 'Ringkas sidebar'),
+            );
+        });
+
+        toggleIcons.forEach((icon) => {
+            icon.textContent = sidebarMobileOpen ? 'close' : (sidebarCollapsed ? 'menu' : 'menu_open');
+        });
+    };
+
+    const toggleSidebar = () => {
+        if (desktopQuery.matches) {
+            sidebarCollapsed = !sidebarCollapsed;
+            window.localStorage?.setItem('etc-dashboard-sidebar-collapsed', sidebarCollapsed ? '1' : '0');
+            syncPrePaintState();
+        } else {
+            sidebarMobileOpen = !sidebarMobileOpen;
+        }
+
+        syncSidebar();
+    };
+
+    const closeMobileSidebar = () => {
+        sidebarMobileOpen = false;
+        syncSidebar();
+    };
+
+    sidebarToggles.forEach((toggle) => {
+        toggle.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            toggleSidebar();
+        });
+    });
+
+    backdrop?.addEventListener('click', closeMobileSidebar);
+
+    sidebarLinks.forEach((link) => {
+        link.addEventListener('click', () => {
+            if (!desktopQuery.matches) {
+                closeMobileSidebar();
+            }
+        });
+    });
+
+    profileTrigger?.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        profileMenuOpen = !profileMenuOpen;
+        syncProfileMenu();
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!profileMenuOpen) {
+            return;
+        }
+
+        if (profileMenu?.contains(event.target) || profileTrigger?.contains(event.target)) {
+            return;
+        }
+
+        closeProfileMenu();
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+        closeMobileSidebar();
+        closeProfileMenu();
+    });
+
+    desktopQuery.addEventListener('change', syncSidebar);
+
+    syncPrePaintState();
+    syncSidebar();
+    syncProfileMenu();
+    requestAnimationFrame(() => {
+        shell.dataset.dashboardHydrated = 'true';
+    });
+}
+
 function initPublicChatbot() {
     const widget = document.querySelector('[data-chatbot-widget]');
 
@@ -263,6 +437,7 @@ function initDataTables() {
 document.addEventListener('DOMContentLoaded', () => {
     initRegistrationProgramPage();
     initStudentDashboardPage();
+    initDashboardShell();
     initPublicChatbot();
     initDataTables();
 });

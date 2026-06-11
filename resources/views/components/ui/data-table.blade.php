@@ -12,11 +12,20 @@
     'searchName' => 'search',
     'searchPlaceholder' => 'Cari data',
     'searchValue' => null,
+    'perPageName' => 'per_page',
+    'perPageValue' => null,
+    'perPageOptions' => [10 => '10', 20 => '20', 50 => '50'],
 ])
 
 @php
     $isPaginator = $items instanceof \Illuminate\Contracts\Pagination\Paginator;
-    $rows = $isPaginator ? $items->items() : $items;
+    $perPageOptions = collect($perPageOptions)
+        ->mapWithKeys(fn ($label, $value) => [(int) $value => (string) $label])
+        ->all();
+    $allowedPerPage = array_keys($perPageOptions);
+    $perPageValue = (int) ($perPageValue ?? request($perPageName, 10));
+    $perPageValue = in_array($perPageValue, $allowedPerPage, true) ? $perPageValue : 10;
+    $rows = collect($isPaginator ? $items->items() : $items)->take($perPageValue);
     $nextDirection = $direction === 'asc' ? 'desc' : 'asc';
     $searchValue ??= request($searchName);
     $tableId = 'data-table-'.substr(md5(($action ?? request()->url()).($rowView ?? '').implode('|', array_keys($columns))), 0, 10);
@@ -32,10 +41,12 @@
     });
     $filterNames = $columnFilters->pluck('name')
         ->when($showSearch, fn ($names) => $names->push($searchName))
+        ->push($perPageName)
         ->push('page')
         ->unique();
     $resetQuery = collect(request()->query())->except($filterNames->all())->all();
     $resetUrl = url()->current().(count($resetQuery) ? '?'.http_build_query($resetQuery) : '');
+    $hasActivePerPage = $perPageValue !== 10;
 @endphp
 
 <form
@@ -44,7 +55,7 @@
     action="{{ $action }}"
     data-data-table-form
 >
-    <div class="mb-4 flex items-center gap-3" data-data-table-toolbar>
+    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center" data-data-table-toolbar>
         @if ($showSearch)
             <div class="min-w-0 flex-1">
                 <x-ui.search-field
@@ -56,12 +67,26 @@
             </div>
         @endif
 
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-wrap items-center justify-end gap-3">
+            <div class="flex items-center gap-2">
+                <span class="font-heading text-xs font-bold text-etc-on-muted">Tampilkan</span>
+                <div class="w-24">
+                    <x-ui.select
+                        :name="$perPageName"
+                        :value="$perPageValue"
+                        :options="$perPageOptions"
+                        size="sm"
+                        data-table-filter-immediate
+                        aria-label="Jumlah data per halaman"
+                    />
+                </div>
+            </div>
+
             @isset($actions)
                 {{ $actions }}
             @endisset
 
-            @if ($showSearch || $columnFilters->isNotEmpty())
+            @if ($showSearch || $columnFilters->isNotEmpty() || $hasActivePerPage)
                 <x-ui.button
                     :href="$resetUrl"
                     outlined
@@ -75,6 +100,7 @@
 
     <input type="hidden" name="sort" value="{{ $sort }}">
     <input type="hidden" name="direction" value="{{ $direction }}">
+    <input type="hidden" name="page" value="{{ request('page', 1) }}">
 
     <x-filament::section {{ $attributes->class('etc-data-table') }}>
         <div class="etc-data-table-scroll overflow-x-auto">

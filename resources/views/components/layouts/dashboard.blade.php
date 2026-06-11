@@ -23,6 +23,15 @@
 
         <title>{{ $title ? $title . ' - ' : '' }}{{ config('app.name', 'ETC Planet') }}</title>
 
+        <script>
+            try {
+                if (window.localStorage?.getItem('etc-dashboard-sidebar-collapsed') === '1') {
+                    document.documentElement.dataset.dashboardSidebarCollapsed = 'true';
+                }
+            } catch {
+            }
+        </script>
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800;900&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -39,6 +48,7 @@
     </head>
     <body
         class="etc-filament-ui h-screen overflow-hidden bg-etc-surface font-body text-etc-on-surface antialiased"
+        data-dashboard-shell
         x-data="{
             sidebarCollapsed: false,
             sidebarMobileOpen: false,
@@ -66,27 +76,29 @@
                 x-cloak
                 x-show="sidebarMobileOpen"
                 x-transition.opacity
-                class="fixed inset-0 z-40 bg-etc-charcoal/35 backdrop-blur-sm md:hidden"
-                x-on:click="closeMobileSidebar()"
+                class="fixed inset-0 z-40 hidden bg-etc-charcoal/35 backdrop-blur-sm md:hidden"
                 aria-hidden="true"
+                data-sidebar-backdrop
             ></div>
 
             <x-dashboard.sidebar :area="$area" :items="$sidebarItems" :active="$active" />
 
-            <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
-                <header class="border-b-2 border-etc-outline-variant bg-etc-surface/90 px-4 py-3 backdrop-blur sm:px-6 lg:px-8">
+            <div class="flex min-h-0 min-w-0 flex-1 flex-col">
+                <header class="relative z-30 border-b-2 border-etc-outline-variant bg-etc-surface/90 px-4 py-3 backdrop-blur sm:px-6 lg:px-8">
                     <div class="flex min-h-12 items-center justify-between gap-4">
                         <x-ui.icon-button
                             icon="heroicon-m-bars-3"
-                            label="Buka atau ringkas sidebar"
-                            x-on:click="toggleSidebar()"
+                            label="Buka sidebar"
+                            class="md:hidden"
                             aria-controls="dashboard-sidebar"
-                            x-bind:aria-expanded="sidebarMobileOpen || ! sidebarCollapsed"
+                            x-bind:aria-expanded="sidebarMobileOpen"
+                            x-bind:aria-label="sidebarMobileOpen ? 'Tutup sidebar' : 'Buka sidebar'"
                             data-sidebar-toggle
+                            data-sidebar-mobile-toggle
                         />
 
                         <div
-                            class="relative"
+                            class="relative ml-auto"
                             x-data="{ profileMenuOpen: false }"
                             x-on:click.outside="profileMenuOpen = false"
                             x-on:keydown.escape.window="profileMenuOpen = false"
@@ -96,9 +108,9 @@
                                 class="flex min-h-8 max-w-64 items-center gap-2 rounded-field px-2 py-1 text-left transition hover:bg-etc-surface-container"
                                 aria-label="Buka menu profil"
                                 data-dashboard-profile-trigger
-                                x-on:click.stop="profileMenuOpen = ! profileMenuOpen"
                                 x-bind:aria-expanded="profileMenuOpen"
                                 aria-haspopup="menu"
+                                aria-expanded="false"
                             >
                                 <span class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-selector bg-etc-magenta font-heading text-xs font-bold text-etc-surface">
                                     @if ($avatar)
@@ -120,7 +132,7 @@
                                     x-show="profileMenuOpen"
                                     x-transition.origin.top.right
                                     style="display: none;"
-                                    class="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-box border-2 border-etc-outline-variant bg-etc-surface shadow-panel"
+                                    class="absolute right-0 z-50 mt-2 hidden w-44 overflow-hidden rounded-box border-2 border-etc-outline-variant bg-etc-surface shadow-panel"
                                     role="menu"
                                     data-dashboard-profile-menu
                                 >
@@ -141,7 +153,7 @@
                     </div>
                 </header>
 
-                <main class="flex-1 overflow-y-auto px-6 py-6 lg:px-8 lg:py-8">
+                <main class="min-h-0 flex-1 overflow-y-auto px-6 py-6 lg:px-8 lg:py-8">
                     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <div>
                             @isset($eyebrow)
