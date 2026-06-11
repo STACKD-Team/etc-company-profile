@@ -3,6 +3,7 @@
 use App\Models\CourseClass;
 use App\Models\Enrollment;
 use App\Models\Program;
+use App\Models\Registration;
 use App\Models\ReportCard;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -398,17 +399,36 @@ test('student dashboard shows owned learning data and working mecca links', func
     ]);
     createMeccaSprint4Enrollment($otherStudent, $otherClass);
 
+    Registration::query()->create([
+        'registration_code' => 'REG-DASHBOARD-PAID',
+        'user_id' => $student->id,
+        'program_id' => $activeClass->program_id,
+        'class_id' => $activeClass->id,
+        'applicant_name' => 'Mecca Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_amount' => 1400000,
+        'payment_method' => 'qris',
+        'paid_at' => '2026-06-10 10:00:00',
+        'status' => 'paid',
+    ]);
+
     $this->actingAs($student)
         ->get(route('student.dashboard', [], false))
         ->assertOk()
         ->assertSee('Mecca Student')
         ->assertSee('Owned Active Class')
+        ->assertSee('Pembayaran Terakhir')
+        ->assertSee('REG-DASHBOARD-PAID')
+        ->assertSee('Lunas')
+        ->assertSee('Rp 1.400.000')
+        ->assertSee('Rapor Terbaru')
+        ->assertSee('Riwayat Belajar Ringkas')
         ->assertDontSee('Other Student Class')
         ->assertDontSee(route('student.help.index', [], false), false)
         ->assertSee(route('student.classes.show', $activeClass, false), false)
-        ->assertSee(route('student.report-cards.index', [], false), false)
         ->assertSee(route('student.report-cards.download', $downloadableReport, false), false)
-        ->assertSee(route('student.report-cards.show', $viewOnlyReport, false), false);
+        ->assertSee(route('student.learning-history.index', [], false), false);
 });
 
 test('student profile update uses validated allowed fields', function () {
@@ -471,14 +491,16 @@ test('student classes only expose enrollments owned by the authenticated student
         ->assertNotFound();
 });
 
-test('student learning history only shows completed and dropped enrollments', function () {
+test('student learning history shows all owned enrollments and published report links', function () {
     $student = User::factory()->create(['role' => 'student']);
+    $otherStudent = User::factory()->create(['role' => 'student']);
     $activeClass = createMeccaSprint4Class(['name' => 'Still Active Class']);
     $completedClass = createMeccaSprint4Class(['name' => 'Completed History Class']);
     $droppedClass = createMeccaSprint4Class(['name' => 'Dropped History Class']);
+    $otherClass = createMeccaSprint4Class(['name' => 'Other Student History Class']);
 
     createMeccaSprint4Enrollment($student, $activeClass, ['status' => 'active']);
-    createMeccaSprint4Enrollment($student, $completedClass, [
+    $completedEnrollment = createMeccaSprint4Enrollment($student, $completedClass, [
         'status' => 'completed',
         'completed_at' => '2026-07-12',
     ]);
@@ -486,13 +508,19 @@ test('student learning history only shows completed and dropped enrollments', fu
         'status' => 'dropped',
         'completed_at' => '2026-07-13',
     ]);
+    createMeccaSprint4Enrollment($otherStudent, $otherClass, ['status' => 'completed']);
+    $publishedReport = createMeccaSprint4ReportCard($completedEnrollment);
 
     $this->actingAs($student)
         ->get(route('student.learning-history.index', [], false))
         ->assertOk()
+        ->assertSee('Still Active Class')
         ->assertSee('Completed History Class')
         ->assertSee('Dropped History Class')
-        ->assertDontSee('Still Active Class');
+        ->assertSee('Sedang Berjalan')
+        ->assertSee('Rapor Published')
+        ->assertSee(route('student.report-cards.show', $publishedReport, false), false)
+        ->assertDontSee('Other Student History Class');
 });
 
 test('student report cards only expose published reports owned by the authenticated student', function () {
@@ -527,6 +555,10 @@ test('student report cards only expose published reports owned by the authentica
     $this->actingAs($student)
         ->get(route('student.report-cards.show', $ownedPublishedReport, false))
         ->assertOk()
+        ->assertSee('Written Test')
+        ->assertSee('Overall Class Assessment')
+        ->assertSee('Next Class')
+        ->assertSee('Comments and Suggestions')
         ->assertSee('Owned published comment.');
 
     $this->actingAs($student)

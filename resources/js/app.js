@@ -114,10 +114,6 @@ function initStudentDashboardPage() {
 
     const showToast = createToast('dashboard-toast');
 
-    page.querySelectorAll('[data-stat-card]').forEach((card, index) => {
-        setTimeout(() => card.classList.add('is-visible'), index * 120);
-    });
-
     page.querySelectorAll('[data-stat-value]').forEach((value) => {
         const target = Number(value.textContent);
 
@@ -326,6 +322,12 @@ function initDashboardShell() {
     syncProfileMenu();
     requestAnimationFrame(() => {
         shell.dataset.dashboardHydrated = 'true';
+        });
+}
+
+function initStudentRevealCards() {
+    document.querySelectorAll('[data-reveal-card]').forEach((card, index) => {
+        setTimeout(() => card.classList.add('is-visible'), index * 90);
     });
 }
 
@@ -655,6 +657,7 @@ function initDataTables() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initRegistrationProgramPage();
+    initStudentRevealCards();
     initStudentDashboardPage();
     initDashboardShell();
     initPublicChatbot();
