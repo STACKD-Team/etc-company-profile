@@ -1,6 +1,6 @@
 @php
     $methods = ['qris' => 'QRIS', 'bank_transfer' => 'Transfer Bank', 'virtual_account' => 'Virtual Account', 'ewallet' => 'E-Wallet', 'manual' => 'Manual'];
-    $proofUrl = $payment->payment_proof ? \Illuminate\Support\Facades\Storage::url($payment->payment_proof) : null;
+    $proofUrl = $payment->payment_proof ? app(\App\Services\MediaStorageService::class)->url($payment->payment_proof) : null;
     $summary = [
         'Pendaftar' => $payment->applicant_name,
         'Program' => $payment->program?->name ?? '-',

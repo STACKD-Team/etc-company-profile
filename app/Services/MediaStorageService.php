@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Cloudinary\Cloudinary;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -13,6 +14,11 @@ class MediaStorageService
     public function putUploadedFile(UploadedFile $file, string $directory): string
     {
         $path = $this->buildPath($file, $directory);
+
+        if ($this->hasCloudinary()) {
+            return $this->uploadToCloudinary($file, $directory, $path);
+        }
+
         $this->uploadToFirebase($file, $path);
 
         return $path;
@@ -21,6 +27,12 @@ class MediaStorageService
     public function delete(?string $path): void
     {
         if ($path === null || $path === '') {
+            return;
+        }
+
+        if ($this->hasCloudinaryPath($path)) {
+            $this->deleteFromCloudinary($path);
+
             return;
         }
 
@@ -33,6 +45,27 @@ class MediaStorageService
         $this->delete($oldPath);
 
         return $path;
+    }
+
+    public function url(?string $path): ?string
+    {
+        if ($path === null || $path === '') {
+            return null;
+        }
+
+        if (Str::startsWith($path, ['http://', 'https://', '/'])) {
+            return $path;
+        }
+
+        if ($this->hasCloudinaryPath($path)) {
+            return $this->cloudinary()->image($this->cloudinaryPublicId($path))->toUrl();
+        }
+
+        if (Str::startsWith($path, ['images/', 'videos/', 'storage/'])) {
+            return asset(ltrim($path, '/'));
+        }
+
+        return Storage::disk('public')->url($path);
     }
 
     protected function buildPath(UploadedFile $file, string $directory): string
@@ -114,5 +147,78 @@ class MediaStorageService
         return class_exists('Kreait\\Firebase\\Factory')
             && (bool) config('firebase.credentials')
             && (bool) config('firebase.storage_bucket');
+    }
+
+    protected function uploadToCloudinary(UploadedFile $file, string $directory, string $fallbackPath): string
+    {
+        $folder = trim($directory, '/');
+        $publicId = Str::beforeLast($fallbackPath, '.');
+        $resourceType = $this->cloudinaryResourceType($file->getMimeType());
+
+        $result = $this->cloudinary()->uploadApi()->upload($file->getRealPath(), [
+            'folder' => $folder,
+            'public_id' => Str::after($publicId, $folder.'/'),
+            'resource_type' => $resourceType,
+            'overwrite' => true,
+        ]);
+
+        $storedPublicId = $result['public_id'] ?? $publicId;
+        $version = $result['version'] ?? null;
+
+        return 'cloudinary://'.$storedPublicId.($version ? '?v='.$version : '');
+    }
+
+    protected function deleteFromCloudinary(string $path): void
+    {
+        $this->cloudinary()->uploadApi()->destroy($this->cloudinaryPublicId($path), [
+            'resource_type' => 'auto',
+            'invalidate' => true,
+        ]);
+    }
+
+    protected function cloudinary(): Cloudinary
+    {
+        if (config('cloudinary.url')) {
+            return new Cloudinary(config('cloudinary.url'));
+        }
+
+        return new Cloudinary([
+            'cloud' => [
+                'cloud_name' => config('cloudinary.cloud_name'),
+                'api_key' => config('cloudinary.api_key'),
+                'api_secret' => config('cloudinary.api_secret'),
+            ],
+            'url' => [
+                'secure' => (bool) config('cloudinary.secure', true),
+            ],
+        ]);
+    }
+
+    protected function hasCloudinary(): bool
+    {
+        return class_exists(Cloudinary::class)
+            && (
+                (bool) config('cloudinary.url')
+                || ((bool) config('cloudinary.cloud_name') && (bool) config('cloudinary.api_key') && (bool) config('cloudinary.api_secret'))
+            );
+    }
+
+    protected function hasCloudinaryPath(string $path): bool
+    {
+        return Str::startsWith($path, 'cloudinary://') && $this->hasCloudinary();
+    }
+
+    protected function cloudinaryPublicId(string $path): string
+    {
+        return Str::before(Str::after($path, 'cloudinary://'), '?');
+    }
+
+    protected function cloudinaryResourceType(?string $mimeType): string
+    {
+        return match (true) {
+            Str::startsWith((string) $mimeType, 'image/') => 'image',
+            Str::startsWith((string) $mimeType, 'video/') => 'video',
+            default => 'raw',
+        };
     }
 }
