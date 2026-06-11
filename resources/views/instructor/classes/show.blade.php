@@ -1,4 +1,10 @@
-<x-layouts.dashboard :title="$class->name" area="instructor" active="classes">
+<x-layouts.dashboard
+    :title="$class->name"
+    :description="($class->program?->name ?? 'Program belum ditentukan').' - ringkasan jadwal dan siswa kelas.'"
+    area="instructor"
+    active="classes"
+>
+    <x-slot:eyebrow>Detail Kelas</x-slot:eyebrow>
     <x-slot:headerActions>
         <x-ui.button :href="route('instructor.classes.index')" outlined icon="heroicon-m-arrow-left">
             Kembali
@@ -6,23 +12,29 @@
     </x-slot:headerActions>
 
     <div class="space-y-6">
-        <x-ui.panel :heading="$class->program?->name ?? 'Detail Kelas'" description="Informasi operasional kelas yang kamu ajar." icon="heroicon-o-academic-cap">
-            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <x-ui.panel
+            heading="Ringkasan Kelas"
+            description="Informasi operasional untuk kelas yang kamu ajar."
+            icon="heroicon-o-academic-cap"
+            data-instructor-class-summary
+        >
+            <x-slot:actions>
+                <x-ui.badge :status="$class->status" />
+            </x-slot:actions>
+
+            <dl class="grid gap-x-6 gap-y-5 sm:grid-cols-2 xl:grid-cols-4">
                 @foreach ([
                     ['label' => 'Jadwal', 'value' => trim(($class->schedule_days ?? '-').' '.($class->schedule_time ?? ''))],
                     ['label' => 'Ruangan', 'value' => $class->room ?? '-'],
                     ['label' => 'Periode', 'value' => ($class->start_date?->format('d M Y') ?? '-').' - '.($class->end_date?->format('d M Y') ?? '-')],
                     ['label' => 'Jumlah Siswa', 'value' => $class->enrollments_count],
                 ] as $detail)
-                    <div class="rounded-box border-2 border-etc-outline-variant bg-etc-surface p-4">
-                        <p class="font-heading text-xs font-bold uppercase text-etc-on-muted">{{ $detail['label'] }}</p>
-                        <p class="mt-2 text-sm font-semibold text-etc-on-surface">{{ $detail['value'] }}</p>
+                    <div class="border-l-2 border-etc-outline-variant pl-4 first:border-etc-magenta">
+                        <dt class="font-heading text-xs font-bold uppercase tracking-wide text-etc-on-muted">{{ $detail['label'] }}</dt>
+                        <dd class="mt-2 text-sm font-semibold text-etc-on-surface">{{ $detail['value'] }}</dd>
                     </div>
                 @endforeach
-            </div>
-            <div class="mt-5">
-                <x-ui.badge :status="$class->status" />
-            </div>
+            </dl>
         </x-ui.panel>
 
         <x-ui.data-table
@@ -62,6 +74,7 @@
             empty="Belum ada siswa di kelas ini"
             empty-description="Enrollment siswa akan tampil setelah diproses admin."
             search-placeholder="Cari nama atau email siswa"
+            data-instructor-class-students-table
         />
     </div>
 </x-layouts.dashboard>

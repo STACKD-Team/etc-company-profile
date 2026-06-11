@@ -1,4 +1,11 @@
-<x-layouts.dashboard title="Siswa Instructor" area="instructor" active="students">
+<x-layouts.dashboard
+    title="Siswa Instructor"
+    description="Daftar ini hanya memuat siswa dari kelas yang ditugaskan kepadamu."
+    area="instructor"
+    active="students"
+>
+    <x-slot:eyebrow>Instructor Workspace</x-slot:eyebrow>
+
     <x-ui.data-table
         :items="$students"
         :columns="[
@@ -46,5 +53,6 @@
         empty="Belum ada siswa"
         empty-description="Siswa dari kelas yang kamu ajar akan tampil di sini."
         search-placeholder="Cari nama, email, atau kelas"
+        data-instructor-students-table
     />
 </x-layouts.dashboard>

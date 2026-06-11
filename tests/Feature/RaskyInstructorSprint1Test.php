@@ -415,6 +415,83 @@ it('validates instructor assessment scores grades and text length', function () 
         ]);
 });
 
+it('renders the compact shared instructor workspace across sprint one pages', function () {
+    [$instructor, $program] = createSprintOneInstructorContext();
+    $class = createSprintOneClass($program, $instructor, 'Compact Workspace Class', 'ongoing');
+    $student = User::factory()->create(['role' => 'student', 'full_name' => 'Compact Workspace Student']);
+    $enrollment = createSprintOneEnrollment($student, $class);
+
+    $dashboard = $this->actingAs($instructor)
+        ->get(route('instructor.dashboard'))
+        ->assertOk()
+        ->assertSee('Instructor Workspace')
+        ->assertSee('Pantau kelas yang kamu ajar')
+        ->assertSee('data-instructor-dashboard', false)
+        ->assertSee('data-instructor-priority-classes', false)
+        ->assertSee('data-instructor-assessments', false)
+        ->assertSee('Buka Assessment')
+        ->assertDontSee('Ruang Mengajar');
+
+    foreach (range(1, 5) as $statIndex) {
+        $dashboard->assertSee('data-instructor-stat="'.$statIndex.'"', false);
+    }
+
+    $this->actingAs($instructor)
+        ->get(route('instructor.classes.index'))
+        ->assertOk()
+        ->assertSee('data-instructor-classes-table', false)
+        ->assertSee('Temukan kelas berdasarkan program');
+
+    $this->actingAs($instructor)
+        ->get(route('instructor.students.index'))
+        ->assertOk()
+        ->assertSee('data-instructor-students-table', false)
+        ->assertSee('hanya memuat siswa dari kelas');
+
+    $this->actingAs($instructor)
+        ->get(route('instructor.classes.show', $class))
+        ->assertOk()
+        ->assertSee('data-instructor-class-summary', false)
+        ->assertSee('data-instructor-class-students-table', false)
+        ->assertSee('<dl', false);
+
+    $this->actingAs($instructor)
+        ->get(route('instructor.report-cards.index'))
+        ->assertOk()
+        ->assertSee('data-instructor-assessments-table', false);
+
+    $this->actingAs($instructor)
+        ->get(route('instructor.report-cards.create', $enrollment))
+        ->assertOk()
+        ->assertSee('data-instructor-assessment-identity', false)
+        ->assertSee('name="score_listening"', false)
+        ->assertSee('Simpan Draft Assessment');
+});
+
+it('keeps draft actions editable and published assessments read only in the redesigned review', function () {
+    [$instructor, $program] = createSprintOneInstructorContext();
+    $class = createSprintOneClass($program, $instructor, 'Review State Class', 'completed');
+    $student = User::factory()->create(['role' => 'student', 'full_name' => 'Review State Student']);
+    $enrollment = createSprintOneEnrollment($student, $class);
+    $reportCard = createSprintOneAssessment($enrollment, $instructor, completeSprintOneAssessmentData());
+
+    $this->actingAs($instructor)
+        ->get(route('instructor.report-cards.show', $reportCard))
+        ->assertOk()
+        ->assertSee('Edit Draft')
+        ->assertSee('data-instructor-recommendation', false)
+        ->assertDontSee('Rapor sudah dipublish');
+
+    $reportCard->update(['is_published' => true]);
+
+    $this->actingAs($instructor)
+        ->get(route('instructor.report-cards.show', $reportCard))
+        ->assertOk()
+        ->assertSee('Rapor sudah dipublish')
+        ->assertSee('publish tetap menjadi kewenangan admin')
+        ->assertDontSee('Edit Draft');
+});
+
 function createSprintOneInstructorContext(): array
 {
     $instructor = User::factory()->create([
