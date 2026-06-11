@@ -1,4 +1,4 @@
-<tr>
+<tr class="group">
     <td class="py-4 pr-4">
         <p class="font-heading font-bold text-etc-on-surface">{{ $item->user?->full_name ?? $item->user?->name ?? '-' }}</p>
         <p class="mt-1 text-xs text-etc-on-muted">{{ $item->user?->email ?? '-' }}</p>
@@ -23,17 +23,21 @@
     </td>
     <td class="py-4 pr-4">
         @if ($item->reportCard)
-            <x-ui.button
+            <x-ui.icon-button
                 :href="route($item->reportCard->is_published ? 'instructor.report-cards.show' : 'instructor.report-cards.edit', $item->reportCard)"
+                :icon="$item->reportCard->is_published ? 'heroicon-m-eye' : 'heroicon-m-pencil-square'"
+                :label="$item->reportCard->is_published ? 'Lihat assessment siswa' : 'Nilai siswa'"
                 size="sm"
                 outlined
-            >
-                {{ $item->reportCard->is_published ? 'Lihat' : 'Nilai' }}
-            </x-ui.button>
+            />
         @else
-            <x-ui.button :href="route('instructor.report-cards.create', $item)" size="sm" outlined>
-                Mulai
-            </x-ui.button>
+            <x-ui.icon-button
+                :href="route('instructor.report-cards.create', $item)"
+                icon="heroicon-m-pencil-square"
+                label="Mulai assessment siswa"
+                size="sm"
+                outlined
+            />
         @endif
     </td>
 </tr>

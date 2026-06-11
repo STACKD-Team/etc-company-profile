@@ -1,6 +1,6 @@
-<tr>
+<tr class="group">
     <td class="py-4 pr-4 font-heading font-bold text-etc-on-surface">
-        <a href="{{ route('instructor.classes.show', $item) }}" class="text-etc-magenta hover:text-etc-primary">{{ $item->name }}</a>
+        <a href="{{ route('instructor.classes.show', $item) }}" class="text-etc-on-surface hover:text-etc-magenta">{{ $item->name }}</a>
     </td>
     <td class="py-4 pr-4 text-etc-on-muted">{{ $item->program?->name ?? '-' }}</td>
     <td class="py-4 pr-4">
@@ -11,8 +11,12 @@
     <td class="py-4 pr-4">{{ $item->enrollments_count }}</td>
     <td class="py-4 pr-4"><x-ui.badge :status="$item->status" /></td>
     <td class="py-4 pr-4">
-        <x-ui.button :href="route('instructor.classes.show', $item)" size="sm" outlined>
-            Detail
-        </x-ui.button>
+        <x-ui.icon-button
+            :href="route('instructor.classes.show', $item)"
+            icon="heroicon-m-arrow-right"
+            :label="'Buka detail '.$item->name"
+            size="sm"
+            outlined
+        />
     </td>
 </tr>

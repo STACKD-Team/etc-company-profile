@@ -1,4 +1,11 @@
-<x-layouts.dashboard title="Kelas Mengajar" area="instructor" active="classes">
+<x-layouts.dashboard
+    title="Kelas Mengajar"
+    description="Temukan kelas berdasarkan program, jadwal, jumlah siswa, atau status pembelajaran."
+    area="instructor"
+    active="classes"
+>
+    <x-slot:eyebrow>Instructor Workspace</x-slot:eyebrow>
+
     <x-ui.data-table
         :items="$classes"
         :columns="[
@@ -41,5 +48,6 @@
         empty="Belum ada kelas yang ditugaskan"
         empty-description="Kelas akan tampil setelah admin menugaskan instructor."
         search-placeholder="Cari nama kelas, program, atau ruangan"
+        data-instructor-classes-table
     />
 </x-layouts.dashboard>

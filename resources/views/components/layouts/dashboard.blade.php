@@ -1,5 +1,6 @@
 @props([
     'title' => null,
+    'description' => null,
     'area' => 'student',
     'sidebarItems' => null,
     'active' => null,
@@ -147,6 +148,9 @@
                                 <p class="mb-1 font-heading text-xs font-bold uppercase text-etc-magenta">{{ $eyebrow }}</p>
                             @endisset
                             <h1 class="font-heading text-2xl font-bold text-etc-on-surface md:text-3xl">{{ $title ?? str($area)->headline()->toString() }}</h1>
+                            @if ($description)
+                                <p class="mt-2 max-w-3xl text-sm leading-6 text-etc-on-muted">{{ $description }}</p>
+                            @endif
                         </div>
 
                         @isset($headerActions)

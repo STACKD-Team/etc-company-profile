@@ -1,4 +1,11 @@
-<x-layouts.dashboard title="Assessment & Rapor" area="instructor" active="reports">
+<x-layouts.dashboard
+    title="Assessment & Rapor"
+    description="Mulai, lanjutkan, atau tinjau assessment siswa pada kelas yang kamu ajar."
+    area="instructor"
+    active="reports"
+>
+    <x-slot:eyebrow>Instructor Workspace</x-slot:eyebrow>
+
     @if (session('status'))
         <x-ui.alert status="success" class="mb-5">{{ session('status') }}</x-ui.alert>
     @endif
@@ -38,5 +45,6 @@
         empty="Belum ada siswa untuk dinilai"
         empty-description="Assessment tersedia setelah siswa masuk ke kelas yang kamu ajar."
         search-placeholder="Cari siswa atau kelas"
+        data-instructor-assessments-table
     />
 </x-layouts.dashboard>
