@@ -492,3 +492,39 @@
         transform: scale(1.015);
     }
 }
+
+@media (min-width: 768px) {
+    html[data-dashboard-sidebar-collapsed='true'] [data-dashboard-sidebar] {
+        width: 4rem !important;
+        padding-right: 0.5rem !important;
+        padding-left: 0.5rem !important;
+    }
+
+    html[data-dashboard-sidebar-collapsed='true'] [data-sidebar-brand-row] {
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+    }
+
+    html[data-dashboard-sidebar-collapsed='true'] [data-sidebar-brand-link] {
+        width: 0 !important;
+        flex: none !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        pointer-events: none !important;
+    }
+
+    html[data-dashboard-sidebar-collapsed='true'] [data-sidebar-nav-link] {
+        justify-content: center !important;
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+    }
+
+    html[data-dashboard-sidebar-collapsed='true'] [data-sidebar-label] {
+        display: none !important;
+    }
+}
+
+[data-dashboard-shell][data-dashboard-hydrated='true'] [data-dashboard-sidebar] {
+    transition-duration: 300ms;
+    transition-property: width, transform, padding;
+}

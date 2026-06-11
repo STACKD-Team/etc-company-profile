@@ -66,32 +66,24 @@
 
 <aside
     id="dashboard-sidebar"
-    {{ $attributes->class('fixed inset-y-0 left-0 z-50 flex w-72 flex-shrink-0 -translate-x-full flex-col overflow-y-auto border-r-2 border-etc-outline-variant bg-etc-surface px-3 py-4 text-etc-on-surface shadow-soft transition-[width,transform,padding] duration-300 md:relative md:z-auto md:translate-x-0') }}
-    x-bind:class="{
-        'translate-x-0': sidebarMobileOpen,
-        '-translate-x-full': ! sidebarMobileOpen,
-        'md:w-16 md:px-2': sidebarCollapsed,
-        'md:w-64': ! sidebarCollapsed,
-    }"
+    {{ $attributes->class('fixed inset-y-0 left-0 z-50 flex w-72 flex-shrink-0 -translate-x-full flex-col overflow-y-auto border-r-2 border-etc-outline-variant bg-etc-surface px-3 py-4 text-etc-on-surface shadow-soft md:relative md:z-auto md:w-64 md:translate-x-0') }}
     aria-label="Sidebar dashboard"
+    data-dashboard-sidebar
 >
-    <div
-        class="mb-6 flex items-center justify-between"
-        x-bind:class="sidebarCollapsed && ! sidebarMobileOpen ? 'md:px-0' : 'px-2'"
-    >
+    <div class="mb-6 flex items-center gap-2 px-2" data-sidebar-brand-row>
         <a
             href="{{ $routeUrl('public.home', '/') }}"
-            class="flex min-w-0 items-center gap-2 rounded-field text-etc-on-surface transition hover:bg-etc-surface-container"
-            x-bind:class="sidebarCollapsed && ! sidebarMobileOpen ? 'md:w-full md:justify-center md:p-0' : 'p-1 pr-2'"
+            class="flex min-w-0 flex-1 items-center gap-2 rounded-field p-1 pr-2 text-etc-on-surface transition hover:bg-etc-surface-container"
             aria-label="ETC Padang"
+            data-sidebar-brand-link
         >
             <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-selector bg-etc-magenta text-etc-surface shadow-soft">
                 <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">school</span>
             </span>
             <span
-                x-show="! sidebarCollapsed || sidebarMobileOpen"
-                x-transition.opacity
                 class="truncate font-heading text-sm font-bold text-etc-on-surface"
+                data-sidebar-label
+                data-sidebar-brand-label
             >
                 ETC Padang
             </span>
@@ -99,11 +91,15 @@
 
         <button
             type="button"
-            class="flex h-8 w-8 items-center justify-center rounded-field text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-magenta md:hidden"
-            x-on:click="closeMobileSidebar()"
-            aria-label="Tutup sidebar"
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-field text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-magenta"
+            aria-controls="dashboard-sidebar"
+            data-sidebar-toggle
+            data-sidebar-primary-toggle
         >
-            <span class="material-symbols-outlined">close</span>
+            <span
+                class="material-symbols-outlined"
+                data-sidebar-toggle-icon
+            >menu</span>
         </button>
     </div>
 
@@ -112,7 +108,6 @@
             @php($isActive = $currentActive === $item['key'])
             <a
                 href="{{ $item['url'] }}"
-                x-on:click="closeMobileSidebar()"
                 x-tooltip="{
                     content: sidebarCollapsed && ! sidebarMobileOpen ? @js($item['label']) : '',
                     theme: $store.theme,
@@ -122,16 +117,16 @@
                     'bg-etc-surface-container text-etc-magenta shadow-soft ring-1 ring-etc-magenta/20' => $isActive,
                     'text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-on-surface' => ! $isActive,
                 ])
-                x-bind:class="sidebarCollapsed && ! sidebarMobileOpen ? 'md:justify-center md:px-0' : ''"
                 @if ($isActive) aria-current="page" @endif
                 aria-label="{{ $item['label'] }}"
+                data-sidebar-nav-link
             >
                 @if ($item['svg'] ?? null)
                     <x-ui.icon :name="$item['svg']" class="h-5 w-5 shrink-0" />
                 @else
                     <span class="material-symbols-outlined shrink-0 text-[20px]" @if ($isActive) style="font-variation-settings: 'FILL' 1;" @endif>{{ $item['icon'] }}</span>
                 @endif
-                <span x-show="! sidebarCollapsed || sidebarMobileOpen" x-transition.opacity class="truncate">{{ $item['label'] }}</span>
+                <span class="truncate" data-sidebar-label>{{ $item['label'] }}</span>
             </a>
         @endforeach
     </nav>
