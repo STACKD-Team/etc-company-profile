@@ -12,6 +12,7 @@ class HomeController extends Controller
     {
         return view('public.home', [
             'programs' => $discovery->programHighlights(),
+            'partners' => $discovery->partners(),
             'reels' => $discovery->reels(4),
             'instructors' => $discovery->instructors(4),
             'settings' => $discovery->settings(),

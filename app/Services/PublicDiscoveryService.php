@@ -38,6 +38,14 @@ class PublicDiscoveryService
     }
 
     /**
+     * @return Collection<int, Content>
+     */
+    public function partners(): Collection
+    {
+        return $this->publishedContent('partner')->get();
+    }
+
+    /**
      * @return Collection<int, Reel>
      */
     public function reels(?int $limit = null): Collection
@@ -78,6 +86,7 @@ class PublicDiscoveryService
     public function programHighlights(int $limit = 3): Collection
     {
         return Program::query()
+            ->with('activePromotions')
             ->where('is_active', true)
             ->orderBy('name')
             ->limit($limit)
@@ -95,15 +104,36 @@ class PublicDiscoveryService
             ->get()
             ->mapWithKeys(function (Content $content): array {
                 if ($content->slug === 'qris' && $content->image) {
-                    return ['qris' => Storage::url($content->image)];
+                    return ['qris' => $this->mediaUrl($content->image)];
                 }
 
                 $value = $content->meta['value'] ?? $content->body ?? null;
-                $value ??= $content->image ? Storage::url($content->image) : null;
+                $value ??= $content->image ? $this->mediaUrl($content->image) : null;
 
                 return [$content->slug ?: Str::slug($content->title) => $value];
             })
             ->all();
+    }
+
+    public function mediaUrl(?string $path, string $fallback = 'images/hero-img.jpeg'): string
+    {
+        if (! $path) {
+            return asset($fallback);
+        }
+
+        if (Str::startsWith($path, ['http://', 'https://'])) {
+            return $path;
+        }
+
+        if (Str::startsWith($path, ['/'])) {
+            return asset(ltrim($path, '/'));
+        }
+
+        if (Str::startsWith($path, ['images/', 'videos/', 'storage/'])) {
+            return asset($path);
+        }
+
+        return Storage::url($path);
     }
 
     /**
@@ -161,7 +191,7 @@ class PublicDiscoveryService
         if (Str::contains($text, ['daftar', 'pendaftaran', 'registrasi', 'join'])) {
             return [
                 'intent' => 'registration',
-                'reply' => 'Untuk Sprint 1, pendaftaran dibantu dulu lewat form kontak. Kirim nama, nomor WhatsApp, dan program yang diminati, lalu tim ETC akan menghubungi kamu.',
+                'reply' => 'Pendaftaran bisa dimulai dari tombol Daftar Sekarang. Pilih program, isi data calon siswa, lalu tim ETC akan membantu tahap pembayaran dan placement test.',
             ];
         }
 

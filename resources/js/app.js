@@ -36,8 +36,12 @@ function initRegistrationProgramPage() {
     const summaryTotal = page.querySelector('#summary-total');
     const continueButton = page.querySelector('[data-registration-continue]');
     const cards = [...page.querySelectorAll('.registration-program-card')];
-    const radios = [...page.querySelectorAll('[data-program-radio]')];
+    const radios = cards
+        .map((card) => card.querySelector('input[type="radio"]'))
+        .filter(Boolean);
     const stepperItems = [...page.querySelectorAll('.stepper-item')];
+
+    const programData = (radio) => radio.closest('[data-program-radio]')?.dataset || radio.dataset;
 
     const markSelectedCard = (radio) => {
         cards.forEach((card) => card.classList.toggle('is-selected', card.contains(radio)));
@@ -61,7 +65,8 @@ function initRegistrationProgramPage() {
         radio.addEventListener('change', () => {
             const card = radio.closest('.registration-program-card');
             const icon = card?.querySelector('[data-program-icon]');
-            const price = Number(radio.dataset.price || 0);
+            const data = programData(radio);
+            const price = Number(data.price || 0);
             const formattedPrice = formatRupiah.format(price).replace('IDR', 'Rp').trim();
 
             if (summaryIcon && icon) {
@@ -69,7 +74,7 @@ function initRegistrationProgramPage() {
             }
 
             if (summaryName) {
-                summaryName.textContent = radio.dataset.name || 'Program ETC Planet';
+                summaryName.textContent = data.name || 'Program ETC Planet';
             }
 
             if (summaryPrice) {
@@ -80,18 +85,19 @@ function initRegistrationProgramPage() {
                 summaryTotal.textContent = formattedPrice;
             }
 
-            if (continueButton && radio.dataset.nextUrl) {
-                continueButton.href = radio.dataset.nextUrl;
+            if (continueButton && data.nextUrl) {
+                continueButton.href = data.nextUrl;
             }
 
             markSelectedCard(radio);
             flashSummary();
-            showToast(`${radio.dataset.name || 'Program'} dipilih.`);
+            showToast(`${data.name || 'Program'} dipilih.`);
         });
     });
 
     continueButton?.addEventListener('click', (event) => {
-        const selectedProgram = page.querySelector('[data-program-radio]:checked')?.dataset.name || 'program ini';
+        const selectedRadio = radios.find((radio) => radio.checked);
+        const selectedProgram = selectedRadio ? (programData(selectedRadio).name || 'program ini') : 'program ini';
         stepperItems[1]?.classList.add('is-preview');
         showToast(`Membuka form pendaftaran untuk ${selectedProgram}.`);
 
@@ -178,8 +184,8 @@ function initPublicChatbot() {
     const addMessage = (message, fromUser = false) => {
         const bubble = document.createElement('p');
         bubble.className = fromUser
-            ? 'ml-auto max-w-[85%] rounded-2xl rounded-tr-sm bg-etc-magenta px-4 py-3 text-sm leading-6 text-white shadow-soft'
-            : 'max-w-[85%] rounded-2xl rounded-tl-sm bg-white px-4 py-3 text-sm leading-6 text-etc-on-muted shadow-soft';
+            ? 'ml-auto max-w-[85%] rounded-card bg-etc-magenta px-4 py-3 text-sm leading-6 text-white shadow-soft'
+            : 'max-w-[85%] rounded-card bg-etc-surface px-4 py-3 text-sm leading-6 text-etc-on-muted shadow-soft';
         bubble.textContent = message;
         messages?.appendChild(bubble);
         messages?.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
@@ -227,6 +233,219 @@ function initPublicChatbot() {
     });
 }
 
+function initPublicReveal() {
+    const elements = [...document.querySelectorAll('[data-public-reveal]')];
+
+    if (elements.length === 0) {
+        return;
+    }
+
+    if (!('IntersectionObserver' in window)) {
+        elements.forEach((element) => element.classList.add('is-visible'));
+
+        return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+                return;
+            }
+
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.16 });
+
+    elements.forEach((element) => observer.observe(element));
+}
+
+function initPublicReels() {
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const formatter = new Intl.NumberFormat('id-ID');
+
+    const setLikeState = (button, liked, count = null) => {
+        button.dataset.liked = liked ? 'true' : 'false';
+        button.setAttribute('aria-pressed', liked ? 'true' : 'false');
+
+        const icon = button.querySelector('[data-like-icon]');
+
+        if (icon) {
+            icon.style.fontVariationSettings = liked ? "'FILL' 1" : "'FILL' 0";
+        }
+
+        const countTarget = button.dataset.likesCountTarget
+            ? document.getElementById(button.dataset.likesCountTarget)
+            : button.querySelector('[data-likes-count]');
+
+        if (countTarget && count !== null) {
+            countTarget.textContent = formatter.format(count);
+        }
+    };
+
+    const markViewed = (video) => {
+        if (!token || !video.dataset.viewEndpoint || video.dataset.viewed === 'true') {
+            return;
+        }
+
+        video.dataset.viewed = 'true';
+
+        fetch(video.dataset.viewEndpoint, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json',
+            },
+        })
+            .then((response) => response.ok ? response.json() : null)
+            .then((data) => {
+                const target = video.dataset.viewCountTarget
+                    ? document.getElementById(video.dataset.viewCountTarget)
+                    : document.querySelector('[data-views-count]');
+
+                if (target && data?.views_count !== undefined) {
+                    target.textContent = formatter.format(data.views_count);
+                }
+            })
+            .catch(() => {});
+    };
+
+    const videoObserver = 'IntersectionObserver' in window
+        ? new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                const video = entry.target;
+
+                if (entry.isIntersecting && entry.intersectionRatio >= 0.62) {
+                    markViewed(video);
+
+                    if (video.dataset.autoplayReel === 'true') {
+                        video.play().catch(() => {});
+                    }
+
+                    return;
+                }
+
+                if (video.dataset.autoplayReel === 'true') {
+                    video.pause();
+                }
+            });
+        }, { threshold: [0, 0.62, 0.9] })
+        : null;
+
+    document.querySelectorAll('[data-view-endpoint]').forEach((video) => {
+        if (videoObserver) {
+            videoObserver.observe(video);
+        } else {
+            markViewed(video);
+        }
+    });
+
+    document.querySelectorAll('[data-like-endpoint]').forEach((button) => {
+        setLikeState(button, button.dataset.liked === 'true');
+
+        button.addEventListener('click', () => {
+            if (!token || button.dataset.loading === 'true') {
+                return;
+            }
+
+            button.dataset.loading = 'true';
+
+            fetch(button.dataset.likeEndpoint, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json',
+                },
+            })
+                .then((response) => response.ok ? response.json() : null)
+                .then((data) => {
+                    if (!data) {
+                        return;
+                    }
+
+                    setLikeState(button, Boolean(data.liked), data.likes_count);
+                })
+                .catch(() => {})
+                .finally(() => {
+                    button.dataset.loading = 'false';
+                });
+        });
+    });
+
+    document.querySelectorAll('[data-vertical-reels-feed]').forEach((feed) => {
+        const slides = [...feed.querySelectorAll('[data-reel-slide]')];
+
+        if (slides.length <= 1) {
+            return;
+        }
+
+        feed.tabIndex = feed.tabIndex >= 0 ? feed.tabIndex : 0;
+
+        let locked = false;
+        let settleTimer;
+
+        const currentIndex = () => {
+            const feedTop = feed.scrollTop;
+
+            return slides.reduce((closest, slide, index) => {
+                const distance = Math.abs(slide.offsetTop - feedTop);
+
+                return distance < closest.distance ? { index, distance } : closest;
+            }, { index: 0, distance: Number.POSITIVE_INFINITY }).index;
+        };
+
+        const goTo = (index) => {
+            const target = slides[Math.max(0, Math.min(slides.length - 1, index))];
+
+            if (!target) {
+                return;
+            }
+
+            target.scrollIntoView({
+                block: 'start',
+                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+            });
+        };
+
+        const snapToNearest = () => goTo(currentIndex());
+
+        feed.addEventListener('wheel', (event) => {
+            if (Math.abs(event.deltaY) < 8) {
+                return;
+            }
+
+            event.preventDefault();
+
+            if (locked) {
+                return;
+            }
+
+            locked = true;
+            goTo(currentIndex() + (event.deltaY > 0 ? 1 : -1));
+            window.setTimeout(() => {
+                locked = false;
+            }, 520);
+        }, { passive: false });
+
+        feed.addEventListener('keydown', (event) => {
+            const nextKeys = ['ArrowDown', 'PageDown', ' '];
+            const previousKeys = ['ArrowUp', 'PageUp'];
+
+            if (![...nextKeys, ...previousKeys].includes(event.key)) {
+                return;
+            }
+
+            event.preventDefault();
+            goTo(currentIndex() + (nextKeys.includes(event.key) ? 1 : -1));
+        });
+
+        feed.addEventListener('scroll', () => {
+            clearTimeout(settleTimer);
+            settleTimer = window.setTimeout(snapToNearest, 140);
+        }, { passive: true });
+    });
+}
+
 function initDataTables() {
     document.querySelectorAll('[data-data-table-form]').forEach((form) => {
         let debounceTimer;
@@ -264,5 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initRegistrationProgramPage();
     initStudentDashboardPage();
     initPublicChatbot();
+    initPublicReveal();
+    initPublicReels();
     initDataTables();
 });

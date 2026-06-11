@@ -16,6 +16,7 @@ class PublicDiscoverySeeder extends Seeder
         $this->seedSettings();
         $this->seedRooms();
         $this->seedGallery();
+        $this->seedPartners();
         $this->seedInstructors();
         $this->seedReels();
     }
@@ -169,6 +170,45 @@ class PublicDiscoverySeeder extends Seeder
                     'image' => $item['image'],
                     'images' => $item['images'],
                     'meta' => $item['meta'],
+                    'display_order' => $index + 1,
+                    'is_published' => true,
+                ],
+            );
+        }
+    }
+
+    protected function seedPartners(): void
+    {
+        foreach ([
+            [
+                'title' => 'SMA Partner Padang',
+                'slug' => 'sma-partner-padang',
+                'body' => 'Kolaborasi kelas bahasa dan workshop speaking untuk siswa sekolah menengah.',
+                'image' => 'images/hero-img.jpeg',
+                'meta' => ['category' => 'Sekolah', 'since' => '2024', 'website' => 'https://etcplanet.test'],
+            ],
+            [
+                'title' => 'Komunitas Bahasa Muda',
+                'slug' => 'komunitas-bahasa-muda',
+                'body' => 'Program latihan conversation untuk komunitas pelajar dan mahasiswa.',
+                'image' => 'images/pu1-img.jpg',
+                'meta' => ['category' => 'Komunitas', 'since' => '2025'],
+            ],
+            [
+                'title' => 'Career Ready Center',
+                'slug' => 'career-ready-center',
+                'body' => 'Kerja sama persiapan interview, presentation skill, dan bahasa profesional.',
+                'image' => 'images/pu2-img.jpg',
+                'meta' => ['category' => 'Karier', 'since' => '2025'],
+            ],
+        ] as $index => $partner) {
+            Content::query()->updateOrCreate(
+                ['type' => 'partner', 'slug' => $partner['slug']],
+                [
+                    'title' => $partner['title'],
+                    'body' => $partner['body'],
+                    'image' => $partner['image'],
+                    'meta' => $partner['meta'],
                     'display_order' => $index + 1,
                     'is_published' => true,
                 ],

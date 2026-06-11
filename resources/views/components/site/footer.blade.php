@@ -53,13 +53,19 @@
                 &copy; {{ now()->year }} ETC Planet.<br>
                 {{ $address }}
             </p>
-            <a href="https://www.instagram.com/etcplanet/" aria-label="Instagram ETC Planet" class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/20 text-white/75 transition hover:border-etc-magenta hover:text-etc-magenta">
+            <x-ui.button
+                href="https://www.instagram.com/etcplanet/"
+                target="_blank"
+                color="gray"
+                aria-label="Instagram ETC Planet"
+                class="!inline-flex !h-8 !min-h-8 !w-8 !items-center !justify-center !rounded-md !border !border-white/20 !bg-transparent !p-0 !text-white/75 !shadow-none transition hover:!border-etc-magenta hover:!bg-transparent hover:!text-etc-magenta"
+            >
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2Zm0 2A3.75 3.75 0 0 0 4 7.75v8.5A3.75 3.75 0 0 0 7.75 20h8.5A3.75 3.75 0 0 0 20 16.25v-8.5A3.75 3.75 0 0 0 16.25 4h-8.5Z" fill="currentColor"/>
                     <path d="M12 7.25A4.75 4.75 0 1 1 12 16.75 4.75 4.75 0 0 1 12 7.25Zm0 2A2.75 2.75 0 1 0 12 14.75 2.75 2.75 0 0 0 12 9.25Z" fill="currentColor"/>
                     <path d="M17.25 6.75a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" fill="currentColor"/>
                 </svg>
-            </a>
+            </x-ui.button>
         </div>
 
         <div class="pt-1 md:pl-20">
@@ -71,9 +77,14 @@
                     ['label' => 'Karir', 'url' => '#'],
                 ] as $link)
                     <li>
-                        <a href="{{ $linkUrl($link) }}" class="text-white/50 underline decoration-etc-magenta/60 underline-offset-4 transition hover:text-etc-magenta">
+                        <x-ui.button
+                            :href="$linkUrl($link)"
+                            color="gray"
+                            size="sm"
+                            class="!min-h-0 !rounded-none !bg-transparent !p-0 !text-white/50 !underline !decoration-etc-magenta/60 !underline-offset-4 !shadow-none transition hover:!bg-transparent hover:!text-etc-magenta"
+                        >
                             {{ $link['label'] }}
-                        </a>
+                        </x-ui.button>
                     </li>
                 @endforeach
             </ul>
