@@ -7,9 +7,20 @@ use Illuminate\Validation\Rule;
 
 class TableQueryRequest extends FormRequest
 {
+    private const PER_PAGE_OPTIONS = [10, 20, 50];
+
     public function authorize(): bool
     {
         return $this->user()?->role === 'instructor';
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $perPage = filter_var($this->input('per_page'), FILTER_VALIDATE_INT);
+
+        $this->merge([
+            'per_page' => in_array($perPage, self::PER_PAGE_OPTIONS, true) ? $perPage : 10,
+        ]);
     }
 
     public function rules(): array
@@ -34,6 +45,7 @@ class TableQueryRequest extends FormRequest
             ],
             'sort' => ['nullable', 'string', 'max:50'],
             'direction' => ['nullable', Rule::in(['asc', 'desc'])],
+            'per_page' => ['required', 'integer', Rule::in(self::PER_PAGE_OPTIONS)],
             'page' => ['nullable', 'integer', 'min:1'],
         ];
     }

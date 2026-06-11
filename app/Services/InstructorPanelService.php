@@ -9,6 +9,7 @@ use App\Models\ReportCard;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\DB;
 
 class InstructorPanelService
@@ -62,7 +63,7 @@ class InstructorPanelService
         ];
     }
 
-    public function paginateClasses(int $instructorId, array $filters, int $perPage = 10): LengthAwarePaginator
+    public function paginateClasses(int $instructorId, array $filters): LengthAwarePaginator
     {
         $query = $this->classesQuery($instructorId)
             ->with('program')
@@ -93,13 +94,25 @@ class InstructorPanelService
 
         return $this->applySort($query, $filters, [
             'name' => 'name',
+            'program' => fn (Builder $query, string $direction) => $query->orderBy(
+                Program::query()
+                    ->select('name')
+                    ->whereColumn('programs.id', 'classes.program_id')
+                    ->limit(1),
+                $direction,
+            ),
+            'schedule' => fn (Builder $query, string $direction) => $query
+                ->orderBy('schedule_days', $direction)
+                ->orderBy('schedule_time', $direction)
+                ->orderBy('room', $direction),
+            'students' => 'enrollments_count',
             'status' => 'status',
             'start_date' => 'start_date',
             'created_at' => 'created_at',
-        ], 'start_date')->paginate($perPage)->withQueryString();
+        ], 'start_date')->paginate($this->perPage($filters))->withQueryString();
     }
 
-    public function paginateStudents(int $instructorId, array $filters, int $perPage = 10): LengthAwarePaginator
+    public function paginateStudents(int $instructorId, array $filters): LengthAwarePaginator
     {
         $query = $this->enrollmentsQuery($instructorId)
             ->with(['user', 'courseClass', 'reportCard'])
@@ -122,16 +135,28 @@ class InstructorPanelService
             ->when($filters['assessment_status'] ?? null, fn (Builder $query, string $status) => $this->applyAssessmentStatusConstraint($query, $status));
 
         return $this->applySort($query, $filters, [
+            'student' => fn (Builder $query, string $direction) => $query->orderBy(
+                $this->studentNameSubquery(),
+                $direction,
+            ),
+            'class' => fn (Builder $query, string $direction) => $query->orderBy(
+                $this->classNameSubquery(),
+                $direction,
+            ),
             'status' => 'status',
+            'assessment' => fn (Builder $query, string $direction) => $query->orderBy(
+                $this->assessmentStateExpression(),
+                $direction,
+            ),
             'enrolled_at' => 'enrolled_at',
             'created_at' => 'created_at',
         ], 'enrolled_at')
-            ->paginate($perPage)
+            ->paginate($this->perPage($filters))
             ->withQueryString()
             ->through(fn (Enrollment $enrollment) => $this->decorateAssessment($enrollment));
     }
 
-    public function paginateAssessments(int $instructorId, array $filters, int $perPage = 10): LengthAwarePaginator
+    public function paginateAssessments(int $instructorId, array $filters): LengthAwarePaginator
     {
         $query = $this->enrollmentsQuery($instructorId)
             ->with(['user', 'courseClass', 'reportCard'])
@@ -158,11 +183,26 @@ class InstructorPanelService
             ->when($filters['assessment_status'] ?? null, fn (Builder $query, string $status) => $this->applyAssessmentStatusConstraint($query, $status));
 
         return $this->applySort($query, $filters, [
-            'status' => 'status',
+            'student' => fn (Builder $query, string $direction) => $query->orderBy(
+                $this->studentNameSubquery(),
+                $direction,
+            ),
+            'class' => fn (Builder $query, string $direction) => $query->orderBy(
+                $this->classNameSubquery(),
+                $direction,
+            ),
+            'score' => fn (Builder $query, string $direction) => $query->orderBy(
+                $this->reportCardValueSubquery('total_score'),
+                $direction,
+            ),
+            'assessment' => fn (Builder $query, string $direction) => $query->orderBy(
+                $this->assessmentStateExpression(),
+                $direction,
+            ),
             'enrolled_at' => 'enrolled_at',
             'created_at' => 'created_at',
         ], 'enrolled_at')
-            ->paginate($perPage)
+            ->paginate($this->perPage($filters))
             ->withQueryString()
             ->through(fn (Enrollment $enrollment) => $this->decorateAssessment($enrollment));
     }
@@ -214,7 +254,6 @@ class InstructorPanelService
         int $instructorId,
         CourseClass $class,
         array $filters,
-        int $perPage = 10,
     ): LengthAwarePaginator {
         $class = $this->ownedClass($instructorId, $class);
 
@@ -234,11 +273,19 @@ class InstructorPanelService
             ->when($filters['assessment_status'] ?? null, fn (Builder $query, string $status) => $this->applyAssessmentStatusConstraint($query, $status));
 
         return $this->applySort($query, $filters, [
+            'student' => fn (Builder $query, string $direction) => $query->orderBy(
+                $this->studentNameSubquery(),
+                $direction,
+            ),
             'status' => 'status',
+            'assessment' => fn (Builder $query, string $direction) => $query->orderBy(
+                $this->assessmentStateExpression(),
+                $direction,
+            ),
             'enrolled_at' => 'enrolled_at',
             'created_at' => 'created_at',
         ], 'enrolled_at')
-            ->paginate($perPage)
+            ->paginate($this->perPage($filters))
             ->withQueryString()
             ->through(fn (Enrollment $enrollment) => $this->decorateAssessment($enrollment));
     }
@@ -410,6 +457,61 @@ class InstructorPanelService
         $sort = $sortable[$filters['sort'] ?? ''] ?? $sortable[$defaultSort];
         $direction = ($filters['direction'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
 
-        return $query->orderBy($sort, $direction);
+        if (is_callable($sort)) {
+            $sort($query, $direction);
+        } else {
+            $query->orderBy($sort, $direction);
+        }
+
+        return $query->orderBy($query->getModel()->qualifyColumn('id'), $direction);
+    }
+
+    private function perPage(array $filters): int
+    {
+        $perPage = (int) ($filters['per_page'] ?? 10);
+
+        return in_array($perPage, [10, 20, 50], true) ? $perPage : 10;
+    }
+
+    private function studentNameSubquery(): Builder
+    {
+        return User::query()
+            ->selectRaw('coalesce(full_name, name)')
+            ->whereColumn('users.id', 'enrollments.user_id')
+            ->limit(1);
+    }
+
+    private function classNameSubquery(): Builder
+    {
+        return CourseClass::query()
+            ->select('name')
+            ->whereColumn('classes.id', 'enrollments.class_id')
+            ->limit(1);
+    }
+
+    private function reportCardValueSubquery(string $column): Builder
+    {
+        return ReportCard::query()
+            ->select($column)
+            ->whereColumn('report_cards.enrollment_id', 'enrollments.id')
+            ->limit(1);
+    }
+
+    private function assessmentStateExpression(): Expression
+    {
+        $completeConditions = collect(self::ASSESSMENT_FIELDS)
+            ->map(fn (string $field) => "report_cards.{$field} is not null")
+            ->implode(' and ');
+
+        return DB::raw(
+            "(select case
+                when report_cards.is_published = 1 then 3
+                when {$completeConditions} then 2
+                else 1
+            end
+            from report_cards
+            where report_cards.enrollment_id = enrollments.id
+            limit 1)",
+        );
     }
 }

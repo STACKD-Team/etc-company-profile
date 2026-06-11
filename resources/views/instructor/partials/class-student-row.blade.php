@@ -4,6 +4,7 @@
         <p class="font-heading font-bold text-etc-on-surface">{{ $item->user?->full_name ?? $item->user?->name ?? '-' }}</p>
         <p class="mt-1 text-xs text-etc-on-muted">{{ $item->user?->email ?? '-' }}</p>
     </td>
+    <td class="py-4 pr-4">{{ $item->enrolled_at?->format('d M Y') ?? '-' }}</td>
     <td class="py-4 pr-4"><x-ui.badge :status="$item->status" /></td>
     <td class="py-4 pr-4">
         <x-ui.badge :status="$item->assessment_state">

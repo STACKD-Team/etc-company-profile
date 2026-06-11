@@ -17,14 +17,20 @@
             ],
             'program' => [
                 'label' => 'Program',
+                'key' => 'program',
+                'sortable' => true,
                 'filter' => ['type' => 'autocomplete', 'name' => 'program_id', 'options' => $programOptions],
             ],
             'schedule' => [
                 'label' => 'Jadwal / Ruang',
+                'key' => 'schedule',
+                'sortable' => true,
                 'filter' => ['type' => 'text', 'name' => 'schedule', 'placeholder' => 'Hari, jam, atau ruangan'],
             ],
             'students' => [
                 'label' => 'Siswa',
+                'key' => 'students',
+                'sortable' => true,
                 'filter' => ['type' => 'number', 'name' => 'students_count', 'min' => 0, 'placeholder' => 'Jumlah tepat'],
             ],
             'status' => [

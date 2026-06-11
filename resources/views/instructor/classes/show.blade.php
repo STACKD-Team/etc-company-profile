@@ -42,7 +42,14 @@
             :columns="[
                 'student' => [
                     'label' => 'Siswa',
+                    'key' => 'student',
+                    'sortable' => true,
                     'filter' => ['type' => 'autocomplete', 'name' => 'student_id', 'options' => $studentOptions],
+                ],
+                'enrolled_at' => [
+                    'label' => 'Mulai',
+                    'key' => 'enrolled_at',
+                    'sortable' => true,
                 ],
                 'status' => [
                     'label' => 'Enrollment',
@@ -56,6 +63,8 @@
                 ],
                 'assessment' => [
                     'label' => 'Assessment',
+                    'key' => 'assessment',
+                    'sortable' => true,
                     'filter' => [
                         'type' => 'select',
                         'name' => 'assessment_status',

@@ -11,10 +11,14 @@
         :columns="[
             'student' => [
                 'label' => 'Siswa',
+                'key' => 'student',
+                'sortable' => true,
                 'filter' => ['type' => 'autocomplete', 'name' => 'student_id', 'options' => $studentOptions],
             ],
             'class' => [
                 'label' => 'Kelas',
+                'key' => 'class',
+                'sortable' => true,
                 'filter' => ['type' => 'autocomplete', 'name' => 'class_id', 'options' => $classOptions],
             ],
             'enrolled_at' => [
@@ -35,6 +39,8 @@
             ],
             'assessment' => [
                 'label' => 'Assessment',
+                'key' => 'assessment',
+                'sortable' => true,
                 'filter' => [
                     'type' => 'select',
                     'name' => 'assessment_status',
