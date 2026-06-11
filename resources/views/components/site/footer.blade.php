@@ -49,7 +49,7 @@
     <div class="mx-auto grid max-w-[1120px] grid-cols-1 gap-12 px-5 md:grid-cols-[260px_1fr] lg:px-0">
         <div class="space-y-5">
             <div class="font-heading text-[18px] font-black">{{ $brand }}</div>
-            <p class="text-[13px] leading-7 text-white/60">
+            <p class="text-[14px] leading-[var(--etc-leading-normal)] text-white/60">
                 &copy; {{ now()->year }} ETC Planet.<br>
                 {{ $address }}
             </p>
@@ -57,8 +57,9 @@
                 href="https://www.instagram.com/etcplanet/"
                 target="_blank"
                 color="gray"
+                size="sm"
                 aria-label="Instagram ETC Planet"
-                class="!inline-flex !h-8 !min-h-8 !w-8 !items-center !justify-center !rounded-md !border !border-white/20 !bg-transparent !p-0 !text-white/75 !shadow-none transition hover:!border-etc-magenta hover:!bg-transparent hover:!text-etc-magenta"
+                class="!inline-flex !items-center !justify-center !rounded-field !border !border-white/20 !bg-transparent !p-0 !text-white/75 !shadow-none transition hover:!border-etc-magenta hover:!bg-transparent hover:!text-etc-magenta"
             >
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2Zm0 2A3.75 3.75 0 0 0 4 7.75v8.5A3.75 3.75 0 0 0 7.75 20h8.5A3.75 3.75 0 0 0 20 16.25v-8.5A3.75 3.75 0 0 0 16.25 4h-8.5Z" fill="currentColor"/>
@@ -69,7 +70,7 @@
         </div>
 
         <div class="pt-1 md:pl-20">
-            <ul class="space-y-5 text-[13px]">
+            <ul class="space-y-5 text-[14px]">
                 @foreach ([
                     ['label' => 'Kebijakan Privasi', 'url' => '#'],
                     ['label' => 'Syarat & Ketentuan', 'url' => '#'],

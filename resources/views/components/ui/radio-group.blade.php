@@ -58,7 +58,7 @@
                 <span class="min-w-0">
                     <span class="block text-sm font-medium text-etc-on-surface">{{ $optionLabel }}</span>
                     @if ($optionHelper)
-                        <span class="mt-1 block text-xs leading-5 text-etc-on-muted">{{ $optionHelper }}</span>
+                        <span class="mt-1 block text-xs leading-[var(--etc-leading-normal)] text-etc-on-muted">{{ $optionHelper }}</span>
                     @endif
                 </span>
             </label>

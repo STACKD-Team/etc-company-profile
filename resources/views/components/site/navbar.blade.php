@@ -63,7 +63,7 @@
                     color="gray"
                     size="sm"
                     @class([
-                        '!min-h-0 !rounded-none !bg-transparent !p-0 !font-heading !text-[13px] !font-bold !shadow-none transition duration-200 hover:!bg-transparent',
+                        '!min-h-0 !rounded-none !bg-transparent !p-0 !font-heading !text-[14px] !font-bold !shadow-none transition duration-200 hover:!bg-transparent',
                         '!text-etc-magenta' => $isActive,
                         '!text-white/75 hover:!text-white' => ! $isActive,
                     ])
@@ -81,14 +81,14 @@
                 :href="$loginUrl"
                 color="gray"
                 size="sm"
-                class="!hidden !min-h-0 !rounded-pill !bg-transparent !px-1 !py-2 !font-heading !text-[13px] !font-bold !text-white/75 !shadow-none transition hover:!bg-transparent hover:!text-white md:!inline-flex"
+                class="!hidden !min-h-0 !rounded-pill !bg-transparent !px-1 !py-2 !font-heading !text-[14px] !font-bold !text-white/75 !shadow-none transition hover:!bg-transparent hover:!text-white md:!inline-flex"
             >
                 Masuk
             </x-ui.button>
             <x-ui.button
                 :href="$registerUrl"
                 size="xl"
-                class="!rounded-pill !px-8 !py-3 !text-[14px] shadow-soft"
+                class="!rounded-pill !px-4 !py-3 !text-[14px] shadow-soft"
             >
                 Daftar Sekarang
             </x-ui.button>
@@ -104,7 +104,7 @@
             color="gray"
             size="sm"
             @class([
-                '!flex !min-h-0 !w-16 !flex-col !items-center !justify-center !gap-1 !rounded-card !bg-transparent !p-2 !font-heading !text-[10px] !font-bold !uppercase !shadow-none transition hover:!bg-etc-surface/5',
+                '!flex !min-h-0 !w-16 !flex-col !items-center !justify-center !gap-1 !rounded-field !bg-transparent !p-2 !font-heading !text-xs !font-bold !uppercase !leading-[var(--etc-leading-tight)] !shadow-none transition hover:!bg-etc-surface/5',
                 'scale-105 !bg-etc-surface/5 !text-etc-magenta' => $isActive,
                 '!text-white/60 active:!bg-etc-surface/10' => ! $isActive,
             ])

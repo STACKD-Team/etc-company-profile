@@ -77,7 +77,7 @@
             aria-label="ETC Padang"
             data-sidebar-brand-link
         >
-            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-selector bg-etc-magenta text-etc-surface shadow-soft">
+            <span class="flex h-[var(--etc-selector-size-xl)] w-[var(--etc-selector-size-xl)] shrink-0 items-center justify-center rounded-selector bg-etc-magenta text-etc-surface shadow-soft">
                 <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">school</span>
             </span>
             <span
@@ -91,7 +91,7 @@
 
         <button
             type="button"
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-field text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-magenta"
+            class="flex h-[var(--etc-field-size-sm)] w-[var(--etc-field-size-sm)] shrink-0 items-center justify-center rounded-field text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-magenta"
             aria-controls="dashboard-sidebar"
             data-sidebar-toggle
             data-sidebar-primary-toggle
@@ -113,7 +113,7 @@
                     theme: $store.theme,
                 }"
                 @class([
-                    'flex min-h-8 items-center gap-3 rounded-field px-2.5 py-1.5 font-heading text-sm font-bold transition duration-200',
+                    'flex min-h-[var(--etc-field-size-sm)] items-center gap-3 rounded-field px-4 py-1.5 font-heading text-sm font-bold transition duration-200',
                     'bg-etc-surface-container text-etc-magenta shadow-soft ring-1 ring-etc-magenta/20' => $isActive,
                     'text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-on-surface' => ! $isActive,
                 ])

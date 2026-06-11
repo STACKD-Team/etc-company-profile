@@ -34,6 +34,6 @@
         @if ($title)
             <p class="font-heading font-bold">{{ $title }}</p>
         @endif
-        <div @class(['leading-6', 'mt-1' => $title])>{{ $slot }}</div>
+        <div @class(['leading-[var(--etc-leading-normal)]', 'mt-1' => $title])>{{ $slot }}</div>
     </div>
 </div>

@@ -7,19 +7,19 @@ colors:
 typography:
   h1:
     fontFamily: Plus Jakarta Sans
-    fontSize: 56px
+    fontSize: 32-36px
     fontWeight: '700'
-    lineHeight: '1.1'
+    lineHeight: '1.4'
   h2:
     fontFamily: Plus Jakarta Sans
-    fontSize: 36px
+    fontSize: 24-30px
     fontWeight: '700'
-    lineHeight: '1.2'
+    lineHeight: '1.4'
   h3:
     fontFamily: Plus Jakarta Sans
-    fontSize: 24px
+    fontSize: 20-24px
     fontWeight: '700'
-    lineHeight: '1.3'
+    lineHeight: '1.4'
   body:
     fontFamily: Work Sans
     fontSize: 16px
@@ -27,24 +27,31 @@ typography:
     lineHeight: '1.5'
   button:
     fontFamily: Plus Jakarta Sans
-    fontSize: 15px
+    fontSize: 14-16px
     fontWeight: '700'
-    lineHeight: '1'
+    lineHeight: '1.4'
   small:
     fontFamily: Work Sans
-    fontSize: 13px
+    fontSize: 12-14px
     fontWeight: '400'
-    lineHeight: '1.4'
+    lineHeight: '1.4-1.6'
 rounded:
-  box: 0.5rem
-  field: 0.25rem
-  selector: 0.5rem
+  box: 1rem
+  field: 2rem
+  selector: 1rem
 sizes:
-  xs: 16px
-  sm: 20px
-  md: 24px
-  lg: 28px
-  xl: 32px
+  field:
+    xs: 24px
+    sm: 32px
+    md: 40px
+    lg: 48px
+    xl: 56px
+  selector:
+    xs: 16px
+    sm: 20px
+    md: 24px
+    lg: 28px
+    xl: 32px
 spacing:
   base-unit: 4px
   gutter: 24px
@@ -76,6 +83,8 @@ For **Headings and Accent text**, the design system utilizes a rounded, friendly
 
 Weight is strictly limited to Regular (400) and Bold (700) to maintain a clean hierarchy without unnecessary complexity. Headlines should always use the Bold weight to anchor the page, while the Body uses Regular for maximum readability.
 
+Shared typography uses a 16px body base and never drops below 12px. Font sizes must use even pixel values only. H1 ranges from 32-36px, H2 from 24-30px, and H3 from 20-24px. Buttons and action controls use only the even endpoints in the 14-16px range. Captions, hints, metadata, helper text, and compact labels use only the even endpoints in the 12-14px range. Line-height must stay between 1.4 and 1.6 for readable text; icon font rendering may use tighter line-height only when the glyph itself is the control.
+
 ## Layout & Spacing
 The layout follows a **Fixed Grid** philosophy, centering content within a 1200px maximum width container on desktop. A 12-column grid is used for desktop layouts, transitioning to a 4-column grid for mobile devices. 
 
@@ -89,9 +98,9 @@ Hierarchy is primarily established through **Tonal Layers**, using low-opacity M
 ## Shapes
 The shape language is consistently rounded to reinforce the "Playful" brand pillar. 
 
-- **Boxes:** Cards, panels, modals, drawers, alerts, and empty states use a `0.5rem` radius.
-- **Fields:** Buttons, icon buttons, inputs, selects, textareas, date fields, search fields, tabs, and pagination controls use a `0.25rem` radius.
-- **Selectors:** Checkboxes, radio controls, toggles, badges, and chips use a `0.5rem` radius.
+- **Boxes:** Cards, panels, modals, drawers, alerts, and empty states use a `1rem` radius.
+- **Fields:** Buttons, icon buttons, inputs, selects, textareas, date fields, search fields, tabs, and pagination controls use a `2rem` radius.
+- **Selectors:** Checkboxes, radio controls, toggles, badges, and chips use a `1rem` radius.
 - **Borders:** Every visible component border and focus border uses a `2px` width.
 
 Decorative blobs should be asymmetrical and organic, avoiding perfect circles to maintain a hand-drawn, inclusive feel.
@@ -99,14 +108,14 @@ Decorative blobs should be asymmetrical and organic, avoiding perfect circles to
 ## Components
 Consistent component behavior is vital for the trustworthy aspect of the "Playful Professional" style.
 
-- **Buttons:** Buttons use the shared field radius (`0.25rem`) and one of the fixed field heights: `xs` 16px, `sm` 20px, `md` 24px, `lg` 28px, or `xl` 32px. Primary buttons use Magenta with off-white text. Secondary buttons use Charcoal or an outline style.
-- **Input Fields:** Use `0.25rem` radius, a 2px Charcoal-opacity border, off-white background, Magenta focus border, and the same fixed field height scale as buttons.
-- **Cards:** Use `0.5rem` radius, a 2px Charcoal-opacity border, and subtle ambient shadow. Content within cards should have a minimum of 24px internal padding.
-- **Chips/Badges:** Use `0.5rem` radius, the fixed selector size scale (`xs` 16px through `xl` 32px), and tonal backgrounds derived from the three brand colors, except semantic status variants.
-- **Checkboxes & Radios:** Use `0.5rem` selector radius, the fixed selector size scale, and the primary brand color for the active state.
+- **Buttons:** Buttons use the shared field radius (`2rem`), 16px horizontal padding for text-bearing variants, and one of the fixed field heights: `xs` 24px, `sm` 32px, `md` 40px, `lg` 48px, or `xl` 56px. Primary buttons use Magenta with off-white text. Secondary buttons use Charcoal or an outline style.
+- **Input Fields:** Use `2rem` radius, 16px horizontal padding, a 2px Charcoal-opacity border, off-white background, Magenta focus border, the same fixed field height scale as buttons, and a 16px body text default.
+- **Cards:** Use `1rem` radius, a 2px Charcoal-opacity border, and subtle ambient shadow. Content within cards should have a minimum of 24px internal padding.
+- **Chips/Badges:** Use `1rem` radius, the fixed selector size scale (`xs` 16px through `xl` 32px), and tonal backgrounds derived from the three brand colors, except semantic status variants.
+- **Checkboxes & Radios:** Use `1rem` selector radius, the fixed selector size scale, and the primary brand color for the active state.
 - **Decorative Blobs:** Use these as background elements for "Hero" images or behind "Teacher Profiles" to create a sense of depth and personality.
 
-All component dimensions, padding, gaps, and icon sizes use the 4px base unit. Field and selector heights follow the fixed `xs` 16px, `sm` 20px, `md` 24px, `lg` 28px, and `xl` 32px scale.
+All component dimensions, padding, gaps, and icon sizes use the 4px base unit. Text-bearing field controls use 16px left and right padding. Field heights follow `xs` 24px, `sm` 32px, `md` 40px, `lg` 48px, and `xl` 56px. Selector dimensions follow `xs` 16px, `sm` 20px, `md` 24px, `lg` 28px, and `xl` 32px.
 
 ## Dashboard Shell
 

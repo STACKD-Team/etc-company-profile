@@ -16,6 +16,21 @@
     --etc-outline: rgba(39, 23, 28, .52);
     --shadow-soft: 0 2px 8px rgba(39, 23, 28, .06);
     --shadow-panel: 0 18px 45px rgba(39, 23, 28, .12);
+    --etc-font-size-body: 1rem;
+    --etc-font-size-h1: 2rem;
+    --etc-font-size-h1-lg: 2.25rem;
+    --etc-font-size-h2: 1.5rem;
+    --etc-font-size-h2-lg: 1.875rem;
+    --etc-font-size-h3: 1.25rem;
+    --etc-font-size-h3-lg: 1.5rem;
+    --etc-font-size-button-sm: .875rem;
+    --etc-font-size-button-md: 1rem;
+    --etc-font-size-button-lg: 1rem;
+    --etc-font-size-caption: .75rem;
+    --etc-font-size-caption-lg: .875rem;
+    --etc-leading-tight: 1.4;
+    --etc-leading-normal: 1.5;
+    --etc-leading-relaxed: 1.6;
 }
 
 html {
@@ -27,6 +42,8 @@ body {
     background: var(--etc-surface);
     color: var(--etc-on-surface);
     font-family: "Work Sans", "Segoe UI", sans-serif;
+    font-size: var(--etc-font-size-body);
+    line-height: var(--etc-leading-normal);
 }
 
 a {
@@ -76,8 +93,9 @@ header[class*="bg-etc-charcoal"] nav div {
 header.sticky nav a,
 header[class*="bg-etc-charcoal"] nav a {
     font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
-    font-size: 13px;
+    font-size: var(--etc-font-size-caption-lg);
     font-weight: 800;
+    line-height: var(--etc-leading-tight);
 }
 
 header.sticky a[href*="registration"],
@@ -89,7 +107,7 @@ header[class*="bg-etc-charcoal"] a[href*="registration"] {
     border-radius: 32px;
     background: var(--etc-magenta);
     color: var(--etc-surface);
-    padding: 10px 28px;
+    padding: 10px 16px;
     box-shadow: var(--shadow-soft);
 }
 
@@ -203,7 +221,7 @@ footer[class*="bg-etc-charcoal"] a {
 
 [data-registration-program-page] p {
     color: var(--etc-on-muted);
-    line-height: 1.65;
+    line-height: var(--etc-leading-relaxed);
 }
 
 [data-registration-program-page] h1,
@@ -214,8 +232,8 @@ footer[class*="bg-etc-charcoal"] a {
 
 #page-title {
     margin: 12px 0 0;
-    font-size: clamp(34px, 4vw, 48px);
-    line-height: 1.12;
+    font-size: clamp(var(--etc-font-size-h1), 4vw, var(--etc-font-size-h1-lg));
+    line-height: var(--etc-leading-tight);
     font-weight: 900;
 }
 
@@ -260,10 +278,11 @@ footer[class*="bg-etc-charcoal"] a {
     border-radius: 32px;
     background: var(--etc-magenta);
     color: var(--etc-surface);
-    padding: 12px 20px;
+    padding: 12px 16px;
     font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
-    font-size: 14px;
+    font-size: var(--etc-font-size-button-sm);
     font-weight: 800;
+    line-height: var(--etc-leading-tight);
 }
 
 .registration-summary .text-etc-magenta,
@@ -320,8 +339,83 @@ footer[class*="bg-etc-charcoal"] a {
     --radius-box: 1rem;
     --radius-field: 2rem;
     --radius-selector: 1rem;
+    --etc-field-size-xs: 24px;
+    --etc-field-size-sm: 32px;
+    --etc-field-size-md: 40px;
+    --etc-field-size-lg: 48px;
+    --etc-field-size-xl: 56px;
+    --etc-selector-size-xs: 16px;
+    --etc-selector-size-sm: 20px;
+    --etc-selector-size-md: 24px;
+    --etc-selector-size-lg: 28px;
+    --etc-selector-size-xl: 32px;
+    --etc-size-xs: var(--etc-selector-size-xs);
+    --etc-size-sm: var(--etc-selector-size-sm);
+    --etc-size-md: var(--etc-selector-size-md);
+    --etc-size-lg: var(--etc-selector-size-lg);
+    --etc-size-xl: var(--etc-selector-size-xl);
+    --etc-font-size-body: 1rem;
+    --etc-font-size-h1: 2rem;
+    --etc-font-size-h1-lg: 2.25rem;
+    --etc-font-size-h2: 1.5rem;
+    --etc-font-size-h2-lg: 1.875rem;
+    --etc-font-size-h3: 1.25rem;
+    --etc-font-size-h3-lg: 1.5rem;
+    --etc-font-size-button-sm: .875rem;
+    --etc-font-size-button-md: 1rem;
+    --etc-font-size-button-lg: 1rem;
+    --etc-font-size-caption: .75rem;
+    --etc-font-size-caption-lg: .875rem;
+    --etc-leading-tight: 1.4;
+    --etc-leading-normal: 1.5;
+    --etc-leading-relaxed: 1.6;
     --border-component: 2px;
     background: var(--color-etc-surface);
+    font-size: var(--etc-font-size-body);
+    line-height: var(--etc-leading-normal);
+}
+
+.etc-filament-ui .fi-btn {
+    font-size: var(--etc-font-size-button-md);
+    line-height: var(--etc-leading-tight);
+    padding-inline: 1rem;
+}
+
+.etc-filament-ui .fi-btn.fi-size-xs,
+.etc-filament-ui .fi-btn.fi-size-sm {
+    font-size: var(--etc-font-size-button-sm);
+}
+
+.etc-filament-ui .fi-btn.fi-size-lg,
+.etc-filament-ui .fi-btn.fi-size-xl {
+    font-size: var(--etc-font-size-button-lg);
+}
+
+.etc-filament-ui input.fi-input,
+.etc-filament-ui select.fi-select-input,
+.etc-filament-ui textarea.fi-input {
+    font-size: var(--etc-font-size-body);
+    line-height: var(--etc-leading-normal);
+    padding-inline: 1rem;
+}
+
+.etc-filament-ui .etc-field-size-xs input.fi-input,
+.etc-filament-ui .etc-field-size-xs select.fi-select-input,
+.etc-filament-ui .etc-field-size-xs textarea.fi-input,
+.etc-filament-ui .etc-field-size-sm input.fi-input,
+.etc-filament-ui .etc-field-size-sm select.fi-select-input,
+.etc-filament-ui .etc-field-size-sm textarea.fi-input {
+    font-size: var(--etc-font-size-caption-lg);
+}
+
+.etc-filament-ui .fi-badge {
+    font-size: var(--etc-font-size-caption);
+    line-height: var(--etc-leading-tight);
+}
+
+.etc-filament-ui .fi-badge.fi-size-lg,
+.etc-filament-ui .fi-badge.fi-size-xl {
+    font-size: var(--etc-font-size-caption-lg);
 }
 
 .etc-filament-ui .fi-btn,
@@ -331,8 +425,112 @@ footer[class*="bg-etc-charcoal"] a {
 .etc-filament-ui .fi-pagination a,
 .etc-filament-ui .fi-tabs,
 .etc-filament-ui .fi-tabs-item {
-    min-height: 48px;
+    min-height: var(--etc-field-size-md);
     border-radius: var(--radius-field);
+}
+
+.etc-filament-ui .fi-pagination button,
+.etc-filament-ui .fi-pagination a,
+.etc-filament-ui .fi-tabs,
+.etc-filament-ui .fi-tabs-item {
+    padding-inline: 1rem;
+}
+
+.etc-filament-ui [data-pagination-links] nav > div:last-child {
+    gap: .25rem;
+}
+
+.etc-filament-ui [data-pagination-links] a,
+.etc-filament-ui [data-pagination-links] span[aria-disabled='true'] span,
+.etc-filament-ui [data-pagination-links] span[aria-current='page'] span {
+    min-height: var(--etc-field-size-sm);
+    padding-inline: 1rem !important;
+    border-color: var(--color-etc-outline-variant) !important;
+    border-radius: var(--radius-field) !important;
+    background: var(--color-etc-surface) !important;
+    color: rgba(39, 23, 28, .68) !important;
+    box-shadow: none !important;
+}
+
+.etc-filament-ui [data-pagination-links] span[aria-current='page'] span {
+    background: rgba(230, 0, 127, .08) !important;
+    color: var(--color-etc-magenta) !important;
+    font-weight: 700;
+}
+
+.etc-filament-ui [data-pagination-links] a:hover {
+    background: rgba(230, 0, 127, .08) !important;
+    color: #27171c !important;
+}
+
+.etc-filament-ui [data-pagination-links] span[aria-disabled='true'] span {
+    opacity: .48;
+}
+
+.etc-filament-ui .fi-btn.fi-size-xs,
+.etc-filament-ui .etc-field-size-xs,
+.etc-filament-ui .etc-field-size-xs input.fi-input,
+.etc-filament-ui .etc-field-size-xs select.fi-select-input,
+.etc-filament-ui .etc-field-size-xs textarea.fi-input {
+    min-height: var(--etc-field-size-xs);
+}
+
+.etc-filament-ui .fi-btn.fi-size-sm,
+.etc-filament-ui .etc-field-size-sm,
+.etc-filament-ui .etc-field-size-sm input.fi-input,
+.etc-filament-ui .etc-field-size-sm select.fi-select-input,
+.etc-filament-ui .etc-field-size-sm textarea.fi-input {
+    min-height: var(--etc-field-size-sm);
+}
+
+.etc-filament-ui .fi-btn.fi-size-md,
+.etc-filament-ui .etc-field-size-md,
+.etc-filament-ui .etc-field-size-md input.fi-input,
+.etc-filament-ui .etc-field-size-md select.fi-select-input,
+.etc-filament-ui .etc-field-size-md textarea.fi-input {
+    min-height: var(--etc-field-size-md);
+}
+
+.etc-filament-ui .fi-btn.fi-size-lg,
+.etc-filament-ui .etc-field-size-lg,
+.etc-filament-ui .etc-field-size-lg input.fi-input,
+.etc-filament-ui .etc-field-size-lg select.fi-select-input,
+.etc-filament-ui .etc-field-size-lg textarea.fi-input {
+    min-height: var(--etc-field-size-lg);
+}
+
+.etc-filament-ui .fi-btn.fi-size-xl,
+.etc-filament-ui .etc-field-size-xl,
+.etc-filament-ui .etc-field-size-xl input.fi-input,
+.etc-filament-ui .etc-field-size-xl select.fi-select-input,
+.etc-filament-ui .etc-field-size-xl textarea.fi-input {
+    min-height: var(--etc-field-size-xl);
+}
+
+.etc-filament-ui .fi-icon-btn.fi-size-xs {
+    width: var(--etc-field-size-xs);
+    height: var(--etc-field-size-xs);
+}
+
+.etc-filament-ui .fi-icon-btn.fi-size-sm {
+    width: var(--etc-field-size-sm);
+    height: var(--etc-field-size-sm);
+}
+
+.etc-filament-ui .fi-icon-btn,
+.etc-filament-ui .fi-icon-btn.fi-size-md {
+    width: var(--etc-field-size-md);
+    height: var(--etc-field-size-md);
+}
+
+.etc-filament-ui .fi-icon-btn.fi-size-lg {
+    width: var(--etc-field-size-lg);
+    height: var(--etc-field-size-lg);
+}
+
+.etc-filament-ui .fi-icon-btn.fi-size-xl {
+    width: var(--etc-field-size-xl);
+    height: var(--etc-field-size-xl);
 }
 
 .etc-filament-ui .fi-section:not(.fi-section-not-contained),
@@ -348,6 +546,90 @@ footer[class*="bg-etc-charcoal"] a {
 .etc-filament-ui .fi-toggle,
 .etc-filament-ui .fi-toggle > :first-child {
     border-radius: var(--radius-selector);
+}
+
+.etc-filament-ui .fi-badge,
+.etc-filament-ui .fi-badge.fi-size-md {
+    min-height: var(--etc-selector-size-md);
+}
+
+.etc-filament-ui .fi-badge.fi-size-xs {
+    min-height: var(--etc-selector-size-xs);
+}
+
+.etc-filament-ui .fi-badge.fi-size-sm {
+    min-height: var(--etc-selector-size-sm);
+}
+
+.etc-filament-ui .fi-badge.fi-size-lg {
+    min-height: var(--etc-selector-size-lg);
+}
+
+.etc-filament-ui .fi-badge.fi-size-xl {
+    min-height: var(--etc-selector-size-xl);
+}
+
+.etc-filament-ui .fi-checkbox-input,
+.etc-filament-ui .fi-radio-input {
+    width: var(--etc-selector-size-md);
+    height: var(--etc-selector-size-md);
+}
+
+.etc-filament-ui .etc-selector-size-xs .fi-checkbox-input,
+.etc-filament-ui .etc-selector-size-xs .fi-radio-input,
+.etc-filament-ui .fi-checkbox-input.etc-selector-size-xs {
+    width: var(--etc-selector-size-xs);
+    height: var(--etc-selector-size-xs);
+}
+
+.etc-filament-ui .etc-selector-size-sm .fi-checkbox-input,
+.etc-filament-ui .etc-selector-size-sm .fi-radio-input,
+.etc-filament-ui .fi-checkbox-input.etc-selector-size-sm {
+    width: var(--etc-selector-size-sm);
+    height: var(--etc-selector-size-sm);
+}
+
+.etc-filament-ui .etc-selector-size-lg .fi-checkbox-input,
+.etc-filament-ui .etc-selector-size-lg .fi-radio-input,
+.etc-filament-ui .fi-checkbox-input.etc-selector-size-lg {
+    width: var(--etc-selector-size-lg);
+    height: var(--etc-selector-size-lg);
+}
+
+.etc-filament-ui .etc-selector-size-xl .fi-checkbox-input,
+.etc-filament-ui .etc-selector-size-xl .fi-radio-input,
+.etc-filament-ui .fi-checkbox-input.etc-selector-size-xl {
+    width: var(--etc-selector-size-xl);
+    height: var(--etc-selector-size-xl);
+}
+
+.etc-filament-ui .fi-toggle {
+    min-width: calc(var(--etc-selector-size-md) * 1.7);
+    min-height: var(--etc-selector-size-md);
+}
+
+.etc-filament-ui .etc-selector-size-xs.fi-toggle,
+.etc-filament-ui .etc-selector-size-xs .fi-toggle {
+    min-width: calc(var(--etc-selector-size-xs) * 1.7);
+    min-height: var(--etc-selector-size-xs);
+}
+
+.etc-filament-ui .etc-selector-size-sm.fi-toggle,
+.etc-filament-ui .etc-selector-size-sm .fi-toggle {
+    min-width: calc(var(--etc-selector-size-sm) * 1.7);
+    min-height: var(--etc-selector-size-sm);
+}
+
+.etc-filament-ui .etc-selector-size-lg.fi-toggle,
+.etc-filament-ui .etc-selector-size-lg .fi-toggle {
+    min-width: calc(var(--etc-selector-size-lg) * 1.7);
+    min-height: var(--etc-selector-size-lg);
+}
+
+.etc-filament-ui .etc-selector-size-xl.fi-toggle,
+.etc-filament-ui .etc-selector-size-xl .fi-toggle {
+    min-width: calc(var(--etc-selector-size-xl) * 1.7);
+    min-height: var(--etc-selector-size-xl);
 }
 
 .etc-filament-ui .fi-input-wrp,

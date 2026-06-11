@@ -105,14 +105,14 @@
                         >
                             <button
                                 type="button"
-                                class="flex min-h-8 max-w-64 items-center gap-2 rounded-field px-2 py-1 text-left transition hover:bg-etc-surface-container"
+                                class="flex min-h-[var(--etc-field-size-sm)] max-w-64 items-center gap-2 rounded-field px-4 py-1 text-left transition hover:bg-etc-surface-container"
                                 aria-label="Buka menu profil"
                                 data-dashboard-profile-trigger
                                 x-bind:aria-expanded="profileMenuOpen"
                                 aria-haspopup="menu"
                                 aria-expanded="false"
                             >
-                                <span class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-selector bg-etc-magenta font-heading text-xs font-bold text-etc-surface">
+                                <span class="flex h-[var(--etc-selector-size-xl)] w-[var(--etc-selector-size-xl)] shrink-0 items-center justify-center overflow-hidden rounded-selector bg-etc-magenta font-heading text-xs font-bold text-etc-surface">
                                     @if ($avatar)
                                         <img src="{{ \Illuminate\Support\Facades\Storage::url($avatar) }}" alt="{{ $displayName }}" class="h-full w-full object-cover">
                                     @else
@@ -161,9 +161,9 @@
                             @isset($eyebrow)
                                 <p class="mb-1 font-heading text-xs font-bold uppercase text-etc-magenta">{{ $eyebrow }}</p>
                             @endisset
-                            <h1 class="font-heading text-2xl font-bold text-etc-on-surface md:text-3xl">{{ $title ?? str($area)->headline()->toString() }}</h1>
+                            <h1 class="font-heading text-[var(--etc-font-size-h1)] font-bold leading-[var(--etc-leading-tight)] text-etc-on-surface md:text-[var(--etc-font-size-h1-lg)]">{{ $title ?? str($area)->headline()->toString() }}</h1>
                             @if ($description)
-                                <p class="mt-2 max-w-3xl text-sm leading-6 text-etc-on-muted">{{ $description }}</p>
+                                <p class="mt-2 max-w-3xl text-sm leading-[var(--etc-leading-normal)] text-etc-on-muted">{{ $description }}</p>
                             @endif
                         </div>
 
