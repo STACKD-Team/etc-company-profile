@@ -24,8 +24,17 @@ class Registration extends Model
         'placement_test_at',
         'placement_test_result',
         'payment_method',
+        'payment_status',
         'payment_amount',
+        'payment_original_amount',
+        'payment_discount_amount',
+        'payment_final_amount',
+        'payment_promotion_id',
+        'payment_promotion_title',
         'payment_gateway_id',
+        'payment_redirect_url',
+        'payment_snap_token',
+        'payment_expires_at',
         'payment_proof',
         'paid_at',
         'status',
@@ -37,6 +46,10 @@ class Registration extends Model
         return [
             'placement_test_at' => 'datetime',
             'payment_amount' => 'decimal:2',
+            'payment_original_amount' => 'decimal:2',
+            'payment_discount_amount' => 'decimal:2',
+            'payment_final_amount' => 'decimal:2',
+            'payment_expires_at' => 'datetime',
             'paid_at' => 'datetime',
         ];
     }
@@ -54,5 +67,10 @@ class Registration extends Model
     public function courseClass(): BelongsTo
     {
         return $this->belongsTo(CourseClass::class, 'class_id');
+    }
+
+    public function paymentPromotion(): BelongsTo
+    {
+        return $this->belongsTo(ProgramPromotion::class, 'payment_promotion_id');
     }
 }

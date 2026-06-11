@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\Registration;
 use App\Models\ReportCard;
+use App\Services\StudentPanelService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, StudentPanelService $panel): View
     {
         $student = $request->user();
 
@@ -40,6 +41,7 @@ class DashboardController extends Controller
             ->latest('paid_at')
             ->latest('created_at')
             ->get();
+        $latestPayment = $payments->first();
 
         $recentLearningHistory = $student->enrollments()
             ->with(['courseClass.program', 'courseClass.instructor', 'reportCard'])
@@ -61,7 +63,8 @@ class DashboardController extends Controller
             'activeProgram' => $activeProgram,
             'publishedReports' => $publishedReports,
             'payments' => $payments,
-            'latestPayment' => $payments->first(),
+            'latestPayment' => $latestPayment,
+            'latestPaymentSummary' => $latestPayment ? $panel->paymentSummary($latestPayment) : null,
             'latestReport' => $publishedReports->first(),
             'recentLearningHistory' => $recentLearningHistory,
             'stats' => [

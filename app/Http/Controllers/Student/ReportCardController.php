@@ -3,37 +3,30 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Student\TableQueryRequest;
 use App\Models\ReportCard;
+use App\Services\StudentPanelService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ReportCardController extends Controller
 {
-    public function index(Request $request): View
+    public function index(TableQueryRequest $request, StudentPanelService $panel): View
     {
+        $studentId = (int) $request->user()->id;
+
         return view('student.report-cards.index', [
             'student' => $request->user(),
-            'reportCards' => $request->user()->enrollments()
-                ->with(['reportCard.instructor', 'courseClass.program', 'courseClass.instructor'])
-                ->whereHas('reportCard', fn ($query) => $query->where('is_published', true))
-                ->latest('enrolled_at')
-                ->get()
-                ->pluck('reportCard')
-                ->filter(),
+            'reportCards' => $panel->paginateReportCards($studentId, $request->validated()),
+            'programOptions' => $panel->reportProgramOptions($studentId),
+            'classOptions' => $panel->reportClassOptions($studentId),
+            'instructorOptions' => $panel->reportInstructorOptions($studentId),
         ]);
     }
 
-    public function show(Request $request, ReportCard $reportCard): View
+    public function show(Request $request, ReportCard $reportCard, StudentPanelService $panel): View
     {
-        $reportCard->load([
-            'enrollment.courseClass.program',
-            'enrollment.courseClass.instructor',
-            'instructor',
-            'academicDirector',
-            'managingDirector',
-        ]);
-
-        abort_unless($reportCard->is_published && $reportCard->enrollment?->user_id === $request->user()->id, 403);
+        $reportCard = $panel->ownedPublishedReportCard((int) $request->user()->id, $reportCard);
 
         return view('student.report-cards.show', [
             'student' => $request->user(),
