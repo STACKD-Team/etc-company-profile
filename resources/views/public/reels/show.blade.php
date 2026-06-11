@@ -1,96 +1,66 @@
-<x-layouts.public :title="$reel->title">
+<x-layouts.public
+    :title="$reel->title"
+    :show-navbar="false"
+    :show-footer="false"
+    :show-chatbot="false"
+    body-class="public-reels-page"
+    main-class="h-screen"
+>
     @php
-        $assetUrl = static function (?string $path, string $fallback = 'videos/video1.mp4'): string {
-            if (! $path) {
-                return asset($fallback);
-            }
-
-            return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://', '/', 'images/', 'videos/', 'storage/'])
-                ? asset(ltrim($path, '/'))
-                : \Illuminate\Support\Facades\Storage::url($path);
-        };
+        $media = app(\App\Services\PublicDiscoveryService::class);
+        $assetUrl = static fn (?string $path, string $fallback = 'videos/video1.mp4'): string => $media->mediaUrl($path, $fallback);
     @endphp
 
-    <section class="bg-etc-charcoal py-12 text-white md:py-20">
-        <div class="mx-auto grid max-w-[1120px] gap-10 px-5 lg:grid-cols-[430px_1fr] lg:px-0">
-            <div class="overflow-hidden rounded-[28px] border border-white/15 bg-black shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
-                <video controls autoplay muted playsinline poster="{{ $assetUrl($reel->thumbnail_path, 'images/pu1-img (3).jpg') }}" class="aspect-[9/14] w-full object-cover" data-view-endpoint="{{ route('public.reels.views.store', $reel) }}">
-                    <source src="{{ $assetUrl($reel->video_path) }}" type="video/mp4">
-                    Browser kamu tidak mendukung pemutar video.
-                </video>
-            </div>
+    <section class="public-reel-slide min-h-screen" data-vertical-reel-detail>
+        <x-ui.button
+            :href="route('public.reels.index')"
+            color="gray"
+            size="sm"
+            class="absolute left-4 top-4 z-20 !inline-flex !min-h-0 !items-center !gap-2 !rounded-none !bg-transparent !p-0 !font-heading !text-sm !font-bold !text-white/80 !shadow-none transition hover:!bg-transparent hover:!text-white md:left-6 md:top-6"
+        >
+            <span class="material-symbols-outlined text-base">arrow_back</span>
+            Kembali
+        </x-ui.button>
 
-            <div class="flex flex-col justify-center">
-                <a href="{{ route('public.reels.index') }}" class="mb-8 inline-flex items-center gap-2 text-sm font-bold text-white/60 hover:text-white">
-                    <span class="material-symbols-outlined text-base">arrow_back</span>
-                    Kembali ke reels
-                </a>
-                <p class="font-heading text-sm font-black uppercase tracking-[0.18em] text-etc-magenta">{{ $reel->category }}</p>
-                <h1 class="mt-4 font-heading text-[38px] font-black leading-tight md:text-[54px]">{{ $reel->title }}</h1>
-                <p class="mt-6 text-[16px] leading-8 text-white/75">{{ $reel->description ?: 'Cuplikan kegiatan ETC Planet.' }}</p>
+        <div class="public-reel-video-frame aspect-[9/16]">
+            <video
+                controls
+                autoplay
+                muted
+                playsinline
+                loop
+                preload="metadata"
+                poster="{{ $assetUrl($reel->thumbnail_path, 'images/pu1-img (3).jpg') }}"
+                data-view-endpoint="{{ route('public.reels.views.store', $reel) }}"
+            >
+                <source src="{{ $assetUrl($reel->video_path) }}" type="video/mp4">
+                Browser kamu tidak mendukung pemutar video.
+            </video>
 
-                <div class="mt-8 flex flex-wrap gap-4">
-                    <span class="inline-flex min-h-11 items-center gap-2 rounded-full bg-white/10 px-5 py-2 font-heading text-sm font-bold text-white">
-                        <span class="material-symbols-outlined text-base">visibility</span>
-                        <span data-views-count>{{ number_format((int) $reel->views_count) }}</span> views
-                    </span>
-                    <button type="button" data-like-endpoint="{{ route('public.reels.likes.store', $reel) }}" data-liked="{{ $liked ? 'true' : 'false' }}" class="inline-flex min-h-11 items-center gap-2 rounded-full bg-etc-magenta px-5 py-2 font-heading text-sm font-bold text-white">
-                        <span class="material-symbols-outlined text-base">favorite</span>
-                        <span data-likes-count>{{ number_format((int) $reel->likes_count) }}</span>
-                    </button>
-                </div>
+            <div class="public-reel-overlay">
+                <p class="font-heading text-xs font-bold uppercase tracking-[0.16em] text-etc-magenta">{{ $reel->category ?? 'reel' }}</p>
+                <h1 class="mt-2 max-w-[18rem] font-heading text-2xl font-bold leading-tight text-white">{{ $reel->title }}</h1>
+                <p class="mt-2 max-w-[20rem] text-sm leading-6 text-white/75">{{ $reel->description ?: 'Cuplikan kegiatan ETC Planet.' }}</p>
             </div>
         </div>
+
+        <div class="public-reel-actions" aria-label="Statistik reel">
+            <span class="public-reel-action" aria-label="{{ number_format((int) $reel->views_count) }} views">
+                <span class="material-symbols-outlined">visibility</span>
+                <span data-views-count>{{ number_format((int) $reel->views_count) }}</span>
+            </span>
+            <x-ui.button
+                type="button"
+                color="gray"
+                class="public-reel-action public-reel-like !min-h-0 !rounded-none !bg-transparent !p-0 !text-white !shadow-none hover:!bg-transparent"
+                data-like-endpoint="{{ route('public.reels.likes.store', $reel) }}"
+                data-liked="{{ $liked ? 'true' : 'false' }}"
+                aria-label="Like {{ $reel->title }}"
+                aria-pressed="{{ $liked ? 'true' : 'false' }}"
+            >
+                <span class="material-symbols-outlined" data-like-icon>favorite</span>
+                <span data-likes-count>{{ number_format((int) $reel->likes_count) }}</span>
+            </x-ui.button>
+        </div>
     </section>
-
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                const video = document.querySelector('[data-view-endpoint]');
-                const likeButton = document.querySelector('[data-like-endpoint]');
-
-                if (video && token) {
-                    fetch(video.dataset.viewEndpoint, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': token,
-                            'Accept': 'application/json'
-                        }
-                    })
-                        .then((response) => response.ok ? response.json() : null)
-                        .then((data) => {
-                            if (data?.views_count !== undefined) {
-                                document.querySelector('[data-views-count]').textContent = new Intl.NumberFormat().format(data.views_count);
-                            }
-                        })
-                        .catch(() => {});
-                }
-
-                if (likeButton && token) {
-                    likeButton.addEventListener('click', () => {
-                        fetch(likeButton.dataset.likeEndpoint, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': token,
-                                'Accept': 'application/json'
-                            }
-                        })
-                            .then((response) => response.ok ? response.json() : null)
-                            .then((data) => {
-                                if (!data) {
-                                    return;
-                                }
-
-                                likeButton.dataset.liked = data.liked ? 'true' : 'false';
-                                likeButton.classList.toggle('bg-etc-magenta', data.liked);
-                                likeButton.classList.toggle('bg-white/10', !data.liked);
-                                document.querySelector('[data-likes-count]').textContent = new Intl.NumberFormat().format(data.likes_count);
-                            })
-                            .catch(() => {});
-                    });
-                }
-            });
-        </script>
-    @endpush
 </x-layouts.public>

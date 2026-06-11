@@ -4,6 +4,11 @@
     'navbarItems' => null,
     'navbarActive' => null,
     'footerLinkGroups' => null,
+    'showNavbar' => true,
+    'showFooter' => true,
+    'showChatbot' => true,
+    'bodyClass' => '',
+    'mainClass' => '',
 ])
 
 <!DOCTYPE html>
@@ -29,15 +34,22 @@
         @endif
         @stack('styles')
     </head>
-    <body class="etc-filament-ui min-h-screen bg-etc-surface font-body text-etc-on-surface antialiased selection:bg-etc-magenta selection:text-white">
-        <x-site.navbar :title="$brand" :items="$navbarItems" :active="$navbarActive" />
+    <body @class(['etc-filament-ui min-h-screen bg-etc-surface font-body text-etc-on-surface antialiased selection:bg-etc-magenta selection:text-white', $bodyClass])>
+        @if ($showNavbar)
+            <x-site.navbar :title="$brand" :items="$navbarItems" :active="$navbarActive" />
+        @endif
 
-        <main>
+        <main @class([$mainClass])>
             {{ $slot }}
         </main>
 
-        <x-site.footer :brand="$brand" :link-groups="$footerLinkGroups" />
-        <x-site.chatbot />
+        @if ($showFooter)
+            <x-site.footer :brand="$brand" :link-groups="$footerLinkGroups" />
+        @endif
+
+        @if ($showChatbot)
+            <x-site.chatbot />
+        @endif
         @filamentScripts(withCore: true)
         @stack('scripts')
     </body>

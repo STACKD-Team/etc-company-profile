@@ -150,13 +150,22 @@ it('renders all Miftah pages through the shared public layout', function () {
         route('public.faq.index'),
         route('public.programs.index'),
         route('public.programs.show', $program),
-        route('public.reels.index'),
-        route('public.reels.show', $reel),
     ] as $url) {
         $this->get($url)
             ->assertOk()
             ->assertSee('ETC Planet', false)
             ->assertSee('data-chatbot-widget', false)
+            ->assertDontSee('Fondasi halaman')
+            ->assertDontSee('Implementasi penuh');
+    }
+
+    foreach ([
+        route('public.reels.index'),
+        route('public.reels.show', $reel),
+    ] as $url) {
+        $this->get($url)
+            ->assertOk()
+            ->assertDontSee('data-chatbot-widget', false)
             ->assertDontSee('Fondasi halaman')
             ->assertDontSee('Implementasi penuh');
     }

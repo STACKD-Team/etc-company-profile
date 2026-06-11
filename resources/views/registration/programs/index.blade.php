@@ -19,6 +19,41 @@
     $selectedProgram ??= $programs->first();
     $selectedIcon = $selectedProgram ? ($iconMap[$selectedProgram['icon']] ?? 'program-general') : 'program-general';
     $selectedNextUrl = $selectedProgram['next_url'] ?? '/registration/form';
+    $programOptions = $programs->mapWithKeys(fn ($program) => [$program['id'] => $program['name']])->all();
+    $programHelpers = $programs->mapWithKeys(fn ($program) => [
+        $program['id'] => $program['description'].' - Biaya pendaftaran '.$formatRupiah($program['registration_fee']),
+    ])->all();
+    $programIcons = $programs->mapWithKeys(fn ($program) => [
+        $program['id'] => $iconMap[$program['icon']] ?? 'program-general',
+    ])->all();
+    $programInputAttributes = $programs->mapWithKeys(fn ($program) => [
+        $program['id'] => [
+            'data-program-radio' => true,
+            'data-name' => $program['name'],
+            'data-icon' => $program['icon'],
+            'data-tone' => $program['tone'],
+            'data-price' => $program['registration_fee'],
+            'data-next-url' => $program['next_url'],
+        ],
+    ])->all();
+    $programWrapperAttributes = $programs->mapWithKeys(function ($program) use ($selectedProgram): array {
+        $isSelected = $selectedProgram && $selectedProgram['id'] === $program['id'];
+
+        return [
+            $program['id'] => [
+                'class' => implode(' ', array_filter([
+                    'registration-program-card group relative cursor-pointer rounded-card border bg-white p-5 shadow-soft transition hover:-translate-y-1 hover:border-etc-magenta/70 hover:shadow-panel',
+                    $isSelected ? 'is-selected border-etc-magenta ring-2 ring-etc-magenta/15' : 'border-etc-outline-variant',
+                ])),
+            ],
+        ];
+    })->all();
+    $programIconAttributes = $programs->mapWithKeys(fn ($program) => [
+        $program['id'] => [
+            'data-program-icon' => true,
+            'class' => 'mb-2 bg-etc-surface-low',
+        ],
+    ])->all();
 @endphp
 
 <x-layouts.public title="Pilih Program" :footer-link-groups="$footerLinkGroups">
@@ -48,51 +83,29 @@
                     </p>
 
                     @if ($programs->isEmpty())
-                        <div class="mt-8 rounded-card border border-dashed border-etc-outline-variant bg-etc-surface-low p-8 text-center">
-                            <p class="font-heading text-lg font-bold text-etc-on-surface">Belum ada program aktif.</p>
-                            <p class="mt-2 text-sm text-etc-on-muted">Program yang tersedia akan muncul di sini setelah diaktifkan admin.</p>
+                        <div class="mt-8">
+                            <x-ui.empty-state
+                                heading="Belum ada program aktif"
+                                description="Program yang tersedia akan muncul di sini setelah diaktifkan admin."
+                                icon="heroicon-o-academic-cap"
+                                contained
+                            />
                         </div>
                     @else
                         <form class="mt-8" action="#" method="POST">
                             @csrf
-                            <div class="grid gap-4 sm:grid-cols-2">
-                                @foreach ($programs as $program)
-                                    @php
-                                        $programIcon = $iconMap[$program['icon']] ?? 'program-general';
-                                        $isSelected = $selectedProgram && $selectedProgram['id'] === $program['id'];
-                                    @endphp
-                                    <label
-                                        @class([
-                                            'registration-program-card group relative cursor-pointer rounded-card border bg-white p-5 shadow-soft transition hover:-translate-y-1 hover:border-etc-magenta/70 hover:shadow-panel',
-                                            'is-selected border-etc-magenta ring-2 ring-etc-magenta/15' => $isSelected,
-                                            'border-etc-outline-variant' => ! $isSelected,
-                                        ])
-                                    >
-                                        <input
-                                            class="sr-only"
-                                            type="radio"
-                                            name="program_id"
-                                            value="{{ $program['id'] }}"
-                                            data-program-radio
-                                            data-name="{{ $program['name'] }}"
-                                            data-icon="{{ $program['icon'] }}"
-                                            data-tone="{{ $program['tone'] }}"
-                                            data-price="{{ $program['registration_fee'] }}"
-                                            data-next-url="{{ $program['next_url'] }}"
-                                            @checked($isSelected)
-                                        >
-                                        <span class="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full border border-etc-outline-variant bg-white text-etc-magenta transition group-has-[:checked]:border-etc-magenta group-has-[:checked]:bg-etc-magenta group-has-[:checked]:text-white">
-                                            <span class="material-symbols-outlined text-base">check</span>
-                                        </span>
-                                        <span class="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-etc-surface-low" data-program-icon>
-                                            <x-ui.icon :name="$programIcon" class="h-7 w-7" />
-                                        </span>
-                                        <span class="block font-heading text-lg font-bold text-etc-on-surface">{{ $program['name'] }}</span>
-                                        <span class="mt-2 block min-h-12 text-sm leading-6 text-etc-on-muted">{{ $program['description'] }}</span>
-                                        <span class="mt-4 block font-heading text-sm font-bold text-etc-magenta">{{ $formatRupiah($program['registration_fee']) }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
+                            <x-ui.radio-group
+                                name="program_id"
+                                :value="$selectedProgram['id'] ?? null"
+                                :options="$programOptions"
+                                :option-helpers="$programHelpers"
+                                :option-icons="$programIcons"
+                                :option-attributes="$programInputAttributes"
+                                :option-wrapper-attributes="$programWrapperAttributes"
+                                :option-icon-attributes="$programIconAttributes"
+                                columns="sm:grid-cols-2"
+                                required
+                            />
                         </form>
                     @endif
                 </section>
@@ -125,10 +138,16 @@
                                 <strong id="summary-total" class="font-heading text-xl text-etc-magenta">{{ $formatRupiah($selectedProgram['registration_fee']) }}</strong>
                             </div>
 
-                            <a href="{{ $selectedNextUrl }}" data-registration-continue class="mt-8 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-pill bg-etc-magenta px-5 py-3 font-heading text-sm font-bold text-white transition hover:bg-etc-primary">
+                            <x-ui.button
+                                :href="$selectedNextUrl"
+                                data-registration-continue
+                                size="xl"
+                                class="mt-8 w-full !rounded-pill"
+                                icon="heroicon-m-arrow-right"
+                                icon-position="after"
+                            >
                                 Lanjut ke Data Pribadi
-                                <span class="material-symbols-outlined text-lg">arrow_forward</span>
-                            </a>
+                            </x-ui.button>
                         </div>
                     @else
                         <p class="mt-6 text-sm leading-6 text-white/75">Pilih program aktif setelah tersedia untuk melihat ringkasannya.</p>

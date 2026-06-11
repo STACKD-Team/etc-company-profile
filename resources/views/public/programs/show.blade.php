@@ -6,6 +6,8 @@
     $registerUrl = \Illuminate\Support\Facades\Route::has('registrations.programs.index')
         ? route('registrations.programs.index', ['program' => $program->id])
         : route('public.contact.index', ['program' => $program->id]);
+    $media = app(\App\Services\PublicDiscoveryService::class);
+    $coverUrl = $media->mediaUrl($program->thumbnail, 'images/hero-img.jpeg');
     $categoryLabel = str($program->category)->replace('_', ' ')->headline()->toString();
     $typeLabel = str($program->type)->replace('_', ' ')->headline()->toString();
     $targetAgeLabel = str($program->target_age)->replace('_', ' ')->headline()->toString();
@@ -15,165 +17,217 @@
     $instructorName = $featuredInstructor?->full_name ?: $featuredInstructor?->name ?: 'Instructor akan dikonfirmasi';
     $instructorPosition = $featuredInstructor?->instructor_position ?: 'Instructor Utama';
     $instructorSpecialization = $featuredInstructor?->instructor_specialization ?: $categoryLabel;
+    $promotion = $program->currentPromotion();
+    $discount = $promotion?->discountAmount($program->price) ?? 0;
+    $finalPrice = $promotion?->finalPrice($program->price) ?? (float) $program->price;
+    $formatRupiah = static fn ($value): string => 'Rp '.number_format((float) $value, 0, ',', '.');
 @endphp
 
-<x-layouts.public :title="$program->name">
-    <div class="bg-etc-surface text-etc-on-surface">
-        <section class="relative isolate overflow-hidden border-b border-etc-outline-variant/60 bg-white">
-            <div class="absolute inset-y-0 right-0 hidden w-[38%] bg-etc-surface-high lg:block"></div>
-            <div class="absolute bottom-0 left-0 right-0 h-14 origin-bottom-left -skew-y-2 bg-etc-surface"></div>
+<x-layouts.public :title="$program->name" navbar-active="program">
+    <section class="relative isolate overflow-hidden bg-etc-charcoal text-white">
+        <img src="{{ $coverUrl }}" alt="Cover program {{ $program->name }}" class="absolute inset-0 h-full w-full object-cover opacity-35" data-program-cover>
+        <div class="absolute inset-0 bg-gradient-to-r from-etc-charcoal via-etc-charcoal/85 to-etc-charcoal/55"></div>
 
-            <div class="relative mx-auto max-w-[1200px] px-6 pb-20 pt-10 lg:px-8 lg:pb-24">
-                <nav class="mb-10 flex flex-wrap items-center gap-2 text-sm text-etc-on-muted" aria-label="Breadcrumb">
-                    <span>Beranda</span>
+        <div class="public-shell relative grid min-h-[640px] items-end gap-8 py-16 lg:grid-cols-[1fr_360px]">
+            <div class="public-reveal" data-public-reveal>
+                <nav class="mb-6 flex flex-wrap items-center gap-2 text-sm text-white/70" aria-label="Breadcrumb">
+                    <x-ui.button
+                        :href="route('public.home')"
+                        color="gray"
+                        size="sm"
+                        class="!min-h-0 !rounded-none !bg-transparent !p-0 !text-white/70 !shadow-none hover:!bg-transparent hover:!text-white"
+                    >
+                        Beranda
+                    </x-ui.button>
                     <span class="material-symbols-outlined text-base">chevron_right</span>
-                    <span>Program</span>
+                    <x-ui.button
+                        :href="route('public.programs.index')"
+                        color="gray"
+                        size="sm"
+                        class="!min-h-0 !rounded-none !bg-transparent !p-0 !text-white/70 !shadow-none hover:!bg-transparent hover:!text-white"
+                    >
+                        Program
+                    </x-ui.button>
                     <span class="material-symbols-outlined text-base">chevron_right</span>
-                    <span class="font-bold text-etc-on-surface">{{ $program->name }}</span>
+                    <span class="font-bold text-white">{{ $program->name }}</span>
                 </nav>
 
-                <div class="grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
-                    <div>
-                        <div class="mb-7 flex flex-wrap gap-3">
-                            <span class="rounded-full bg-etc-surface-container px-4 py-2 font-heading text-sm font-bold text-etc-magenta">{{ $categoryLabel }}</span>
-                            <span class="rounded-full border border-etc-outline-variant bg-white px-4 py-2 font-heading text-sm font-bold text-etc-on-muted">{{ $typeLabel }}</span>
-                            <span class="rounded-full border border-etc-outline-variant bg-white px-4 py-2 font-heading text-sm font-bold text-etc-on-muted">{{ $targetAgeLabel }}</span>
-                        </div>
+                <div class="mb-6 flex flex-wrap gap-2">
+                    <x-ui.badge color="primary" class="!bg-etc-surface !text-etc-magenta">{{ $categoryLabel }}</x-ui.badge>
+                    <x-ui.badge color="gray" class="!bg-etc-surface/10 !text-white">{{ $typeLabel }}</x-ui.badge>
+                    <x-ui.badge color="gray" class="!bg-etc-surface/10 !text-white">{{ $targetAgeLabel }}</x-ui.badge>
+                    @if ($promotion)
+                        <x-ui.badge color="primary" class="!bg-etc-magenta !text-white" data-promo-badge>{{ $promotion->displayBadge() }}</x-ui.badge>
+                    @endif
+                </div>
 
-                        <h1 class="max-w-4xl font-heading text-4xl font-black leading-tight tracking-normal text-etc-on-surface md:text-6xl">
-                            {{ $program->name }}
-                        </h1>
-                        <p class="mt-6 max-w-2xl text-lg leading-8 text-etc-on-muted">
-                            {{ $description }}
-                        </p>
+                <h1 class="max-w-4xl font-heading text-4xl font-bold leading-tight md:text-6xl">{{ $program->name }}</h1>
+                <p class="mt-6 max-w-2xl text-lg leading-8 text-white/75">{{ $description }}</p>
+
+                <div class="mt-8 grid max-w-3xl grid-cols-3 overflow-hidden rounded-card border-2 border-etc-surface/15 bg-etc-surface/10">
+                    <div class="border-r-2 border-etc-surface/15 p-4">
+                        <p class="font-heading text-xs font-bold uppercase text-white/60">Durasi</p>
+                        <p class="mt-2 font-heading text-lg font-bold">{{ $program->duration_meetings ?? 16 }}x</p>
                     </div>
-
-                    <div class="grid grid-cols-3 overflow-hidden rounded-card border border-etc-outline-variant/70 bg-etc-surface-low shadow-soft">
-                        <div class="border-r border-etc-outline-variant/70 p-4">
-                            <p class="font-heading text-xs font-bold uppercase text-etc-on-muted">Durasi</p>
-                            <p class="mt-2 font-heading text-lg font-black text-etc-on-surface">{{ $program->duration_meetings ?? 16 }}x</p>
-                        </div>
-                        <div class="border-r border-etc-outline-variant/70 p-4">
-                            <p class="font-heading text-xs font-bold uppercase text-etc-on-muted">Kapasitas</p>
-                            <p class="mt-2 font-heading text-lg font-black text-etc-on-surface">{{ $program->max_students ?? 10 }}</p>
-                        </div>
-                        <div class="p-4">
-                            <p class="font-heading text-xs font-bold uppercase text-etc-on-muted">Kelas</p>
-                            <p class="mt-2 font-heading text-lg font-black text-etc-on-surface">{{ $typeLabel }}</p>
-                        </div>
+                    <div class="border-r-2 border-etc-surface/15 p-4">
+                        <p class="font-heading text-xs font-bold uppercase text-white/60">Kapasitas</p>
+                        <p class="mt-2 font-heading text-lg font-bold">{{ $program->max_students ?? 10 }} siswa</p>
+                    </div>
+                    <div class="p-4">
+                        <p class="font-heading text-xs font-bold uppercase text-white/60">Target</p>
+                        <p class="mt-2 font-heading text-lg font-bold">{{ $targetAgeLabel }}</p>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <section class="px-6 py-14 lg:px-8 lg:py-18">
-            <div class="mx-auto grid max-w-[1200px] gap-8 lg:grid-cols-[minmax(0,1fr)_372px]">
-                <div class="space-y-8">
-                    <article class="rounded-card border border-etc-outline-variant/60 bg-white p-7 shadow-soft md:p-8">
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined flex h-11 w-11 items-center justify-center rounded-full bg-etc-surface-container text-etc-magenta">forum</span>
-                            <h2 class="font-heading text-2xl font-black text-etc-on-surface">{{ $aboutHeading }}</h2>
+            <aside class="public-card overflow-hidden border-t-4 border-t-etc-magenta bg-etc-surface text-etc-on-surface public-reveal" data-public-reveal data-sprint1-pricing-panel>
+                <div class="p-6">
+                    <p class="font-heading text-sm font-bold uppercase text-etc-magenta">Investasi belajar</p>
+
+                    @if ($promotion)
+                        <div class="mt-5 rounded-card bg-etc-surface-container p-4">
+                            <p class="font-heading text-xs font-bold uppercase text-etc-on-muted">{{ $promotion->title }}</p>
+                            @if ($promotion->description)
+                                <p class="mt-2 text-sm leading-6 text-etc-on-muted">{{ $promotion->description }}</p>
+                            @endif
                         </div>
-                        <div class="mt-6 max-w-3xl space-y-4 text-base leading-8 text-etc-on-muted">
-                            <p>{{ $description }}</p>
-                            <p>Kelas dirancang untuk membantu siswa belajar lebih aktif, terarah, dan percaya diri melalui latihan yang dekat dengan kebutuhan sehari-hari.</p>
-                        </div>
-                    </article>
+                    @endif
 
-                    <article class="rounded-card border border-etc-outline-variant/60 bg-white p-7 shadow-soft md:p-8">
-                        <div class="flex flex-col justify-between gap-3 md:flex-row md:items-end">
-                            <div>
-                                <p class="font-heading text-sm font-bold uppercase text-etc-magenta">Learning outcomes</p>
-                                <h2 class="mt-2 font-heading text-2xl font-black text-etc-on-surface">{{ $learningHeading }}</h2>
-                            </div>
-                            <span class="inline-flex w-fit rounded-full bg-etc-surface-container px-4 py-2 font-heading text-xs font-bold text-etc-magenta">
-                                {{ count($learningOutcomes) }} fokus belajar
-                            </span>
-                        </div>
-
-                        <div class="mt-7 grid gap-4 md:grid-cols-2">
-                            @foreach ($learningOutcomes as $outcome)
-                                <div class="flex min-h-20 items-start gap-3 rounded-lg border border-etc-outline-variant/50 bg-etc-surface-low p-4">
-                                    <span class="material-symbols-outlined mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white text-lg text-etc-magenta">check</span>
-                                    <p class="text-sm leading-6 text-etc-on-muted">{{ $outcome }}</p>
-                                </div>
-                            @endforeach
-                        </div>
-                    </article>
-
-                    <div class="grid gap-6 md:grid-cols-2">
-                        <article class="rounded-card border border-etc-outline-variant/60 bg-white p-6 shadow-soft">
-                            <div class="flex items-start justify-between gap-4">
-                                <div>
-                                    <p class="font-heading text-sm font-bold uppercase text-etc-magenta">Schedule</p>
-                                    <h2 class="mt-2 font-heading text-2xl font-black text-etc-on-surface">Jadwal Kelas</h2>
-                                </div>
-                                <span class="material-symbols-outlined flex h-12 w-12 items-center justify-center rounded-full bg-etc-surface-container text-2xl text-etc-magenta">calendar_month</span>
-                            </div>
-                            <div class="mt-7 rounded-lg bg-etc-surface-low p-4">
-                                <p class="font-heading text-lg font-black text-etc-on-surface">{{ $scheduleDays }}</p>
-                                <p class="mt-1 text-sm text-etc-on-muted">{{ $scheduleTime }}</p>
-                                @if ($featuredClass?->room)
-                                    <p class="mt-4 inline-flex rounded-full bg-white px-3 py-1 font-heading text-xs font-bold text-etc-on-muted">{{ $featuredClass->room }}</p>
-                                @endif
-                            </div>
-                        </article>
-
-                        <article class="rounded-card border border-etc-outline-variant/60 bg-white p-6 shadow-soft">
-                            <p class="font-heading text-sm font-bold uppercase text-etc-magenta">Mentor</p>
-                            <div class="mt-5 flex items-center gap-4">
-                                <div class="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full border-4 border-etc-surface-container bg-etc-charcoal font-heading text-2xl font-black text-white">
-                                    {{ str($instructorName)->substr(0, 1)->upper() }}
-                                </div>
-                                <div class="min-w-0">
-                                    <p class="font-heading text-xs font-bold uppercase tracking-normal text-etc-on-muted">{{ $instructorPosition }}</p>
-                                    <h2 class="mt-1 font-heading text-xl font-black leading-snug text-etc-on-surface">{{ $instructorName }}</h2>
-                                    <p class="mt-2 text-sm text-etc-magenta">{{ $instructorSpecialization }}</p>
-                                </div>
-                            </div>
-                            <p class="mt-5 text-sm leading-6 text-etc-on-muted">
-                                Siswa akan dibimbing dengan latihan terstruktur, koreksi langsung, dan aktivitas komunikasi yang aktif.
-                            </p>
-                        </article>
+                    <div class="mt-5">
+                        @if ($promotion)
+                            <p class="font-heading text-base font-bold text-etc-on-muted line-through">{{ $formatRupiah($program->price) }}</p>
+                            <p class="mt-1 font-heading text-4xl font-bold text-etc-magenta" data-promo-final-price>{{ $formatRupiah($finalPrice) }}</p>
+                            <p class="mt-2 text-sm font-bold text-etc-on-muted">Potongan {{ $formatRupiah($discount) }}</p>
+                        @else
+                            <p class="font-heading text-4xl font-bold">{{ $formatRupiah($program->price) }}</p>
+                        @endif
                     </div>
-                </div>
 
-                <aside class="h-fit overflow-hidden rounded-card border border-etc-outline-variant/60 border-t-4 border-t-etc-magenta bg-white shadow-panel lg:sticky lg:top-28">
-                    <div class="p-7">
-                        <p class="font-heading text-sm font-bold uppercase text-etc-magenta">Investasi belajar</p>
-                        <div class="mt-5 flex items-end gap-2">
-                            <span class="pb-2 font-heading text-xl font-black text-etc-on-surface">Rp</span>
-                            <p class="font-heading text-4xl font-black text-etc-on-surface">
-                                {{ number_format((float) $program->price, 0, ',', '.') }}
-                            </p>
-                        </div>
-                        <div class="mt-5 rounded-lg bg-etc-surface-low p-4">
-                            <p class="font-heading text-xs font-bold uppercase text-etc-on-muted">Biaya pendaftaran</p>
-                            <p class="mt-1 font-heading text-xl font-black text-etc-magenta">Rp {{ number_format((float) $program->registration_fee, 0, ',', '.') }}</p>
-                        </div>
+                    <div class="mt-5 rounded-card bg-etc-surface-container p-4">
+                        <p class="font-heading text-xs font-bold uppercase text-etc-on-muted">Biaya pendaftaran</p>
+                        <p class="mt-1 font-heading text-xl font-bold">{{ $formatRupiah($program->registration_fee) }}</p>
+                    </div>
 
-                        <a href="{{ $registerUrl }}" class="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-etc-magenta px-5 py-3 font-heading text-sm font-bold text-white shadow-soft transition hover:bg-etc-primary">
+                    @if ($promotion?->terms)
+                        <div class="mt-4 rounded-card border-2 border-etc-outline-variant p-4" data-promo-terms>
+                            <p class="font-heading text-xs font-bold uppercase text-etc-on-muted">Syarat promo</p>
+                            <p class="mt-2 text-sm leading-6 text-etc-on-muted">{{ $promotion->terms }}</p>
+                        </div>
+                    @endif
+
+                    <div class="mt-6">
+                        <x-ui.button :href="$registerUrl" size="xl" class="w-full" icon="heroicon-m-arrow-right" icon-position="after">
                             Daftar Program Ini
-                            <span class="material-symbols-outlined text-lg">arrow_forward</span>
-                        </a>
-
-                        <p class="mt-4 text-center text-xs leading-5 text-etc-on-muted">
-                            Placement test tetap dilakukan offline dan akan dikonfirmasi setelah pembayaran diverifikasi admin.
-                        </p>
+                        </x-ui.button>
                     </div>
 
-                    <div class="border-t border-etc-outline-variant/50 bg-etc-surface-container px-6 py-5">
-                        <ul class="space-y-3">
-                            @foreach ($trustBadges as $badge)
-                                <li class="flex items-center gap-3 text-sm text-etc-on-muted">
-                                    <span class="material-symbols-outlined text-xl text-etc-magenta">{{ $badge['icon'] ?? 'verified' }}</span>
-                                    <span>{{ $badge['label'] ?? '' }}</span>
-                                </li>
-                            @endforeach
-                        </ul>
+                    <p class="mt-4 text-center text-xs leading-5 text-etc-on-muted">
+                        Placement test dilakukan offline supaya level kelas lebih akurat.
+                    </p>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <section class="public-section bg-etc-surface">
+        <div class="public-shell grid gap-6 lg:grid-cols-[1fr_320px]">
+            <div class="space-y-6">
+                <article class="public-card p-6 public-reveal" data-public-reveal>
+                    <div class="flex items-center gap-3">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-selector bg-etc-surface-container text-etc-magenta">
+                            <span class="material-symbols-outlined">forum</span>
+                        </span>
+                        <h2 class="font-heading text-2xl font-bold">{{ $aboutHeading }}</h2>
                     </div>
-                </aside>
+                    <div class="mt-5 max-w-3xl space-y-4 leading-8 text-etc-on-muted">
+                        <p>{{ $description }}</p>
+                        <p>Kelas dirancang untuk membantu siswa belajar lebih aktif, terarah, dan percaya diri melalui latihan yang dekat dengan kebutuhan sehari-hari.</p>
+                    </div>
+                </article>
+
+                <article class="public-card p-6 public-reveal" data-public-reveal>
+                    <div class="flex flex-col justify-between gap-3 md:flex-row md:items-end">
+                        <div>
+                            <p class="public-eyebrow">Learning outcomes</p>
+                            <h2 class="mt-2 font-heading text-2xl font-bold">{{ $learningHeading }}</h2>
+                        </div>
+                        <x-ui.badge color="gray">{{ count($learningOutcomes) }} fokus belajar</x-ui.badge>
+                    </div>
+
+                    <div class="mt-6 grid gap-3 md:grid-cols-2">
+                        @forelse ($learningOutcomes as $outcome)
+                            <div class="flex min-h-20 items-start gap-3 rounded-card border-2 border-etc-outline-variant bg-etc-surface-container p-4">
+                                <span class="material-symbols-outlined mt-0.5 text-lg text-etc-magenta">check_circle</span>
+                                <p class="text-sm leading-6 text-etc-on-muted">{{ $outcome }}</p>
+                            </div>
+                        @empty
+                            <div class="rounded-card border-2 border-etc-outline-variant bg-etc-surface-container p-4 md:col-span-2">
+                                <p class="text-sm leading-6 text-etc-on-muted">Tim ETC akan menyesuaikan fokus belajar dengan level dan tujuan siswa saat konsultasi awal.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </article>
+
+                <div class="grid gap-5 md:grid-cols-2">
+                    <article class="public-card p-5 public-reveal" data-public-reveal>
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <p class="public-eyebrow">Schedule</p>
+                                <h2 class="mt-2 font-heading text-2xl font-bold">Jadwal Kelas</h2>
+                            </div>
+                            <span class="material-symbols-outlined text-3xl text-etc-magenta">calendar_month</span>
+                        </div>
+                        <div class="mt-6 rounded-card bg-etc-surface-container p-4">
+                            <p class="font-heading text-lg font-bold">{{ $scheduleDays }}</p>
+                            <p class="mt-1 text-sm text-etc-on-muted">{{ $scheduleTime }}</p>
+                            @if ($featuredClass?->room)
+                                <x-ui.badge color="gray" class="mt-4">{{ $featuredClass->room }}</x-ui.badge>
+                            @endif
+                        </div>
+                    </article>
+
+                    <article class="public-card p-5 public-reveal" data-public-reveal>
+                        <p class="public-eyebrow">Mentor</p>
+                        <div class="mt-5 flex items-center gap-4">
+                            <div class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-etc-outline-variant bg-etc-charcoal font-heading text-2xl font-bold text-white">
+                                {{ str($instructorName)->substr(0, 1)->upper() }}
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-heading text-xs font-bold uppercase text-etc-on-muted">{{ $instructorPosition }}</p>
+                                <h2 class="mt-1 font-heading text-xl font-bold leading-snug">{{ $instructorName }}</h2>
+                                <p class="mt-2 text-sm text-etc-magenta">{{ $instructorSpecialization }}</p>
+                            </div>
+                        </div>
+                        <p class="mt-5 text-sm leading-6 text-etc-on-muted">Siswa akan dibimbing dengan latihan terstruktur, koreksi langsung, dan aktivitas komunikasi yang aktif.</p>
+                    </article>
+                </div>
             </div>
-        </section>
-    </div>
+
+            <aside class="public-card h-fit p-5 public-reveal lg:sticky lg:top-28" data-public-reveal>
+                <p class="public-eyebrow">Kenapa pilih kelas ini?</p>
+                <ul class="mt-5 space-y-3">
+                    @forelse ($trustBadges as $badge)
+                        <li class="flex items-center gap-3 text-sm text-etc-on-muted">
+                            <span class="material-symbols-outlined text-xl text-etc-magenta">{{ $badge['icon'] ?? 'verified' }}</span>
+                            <span>{{ $badge['label'] ?? '' }}</span>
+                        </li>
+                    @empty
+                        <li class="flex items-center gap-3 text-sm text-etc-on-muted">
+                            <span class="material-symbols-outlined text-xl text-etc-magenta">verified</span>
+                            <span>Kelas kecil dengan arahan instructor.</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-etc-on-muted">
+                            <span class="material-symbols-outlined text-xl text-etc-magenta">assignment</span>
+                            <span>Placement test membantu penempatan level.</span>
+                        </li>
+                    @endforelse
+                </ul>
+                <div class="mt-6">
+                    <x-ui.button :href="$registerUrl" color="gray" outlined size="xl" class="w-full">
+                        Ambil kelas ini
+                    </x-ui.button>
+                </div>
+            </aside>
+        </div>
+    </section>
 </x-layouts.public>

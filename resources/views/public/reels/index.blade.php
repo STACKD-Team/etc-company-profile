@@ -1,52 +1,96 @@
-<x-layouts.public title="Reels">
+<x-layouts.public
+    title="Reels"
+    :show-navbar="false"
+    :show-footer="false"
+    :show-chatbot="false"
+    body-class="public-reels-page"
+    main-class="h-screen"
+>
     @php
-        $assetUrl = static function (?string $path, string $fallback = 'videos/video1.mp4'): string {
-            if (! $path) {
-                return asset($fallback);
-            }
-
-            return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://', '/', 'images/', 'videos/', 'storage/'])
-                ? asset(ltrim($path, '/'))
-                : \Illuminate\Support\Facades\Storage::url($path);
-        };
+        $media = app(\App\Services\PublicDiscoveryService::class);
+        $assetUrl = static fn (?string $path, string $fallback = 'videos/video1.mp4'): string => $media->mediaUrl($path, $fallback);
+        $likedReels = collect(session('liked_reels', []))->map(fn ($id) => (int) $id)->all();
     @endphp
 
-    <section class="bg-etc-charcoal py-20 text-white">
-        <div class="mx-auto max-w-[1120px] px-5 lg:px-0">
-            <p class="font-heading text-sm font-black uppercase tracking-[0.18em] text-etc-magenta">ETC Planet Reels</p>
-            <h1 class="mt-4 max-w-3xl font-heading text-[42px] font-black leading-tight md:text-[56px]">Cuplikan suasana belajar dan kegiatan ETC</h1>
-            <p class="mt-5 max-w-2xl text-[16px] leading-8 text-white/60">Hanya reels published yang ditampilkan di halaman public.</p>
-        </div>
-    </section>
+    @if ($reels->isNotEmpty())
+        <section class="public-reels-feed" data-vertical-reels-feed aria-label="ETC Planet Reels">
+            @foreach ($reels as $reel)
+                @php($liked = in_array((int) $reel->getKey(), $likedReels, true))
 
-    <section class="bg-[#fff8f8] py-20">
-        <div class="mx-auto max-w-[1120px] px-5 lg:px-0">
-            @if ($reels->isNotEmpty())
-                <div class="grid gap-8 md:grid-cols-3 lg:grid-cols-4">
-                    @foreach ($reels as $reel)
-                        <a href="{{ route('public.reels.show', $reel) }}" class="group overflow-hidden rounded-[22px] border border-[#eeb8c9] bg-white shadow-soft">
-                            <div class="relative aspect-[9/14] overflow-hidden bg-black">
-                                <video preload="metadata" muted playsinline poster="{{ $assetUrl($reel->thumbnail_path, 'images/pu1-img (3).jpg') }}" class="h-full w-full object-cover opacity-90">
-                                    <source src="{{ $assetUrl($reel->video_path) }}" type="video/mp4">
-                                </video>
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent"></div>
-                                <span class="absolute left-4 top-4 rounded-full bg-etc-magenta px-3 py-1 font-heading text-xs font-black uppercase text-white">{{ $reel->category }}</span>
-                                <span class="absolute bottom-4 left-4 right-4 font-heading text-base font-black text-white">{{ $reel->title }}</span>
-                            </div>
-                            <div class="flex items-center justify-between p-5 text-sm text-etc-on-muted">
-                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base">visibility</span>{{ number_format((int) $reel->views_count) }}</span>
-                                <span class="flex items-center gap-1 text-etc-magenta"><span class="material-symbols-outlined text-base">favorite</span>{{ number_format((int) $reel->likes_count) }}</span>
-                            </div>
+                <article class="public-reel-slide" data-reel-slide>
+                    <x-ui.button
+                        :href="route('public.home') . '#reels'"
+                        color="gray"
+                        size="sm"
+                        class="absolute left-4 top-4 z-20 !inline-flex !min-h-0 !items-center !gap-2 !rounded-none !bg-transparent !p-0 !font-heading !text-sm !font-bold !text-white/80 !shadow-none transition hover:!bg-transparent hover:!text-white md:left-6 md:top-6"
+                    >
+                        <span class="material-symbols-outlined text-base">arrow_back</span>
+                        Keluar
+                    </x-ui.button>
+
+                    <div class="public-reel-video-frame">
+                        <video
+                            muted
+                            playsinline
+                            loop
+                            preload="metadata"
+                            poster="{{ $assetUrl($reel->thumbnail_path, 'images/pu1-img (3).jpg') }}"
+                            data-autoplay-reel="true"
+                            data-view-endpoint="{{ route('public.reels.views.store', $reel) }}"
+                            data-view-count-target="reel-views-{{ $reel->id }}"
+                        >
+                            <source src="{{ $assetUrl($reel->video_path) }}" type="video/mp4">
+                            Browser kamu tidak mendukung pemutar video.
+                        </video>
+
+                        <a href="{{ route('public.reels.show', $reel) }}" class="public-reel-overlay">
+                            <p class="font-heading text-xs font-bold uppercase tracking-[0.16em] text-etc-magenta">{{ $reel->category ?? 'reel' }}</p>
+                            <h1 class="mt-2 max-w-[18rem] font-heading text-2xl font-bold leading-tight text-white">{{ $reel->title }}</h1>
+                            <p class="mt-2 line-clamp-2 max-w-[20rem] text-sm leading-6 text-white/75">{{ $reel->description ?: 'Cuplikan kegiatan dan suasana belajar ETC Planet.' }}</p>
                         </a>
-                    @endforeach
-                </div>
-            @else
-                <div class="rounded-[22px] border border-dashed border-[#eeb8c9] bg-white p-10 text-center shadow-soft">
-                    <span class="material-symbols-outlined text-5xl text-etc-magenta">smart_display</span>
-                    <h2 class="mt-4 font-heading text-2xl font-black text-etc-on-surface">Reels belum dipublish</h2>
-                    <p class="mt-3 text-etc-on-muted">Upload dan publish reels dari modul admin CMS pada sprint berikutnya.</p>
-                </div>
-            @endif
-        </div>
-    </section>
+                    </div>
+
+                    <div class="public-reel-actions" aria-label="Statistik reel">
+                        <span class="public-reel-action" aria-label="{{ number_format((int) $reel->views_count) }} views">
+                            <span class="material-symbols-outlined">visibility</span>
+                            <span id="reel-views-{{ $reel->id }}">{{ number_format((int) $reel->views_count) }}</span>
+                        </span>
+                        <x-ui.button
+                            type="button"
+                            color="gray"
+                            class="public-reel-action public-reel-like !min-h-0 !rounded-none !bg-transparent !p-0 !text-white !shadow-none hover:!bg-transparent"
+                            data-like-endpoint="{{ route('public.reels.likes.store', $reel) }}"
+                            data-liked="{{ $liked ? 'true' : 'false' }}"
+                            data-likes-count-target="reel-likes-{{ $reel->id }}"
+                            aria-label="Like {{ $reel->title }}"
+                            aria-pressed="{{ $liked ? 'true' : 'false' }}"
+                        >
+                            <span class="material-symbols-outlined" data-like-icon>favorite</span>
+                            <span id="reel-likes-{{ $reel->id }}">{{ number_format((int) $reel->likes_count) }}</span>
+                        </x-ui.button>
+                    </div>
+                </article>
+            @endforeach
+        </section>
+    @else
+        <section class="grid min-h-screen place-items-center bg-etc-charcoal p-6 text-white">
+            <x-ui.button
+                :href="route('public.home') . '#reels'"
+                color="gray"
+                size="sm"
+                class="absolute left-4 top-4 !inline-flex !min-h-0 !items-center !gap-2 !rounded-none !bg-transparent !p-0 !font-heading !text-sm !font-bold !text-white/80 !shadow-none transition hover:!bg-transparent hover:!text-white md:left-6 md:top-6"
+            >
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+                Keluar
+            </x-ui.button>
+            <div class="max-w-md text-center">
+                <x-ui.empty-state
+                    heading="Reels belum tersedia"
+                    description="Cuplikan kelas dan kegiatan ETC Planet akan tampil di sini setelah dipublikasikan."
+                    icon="heroicon-o-video-camera"
+                    contained
+                />
+            </div>
+        </section>
+    @endif
 </x-layouts.public>

@@ -27,6 +27,15 @@ it('renders all Miftah public discovery pages without foundation placeholders', 
         '/gallery',
         '/contact',
         '/faq',
+    ] as $uri) {
+        $this->get($uri)
+            ->assertOk()
+            ->assertDontSee('Fondasi halaman')
+            ->assertDontSee('Implementasi penuh')
+            ->assertSee('data-chatbot-widget', false);
+    }
+
+    foreach ([
         '/reels',
         "/reels/{$reel->id}",
     ] as $uri) {
@@ -34,7 +43,7 @@ it('renders all Miftah public discovery pages without foundation placeholders', 
             ->assertOk()
             ->assertDontSee('Fondasi halaman')
             ->assertDontSee('Implementasi penuh')
-            ->assertSee('data-chatbot-widget', false);
+            ->assertDontSee('data-chatbot-widget', false);
     }
 });
 

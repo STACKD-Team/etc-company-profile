@@ -1,27 +1,30 @@
-<x-layouts.public title="Fasilitas">
-    @php($assetUrl = static fn (?string $path) => asset($path ?: 'images/pu1-img.jpg'))
+<x-layouts.public title="Fasilitas" navbar-active="about">
+    @php
+        $media = app(\App\Services\PublicDiscoveryService::class);
+        $assetUrl = static fn (?string $path) => $media->mediaUrl($path, 'images/pu1-img.jpg');
+    @endphp
 
-    <section class="bg-[#fff8f8] py-20">
-        <div class="mx-auto max-w-[1120px] px-5 lg:px-0">
-            <p class="font-heading text-sm font-black uppercase tracking-[0.18em] text-etc-magenta">Fasilitas</p>
-            <h1 class="mt-4 max-w-3xl font-heading text-[42px] font-black leading-tight text-etc-on-surface md:text-[56px]">Ruang belajar yang nyaman dan fokus</h1>
-            <p class="mt-5 max-w-2xl text-[16px] leading-8 text-etc-on-muted">Data fasilitas diambil dari CMS contents type room.</p>
+    <section class="public-section bg-etc-surface">
+        <div class="public-shell public-reveal" data-public-reveal>
+            <p class="public-eyebrow">Fasilitas</p>
+            <h1 class="public-title mt-4 max-w-3xl">Ruang belajar yang nyaman dan fokus</h1>
+            <p class="public-subtitle mt-5 max-w-2xl">Setiap ruang dirancang agar siswa nyaman berdiskusi, latihan speaking, dan fokus mengikuti kelas.</p>
         </div>
     </section>
 
-    <section class="bg-white py-20">
-        <div class="mx-auto max-w-[1120px] px-5 lg:px-0">
+    <section class="public-section bg-etc-surface-low">
+        <div class="public-shell">
             @if ($rooms->isNotEmpty())
-                <div class="grid gap-8 md:grid-cols-3">
+                <div class="grid gap-5 md:grid-cols-3">
                     @foreach ($rooms as $room)
-                        <article class="overflow-hidden rounded-[22px] border border-[#eeb8c9] bg-white shadow-soft">
+                        <article class="public-card overflow-hidden public-reveal" data-public-reveal>
                             <img src="{{ $assetUrl($room->image) }}" alt="{{ $room->title }}" class="h-56 w-full object-cover">
-                            <div class="p-6">
-                                <h2 class="font-heading text-2xl font-black text-etc-on-surface">{{ $room->title }}</h2>
+                            <div class="p-5">
+                                <h2 class="font-heading text-xl font-bold">{{ $room->title }}</h2>
                                 <p class="mt-3 min-h-20 text-sm leading-7 text-etc-on-muted">{{ $room->body }}</p>
                                 <div class="mt-5 flex flex-wrap gap-2">
                                     @foreach (($room->meta['facility'] ?? []) as $facility)
-                                        <span class="rounded-full bg-[#ffe6f3] px-3 py-1 font-heading text-xs font-bold text-etc-on-surface">{{ $facility }}</span>
+                                        <x-ui.badge color="gray">{{ $facility }}</x-ui.badge>
                                     @endforeach
                                 </div>
                                 @if ($room->meta['capacity'] ?? null)
@@ -35,11 +38,12 @@
                     @endforeach
                 </div>
             @else
-                <div class="rounded-[22px] border border-dashed border-[#eeb8c9] bg-[#fff8f8] p-10 text-center">
-                    <span class="material-symbols-outlined text-5xl text-etc-magenta">meeting_room</span>
-                    <h2 class="mt-4 font-heading text-2xl font-black text-etc-on-surface">Data fasilitas belum dipublish</h2>
-                    <p class="mt-3 text-etc-on-muted">Tambahkan content type room untuk menampilkan fasilitas.</p>
-                </div>
+                <x-ui.empty-state
+                    heading="Fasilitas belum tersedia"
+                    description="Informasi ruang belajar ETC Planet akan tampil di sini setelah siap."
+                    icon="heroicon-o-building-office-2"
+                    contained
+                />
             @endif
         </div>
     </section>
