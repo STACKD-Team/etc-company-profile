@@ -2,7 +2,7 @@
 
 <x-layouts.dashboard title="Data Enrollment" area="admin" active="enrollments">
     @if (session('status'))
-        <div class="mb-5 rounded-card border border-green-200 bg-green-50 px-5 py-4 font-heading text-sm font-bold text-green-700">{{ session('status') }}</div>
+        <x-ui.alert status="success" class="mb-5">{{ session('status') }}</x-ui.alert>
     @endif
 
     <x-ui.panel heading="Assign Siswa ke Kelas" description="Workflow manual tetap dipertahankan untuk Sprint 1.">

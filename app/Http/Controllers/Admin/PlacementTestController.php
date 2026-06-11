@@ -5,23 +5,55 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CourseClass;
 use App\Models\Registration;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PlacementTestController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $statuses = ['paid' => 'Paid', 'placement_test' => 'Placement Test', 'enrolled' => 'Enrolled'];
+        $sortMap = [
+            'created_at' => 'created_at',
+            'registration_code' => 'registration_code',
+            'applicant_name' => 'applicant_name',
+            'status' => 'status',
+            'placement_test_at' => 'placement_test_at',
+        ];
+        $sort = array_key_exists((string) $request->query('sort'), $sortMap) ? (string) $request->query('sort') : 'created_at';
+        $direction = in_array($request->query('direction'), ['asc', 'desc'], true) ? (string) $request->query('direction') : 'desc';
+
+        $items = Registration::query()
+            ->with('program')
+            ->whereIn('status', array_keys($statuses))
+            ->when($request->filled('search'), fn (Builder $query) => $query->where(function (Builder $query) use ($request): void {
+                $search = (string) $request->query('search');
+
+                $query->where('registration_code', 'like', '%'.$search.'%')
+                    ->orWhere('applicant_name', 'like', '%'.$search.'%')
+                    ->orWhere('applicant_email', 'like', '%'.$search.'%');
+            }))
+            ->when($request->filled('status') && array_key_exists((string) $request->query('status'), $statuses), fn (Builder $query) => $query->where('status', $request->query('status')))
+            ->orderBy($sortMap[$sort], $direction)
+            ->paginate(10)
+            ->withQueryString();
+
         return view('admin.rasky.index', [
             'title' => 'Placement Test',
             'active' => 'placement',
-            'items' => Registration::query()
-                ->with('program')
-                ->whereIn('status', ['paid', 'placement_test', 'enrolled'])
-                ->latest()
-                ->paginate(10),
-            'columns' => ['Kode', 'Nama', 'Program', 'Status', 'Jadwal'],
+            'items' => $items,
+            'columns' => [
+                'registration_code' => ['label' => 'Kode', 'sortable' => true],
+                'applicant_name' => ['label' => 'Nama', 'sortable' => true],
+                'program' => 'Program',
+                'status' => ['label' => 'Status', 'sortable' => true, 'filter' => ['type' => 'select', 'name' => 'status', 'options' => $statuses]],
+                'placement_test_at' => ['label' => 'Jadwal', 'sortable' => true],
+            ],
             'rowView' => 'admin.rasky.partials.placement-row',
             'empty' => 'Belum ada pendaftar yang masuk proses placement test.',
+            'emptyDescription' => 'Pendaftar paid, placement test, atau enrolled akan tampil di sini.',
+            'searchPlaceholder' => 'Cari kode, nama, atau email',
         ]);
     }
 

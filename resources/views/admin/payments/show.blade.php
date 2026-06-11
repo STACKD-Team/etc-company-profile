@@ -13,7 +13,7 @@
 
 <x-layouts.dashboard title="Detail Pembayaran" area="admin" active="payments">
     @if (session('status'))
-        <div class="mb-5 rounded-card border border-green-200 bg-green-50 px-5 py-4 font-heading text-sm font-bold text-green-700">{{ session('status') }}</div>
+        <x-ui.alert status="success" class="mb-5">{{ session('status') }}</x-ui.alert>
     @endif
 
     <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -33,11 +33,11 @@
             </x-ui.panel>
 
             <x-ui.panel heading="Ringkasan Pembayaran">
-                <dl class="grid gap-3 md:grid-cols-2">
+                <dl class="divide-y-2 divide-etc-outline-variant/60">
                     @foreach ($summary as $label => $value)
-                        <div class="rounded-lg bg-etc-surface p-4">
+                        <div class="grid gap-1 py-3 md:grid-cols-[150px_1fr] md:gap-4">
                             <dt class="font-heading text-xs font-bold uppercase text-etc-on-muted">{{ $label }}</dt>
-                            <dd class="mt-2 text-sm text-etc-on-surface">{{ $value }}</dd>
+                            <dd class="text-sm text-etc-on-surface">{{ $value }}</dd>
                         </div>
                     @endforeach
                 </dl>

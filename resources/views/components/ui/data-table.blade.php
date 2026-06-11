@@ -95,9 +95,24 @@
                     Reset
                 </x-ui.button>
             @endif
+
+            <div class="flex flex-wrap items-center gap-3">
+                @isset($actions)
+                    {{ $actions }}
+                @endisset
+
+                @if ($showSearch || $columnFilters->isNotEmpty())
+                    <x-ui.button
+                        :href="$resetUrl"
+                        outlined
+                        icon="heroicon-m-arrow-path"
+                    >
+                        Reset
+                    </x-ui.button>
+                @endif
+            </div>
         </div>
     </div>
-
     <input type="hidden" name="sort" value="{{ $sort }}">
     <input type="hidden" name="direction" value="{{ $direction }}">
     <input type="hidden" name="page" value="{{ request('page', 1) }}">

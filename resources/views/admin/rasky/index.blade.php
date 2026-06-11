@@ -1,44 +1,28 @@
 <x-layouts.dashboard :title="$title" area="admin" :active="$active ?? null">
     @if (session('status'))
-        <div class="mb-5 rounded-lg bg-etc-surface-container p-4 text-sm text-etc-on-surface">{{ session('status') }}</div>
+        <x-ui.alert status="success" class="mb-5">{{ session('status') }}</x-ui.alert>
     @endif
 
-    <section class="rounded-card border border-etc-outline-variant/60 bg-white p-6 shadow-soft">
+    @php
+        $tableColumns = collect($columns)->mapWithKeys(fn ($column, $key) => [is_string($key) ? $key : 'column_'.$key => $column])->all();
+    @endphp
+
+    <x-ui.data-table
+        :items="$items"
+        :columns="$tableColumns"
+        :row-view="$rowView"
+        :empty="$empty"
+        :empty-description="$emptyDescription ?? 'Data akan tampil setelah workflow terkait tersedia.'"
+        :search-placeholder="$searchPlaceholder ?? 'Cari data'"
+    >
         @if (! empty($actions ?? []))
-            <div class="mb-5 flex flex-wrap gap-3">
+            <x-slot:actions>
                 @foreach ($actions as $action)
-                    <x-ui.button :href="route($action['route'])" outlined size="sm">
+                    <x-ui.button :href="route($action['route'])" :icon="($action['icon'] ?? null) === 'add' ? 'heroicon-m-plus' : 'heroicon-m-arrow-down-tray'" outlined size="sm">
                         {{ $action['label'] }}
                     </x-ui.button>
                 @endforeach
-            </div>
+            </x-slot:actions>
         @endif
-
-        <div class="overflow-x-auto">
-            <table class="w-full min-w-[720px] text-left text-sm">
-                <thead>
-                    <tr class="border-b border-etc-outline-variant/60 text-xs uppercase text-etc-on-muted">
-                        @foreach ($columns as $column)
-                            <th class="py-3 pr-4 font-heading font-bold">{{ $column }}</th>
-                        @endforeach
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-etc-outline-variant/50">
-                    @forelse ($items as $item)
-                        @include($rowView, ['item' => $item])
-                    @empty
-                        <tr>
-                            <td colspan="{{ count($columns) }}" class="py-8">
-                                <x-ui.empty-state :heading="$empty" description="Data akan tampil setelah workflow terkait tersedia." icon="heroicon-o-archive-box" />
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        <div class="mt-5">
-            {{ $items->links() }}
-        </div>
-    </section>
+    </x-ui.data-table>
 </x-layouts.dashboard>

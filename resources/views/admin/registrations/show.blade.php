@@ -28,7 +28,7 @@
 
 <x-layouts.dashboard title="Detail Pendaftaran" area="admin" active="registrations">
     @if (session('status'))
-        <div class="mb-5 rounded-card border border-green-200 bg-green-50 px-5 py-4 font-heading text-sm font-bold text-green-700">{{ session('status') }}</div>
+        <x-ui.alert status="success" class="mb-5">{{ session('status') }}</x-ui.alert>
     @endif
 
     <div class="space-y-6">
@@ -50,11 +50,11 @@
         <div class="grid gap-6 xl:grid-cols-2">
             @foreach (['Identitas Pendaftar' => $identity, 'Program dan Jadwal' => $program, 'Pembayaran' => $payment, 'Placement dan Catatan' => $placement] as $heading => $items)
                 <x-ui.panel :heading="$heading">
-                    <dl class="grid gap-3 md:grid-cols-2">
+                    <dl class="divide-y-2 divide-etc-outline-variant/60">
                         @foreach ($items as $label => $value)
-                            <div class="rounded-lg bg-etc-surface p-4">
+                            <div class="grid gap-1 py-3 md:grid-cols-[150px_1fr] md:gap-4">
                                 <dt class="font-heading text-xs font-bold uppercase text-etc-on-muted">{{ $label }}</dt>
-                                <dd class="mt-2 whitespace-pre-line text-sm text-etc-on-surface">{{ $value }}</dd>
+                                <dd class="whitespace-pre-line text-sm text-etc-on-surface">{{ $value }}</dd>
                             </div>
                         @endforeach
                     </dl>

@@ -1,13 +1,30 @@
 @csrf
 @if ($program->exists) @method('PUT') @endif
+
+@php
+    $categories = ['english' => 'English', 'mandarin' => 'Mandarin', 'japanese' => 'Japanese', 'test_prep' => 'Test Prep', 'soft_skills' => 'Soft Skills', 'other' => 'Other'];
+    $types = ['regular' => 'Regular', 'private' => 'Private', 'one_on_one' => 'One on One'];
+    $targetAges = ['all' => 'All', 'kids' => 'Kids', 'teen' => 'Teen', 'adult' => 'Adult', 'university' => 'University'];
+@endphp
+
 <div class="grid gap-5 md:grid-cols-2">
-    @foreach (['name' => 'Nama', 'slug' => 'Slug', 'duration_meetings' => 'Jumlah Pertemuan', 'max_students' => 'Maks Siswa', 'price' => 'Harga Program', 'registration_fee' => 'Biaya Pendaftaran'] as $field => $label)
-        <label><span class="font-heading text-sm font-bold">{{ $label }}</span><input name="{{ $field }}" value="{{ old($field, $program->{$field}) }}" class="mt-2 w-full rounded-xl border border-etc-outline-variant px-4 py-3 text-sm">@error($field)<span class="text-xs text-red-600">{{ $message }}</span>@enderror</label>
-    @endforeach
-    <label><span class="font-heading text-sm font-bold">Kategori</span><select name="category" class="mt-2 w-full rounded-xl border border-etc-outline-variant px-4 py-3 text-sm">@foreach (['english','mandarin','japanese','test_prep','soft_skills','other'] as $option)<option value="{{ $option }}" @selected(old('category', $program->category ?: 'english') === $option)>{{ $option }}</option>@endforeach</select></label>
-    <label><span class="font-heading text-sm font-bold">Tipe</span><select name="type" class="mt-2 w-full rounded-xl border border-etc-outline-variant px-4 py-3 text-sm">@foreach (['regular','private','one_on_one'] as $option)<option value="{{ $option }}" @selected(old('type', $program->type ?: 'regular') === $option)>{{ $option }}</option>@endforeach</select></label>
-    <label><span class="font-heading text-sm font-bold">Target Usia</span><select name="target_age" class="mt-2 w-full rounded-xl border border-etc-outline-variant px-4 py-3 text-sm">@foreach (['all','kids','teen','adult','university'] as $option)<option value="{{ $option }}" @selected(old('target_age', $program->target_age ?: 'all') === $option)>{{ $option }}</option>@endforeach</select></label>
-    <label class="flex items-center gap-2 pt-8"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $program->is_active ?? true))><span class="font-heading text-sm font-bold">Aktif</span></label>
-    <label class="md:col-span-2"><span class="font-heading text-sm font-bold">Deskripsi</span><textarea name="description" rows="4" class="mt-2 w-full rounded-xl border border-etc-outline-variant px-4 py-3 text-sm">{{ old('description', $program->description) }}</textarea></label>
+    <x-ui.field name="name" label="Nama" :value="$program->name" required />
+    <x-ui.field name="slug" label="Slug" :value="$program->slug" required />
+    <x-ui.number-field name="duration_meetings" label="Jumlah Pertemuan" :value="$program->duration_meetings" min="1" />
+    <x-ui.number-field name="max_students" label="Maks Siswa" :value="$program->max_students" min="1" />
+    <x-ui.currency-field name="price" label="Harga Program" :value="$program->price" required />
+    <x-ui.currency-field name="registration_fee" label="Biaya Pendaftaran" :value="$program->registration_fee" required />
+    <x-ui.select name="category" label="Kategori" :value="$program->category ?: 'english'" :options="$categories" required />
+    <x-ui.select name="type" label="Tipe" :value="$program->type ?: 'regular'" :options="$types" required />
+    <x-ui.select name="target_age" label="Target Usia" :value="$program->target_age ?: 'all'" :options="$targetAges" />
+    <div class="md:col-span-2">
+        <x-ui.checkbox name="is_active" label="Aktif" helper="Program aktif bisa ditampilkan dan dipilih calon siswa." :checked="(bool) ($program->is_active ?? true)" />
+    </div>
+    <div class="md:col-span-2">
+        <x-ui.textarea name="description" label="Deskripsi" rows="4" :value="$program->description" />
+    </div>
 </div>
-<button class="mt-6 rounded-pill bg-etc-magenta px-5 py-3 font-heading text-sm font-bold text-white">Simpan</button>
+<div class="mt-6 flex flex-wrap gap-3">
+    <x-ui.button type="submit" icon="heroicon-m-check">Simpan</x-ui.button>
+    <x-ui.button :href="route('admin.programs.index')" outlined color="gray">Batal</x-ui.button>
+</div>

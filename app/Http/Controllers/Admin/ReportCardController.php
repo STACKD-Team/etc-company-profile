@@ -10,19 +10,34 @@ use App\Models\User;
 use App\Services\DocumentExportService;
 use App\Services\ReportCardService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ReportCardController extends Controller
 {
-    public function index(ReportCardService $reportCards): View
+    public function index(Request $request, ReportCardService $reportCards): View
     {
+        $filters = $request->only(['search', 'issued_from', 'issued_to', 'sort', 'direction']);
+
+        if ($request->filled('is_published')) {
+            $filters['is_published'] = $request->boolean('is_published');
+        }
+
         return view('admin.rasky.index', [
             'title' => 'Rapor',
             'active' => 'reports',
-            'items' => $reportCards->paginate([], 10),
-            'columns' => ['Siswa', 'Kelas', 'Total', 'Status', 'Terbit'],
+            'items' => $reportCards->adminPaginate($filters, 10),
+            'columns' => [
+                'student' => 'Siswa',
+                'class' => 'Kelas',
+                'total_score' => ['label' => 'Total', 'sortable' => true],
+                'is_published' => ['label' => 'Status', 'sortable' => true, 'filter' => ['type' => 'select', 'name' => 'is_published', 'options' => ['1' => 'Published', '0' => 'Draft']]],
+                'issued_at' => ['label' => 'Terbit', 'sortable' => true, 'filter' => ['type' => 'date', 'name' => 'issued_from']],
+            ],
             'rowView' => 'admin.rasky.partials.report-card-row',
             'empty' => 'Belum ada rapor.',
+            'emptyDescription' => 'Rapor akan tampil setelah dibuat dari enrollment siswa.',
+            'searchPlaceholder' => 'Cari siswa atau kelas',
             'actions' => [
                 ['label' => 'Buat Rapor', 'route' => 'admin.report-cards.create', 'icon' => 'add'],
                 ['label' => 'Export Rapor', 'route' => 'admin.exports.report-cards', 'icon' => 'download'],

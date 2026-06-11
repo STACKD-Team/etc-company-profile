@@ -1,11 +1,27 @@
 @csrf
 @if ($class->exists) @method('PUT') @endif
+
+@php
+    $programOptions = $programs->pluck('name', 'id')->all();
+    $instructorOptions = $instructors->mapWithKeys(fn ($instructor) => [$instructor->id => $instructor->full_name ?? $instructor->name])->all();
+    $statuses = ['upcoming' => 'Upcoming', 'ongoing' => 'Ongoing', 'completed' => 'Completed', 'cancelled' => 'Cancelled'];
+    $dateValue = static function ($value): ?string {
+        return $value instanceof \Carbon\CarbonInterface ? $value->format('Y-m-d') : $value;
+    };
+@endphp
+
 <div class="grid gap-5 md:grid-cols-2">
-    <label><span class="font-heading text-sm font-bold">Program</span><select name="program_id" class="mt-2 w-full rounded-xl border border-etc-outline-variant px-4 py-3 text-sm">@foreach ($programs as $program)<option value="{{ $program->id }}" @selected(old('program_id', $class->program_id) == $program->id)>{{ $program->name }}</option>@endforeach</select></label>
-    <label><span class="font-heading text-sm font-bold">Instruktur</span><select name="instructor_id" class="mt-2 w-full rounded-xl border border-etc-outline-variant px-4 py-3 text-sm"><option value="">Belum ditentukan</option>@foreach ($instructors as $instructor)<option value="{{ $instructor->id }}" @selected(old('instructor_id', $class->instructor_id) == $instructor->id)>{{ $instructor->full_name ?? $instructor->name }}</option>@endforeach</select></label>
-    @foreach (['name' => 'Nama Kelas', 'schedule_days' => 'Hari', 'schedule_time' => 'Jam', 'room' => 'Ruangan', 'start_date' => 'Tanggal Mulai', 'end_date' => 'Tanggal Selesai'] as $field => $label)
-        <label><span class="font-heading text-sm font-bold">{{ $label }}</span><input name="{{ $field }}" type="{{ str_contains($field, 'date') ? 'date' : 'text' }}" value="{{ old($field, optional($class->{$field})->format('Y-m-d') ?? $class->{$field}) }}" class="mt-2 w-full rounded-xl border border-etc-outline-variant px-4 py-3 text-sm">@error($field)<span class="text-xs text-red-600">{{ $message }}</span>@enderror</label>
-    @endforeach
-    <label><span class="font-heading text-sm font-bold">Status</span><select name="status" class="mt-2 w-full rounded-xl border border-etc-outline-variant px-4 py-3 text-sm">@foreach (['upcoming','ongoing','completed','cancelled'] as $option)<option value="{{ $option }}" @selected(old('status', $class->status ?: 'upcoming') === $option)>{{ $option }}</option>@endforeach</select></label>
+    <x-ui.select name="program_id" label="Program" :value="$class->program_id" :options="$programOptions" required />
+    <x-ui.select name="instructor_id" label="Instruktur" :value="$class->instructor_id" placeholder="Belum ditentukan" :options="$instructorOptions" />
+    <x-ui.field name="name" label="Nama Kelas" :value="$class->name" required />
+    <x-ui.field name="schedule_days" label="Hari" :value="$class->schedule_days" />
+    <x-ui.field name="schedule_time" label="Jam" :value="$class->schedule_time" />
+    <x-ui.field name="room" label="Ruangan" :value="$class->room" />
+    <x-ui.date-picker name="start_date" label="Tanggal Mulai" :value="$dateValue($class->start_date)" />
+    <x-ui.date-picker name="end_date" label="Tanggal Selesai" :value="$dateValue($class->end_date)" />
+    <x-ui.select name="status" label="Status" :value="$class->status ?: 'upcoming'" :options="$statuses" required />
 </div>
-<button class="mt-6 rounded-pill bg-etc-magenta px-5 py-3 font-heading text-sm font-bold text-white">Simpan</button>
+<div class="mt-6 flex flex-wrap gap-3">
+    <x-ui.button type="submit" icon="heroicon-m-check">Simpan</x-ui.button>
+    <x-ui.button :href="route('admin.classes.index')" outlined color="gray">Batal</x-ui.button>
+</div>

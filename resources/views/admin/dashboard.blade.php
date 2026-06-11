@@ -8,41 +8,37 @@
             ['label' => 'Pendapatan Terverifikasi', 'value' => 'Rp '.number_format($summary['paid_revenue'], 0, ',', '.'), 'icon' => 'payments', 'tone' => 'text-emerald-700'],
             ['label' => 'Kelas Aktif', 'value' => number_format($summary['active_classes_count']), 'icon' => 'meeting_room', 'tone' => 'text-etc-magenta'],
         ] as $stat)
-            <article class="rounded-card border border-etc-outline-variant/60 bg-white p-5 shadow-soft">
+            <x-ui.panel compact class="h-full transition hover:-translate-y-0.5">
                 <div class="flex items-start justify-between gap-4">
                     <div>
                         <p class="font-heading text-xs font-bold uppercase text-etc-on-muted">{{ $stat['label'] }}</p>
                         <p class="mt-3 font-heading text-3xl font-black text-etc-on-surface">{{ $stat['value'] }}</p>
                     </div>
-                    <span class="material-symbols-outlined rounded-full bg-etc-surface-container p-3 text-2xl {{ $stat['tone'] }}">{{ $stat['icon'] }}</span>
+                    <span class="material-symbols-outlined rounded-selector bg-etc-surface-container p-2 text-2xl {{ $stat['tone'] }}">{{ $stat['icon'] }}</span>
                 </div>
-            </article>
+            </x-ui.panel>
         @endforeach
     </div>
 
-    <section class="mt-6 rounded-card border border-etc-outline-variant/60 bg-white p-6 shadow-soft">
-        <div class="mb-5 flex flex-col justify-between gap-3 md:flex-row md:items-center">
-            <div>
-                <h2 class="font-heading text-xl font-black text-etc-on-surface">Pendaftaran Terbaru</h2>
-                <p class="mt-1 text-sm text-etc-on-muted">Data diambil dari tabel registrations.</p>
-            </div>
+    <x-ui.panel heading="Pendaftaran Terbaru" description="Data diambil dari tabel registrations." class="mt-6">
+        <x-slot:actions>
             <x-ui.button :href="\Illuminate\Support\Facades\Route::has('admin.registrations.index') ? route('admin.registrations.index') : '#'" outlined size="sm">
                 Lihat Semua
             </x-ui.button>
-        </div>
+        </x-slot:actions>
 
-        <div class="overflow-x-auto">
+        <div class="etc-data-table-scroll overflow-x-auto">
             <table class="w-full min-w-[720px] text-left text-sm">
                 <thead>
-                    <tr class="border-b border-etc-outline-variant/60 text-xs uppercase text-etc-on-muted">
-                        <th class="py-3 pr-4 font-heading font-bold">Kode</th>
-                        <th class="py-3 pr-4 font-heading font-bold">Nama</th>
-                        <th class="py-3 pr-4 font-heading font-bold">Program</th>
-                        <th class="py-3 pr-4 font-heading font-bold">Status</th>
-                        <th class="py-3 font-heading font-bold">Tanggal</th>
+                    <tr class="border-b-2 border-etc-outline-variant/60 text-xs uppercase text-etc-on-muted">
+                        <th class="pb-3 pr-4 font-heading font-bold">Kode</th>
+                        <th class="pb-3 pr-4 font-heading font-bold">Nama</th>
+                        <th class="pb-3 pr-4 font-heading font-bold">Program</th>
+                        <th class="pb-3 pr-4 font-heading font-bold">Status</th>
+                        <th class="pb-3 font-heading font-bold">Tanggal</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-etc-outline-variant/50">
+                <tbody class="divide-y-2 divide-etc-outline-variant/60">
                     @forelse ($latestRegistrations as $registration)
                         <tr>
                             <td class="py-4 pr-4 font-heading font-bold text-etc-on-surface">{{ $registration->registration_code }}</td>
@@ -67,5 +63,5 @@
                 </tbody>
             </table>
         </div>
-    </section>
+    </x-ui.panel>
 </x-layouts.dashboard>

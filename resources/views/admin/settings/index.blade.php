@@ -10,7 +10,7 @@
     @endphp
 
     @if (session('status'))
-        <div class="mb-5 rounded-card border border-green-200 bg-green-50 px-5 py-4 font-heading text-sm font-bold text-green-700">{{ session('status') }}</div>
+        <x-ui.alert status="success" class="mb-5">{{ session('status') }}</x-ui.alert>
     @endif
 
     <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data" class="grid gap-6 lg:grid-cols-[1fr_320px]">
@@ -46,11 +46,11 @@
 
         <aside class="space-y-5">
             <x-ui.panel heading="QRIS" description="Preview QRIS untuk pembayaran manual.">
-                <div class="overflow-hidden rounded-2xl bg-white p-3 ring-1 ring-etc-outline-variant">
+                <div class="overflow-hidden rounded-box border-2 border-etc-outline-variant/60 bg-etc-surface p-3">
                     @if ($qrisUrl)
-                        <img src="{{ $qrisUrl }}" alt="QRIS ETC Planet" class="aspect-square w-full rounded-xl object-contain">
+                        <img src="{{ $qrisUrl }}" alt="QRIS ETC Planet" class="aspect-square w-full rounded-selector object-contain">
                     @else
-                        <div class="flex aspect-square items-center justify-center rounded-xl bg-etc-surface-container text-etc-magenta">
+                        <div class="flex aspect-square items-center justify-center rounded-selector bg-etc-surface-container text-etc-magenta">
                             <span class="material-symbols-outlined text-6xl">qr_code_2</span>
                         </div>
                     @endif

@@ -10,12 +10,12 @@
                 <x-ui.badge :status="$instructor->show_on_team_page ? 'published' : 'draft'">{{ $instructor->show_on_team_page ? 'Tampil di Team' : 'Internal' }}</x-ui.badge>
             </div>
 
-            <div class="mt-6 grid gap-4 md:grid-cols-2">
-                <div class="rounded-lg bg-etc-surface p-4">
+            <div class="mt-6 grid gap-x-6 border-t-2 border-etc-outline-variant/60 md:grid-cols-2">
+                <div class="border-b-2 border-etc-outline-variant/60 py-4">
                     <p class="font-heading text-xs font-bold uppercase text-etc-on-muted">Posisi</p>
                     <p class="mt-2 text-sm text-etc-on-surface">{{ $instructor->instructor_position ?: '-' }}</p>
                 </div>
-                <div class="rounded-lg bg-etc-surface p-4">
+                <div class="border-b-2 border-etc-outline-variant/60 py-4">
                     <p class="font-heading text-xs font-bold uppercase text-etc-on-muted">Bio</p>
                     <p class="mt-2 text-sm leading-6 text-etc-on-surface">{{ $instructor->instructor_bio ?: 'Belum ada bio.' }}</p>
                 </div>

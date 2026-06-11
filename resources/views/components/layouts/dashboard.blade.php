@@ -137,14 +137,16 @@
                                 >
                                     <form method="POST" action="{{ route('auth.logout') }}">
                                         @csrf
-                                        <button
+                                        <x-ui.button
                                             type="submit"
-                                            class="flex min-h-8 w-full items-center gap-2 px-3 py-2 text-left font-heading text-sm font-bold text-red-700 hover:bg-red-50"
+                                            color="danger"
+                                            outlined
+                                            icon="heroicon-m-arrow-right-start-on-rectangle"
+                                            class="w-full justify-start"
                                             role="menuitem"
                                         >
-                                            {{ \Filament\Support\generate_icon_html('heroicon-m-arrow-right-start-on-rectangle', attributes: new \Illuminate\View\ComponentAttributeBag(['class' => 'shrink-0'])) }}
                                             Logout
-                                        </button>
+                                        </x-ui.button>
                                     </form>
                                 </div>
                             @endif
