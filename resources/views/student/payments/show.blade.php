@@ -22,29 +22,29 @@
                 </div>
 
                 @if ($isWaiting)
-                    <div class="mb-6 rounded-card border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                    <x-ui.alert status="warning" title="Menunggu pembayaran" class="mb-6">
                         Pembayaran masih menunggu konfirmasi. Jika pembayaran online sudah aktif, tombol lanjutkan pembayaran akan tersedia dari token/URL Midtrans.
-                    </div>
+                    </x-ui.alert>
                 @endif
 
                 <dl class="grid gap-4 md:grid-cols-2">
-                    <div class="rounded-card bg-etc-surface-low p-4">
+                    <div class="rounded-box bg-etc-surface-container p-4">
                         <dt class="font-heading text-xs font-bold uppercase text-etc-on-muted">Metode</dt>
                         <dd class="mt-2 text-sm font-semibold text-etc-on-surface">{{ $methods[$payment->payment_method] ?? ($payment->payment_method ?? '-') }}</dd>
                     </div>
-                    <div class="rounded-card bg-etc-surface-low p-4">
+                    <div class="rounded-box bg-etc-surface-container p-4">
                         <dt class="font-heading text-xs font-bold uppercase text-etc-on-muted">Status</dt>
                         <dd class="mt-2 text-sm font-semibold text-etc-on-surface">{{ $statusLabel }}</dd>
                     </div>
-                    <div class="rounded-card bg-etc-surface-low p-4">
+                    <div class="rounded-box bg-etc-surface-container p-4">
                         <dt class="font-heading text-xs font-bold uppercase text-etc-on-muted">Tanggal Daftar</dt>
                         <dd class="mt-2 text-sm font-semibold text-etc-on-surface">{{ $payment->created_at?->format('d M Y H:i') ?? '-' }}</dd>
                     </div>
-                    <div class="rounded-card bg-etc-surface-low p-4">
+                    <div class="rounded-box bg-etc-surface-container p-4">
                         <dt class="font-heading text-xs font-bold uppercase text-etc-on-muted">Dibayar Pada</dt>
                         <dd class="mt-2 text-sm font-semibold text-etc-on-surface">{{ $payment->paid_at?->format('d M Y H:i') ?? '-' }}</dd>
                     </div>
-                    <div class="rounded-card bg-etc-surface-low p-4 md:col-span-2">
+                    <div class="rounded-box bg-etc-surface-container p-4 md:col-span-2">
                         <dt class="font-heading text-xs font-bold uppercase text-etc-on-muted">Catatan</dt>
                         <dd class="mt-2 whitespace-pre-line text-sm text-etc-on-surface">{{ $payment->notes ?? '-' }}</dd>
                     </div>
@@ -81,7 +81,7 @@
                     <div class="border-t border-etc-outline-variant/60 pt-3">
                         <div class="flex justify-between gap-3">
                             <dt class="font-heading font-bold text-etc-on-surface">Nominal akhir</dt>
-                            <dd class="font-heading text-xl font-black text-etc-magenta">{{ $finalAmount > 0 ? 'Rp '.number_format($finalAmount, 0, ',', '.') : '-' }}</dd>
+                            <dd class="font-heading text-xl font-bold text-etc-magenta">{{ $finalAmount > 0 ? 'Rp '.number_format($finalAmount, 0, ',', '.') : '-' }}</dd>
                         </div>
                     </div>
                 </dl>

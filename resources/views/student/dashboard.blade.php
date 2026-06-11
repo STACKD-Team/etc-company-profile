@@ -1,12 +1,4 @@
 @php
-    $sidebarItems = [
-        ['label' => 'Dashboard', 'route' => 'student.dashboard', 'url' => '#', 'key' => 'dashboard', 'svg' => 'nav-dashboard'],
-        ['label' => 'Profil Saya', 'route' => 'student.profile.show', 'url' => '#', 'key' => 'profile', 'svg' => 'nav-profile'],
-        ['label' => 'Kelas Saya', 'route' => 'student.classes.index', 'url' => '#', 'key' => 'classes', 'svg' => 'nav-class'],
-        ['label' => 'Rapor', 'route' => 'student.report-cards.index', 'url' => '#', 'key' => 'reports', 'svg' => 'nav-report'],
-        ['label' => 'Riwayat Pembayaran', 'route' => 'student.payments.index', 'url' => '#', 'key' => 'payments', 'svg' => 'nav-payment'],
-    ];
-
     $displayName = $student->full_name ?? $student->name;
     $courseName = $activeProgram?->name ?? 'Belum ada kelas aktif';
     $className = $activeCourseClass?->name ? "{$activeProgram?->name} - {$activeCourseClass->name}" : $courseName;
@@ -41,37 +33,38 @@
     ];
 @endphp
 
-<x-layouts.dashboard title="Dashboard Siswa" area="student" active="dashboard" :user="$student" :sidebar-items="$sidebarItems">
-    <x-slot:sidebarActions>
-        <x-ui.button :href="route('student.help.index')" outlined icon="heroicon-m-question-mark-circle" class="w-full">
-            Bantuan
-        </x-ui.button>
-    </x-slot:sidebarActions>
-
+<x-layouts.dashboard title="Dashboard Siswa" area="student" active="dashboard" :user="$student">
     <div data-student-dashboard-page class="space-y-6">
-        <section class="rounded-card bg-etc-charcoal p-6 text-white shadow-panel md:p-8">
-            <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-end">
+        <section class="overflow-hidden rounded-box bg-etc-charcoal p-6 text-etc-surface shadow-panel md:p-8">
+            <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-end">
                 <div>
-                    <p class="font-heading text-xs font-bold uppercase text-white/60">Student Portal</p>
-                    <h2 class="mt-3 font-heading text-3xl font-black">Halo, {{ $displayName }}!</h2>
-                    <p class="mt-2 max-w-2xl text-sm leading-6 text-white/75">Pantau kelas, pembayaran, riwayat belajar, dan rapor dari satu tempat.</p>
+                    <p class="font-heading text-xs font-bold uppercase text-etc-surface/60">Student Portal</p>
+                    <h2 class="mt-3 font-heading text-3xl font-bold md:text-4xl">Halo, {{ $displayName }}!</h2>
+                    <p class="mt-2 max-w-2xl text-sm leading-6 text-etc-surface/75">Pantau kelas, pembayaran, riwayat belajar, dan rapor dari satu tempat yang ringkas.</p>
                 </div>
-                <div class="rounded-card bg-white/10 p-4">
-                    <p class="text-xs font-bold uppercase text-white/60">Status hari ini</p>
-                    <p class="mt-2 font-heading text-xl font-bold">{{ $currentEnrollment ? 'Kelas aktif tersedia' : 'Menunggu penempatan kelas' }}</p>
-                    <p class="mt-1 text-sm text-white/70">{{ $currentEnrollment ? $className : 'Admin akan memperbarui dashboard setelah proses pendaftaran selesai.' }}</p>
+                <div class="rounded-box border-2 border-etc-surface/15 bg-etc-surface/10 p-4 shadow-soft">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-xs font-bold uppercase text-etc-surface/60">Status hari ini</p>
+                            <p class="mt-2 font-heading text-lg font-bold">{{ $currentEnrollment ? 'Kelas aktif tersedia' : 'Menunggu penempatan kelas' }}</p>
+                        </div>
+                        <x-ui.badge :status="$currentEnrollment?->status ?? 'waiting_payment'" size="sm">
+                            {{ $currentEnrollment ? str($currentEnrollment->status)->headline() : 'Belum Aktif' }}
+                        </x-ui.badge>
+                    </div>
+                    <p class="mt-2 text-sm leading-6 text-etc-surface/70">{{ $currentEnrollment ? $className : 'Admin akan memperbarui dashboard setelah proses pendaftaran selesai.' }}</p>
                 </div>
             </div>
         </section>
 
         <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Ringkasan progres belajar">
             @foreach ($statCards as $card)
-                <article class="student-stat-card rounded-card bg-white p-5 shadow-soft" data-stat-card>
-                    <span class="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-etc-surface-low">
+                <article class="student-reveal rounded-box border-2 border-etc-outline-variant bg-etc-surface p-5 shadow-soft" data-reveal-card>
+                    <span class="mb-5 flex h-12 w-12 items-center justify-center rounded-selector bg-etc-surface-container">
                         <x-ui.icon :name="$card['icon']" class="h-6 w-6" />
                     </span>
-                    <p class="text-sm font-semibold text-etc-on-muted">{{ $card['label'] }}</p>
-                    <strong class="mt-2 block font-heading text-3xl font-black text-etc-on-surface" data-stat-value>{{ $card['value'] }}</strong>
+                    <p class="text-sm text-etc-on-muted">{{ $card['label'] }}</p>
+                    <strong class="mt-2 block font-heading text-3xl font-bold text-etc-on-surface" data-stat-value>{{ $card['value'] }}</strong>
                 </article>
             @endforeach
         </section>
@@ -81,7 +74,7 @@
                 <x-ui.panel heading="Kelas Berlangsung" description="Kelas aktif dan progres belajar terbaru.">
                     @if ($currentEnrollment)
                         <div class="grid gap-5 lg:grid-cols-[260px_minmax(0,1fr)]">
-                            <div class="relative min-h-56 overflow-hidden rounded-card bg-etc-surface-container">
+                            <div class="relative min-h-56 overflow-hidden rounded-box bg-etc-surface-container shadow-soft">
                                 <img src="{{ asset('images/foto_english_student.jpg') }}" alt="Siswa belajar bahasa" class="h-full w-full object-cover">
                                 <div class="absolute left-4 top-4">
                                     <x-ui.badge :status="$currentEnrollment->status">{{ str($currentEnrollment->status)->headline() }}</x-ui.badge>
@@ -92,11 +85,11 @@
                                 <p class="mt-3 text-sm leading-6 text-etc-on-muted">{{ $activeProgram?->description ?? 'Detail kelas akan diperbarui oleh admin.' }}</p>
 
                                 <dl class="mt-5 grid gap-3 sm:grid-cols-2">
-                                    <div class="rounded-card bg-etc-surface-low p-4">
+                                    <div class="rounded-box bg-etc-surface-container p-4">
                                         <dt class="text-xs font-bold uppercase text-etc-on-muted">Instruktur</dt>
                                         <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $instructorName }}</dd>
                                     </div>
-                                    <div class="rounded-card bg-etc-surface-low p-4">
+                                    <div class="rounded-box bg-etc-surface-container p-4">
                                         <dt class="text-xs font-bold uppercase text-etc-on-muted">Jadwal</dt>
                                         <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $schedule }}</dd>
                                     </div>
@@ -140,7 +133,7 @@
                                 $historyClass = $enrollment->courseClass;
                                 $historyReport = $enrollment->reportCard;
                             @endphp
-                            <div class="flex flex-col gap-3 rounded-card border border-etc-outline-variant/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+                            <article class="student-reveal flex flex-col gap-3 rounded-box border-2 border-etc-outline-variant bg-etc-surface p-4 shadow-soft sm:flex-row sm:items-center sm:justify-between" data-reveal-card>
                                 <div class="min-w-0">
                                     <div class="flex flex-wrap items-center gap-2">
                                         <x-ui.badge :status="$enrollment->status">{{ str($enrollment->status)->headline() }}</x-ui.badge>
@@ -152,7 +145,7 @@
                                     <p class="mt-1 text-xs text-etc-on-muted">{{ $enrollment->enrolled_at?->format('d M Y') ?? '-' }} sampai {{ $enrollment->completed_at?->format('d M Y') ?? 'sekarang' }}</p>
                                 </div>
                                 <x-ui.button :href="route('student.learning-history.index')" outlined size="sm">Lihat</x-ui.button>
-                            </div>
+                            </article>
                         @empty
                             <x-ui.empty-state heading="Belum ada riwayat belajar" description="Riwayat akan tampil setelah siswa masuk kelas." icon="heroicon-o-clock" />
                         @endforelse
@@ -171,9 +164,9 @@
                                 </div>
                                 <x-ui.badge :status="$latestPayment->status">{{ $paymentLabel }}</x-ui.badge>
                             </div>
-                            <div class="rounded-card bg-etc-surface-low p-4">
+                            <div class="rounded-box bg-etc-surface-container p-4">
                                 <p class="text-xs font-bold uppercase text-etc-on-muted">Nominal Akhir</p>
-                                <p class="mt-1 font-heading text-2xl font-black text-etc-on-surface">{{ $paymentAmount }}</p>
+                                <p class="mt-1 font-heading text-2xl font-bold text-etc-on-surface">{{ $paymentAmount }}</p>
                             </div>
                             <x-ui.button :href="route('student.payments.show', $latestPayment)" class="w-full" icon="heroicon-m-credit-card">
                                 Detail Pembayaran
@@ -187,11 +180,11 @@
                 <x-ui.panel heading="Rapor Terbaru" description="Hanya rapor yang sudah dipublikasikan admin.">
                     @if ($latestReport)
                         <div class="space-y-4">
-                            <div class="rounded-card bg-etc-surface-low p-4">
+                            <div class="rounded-box bg-etc-surface-container p-4">
                                 <p class="font-heading text-sm font-bold text-etc-on-surface">{{ $latestReportClass?->program?->name ?? 'Program ETC Planet' }}</p>
                                 <p class="mt-1 text-sm text-etc-on-muted">{{ $latestReportClass?->name ?? 'Kelas ETC' }} - {{ $latestReport->issued_at?->format('d M Y') ?? 'Tanggal belum tersedia' }}</p>
                                 <p class="mt-4 text-xs font-bold uppercase text-etc-on-muted">Nilai Akhir</p>
-                                <p class="mt-1 font-heading text-3xl font-black text-etc-magenta">{{ $latestReport->final_grade ?? '-' }}</p>
+                                <p class="mt-1 font-heading text-3xl font-bold text-etc-magenta">{{ $latestReport->final_grade ?? '-' }}</p>
                             </div>
                             <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                                 <x-ui.button :href="route('student.report-cards.show', $latestReport)" icon="heroicon-m-eye">Lihat Rapor</x-ui.button>
@@ -206,11 +199,11 @@
                 </x-ui.panel>
 
                 <x-ui.panel heading="Bantuan Siswa" description="Butuh bantuan tentang kelas, pembayaran, atau rapor?">
-                    <div class="rounded-card bg-etc-charcoal p-4 text-white">
+                    <div class="rounded-box bg-etc-charcoal p-4 text-etc-surface shadow-soft">
                         <p class="font-heading text-sm font-bold">Chatbot bantuan</p>
-                        <p class="mt-2 text-sm leading-6 text-white/70">Kirim pertanyaan melalui halaman bantuan. Untuk saat ini admin akan membantu dari kategori yang tersedia.</p>
+                        <p class="mt-2 text-sm leading-6 text-etc-surface/70">Kirim pertanyaan melalui halaman bantuan. Untuk saat ini admin akan membantu dari kategori yang tersedia.</p>
                     </div>
-                    <x-ui.button :href="route('student.help.index')" class="mt-4 w-full" outlined icon="heroicon-m-chat-bubble-left-right">
+                    <x-ui.button href="#" class="mt-4 w-full" outlined icon="heroicon-m-chat-bubble-left-right" data-dashboard-action="Buka halaman Bantuan dari menu saat tersedia untuk tindak lanjut.">
                         Buka Bantuan
                     </x-ui.button>
                 </x-ui.panel>

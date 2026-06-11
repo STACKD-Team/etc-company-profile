@@ -17,9 +17,9 @@
         <x-ui.panel heading="Kelas Saya" description="Kelas dipisahkan berdasarkan status agar mudah dipantau siswa dan orang tua.">
             <div class="grid gap-4 md:grid-cols-3">
                 @foreach ($groupedEnrollments as $status => $items)
-                    <div class="rounded-card bg-etc-surface-low p-4">
+                    <div class="rounded-box border-2 border-etc-outline-variant bg-etc-surface p-4 shadow-soft">
                         <p class="text-xs font-bold uppercase text-etc-on-muted">{{ $statusLabels[$status] }}</p>
-                        <p class="mt-2 font-heading text-3xl font-black text-etc-on-surface">{{ $items->count() }}</p>
+                        <p class="mt-2 font-heading text-3xl font-bold text-etc-on-surface">{{ $items->count() }}</p>
                     </div>
                 @endforeach
             </div>
@@ -30,7 +30,7 @@
                 <div class="grid gap-4">
                     @forelse ($items as $enrollment)
                         @php($class = $enrollment->courseClass)
-                        <article class="rounded-card border border-etc-outline-variant/70 bg-white p-5">
+                        <article class="student-reveal rounded-box border-2 border-etc-outline-variant bg-etc-surface p-5 shadow-soft" data-reveal-card>
                             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                                 <div class="min-w-0">
                                     <div class="flex flex-wrap items-center gap-2">

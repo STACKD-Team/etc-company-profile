@@ -3,7 +3,7 @@
         <div class="grid gap-5 md:grid-cols-2">
             @forelse ($reportCards as $reportCard)
                 @php($class = $reportCard->enrollment?->courseClass)
-                <article class="rounded-card border border-etc-outline-variant/70 bg-white p-6">
+                <article class="student-reveal rounded-box border-2 border-etc-outline-variant bg-etc-surface p-6 shadow-soft" data-reveal-card>
                     <div class="flex flex-wrap items-center gap-2">
                         <x-ui.badge status="published">Published</x-ui.badge>
                         <x-ui.badge status="success">Nilai {{ $reportCard->final_grade ?? '-' }}</x-ui.badge>
@@ -13,11 +13,11 @@
                     <p class="mt-2 text-sm text-etc-on-muted">{{ $class?->name ?? 'Kelas ETC' }} - {{ $class?->instructor?->full_name ?? $class?->instructor?->name ?? 'Instruktur belum ditentukan' }}</p>
 
                     <dl class="mt-5 grid grid-cols-2 gap-3">
-                        <div class="rounded-card bg-etc-surface-low p-4">
+                        <div class="rounded-box bg-etc-surface-container p-4">
                             <dt class="text-xs font-bold uppercase text-etc-on-muted">Total Score</dt>
-                            <dd class="mt-1 font-heading text-2xl font-black text-etc-magenta">{{ $reportCard->total_score ?? '-' }}</dd>
+                            <dd class="mt-1 font-heading text-2xl font-bold text-etc-magenta">{{ $reportCard->total_score ?? '-' }}</dd>
                         </div>
-                        <div class="rounded-card bg-etc-surface-low p-4">
+                        <div class="rounded-box bg-etc-surface-container p-4">
                             <dt class="text-xs font-bold uppercase text-etc-on-muted">Next Class</dt>
                             <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $reportCard->next_class ?? '-' }}</dd>
                         </div>

@@ -20,7 +20,7 @@
                     <h2 class="mt-4 font-heading text-2xl font-black text-etc-on-surface">{{ $class->program?->name }} - {{ $class->name }}</h2>
                     <p class="mt-2 text-sm leading-6 text-etc-on-muted">{{ $class->program?->description ?? 'Detail program akan diperbarui oleh admin.' }}</p>
                 </div>
-                <div class="rounded-card bg-etc-surface-low p-4">
+                <div class="rounded-box bg-etc-surface-container p-4 shadow-soft">
                     <p class="text-xs font-bold uppercase text-etc-on-muted">Periode belajar</p>
                     <p class="mt-2 font-heading text-sm font-bold text-etc-on-surface">{{ $enrollment->enrolled_at?->format('d M Y') ?? '-' }} sampai {{ $enrollment->completed_at?->format('d M Y') ?? 'sekarang' }}</p>
                 </div>
@@ -29,19 +29,19 @@
 
         <x-ui.panel heading="Jadwal dan Pengajar" description="Detail operasional kelas.">
             <dl class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                <div class="rounded-card bg-etc-surface-low p-4">
+                <div class="rounded-box bg-etc-surface-container p-4">
                     <dt class="text-sm font-bold text-etc-on-muted">Instruktur</dt>
                     <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $class->instructor?->full_name ?? $class->instructor?->name ?? '-' }}</dd>
                 </div>
-                <div class="rounded-card bg-etc-surface-low p-4">
+                <div class="rounded-box bg-etc-surface-container p-4">
                     <dt class="text-sm font-bold text-etc-on-muted">Jadwal</dt>
                     <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $class->schedule_days ?? '-' }} {{ $class->schedule_time ?? '' }}</dd>
                 </div>
-                <div class="rounded-card bg-etc-surface-low p-4">
+                <div class="rounded-box bg-etc-surface-container p-4">
                     <dt class="text-sm font-bold text-etc-on-muted">Ruangan</dt>
                     <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $class->room ?? '-' }}</dd>
                 </div>
-                <div class="rounded-card bg-etc-surface-low p-4">
+                <div class="rounded-box bg-etc-surface-container p-4">
                     <dt class="text-sm font-bold text-etc-on-muted">Status Kelas</dt>
                     <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ str($class->status ?? '-')->headline() }}</dd>
                 </div>

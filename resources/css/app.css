@@ -141,13 +141,13 @@
         transform: translateY(0);
     }
 
-    .student-stat-card {
+    .student-reveal {
         opacity: 0;
         transform: translateY(0.75rem);
         transition: opacity 260ms ease, transform 260ms ease;
     }
 
-    .student-stat-card.is-visible {
+    .student-reveal.is-visible {
         opacity: 1;
         transform: translateY(0);
     }

@@ -3,21 +3,21 @@
         <div class="space-y-6">
             <x-ui.panel heading="Pusat Bantuan Siswa" description="Pilih topik bantuan yang paling sesuai dengan kendala siswa atau orang tua.">
                 <div class="grid gap-4 md:grid-cols-3">
-                    <div class="rounded-card bg-etc-surface-low p-5">
+                    <article class="student-reveal rounded-box border-2 border-etc-outline-variant bg-etc-surface p-5 shadow-soft" data-reveal-card>
                         <span class="material-symbols-outlined text-2xl text-etc-magenta">school</span>
                         <h3 class="mt-4 font-heading text-base font-bold text-etc-on-surface">Akademik</h3>
                         <p class="mt-2 text-sm leading-6 text-etc-on-muted">Jadwal, kelas aktif, instructor, dan riwayat belajar.</p>
-                    </div>
-                    <div class="rounded-card bg-etc-surface-low p-5">
+                    </article>
+                    <article class="student-reveal rounded-box border-2 border-etc-outline-variant bg-etc-surface p-5 shadow-soft" data-reveal-card>
                         <span class="material-symbols-outlined text-2xl text-etc-magenta">payments</span>
                         <h3 class="mt-4 font-heading text-base font-bold text-etc-on-surface">Pembayaran</h3>
                         <p class="mt-2 text-sm leading-6 text-etc-on-muted">Status pembayaran, nominal akhir, dan proses konfirmasi.</p>
-                    </div>
-                    <div class="rounded-card bg-etc-surface-low p-5">
+                    </article>
+                    <article class="student-reveal rounded-box border-2 border-etc-outline-variant bg-etc-surface p-5 shadow-soft" data-reveal-card>
                         <span class="material-symbols-outlined text-2xl text-etc-magenta">description</span>
                         <h3 class="mt-4 font-heading text-base font-bold text-etc-on-surface">Rapor</h3>
                         <p class="mt-2 text-sm leading-6 text-etc-on-muted">Publikasi rapor, download, nilai, dan komentar instructor.</p>
-                    </div>
+                    </article>
                 </div>
             </x-ui.panel>
 
@@ -42,11 +42,11 @@
         <aside class="space-y-6">
             <x-ui.panel heading="Chat Bantuan" description="Tampilan awal chatbot siswa. Integrasi RAG akan ditambahkan pada sprint integrasi.">
                 <div class="space-y-3">
-                    <div class="rounded-card bg-etc-charcoal p-4 text-white">
+                    <div class="rounded-box bg-etc-charcoal p-4 text-etc-surface shadow-soft">
                         <p class="font-heading text-sm font-bold">ETC Assistant</p>
-                        <p class="mt-2 text-sm leading-6 text-white/75">Halo, {{ $student->full_name ?? $student->name }}. Saya bisa membantu mengarahkan pertanyaan tentang kelas, pembayaran, dan rapor.</p>
+                        <p class="mt-2 text-sm leading-6 text-etc-surface/75">Halo, {{ $student->full_name ?? $student->name }}. Saya bisa membantu mengarahkan pertanyaan tentang kelas, pembayaran, dan rapor.</p>
                     </div>
-                    <div class="ml-8 rounded-card bg-etc-surface-low p-4">
+                    <div class="ml-8 rounded-box bg-etc-surface-container p-4 shadow-soft">
                         <p class="text-sm leading-6 text-etc-on-surface">Pilih kategori di halaman ini, lalu hubungi admin jika butuh tindak lanjut.</p>
                     </div>
                 </div>
@@ -54,11 +54,11 @@
 
             <x-ui.panel heading="Kontak Admin" description="Gunakan kanal resmi untuk bantuan yang perlu dicek manual.">
                 <div class="space-y-3 text-sm">
-                    <div class="rounded-card bg-etc-surface-low p-4">
+                    <div class="rounded-box bg-etc-surface-container p-4">
                         <p class="font-heading font-bold text-etc-on-surface">Akademik dan kelas</p>
                         <p class="mt-1 text-etc-on-muted">Minta bantuan jadwal, kelas aktif, dan riwayat pembelajaran.</p>
                     </div>
-                    <div class="rounded-card bg-etc-surface-low p-4">
+                    <div class="rounded-box bg-etc-surface-container p-4">
                         <p class="font-heading font-bold text-etc-on-surface">Pembayaran dan rapor</p>
                         <p class="mt-1 text-etc-on-muted">Minta pengecekan status pembayaran atau publish rapor.</p>
                     </div>

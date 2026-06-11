@@ -9,7 +9,7 @@
                     $statusLabel = $statusLabels[$payment->status] ?? str($payment->status)->replace('_', ' ')->headline();
                     $statusColor = $statusColors[$payment->status] ?? 'primary';
                 @endphp
-                <article class="rounded-card border border-etc-outline-variant/70 bg-white p-5">
+                <article class="student-reveal rounded-box border-2 border-etc-outline-variant bg-etc-surface p-5 shadow-soft" data-reveal-card>
                     <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-center">
                         <div class="min-w-0">
                             <div class="flex flex-wrap items-center gap-2">
@@ -21,7 +21,7 @@
                             <p class="mt-1 text-sm text-etc-on-muted">Pendaftar: {{ $payment->applicant_name }} - {{ $payment->created_at?->format('d M Y') ?? '-' }}</p>
                         </div>
 
-                        <div class="rounded-card bg-etc-surface-low p-4">
+                        <div class="rounded-box bg-etc-surface-container p-4 shadow-soft">
                             <dl class="space-y-2 text-sm">
                                 <div class="flex justify-between gap-3">
                                     <dt class="text-etc-on-muted">Nominal asli</dt>
@@ -57,6 +57,6 @@
             @endforelse
         </div>
 
-        <div class="mt-6">{{ $payments->withQueryString()->links() }}</div>
+        <x-ui.pagination :paginator="$payments" class="mt-6" />
     </x-ui.panel>
 </x-layouts.dashboard>

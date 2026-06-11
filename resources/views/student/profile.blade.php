@@ -4,12 +4,9 @@
         @method('PUT')
 
         @if (session('status'))
-            <x-ui.panel>
-                <div class="flex items-start gap-3 text-sm font-semibold text-green-700">
-                    <span class="material-symbols-outlined text-lg">check_circle</span>
-                    <span>{{ session('status') }}</span>
-                </div>
-            </x-ui.panel>
+            <x-ui.alert status="success" title="Profil tersimpan">
+                {{ session('status') }}
+            </x-ui.alert>
         @endif
 
         <x-ui.panel heading="Identitas Siswa" description="Data utama siswa yang dipakai untuk kelas dan rapor.">
