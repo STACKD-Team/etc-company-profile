@@ -38,6 +38,7 @@
             ['label' => 'Kelas Saya', 'route' => 'student.classes.index', 'url' => '#', 'key' => 'classes', 'svg' => 'nav-class'],
             ['label' => 'Rapor', 'route' => 'student.report-cards.index', 'url' => '#', 'key' => 'reports', 'svg' => 'nav-report'],
             ['label' => 'Riwayat Pembayaran', 'route' => 'student.payments.index', 'url' => '#', 'key' => 'payments', 'svg' => 'nav-payment'],
+            ['label' => 'Bantuan', 'route' => 'student.help.index', 'url' => '#', 'key' => 'help', 'icon' => 'help'],
         ],
         'instructor' => [
             ['label' => 'Dashboard', 'route' => 'instructor.dashboard', 'url' => '#', 'key' => 'dashboard', 'icon' => 'dashboard'],
@@ -67,6 +68,7 @@
 <aside
     id="dashboard-sidebar"
     {{ $attributes->class('fixed inset-y-0 left-0 z-50 flex w-72 flex-shrink-0 -translate-x-full flex-col overflow-y-auto border-r-2 border-etc-outline-variant bg-etc-surface px-3 py-4 text-etc-on-surface shadow-soft md:relative md:z-auto md:w-64 md:translate-x-0') }}
+    x-bind:class="sidebarCollapsed && ! sidebarMobileOpen ? 'md:w-16 md:px-2' : 'md:w-64'"
     aria-label="Sidebar dashboard"
     data-dashboard-sidebar
 >

@@ -20,9 +20,10 @@
         'failed' => 'Gagal',
     ];
 
-    $paymentStatus = $latestPayment?->status;
-    $paymentLabel = $paymentStatus ? ($paymentLabels[$paymentStatus] ?? str($paymentStatus)->replace('_', ' ')->headline()) : 'Belum ada pembayaran';
-    $paymentAmount = $latestPayment?->payment_amount ? 'Rp '.number_format((float) $latestPayment->payment_amount, 0, ',', '.') : '-';
+    $paymentStatus = $latestPaymentSummary['status'] ?? $latestPayment?->status;
+    $paymentLabel = $latestPaymentSummary['label'] ?? ($paymentStatus ? ($paymentLabels[$paymentStatus] ?? str($paymentStatus)->replace('_', ' ')->headline()) : 'Belum ada pembayaran');
+    $paymentAmountValue = $latestPaymentSummary['final_amount'] ?? $latestPayment?->payment_amount;
+    $paymentAmount = $paymentAmountValue ? 'Rp '.number_format((float) $paymentAmountValue, 0, ',', '.') : '-';
     $latestReportClass = $latestReport?->enrollment?->courseClass;
 
     $statCards = [
@@ -162,7 +163,7 @@
                                     <p class="font-heading text-sm font-bold text-etc-on-surface">{{ $latestPayment->registration_code }}</p>
                                     <p class="mt-1 text-sm text-etc-on-muted">{{ $latestPayment->program?->name ?? 'Program ETC Planet' }}</p>
                                 </div>
-                                <x-ui.badge :status="$latestPayment->status">{{ $paymentLabel }}</x-ui.badge>
+                                <x-ui.badge :status="$paymentStatus">{{ $paymentLabel }}</x-ui.badge>
                             </div>
                             <div class="rounded-box bg-etc-surface-container p-4">
                                 <p class="text-xs font-bold uppercase text-etc-on-muted">Nominal Akhir</p>
@@ -203,7 +204,7 @@
                         <p class="font-heading text-sm font-bold">Chatbot bantuan</p>
                         <p class="mt-2 text-sm leading-6 text-etc-surface/70">Kirim pertanyaan melalui halaman bantuan. Untuk saat ini admin akan membantu dari kategori yang tersedia.</p>
                     </div>
-                    <x-ui.button href="#" class="mt-4 w-full" outlined icon="heroicon-m-chat-bubble-left-right" data-dashboard-action="Buka halaman Bantuan dari menu saat tersedia untuk tindak lanjut.">
+                    <x-ui.button :href="route('student.help.index')" class="mt-4 w-full" outlined icon="heroicon-m-chat-bubble-left-right">
                         Buka Bantuan
                     </x-ui.button>
                 </x-ui.panel>

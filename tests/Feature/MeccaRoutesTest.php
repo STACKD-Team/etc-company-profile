@@ -425,7 +425,7 @@ test('student dashboard shows owned learning data and working mecca links', func
         ->assertSee('Rapor Terbaru')
         ->assertSee('Riwayat Belajar Ringkas')
         ->assertDontSee('Other Student Class')
-        ->assertDontSee(route('student.help.index', [], false), false)
+        ->assertSee(route('student.help.index', [], false), false)
         ->assertSee(route('student.classes.show', $activeClass, false), false)
         ->assertSee(route('student.report-cards.download', $downloadableReport, false), false)
         ->assertSee(route('student.learning-history.index', [], false), false);
@@ -478,6 +478,7 @@ test('student classes only expose enrollments owned by the authenticated student
     $this->actingAs($student)
         ->get(route('student.classes.index', [], false))
         ->assertOk()
+        ->assertSee('data-student-classes-table', false)
         ->assertSee('Owned Student Class')
         ->assertDontSee('Other Student Private Class');
 
@@ -514,6 +515,7 @@ test('student learning history shows all owned enrollments and published report 
     $this->actingAs($student)
         ->get(route('student.learning-history.index', [], false))
         ->assertOk()
+        ->assertSee('data-student-learning-history-table', false)
         ->assertSee('Still Active Class')
         ->assertSee('Completed History Class')
         ->assertSee('Dropped History Class')
@@ -548,6 +550,7 @@ test('student report cards only expose published reports owned by the authentica
     $this->actingAs($student)
         ->get(route('student.report-cards.index', [], false))
         ->assertOk()
+        ->assertSee('data-student-report-cards-table', false)
         ->assertSee('Owned Published Program')
         ->assertDontSee('Owned Draft Program')
         ->assertDontSee('Other Published Program');
@@ -609,6 +612,149 @@ test('student report card download requires a published owned file', function ()
     $this->actingAs($student)
         ->get(route('student.report-cards.download', $missingFileReport, false))
         ->assertNotFound();
+});
+
+test('student sprint two list tables support search filters sorting and pagination', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $instructor = User::factory()->create(['role' => 'instructor', 'full_name' => 'Filter Instructor']);
+    $program = createMeccaSprint4Program(['name' => 'Filter Program', 'slug' => 'filter-program']);
+    $targetClass = createMeccaSprint4Class([
+        'program_id' => $program->id,
+        'instructor_id' => $instructor->id,
+        'name' => 'Filter Target Class',
+    ]);
+    $hiddenClass = createMeccaSprint4Class(['name' => 'Hidden Filter Class']);
+
+    $targetEnrollment = createMeccaSprint4Enrollment($student, $targetClass, ['status' => 'completed']);
+    createMeccaSprint4Enrollment($student, $hiddenClass, ['status' => 'active']);
+    $report = createMeccaSprint4ReportCard($targetEnrollment, [
+        'final_grade' => 'B',
+        'total_score' => 82,
+        'pdf_path' => 'report-cards/filter-target.pdf',
+    ]);
+
+    Registration::query()->create([
+        'registration_code' => 'REG-FILTER-TARGET',
+        'user_id' => $student->id,
+        'program_id' => $program->id,
+        'class_id' => $targetClass->id,
+        'applicant_name' => 'Filter Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_method' => 'qris',
+        'payment_status' => 'paid',
+        'payment_amount' => 1500000,
+        'payment_original_amount' => 1500000,
+        'payment_discount_amount' => 250000,
+        'payment_final_amount' => 1250000,
+        'payment_promotion_title' => 'Promo Mecca',
+        'paid_at' => '2026-06-10 10:00:00',
+        'status' => 'paid',
+    ]);
+
+    Registration::query()->create([
+        'registration_code' => 'REG-FILTER-HIDDEN',
+        'user_id' => $student->id,
+        'program_id' => $hiddenClass->program_id,
+        'class_id' => $hiddenClass->id,
+        'applicant_name' => 'Filter Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_method' => 'manual',
+        'payment_status' => 'waiting_payment',
+        'payment_amount' => 1000000,
+        'status' => 'pending_payment',
+    ]);
+
+    $this->actingAs($student)
+        ->get(route('student.classes.index', [
+            'search' => 'Target',
+            'status' => 'completed',
+            'sort' => 'status',
+            'direction' => 'asc',
+            'per_page' => 10,
+        ], false))
+        ->assertOk()
+        ->assertViewHas('enrollments', fn ($enrollments) => collect($enrollments->items())->pluck('id')->all() === [$targetEnrollment->id])
+        ->assertSee('data-student-classes-table', false)
+        ->assertSee('Filter Target Class');
+
+    $this->actingAs($student)
+        ->get(route('student.learning-history.index', [
+            'program_id' => $program->id,
+            'instructor_id' => $instructor->id,
+            'sort' => 'completed_at',
+        ], false))
+        ->assertOk()
+        ->assertViewHas('enrollments', fn ($enrollments) => collect($enrollments->items())->pluck('id')->all() === [$targetEnrollment->id])
+        ->assertSee('Filter Target Class')
+        ->assertSee(route('student.report-cards.show', $report, false), false);
+
+    $this->actingAs($student)
+        ->get(route('student.payments.index', [
+            'payment_status' => 'paid',
+            'payment_method' => 'qris',
+            'sort' => 'payment_amount',
+            'direction' => 'desc',
+        ], false))
+        ->assertOk()
+        ->assertSee('data-student-payments-table', false)
+        ->assertSee('REG-FILTER-TARGET')
+        ->assertSee('Promo Mecca')
+        ->assertSee('Rp 1.250.000')
+        ->assertDontSee('REG-FILTER-HIDDEN');
+
+    $this->actingAs($student)
+        ->get(route('student.report-cards.index', [
+            'final_grade' => 'B',
+            'report_status' => 'with_file',
+            'sort' => 'total_score',
+        ], false))
+        ->assertOk()
+        ->assertSee('data-student-report-cards-table', false)
+        ->assertSee('Filter Program')
+        ->assertSee('Nilai B');
+});
+
+test('student payment detail shows midtrans snapshot and continue payment link', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $program = createMeccaSprint4Program(['name' => 'Snapshot Payment Program', 'slug' => 'snapshot-payment-program']);
+
+    $payment = Registration::query()->create([
+        'registration_code' => 'REG-SNAPSHOT-PAY',
+        'user_id' => $student->id,
+        'program_id' => $program->id,
+        'applicant_name' => 'Snapshot Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_method' => 'virtual_account',
+        'payment_status' => 'waiting_payment',
+        'payment_amount' => 1800000,
+        'payment_original_amount' => 1800000,
+        'payment_discount_amount' => 300000,
+        'payment_final_amount' => 1500000,
+        'payment_promotion_title' => 'Promo Snapshot',
+        'payment_gateway_id' => 'MIDTRANS-123',
+        'payment_redirect_url' => 'https://pay.example.test/snap',
+        'payment_snap_token' => 'SNAP-TOKEN-123',
+        'payment_expires_at' => now()->addHour(),
+        'status' => 'pending_payment',
+    ]);
+
+    $this->actingAs($student)
+        ->get(route('student.payments.show', $payment, false))
+        ->assertOk()
+        ->assertSee('REG-SNAPSHOT-PAY')
+        ->assertSee('Virtual Account')
+        ->assertSee('MIDTRANS-123')
+        ->assertSee('SNAP-TOKEN-123')
+        ->assertSee('Promo Snapshot')
+        ->assertSee('Rp 1.800.000')
+        ->assertSee('Rp 300.000')
+        ->assertSee('Rp 1.500.000')
+        ->assertSee('Lanjutkan Pembayaran')
+        ->assertSee('https://pay.example.test/snap', false)
+        ->assertDontSee('Bukti Pembayaran');
 });
 
 test('admin academic mecca pages render for authenticated admin', function () {

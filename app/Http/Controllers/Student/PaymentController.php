@@ -3,93 +3,41 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Student\TableQueryRequest;
 use App\Models\Registration;
-use Illuminate\Database\Eloquent\Builder;
+use App\Services\StudentPanelService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PaymentController extends Controller
 {
-    public function index(Request $request): View
+    public function index(TableQueryRequest $request, StudentPanelService $panel): View
     {
-        $student = $request->user();
+        $studentId = (int) $request->user()->id;
 
         return view('student.payments.index', [
-            'student' => $student,
-            'payments' => Registration::query()
-                ->with(['program', 'courseClass'])
-                ->where('user_id', $student->id)
-                ->where($this->paymentRelevantFilter())
-                ->latest('created_at')
-                ->paginate(10),
-            'statusLabels' => $this->statusLabels(),
-            'statusColors' => $this->statusColors(),
-            'methods' => $this->methods(),
+            'student' => $request->user(),
+            'payments' => $panel->paginatePayments($studentId, $request->validated()),
+            'programOptions' => $panel->programOptions($studentId),
+            'classOptions' => $panel->classOptions($studentId),
+            'statusLabels' => $panel->statusLabels(),
+            'statusColors' => $panel->statusColors(),
+            'paymentStatusOptions' => $panel->paymentStatusOptions(),
+            'methods' => $panel->methods(),
         ]);
     }
 
-    public function show(Request $request, Registration $payment): View
+    public function show(Request $request, Registration $payment, StudentPanelService $panel): View
     {
-        abort_unless($payment->user_id === $request->user()->id, 403);
+        $payment = $panel->ownedPayment((int) $request->user()->id, $payment);
 
         return view('student.payments.show', [
             'student' => $request->user(),
-            'payment' => $payment->load(['program', 'courseClass']),
-            'statusLabels' => $this->statusLabels(),
-            'statusColors' => $this->statusColors(),
-            'methods' => $this->methods(),
+            'payment' => $payment,
+            'summary' => $panel->paymentSummary($payment),
+            'statusLabels' => $panel->statusLabels(),
+            'statusColors' => $panel->statusColors(),
+            'methods' => $panel->methods(),
         ]);
-    }
-
-    protected function paymentRelevantFilter(): callable
-    {
-        return function (Builder $query): void {
-            $query->whereNotNull('payment_amount')
-                ->orWhereNotNull('payment_method')
-                ->orWhereNotNull('payment_proof')
-                ->orWhereNotNull('paid_at')
-                ->orWhereIn('status', ['pending_payment', 'paid', 'placement_test', 'enrolled', 'rejected', 'cancelled']);
-        };
-    }
-
-    protected function statusLabels(): array
-    {
-        return [
-            'pending_payment' => 'Menunggu Pembayaran',
-            'paid' => 'Lunas',
-            'placement_test' => 'Menunggu Placement Test',
-            'enrolled' => 'Aktif Belajar',
-            'rejected' => 'Ditolak',
-            'cancelled' => 'Dibatalkan',
-            'waiting_payment' => 'Menunggu Pembayaran',
-            'expired' => 'Kedaluwarsa',
-            'failed' => 'Gagal',
-        ];
-    }
-
-    protected function statusColors(): array
-    {
-        return [
-            'pending_payment' => 'warning',
-            'waiting_payment' => 'warning',
-            'paid' => 'success',
-            'placement_test' => 'warning',
-            'enrolled' => 'success',
-            'rejected' => 'danger',
-            'cancelled' => 'danger',
-            'expired' => 'danger',
-            'failed' => 'danger',
-        ];
-    }
-
-    protected function methods(): array
-    {
-        return [
-            'qris' => 'QRIS',
-            'bank_transfer' => 'Transfer Bank',
-            'virtual_account' => 'Virtual Account',
-            'ewallet' => 'E-Wallet',
-            'manual' => 'Manual',
-        ];
     }
 }
