@@ -119,6 +119,12 @@ it('shows active program promo and cover image on listing and detail only', func
     $this->get(route('public.programs.index'))
         ->assertOk()
         ->assertSee('data-sprint1-program-card', false)
+        ->assertSee('public-program-card__description', false)
+        ->assertSee('public-program-card__pricing', false)
+        ->assertSee('public-program-card__registration-fee', false)
+        ->assertSee('public-program-card__actions', false)
+        ->assertSee(route('registrations.create', ['program' => $program->id]), false)
+        ->assertDontSee(route('registrations.programs.index', ['program' => $program->id]), false)
         ->assertSee('data-program-cover', false)
         ->assertSee('Hemat 300K')
         ->assertSee('Rp 2.000.000')
@@ -139,6 +145,7 @@ it('shows active program promo and cover image on listing and detail only', func
         ->assertSee('Potongan Rp 300.000')
         ->assertSee('data-promo-terms', false)
         ->assertSee('programs/thumbnails/intensive.jpg')
+        ->assertSee(route('registrations.create', ['program' => $program->id]), false)
         ->assertDontSee('Hidden Inactive')
         ->assertDontSee('Hidden Future')
         ->assertDontSee('Hidden Expired');
@@ -162,7 +169,7 @@ it('calculates percentage promo for display without changing registration paymen
         ->assertSee('Diskon 25%')
         ->assertSee('Rp 1.500.000')
         ->assertSee('Potongan Rp 500.000')
-        ->assertSee(route('registrations.programs.index', ['program' => $program->id]), false);
+        ->assertSee(route('registrations.create', ['program' => $program->id]), false);
 
     $this->post(route('registrations.store'), miftahSprint1RegistrationPayload($program))
         ->assertRedirect();
@@ -241,6 +248,10 @@ it('renders gallery from published CMS gallery with multiple images and empty st
 
 it('uses vertical reels experience while keeping published only access', function () {
     $published = miftahSprint1Reel(['title' => 'Published Vertical Reel']);
+    $selected = miftahSprint1Reel([
+        'title' => 'Selected Vertical Reel',
+        'published_at' => now()->subDay(),
+    ]);
     $draft = miftahSprint1Reel([
         'title' => 'Draft Vertical Reel',
         'is_published' => false,
@@ -251,21 +262,322 @@ it('uses vertical reels experience while keeping published only access', functio
         ->assertOk()
         ->assertSee('data-vertical-reels-feed', false)
         ->assertSee('data-reel-slide', false)
+        ->assertSee('data-autoplay-reel="true"', false)
         ->assertSee('data-view-endpoint', false)
-        ->assertSee('data-like-endpoint', false)
+        ->assertSee('data-reel-sound-control', false)
+        ->assertSee('data-reel-sound-toggle', false)
+        ->assertDontSee('data-reel-volume-down', false)
+        ->assertDontSee('data-reel-volume-up', false)
+        ->assertDontSee('data-like-endpoint', false)
+        ->assertDontSee('public-reel-actions', false)
+        ->assertDontSee('muted', false)
         ->assertSee('Published Vertical Reel')
+        ->assertSee('Selected Vertical Reel')
         ->assertDontSee('Draft Vertical Reel');
 
-    $this->get(route('public.reels.show', $published))
+    $this->get(route('public.reels.index', ['reel' => $selected->getKey()]))
         ->assertOk()
-        ->assertSee('data-vertical-reel-detail', false)
-        ->assertSee('aspect-[9/16]', false)
-        ->assertSee('data-view-endpoint', false)
-        ->assertSee('data-like-endpoint', false);
+        ->assertSeeInOrder([
+            'data-reel-id="'.$selected->getKey().'"',
+            'Selected Vertical Reel',
+            'data-reel-id="'.$published->getKey().'"',
+            'Published Vertical Reel',
+        ], false);
+
+    $this->get(route('public.reels.show', $published))
+        ->assertRedirect(route('public.reels.index'));
 
     $this->get(route('public.reels.show', $draft))->assertNotFound();
     $this->postJson(route('public.reels.views.store', $draft))->assertNotFound();
     $this->postJson(route('public.reels.likes.store', $draft))->assertNotFound();
+});
+
+it('shows Miftah discovery destinations in the public navbar', function () {
+    $response = $this->get(route('public.home'))->assertOk();
+
+    foreach ([
+        'public.team.index',
+        'public.facilities.index',
+        'public.gallery.index',
+        'public.faq.index',
+    ] as $routeName) {
+        $response->assertSee(route($routeName), false);
+    }
+
+    $response
+        ->assertSee('Team')
+        ->assertSee('Fasilitas')
+        ->assertSee('Galeri')
+        ->assertSee('FAQ');
+});
+
+it('renders a public discovery footer with real website destinations only', function () {
+    $response = $this->get(route('public.home'))
+        ->assertOk()
+        ->assertSee('Jl. S. Parman No. 202B, Ulak Karang Selatan, Padang')
+        ->assertSee('Education Tutorial Centre Padang')
+        ->assertDontSee('English Training Center')
+        ->assertSee('https://www.instagram.com/etcplanet/', false)
+        ->assertSee('@etcplanet')
+        ->assertDontSee('Kebijakan Privasi')
+        ->assertDontSee('Syarat &amp; Ketentuan', false)
+        ->assertDontSee('Karir')
+        ->assertDontSee('hello@etcplanet.test')
+        ->assertDontSee('+62 812-0000-0000');
+
+    foreach ([
+        'public.about',
+        'public.team.index',
+        'public.facilities.index',
+        'public.gallery.index',
+        'public.programs.index',
+        'public.reels.index',
+        'public.faq.index',
+        'public.contact.index',
+    ] as $routeName) {
+        $response->assertSee(route($routeName), false);
+    }
+
+    $footerSource = file_get_contents(resource_path('views/components/public-discovery/footer.blade.php'));
+
+    expect($footerSource)
+        ->toContain('public-discovery-footer__instagram')
+        ->not->toContain('!border');
+});
+
+it('uses one consistent footer across every non fullscreen Miftah discovery page', function () {
+    $program = miftahSprint1Program();
+
+    foreach ([
+        route('public.home'),
+        route('public.about'),
+        route('public.team.index'),
+        route('public.facilities.index'),
+        route('public.gallery.index'),
+        route('public.contact.index'),
+        route('public.faq.index'),
+        route('public.programs.index'),
+        route('public.programs.show', $program),
+    ] as $url) {
+        $content = $this->get($url)
+            ->assertOk()
+            ->assertSee('data-public-discovery-footer', false)
+            ->assertSee('data-public-discovery-page-end', false)
+            ->assertSee('data-chatbot-widget', false)
+            ->assertSee('Education Tutorial Centre Padang')
+            ->getContent();
+
+        expect(substr_count($content, 'data-public-discovery-footer'))->toBe(1);
+        expect(substr_count($content, 'data-public-discovery-page-end'))->toBe(1);
+        expect(substr_count($content, 'data-chatbot-widget'))->toBe(1);
+    }
+});
+
+it('uses the same Miftah public chrome throughout the pre login registration flow', function () {
+    foreach ([
+        resource_path('views/public/registration/create.blade.php'),
+        resource_path('views/public/registration/payment.blade.php'),
+        resource_path('views/public/registration/confirmation.blade.php'),
+        resource_path('views/public/placeholder.blade.php'),
+    ] as $viewPath) {
+        $source = file_get_contents($viewPath);
+
+        expect($source)
+            ->toContain(':show-navbar="false"')
+            ->toContain(':show-footer="false"')
+            ->toContain(':show-chatbot="false"')
+            ->toContain('<x-public-discovery.navbar')
+            ->toContain('<x-public-discovery.page-end />')
+            ->not->toContain('<x-site.footer')
+            ->not->toContain('<x-site.chatbot');
+    }
+
+    $pageEndSource = file_get_contents(resource_path('views/components/public-discovery/page-end.blade.php'));
+    $footerSource = file_get_contents(resource_path('views/components/public-discovery/footer.blade.php'));
+
+    expect($pageEndSource)
+        ->toContain('data-public-discovery-page-end')
+        ->toContain('<x-public-discovery.footer />')
+        ->toContain('<x-public-discovery.chatbot />');
+
+    expect($footerSource)->not->toContain('<x-public-discovery.chatbot />');
+});
+
+it('uses the same Miftah public chrome on every guest authentication page', function () {
+    foreach ([
+        resource_path('views/auth/login.blade.php'),
+        resource_path('views/auth/forgot-password.blade.php'),
+        resource_path('views/auth/reset-password.blade.php'),
+    ] as $viewPath) {
+        $source = file_get_contents($viewPath);
+
+        expect($source)
+            ->toContain(':show-navbar="false"')
+            ->toContain(':show-footer="false"')
+            ->toContain(':show-chatbot="false"')
+            ->toContain('<x-public-discovery.navbar')
+            ->toContain('<x-public-discovery.page-end />')
+            ->not->toContain('<x-site.navbar')
+            ->not->toContain('<x-site.footer')
+            ->not->toContain('<x-site.chatbot');
+    }
+
+    foreach ([
+        route('auth.login'),
+        route('auth.password.request'),
+        route('auth.password.reset', ['token' => 'test-token', 'email' => 'student@example.com']),
+    ] as $url) {
+        $content = $this->get($url)
+            ->assertOk()
+            ->assertSee('data-public-discovery-navbar', false)
+            ->assertSee('data-public-discovery-page-end', false)
+            ->assertSee('data-public-discovery-footer', false)
+            ->assertSee('data-chatbot-widget', false)
+            ->getContent();
+
+        expect(substr_count($content, 'data-public-discovery-navbar'))->toBe(1);
+        expect(substr_count($content, 'data-public-discovery-footer'))->toBe(1);
+        expect(substr_count($content, 'data-chatbot-widget'))->toBe(1);
+    }
+});
+
+it('renders the refined home discovery sections from the Stitch reference', function () {
+    miftahSprint1Program();
+
+    $this->get(route('public.home'))
+        ->assertOk()
+        ->assertSee('public-home-stats', false)
+        ->assertSee('data-public-stat-counter', false)
+        ->assertSee('data-counter-target', false)
+        ->assertSee('public-home-program-card__heading', false)
+        ->assertSee('public-home-program-card__pricing', false)
+        ->assertSee('public-home-program-card__actions', false)
+        ->assertSee('data-home-program-grid', false)
+        ->assertSee('Lihat Semua Program')
+        ->assertSee('data-public-carousel', false)
+        ->assertSee('data-carousel-viewport', false)
+        ->assertSee('data-carousel-slide', false)
+        ->assertSee('data-carousel-prev', false)
+        ->assertSee('data-carousel-next', false)
+        ->assertSee('public-registration-flow', false)
+        ->assertSee('data-registration-flow-step="1"', false)
+        ->assertSee('data-registration-flow-step="5"', false)
+        ->assertSee('data-public-testimonials', false)
+        ->assertSee('Apa Kata Mereka?')
+        ->assertSee('Andi Darmawan')
+        ->assertSee('Sarah Nabila')
+        ->assertSee('Ibu Budi')
+        ->assertSee('Mulai Pendaftaran')
+        ->assertSee(route('public.team.index'), false)
+        ->assertSee('Cuplikan suasana belajar')
+        ->assertSee('data-home-faq', false)
+        ->assertSee('Pertanyaan yang sering ditanyakan')
+        ->assertSee('home-faq-answer-0', false)
+        ->assertSee('Lihat Semua FAQ')
+        ->assertSee(route('public.faq.index'), false)
+        ->assertSee('data-chatbot-suggestion', false)
+        ->assertSee('ETC Planet Bot')
+        ->assertSee('Program yang tersedia')
+        ->assertDontSee('ETC Planet Assistant');
+
+    $scriptSource = file_get_contents(resource_path('js/app.js'));
+    $homeSource = file_get_contents(resource_path('views/public/home.blade.php'));
+    $styleSource = file_get_contents(resource_path('css/app.css'));
+
+    expect($scriptSource)
+        ->toContain("const storageKey = 'etc-registration-progress'")
+        ->toContain("flow.style.setProperty('--registration-progress'")
+        ->toContain("step.classList.toggle('is-complete', completed)")
+        ->toContain('function initPublicStatCounters()')
+        ->toContain("document.querySelectorAll('[data-public-stat-counter]')")
+        ->toContain('observer.unobserve(entry.target)')
+        ->toContain('initPublicStatCounters()')
+        ->toContain('initPublicHomeCarousels()')
+        ->toContain("viewport.addEventListener('pointermove'")
+        ->toContain('resetLoopPosition')
+        ->toContain("viewport.style.scrollBehavior = 'auto'")
+        ->toContain('window.setInterval');
+
+    expect($homeSource)
+        ->toContain('mx-auto max-w-2xl text-center')
+        ->toContain('Partner belajar dan pengembangan bahasa')
+        ->toContain('$programs->take(6)')
+        ->toContain('heroicon-m-chevron-left')
+        ->toContain('heroicon-m-chevron-right')
+        ->toContain("route('public.reels.index', ['reel' => \$reel->getKey()])")
+        ->toContain('public-home-carousel--four')
+        ->toContain('public-home-instructor-card')
+        ->not->toContain('color="primary" class="public-home-carousel__arrow"')
+        ->not->toContain('data-carousel-status')
+        ->not->toContain('md:flex-row md:items-end public-reveal');
+
+    expect($styleSource)
+        ->toContain('inset: 0 -3.75rem 1.25rem')
+        ->toContain('.public-home-carousel__arrow[data-carousel-prev]')
+        ->toContain('.public-home-carousel__arrow[data-carousel-next]')
+        ->toContain('.public-testimonial-card:hover')
+        ->toContain('.public-home-partner-card:hover')
+        ->toContain('.public-home-reel-card:hover')
+        ->toContain('.public-home-instructor-card')
+        ->toContain('.public-home-instructor-card img')
+        ->toContain('background: transparent')
+        ->toContain('0 10px 24px rgb(58 44 51 / 4%)')
+        ->toContain('pointer-events: none');
+});
+
+it('keeps the public discovery chatbot local and interactive without editing shared controls', function () {
+    $chatbotSource = file_get_contents(resource_path('views/components/public-discovery/chatbot.blade.php'));
+    $scriptSource = file_get_contents(resource_path('js/app.js'));
+
+    expect($chatbotSource)
+        ->toContain('data-chatbot-widget')
+        ->toContain('data-chatbot-suggestion')
+        ->toContain('<x-ui.field')
+        ->toContain('<x-ui.icon-button')
+        ->not->toContain('public-discovery-chatbot__notification')
+        ->not->toContain('public-discovery-chatbot__status-dot')
+        ->not->toMatch('/<(button|input|select|textarea)\b/i');
+
+    expect($scriptSource)
+        ->toContain("widget.querySelectorAll('[data-chatbot-suggestion]')")
+        ->toContain('public-discovery-chatbot__bubble--user')
+        ->toContain('public-discovery-chatbot__bubble--bot')
+        ->toContain('showTypingIndicator')
+        ->not->toContain("'--public-chatbot-footer-offset'")
+        ->toContain("widget.classList.toggle('is-open', isOpen)");
+});
+
+it('renders FAQ as a clean collapsed accordion with arrow controls', function () {
+    $this->get(route('public.faq.index'))
+        ->assertOk()
+        ->assertSee('data-public-faq', false)
+        ->assertSee('data-faq-toggle', false)
+        ->assertSee('data-faq-answer', false)
+        ->assertSee('expand_more')
+        ->assertSee('aria-expanded="false"', false)
+        ->assertDontSee('>add<', false)
+        ->assertDontSee('public-card p-5', false);
+
+    $scriptSource = file_get_contents(resource_path('js/app.js'));
+
+    expect($scriptSource)
+        ->toContain('function initPublicFaq()')
+        ->toContain('setOpen(item, opening)')
+        ->not->toContain("items.forEach((candidate) => setOpen(candidate, candidate === item && opening))");
+});
+
+it('keeps reel playback feedback brief and provides a temporary mute toggle', function () {
+    $source = file_get_contents(resource_path('js/app.js'));
+
+    expect($source)
+        ->toContain("video?.addEventListener('click'")
+        ->toContain("event.target.closest('[data-reel-sound-control]')")
+        ->toContain("control.classList.add('is-visible')")
+        ->toContain('}, 1100));')
+        ->toContain("window.localStorage.setItem('etc-reels-muted'")
+        ->toContain('}, 240));')
+        ->not->toContain("window.localStorage.setItem('etc-reels-volume'")
+        ->not->toContain("showPlaybackIndicator(video, 'play_arrow', true)");
 });
 
 it('keeps public discovery copy free from implementation notes', function () {
@@ -301,9 +613,7 @@ it('keeps public discovery controls on shared blade components', function () {
         'views/public/programs/index.blade.php',
         'views/public/programs/show.blade.php',
         'views/public/reels/index.blade.php',
-        'views/public/reels/show.blade.php',
         'views/public/registration/create.blade.php',
-        'views/registration/programs/index.blade.php',
     ];
 
     foreach ($controlFiles as $file) {
@@ -318,7 +628,6 @@ it('keeps public discovery controls on shared blade components', function () {
         'views/components/site/navbar.blade.php',
         'views/components/site/footer.blade.php',
         'views/public/registration/create.blade.php',
-        'views/registration/programs/index.blade.php',
     ] as $file) {
         expect(file_get_contents(resource_path($file)))->not->toMatch('/<a\b/i');
     }

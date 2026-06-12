@@ -76,78 +76,14 @@ function createMeccaSprint4ReportCard(Enrollment $enrollment, array $attributes 
     ], $attributes));
 }
 
-test('registration programs page renders active programs and links the selected program to registration form', function () {
-    $activeProgram = Program::query()->create([
-        'name' => 'General English',
-        'slug' => 'general-english',
-        'category' => 'english',
-        'type' => 'regular',
-        'target_age' => 'teen',
-        'description' => 'Program komunikasi bahasa Inggris.',
-        'duration_meetings' => 20,
-        'max_students' => 12,
-        'price' => 1500000,
-        'registration_fee' => 200000,
-        'is_active' => true,
-    ]);
-
-    Program::query()->create([
-        'name' => 'Inactive Program',
-        'slug' => 'inactive-program',
-        'category' => 'english',
-        'type' => 'regular',
-        'target_age' => 'teen',
-        'duration_meetings' => 12,
-        'max_students' => 12,
-        'price' => 1000000,
-        'registration_fee' => 100000,
-        'is_active' => false,
-    ]);
-
+test('legacy registration programs route redirects to the public programs page', function () {
     $this->get('/registration/programs')
-        ->assertOk()
-        ->assertSee('General English')
-        ->assertSee('value="'.$activeProgram->id.'"', false)
-        ->assertSee('checked', false)
-        ->assertSee('/registration/form/'.$activeProgram->id, false)
-        ->assertDontSee(route('public.contact.index', ['program' => $activeProgram->id]), false)
-        ->assertDontSee('Inactive Program');
+        ->assertRedirect(route('public.programs.index'));
 });
 
-test('registration programs page can preselect a program from query string', function () {
-    $english = Program::query()->create([
-        'name' => 'English Teen',
-        'slug' => 'english-teen-picker',
-        'category' => 'english',
-        'type' => 'regular',
-        'target_age' => 'teen',
-        'duration_meetings' => 16,
-        'max_students' => 10,
-        'price' => 1200000,
-        'registration_fee' => 200000,
-        'is_active' => true,
-    ]);
-
-    $mandarin = Program::query()->create([
-        'name' => 'Mandarin Starter',
-        'slug' => 'mandarin-starter-picker',
-        'category' => 'mandarin',
-        'type' => 'private',
-        'target_age' => 'adult',
-        'duration_meetings' => 12,
-        'max_students' => 6,
-        'price' => 1800000,
-        'registration_fee' => 200000,
-        'is_active' => true,
-    ]);
-
-    $this->get('/registration/programs?program='.$mandarin->id)
-        ->assertOk()
-        ->assertSee('value="'.$english->id.'"', false)
-        ->assertSee('value="'.$mandarin->id.'"', false)
-        ->assertSee('<strong id="summary-name" class="font-heading text-lg">Mandarin Starter</strong>', false)
-        ->assertSee('/registration/form/'.$mandarin->id, false)
-        ->assertDontSee(route('public.contact.index', ['program' => $mandarin->id]), false);
+test('legacy registration programs query also redirects to the public programs page', function () {
+    $this->get('/registration/programs?program=2')
+        ->assertRedirect(route('public.programs.index'));
 });
 
 test('public programs page renders active programs with discovery details', function () {

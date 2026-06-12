@@ -1,5 +1,6 @@
-<x-layouts.public title="FAQ">
-    <section class="public-section bg-etc-surface">
+<x-layouts.public title="FAQ" :show-navbar="false" :show-footer="false" :show-chatbot="false">
+    <x-public-discovery.navbar active="faq" />
+    <section class="public-faq-hero bg-etc-surface">
         <div class="public-shell-narrow text-center public-reveal" data-public-reveal>
             <p class="public-eyebrow">FAQ</p>
             <h1 class="public-title mt-4">{{ $page?->title ?? 'FAQ ETC Planet' }}</h1>
@@ -7,22 +8,30 @@
         </div>
     </section>
 
-    <section class="public-section bg-etc-surface-low">
+    <section class="public-faq-content bg-etc-surface-low">
         <div class="public-shell-narrow">
-            <div class="space-y-3">
-                @foreach ($faqs as $faq)
-                    <article class="public-card p-5 public-reveal" data-public-reveal x-data="{ open: false }">
+            <div class="public-faq-list" data-public-faq>
+                @foreach ($faqs as $index => $faq)
+                    <article class="public-faq-item public-reveal" data-public-reveal data-faq-item>
                         <x-ui.button
                             type="button"
                             color="gray"
-                            class="!flex !w-full !min-h-0 !items-center !justify-between !gap-4 !rounded-none !bg-transparent !p-0 !text-left !font-heading !text-lg !font-bold !text-etc-on-surface !shadow-none hover:!bg-transparent"
-                            x-on:click="open = ! open"
-                            x-bind:aria-expanded="open.toString()"
+                            class="public-faq-question"
+                            data-faq-toggle
+                            aria-expanded="false"
+                            aria-controls="faq-answer-{{ $index }}"
                         >
-                            {{ $faq['question'] }}
-                            <span class="material-symbols-outlined text-etc-magenta transition" x-bind:class="open ? 'rotate-45' : ''">add</span>
+                            <span>{{ $faq['question'] }}</span>
+                            <span class="material-symbols-outlined public-faq-arrow" data-faq-arrow>expand_more</span>
                         </x-ui.button>
-                        <p class="mt-4 leading-7 text-etc-on-muted" x-show="open">{{ $faq['answer'] }}</p>
+
+                        <div
+                            id="faq-answer-{{ $index }}"
+                            class="public-faq-answer hidden"
+                            data-faq-answer
+                        >
+                            <p>{{ $faq['answer'] }}</p>
+                        </div>
                     </article>
                 @endforeach
             </div>
@@ -38,4 +47,5 @@
             </div>
         </div>
     </section>
+    <x-public-discovery.page-end />
 </x-layouts.public>

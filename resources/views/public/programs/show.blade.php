@@ -3,8 +3,8 @@
     $trustBadges = $detailContent['trust_badges'] ?? [];
     $aboutHeading = $detailContent['about_heading'] ?? 'Tentang Program';
     $learningHeading = $detailContent['learning_heading'] ?? 'Yang Akan Kamu Pelajari';
-    $registerUrl = \Illuminate\Support\Facades\Route::has('registrations.programs.index')
-        ? route('registrations.programs.index', ['program' => $program->id])
+    $registerUrl = \Illuminate\Support\Facades\Route::has('registrations.create')
+        ? route('registrations.create', ['program' => $program->id])
         : route('public.contact.index', ['program' => $program->id]);
     $media = app(\App\Services\PublicDiscoveryService::class);
     $coverUrl = $media->mediaUrl($program->thumbnail, 'images/hero-img.jpeg');
@@ -23,7 +23,8 @@
     $formatRupiah = static fn ($value): string => 'Rp '.number_format((float) $value, 0, ',', '.');
 @endphp
 
-<x-layouts.public :title="$program->name" navbar-active="program">
+<x-layouts.public :title="$program->name" :show-navbar="false" :show-footer="false" :show-chatbot="false">
+    <x-public-discovery.navbar active="program" />
     <section class="relative isolate overflow-hidden bg-etc-charcoal text-white">
         <img src="{{ $coverUrl }}" alt="Cover program {{ $program->name }}" class="absolute inset-0 h-full w-full object-cover opacity-35" data-program-cover>
         <div class="absolute inset-0 bg-gradient-to-r from-etc-charcoal via-etc-charcoal/85 to-etc-charcoal/55"></div>
@@ -230,4 +231,5 @@
             </aside>
         </div>
     </section>
+    <x-public-discovery.page-end />
 </x-layouts.public>

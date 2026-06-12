@@ -1,4 +1,5 @@
-<x-layouts.public title="Galeri Kegiatan">
+<x-layouts.public title="Galeri Kegiatan" :show-navbar="false" :show-footer="false" :show-chatbot="false">
+    <x-public-discovery.navbar active="gallery" />
     @php
         $media = app(\App\Services\PublicDiscoveryService::class);
         $assetUrl = static fn (?string $path, string $fallback = 'images/pu1-img (3).jpg'): string => $media->mediaUrl($path, $fallback);
@@ -64,4 +65,5 @@
             @endif
         </div>
     </section>
+    <x-public-discovery.page-end />
 </x-layouts.public>

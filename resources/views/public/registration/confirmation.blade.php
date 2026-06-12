@@ -1,4 +1,5 @@
-<x-layouts.public title="Konfirmasi Pendaftaran">
+<x-layouts.public title="Konfirmasi Pendaftaran" :show-navbar="false" :show-footer="false" :show-chatbot="false">
+    <x-public-discovery.navbar active="program" />
     <link rel="stylesheet" href="{{ asset('css/konfirmasi.css') }}">
     <link rel="stylesheet" href="{{ asset('css/interactive.css') }}">
 
@@ -79,4 +80,5 @@
             </div>
         </main>
     </div>
+    <x-public-discovery.page-end />
 </x-layouts.public>

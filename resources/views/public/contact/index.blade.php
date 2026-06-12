@@ -1,4 +1,5 @@
-<x-layouts.public title="Kontak" navbar-active="contact">
+<x-layouts.public title="Kontak" :show-navbar="false" :show-footer="false" :show-chatbot="false">
+    <x-public-discovery.navbar active="contact" />
     @php
         $defaultSubject = $selectedProgram ? 'Konsultasi program '.$selectedProgram->name : '';
         $defaultMessage = $selectedProgram
@@ -60,4 +61,5 @@
             </div>
         </div>
     </section>
+    <x-public-discovery.page-end />
 </x-layouts.public>

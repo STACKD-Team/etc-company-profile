@@ -1,4 +1,5 @@
-<x-layouts.public title="Tentang ETC Planet" navbar-active="about">
+<x-layouts.public title="Tentang ETC Planet" :show-navbar="false" :show-footer="false" :show-chatbot="false">
+    <x-public-discovery.navbar active="about" />
     @php
         $meta = $page?->meta ?? [];
         $missions = collect($meta['mission'] ?? [])->filter();
@@ -64,4 +65,5 @@
             </div>
         </div>
     </section>
+    <x-public-discovery.page-end />
 </x-layouts.public>

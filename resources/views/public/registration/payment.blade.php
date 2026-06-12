@@ -1,4 +1,5 @@
-<x-layouts.public title="Pembayaran">
+<x-layouts.public title="Pembayaran" :show-navbar="false" :show-footer="false" :show-chatbot="false">
+<x-public-discovery.navbar active="program" />
 <link rel="stylesheet" href="{{ asset('css/pembayaran.css') }}">
 <link rel="stylesheet" href="{{ asset('css/interactive.css') }}">
 
@@ -200,4 +201,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 @endpush
+<x-public-discovery.page-end />
 </x-layouts.public>

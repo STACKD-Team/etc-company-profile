@@ -17,6 +17,7 @@ class HomeController extends Controller
             'instructors' => $discovery->instructors(4),
             'settings' => $discovery->settings(),
             'stats' => $discovery->stats(),
+            'faqs' => collect($discovery->faqItems())->take(5)->all(),
         ]);
     }
 }

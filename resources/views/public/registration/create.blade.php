@@ -1,4 +1,5 @@
-<x-layouts.public title="Pendaftaran Online" navbar-active="program">
+<x-layouts.public title="Pendaftaran Online" :show-navbar="false" :show-footer="false" :show-chatbot="false">
+    <x-public-discovery.navbar active="program" />
     @push('styles')
         <link rel="stylesheet" href="{{ asset('css/pendaftaran.css') }}">
         <link rel="stylesheet" href="{{ asset('css/interactive.css') }}">
@@ -138,7 +139,7 @@
             </article>
 
             <div class="action-row">
-                <x-ui.button :href="route('registrations.programs.index')" color="gray" outlined size="xl" class="btn-kembali">
+                <x-ui.button :href="route('public.programs.index')" color="gray" outlined size="xl" class="btn-kembali">
                     Kembali
                 </x-ui.button>
                 <x-ui.button type="submit" size="xl" class="btn-lanjut" :disabled="$programs->isEmpty()">
@@ -219,4 +220,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 @endpush
+<x-public-discovery.page-end />
 </x-layouts.public>

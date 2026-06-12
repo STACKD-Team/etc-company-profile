@@ -1,4 +1,5 @@
-<x-layouts.public title="Lupa Password">
+<x-layouts.public title="Lupa Password" :show-navbar="false" :show-footer="false" :show-chatbot="false">
+    <x-public-discovery.navbar />
     <section class="bg-etc-surface py-16">
         <div class="mx-auto max-w-xl px-6 lg:px-8">
             <form method="POST" action="{{ route('auth.password.email') }}" class="rounded-card bg-white p-8 shadow-panel">
@@ -22,4 +23,5 @@
             </form>
         </div>
     </section>
+    <x-public-discovery.page-end />
 </x-layouts.public>
