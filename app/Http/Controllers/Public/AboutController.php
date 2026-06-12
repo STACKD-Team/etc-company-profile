@@ -10,7 +10,7 @@ class AboutController extends Controller
 {
     public function index(PublicDiscoveryService $discovery): View
     {
-        return view('public.about', [
+        return view('pages.public.about', [
             'page' => $discovery->page('about'),
             'settings' => $discovery->settings(),
         ]);

@@ -15,7 +15,7 @@ class ContactController extends Controller
 {
     public function index(Request $request, PublicDiscoveryService $discovery): View
     {
-        return view('public.contact.index', [
+        return view('pages.public.contact.index', [
             'settings' => $discovery->settings(),
             'selectedProgram' => Program::query()
                 ->where('is_active', true)

@@ -83,6 +83,11 @@ class Registration extends Model
         return $this->belongsTo(ProgramPromotion::class);
     }
 
+    public function paymentPromotion(): BelongsTo
+    {
+        return $this->belongsTo(ProgramPromotion::class, 'payment_promotion_id');
+    }
+
     public function midtransNotifications(): HasMany
     {
         return $this->hasMany(MidtransNotification::class);

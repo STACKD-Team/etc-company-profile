@@ -26,7 +26,7 @@ abstract class Controller
         $routeName = (string) $request->route()?->getName();
 
         if ($routeName === 'public.home') {
-            return view('public.home');
+            return view('pages.public.home');
         }
 
         $area = $this->areaFromRoute($routeName);

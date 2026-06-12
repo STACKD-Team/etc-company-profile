@@ -42,7 +42,7 @@ it('renders all Miftah public discovery pages without foundation placeholders', 
         ->assertDontSee('data-chatbot-widget', false);
 
     $this->get("/reels/{$reel->id}")
-        ->assertRedirect('/reels');
+        ->assertRedirect(route('public.reels.index', ['reel' => $reel->id]));
 });
 
 it('connects public program CTAs into detail and the registration picker', function () {
@@ -133,7 +133,8 @@ it('only shows published reels publicly and hides unpublished reel detail', func
         ->assertSee($published->title)
         ->assertDontSee($draft->title);
 
-    $this->get("/reels/{$published->id}")->assertRedirect('/reels');
+    $this->get("/reels/{$published->id}")
+        ->assertRedirect(route('public.reels.index', ['reel' => $published->id]));
     $this->get("/reels/{$draft->id}")->assertNotFound();
 });
 

@@ -42,7 +42,7 @@ it('keeps every Miftah public page on the shared public layout', function () {
         'programs/show.blade.php',
         'reels/index.blade.php',
     ] as $view) {
-        expect(file_get_contents(resource_path("views/public/{$view}")))
+        expect(file_get_contents(resource_path("views/pages/public/{$view}")))
             ->toContain('<x-layouts.public');
     }
 });
@@ -52,11 +52,11 @@ it('standardizes Miftah public controls on shared UI components', function () {
         'views/components/site/navbar.blade.php',
         'views/components/site/chatbot.blade.php',
         'views/components/site/footer.blade.php',
-        'views/public/contact/index.blade.php',
-        'views/public/faq/index.blade.php',
-        'views/public/programs/index.blade.php',
-        'views/public/programs/show.blade.php',
-        'views/public/reels/index.blade.php',
+        'views/pages/public/contact/index.blade.php',
+        'views/pages/public/faq/index.blade.php',
+        'views/pages/public/programs/index.blade.php',
+        'views/pages/public/programs/show.blade.php',
+        'views/pages/public/reels/index.blade.php',
     ] as $file) {
         $source = file_get_contents(resource_path($file));
 
@@ -127,7 +127,7 @@ it('renders the complete Miftah public discovery surface after standardization',
     }
 
     $this->get(route('public.reels.show', $reel))
-        ->assertRedirect(route('public.reels.index'));
+        ->assertRedirect(route('public.reels.index', ['reel' => $reel->getKey()]));
 });
 
 it('keeps Miftah reels vertical, sound ready, and free from view or like controls', function () {
@@ -158,7 +158,7 @@ it('keeps Miftah reels vertical, sound ready, and free from view or like control
         ->assertDontSee('favorite');
 
     $this->get(route('public.reels.show', $reel))
-        ->assertRedirect(route('public.reels.index'));
+        ->assertRedirect(route('public.reels.index', ['reel' => $reel->getKey()]));
 
     $reelsCss = file_get_contents(resource_path('css/app.css'));
 

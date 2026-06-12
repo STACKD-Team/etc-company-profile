@@ -285,7 +285,7 @@ it('uses vertical reels experience while keeping published only access', functio
         ], false);
 
     $this->get(route('public.reels.show', $published))
-        ->assertRedirect(route('public.reels.index'));
+        ->assertRedirect(route('public.reels.index', ['reel' => $published->getKey()]));
 
     $this->get(route('public.reels.show', $draft))->assertNotFound();
     $this->postJson(route('public.reels.views.store', $draft))->assertNotFound();
@@ -481,7 +481,7 @@ it('renders the refined home discovery sections from the Stitch reference', func
         ->assertDontSee('ETC Planet Assistant');
 
     $scriptSource = file_get_contents(resource_path('js/app.js'));
-    $homeSource = file_get_contents(resource_path('views/public/home.blade.php'));
+    $homeSource = file_get_contents(resource_path('views/pages/public/home.blade.php'));
     $styleSource = file_get_contents(resource_path('css/app.css'));
 
     expect($scriptSource)
@@ -609,10 +609,10 @@ it('keeps public discovery controls on shared blade components', function () {
         'views/components/site/navbar.blade.php',
         'views/components/site/chatbot.blade.php',
         'views/components/site/footer.blade.php',
-        'views/public/faq/index.blade.php',
-        'views/public/programs/index.blade.php',
-        'views/public/programs/show.blade.php',
-        'views/public/reels/index.blade.php',
+        'views/pages/public/faq/index.blade.php',
+        'views/pages/public/programs/index.blade.php',
+        'views/pages/public/programs/show.blade.php',
+        'views/pages/public/reels/index.blade.php',
         'views/public/registration/create.blade.php',
     ];
 
@@ -633,12 +633,12 @@ it('keeps public discovery controls on shared blade components', function () {
     }
 
     foreach ([
-        'views/public/about.blade.php',
-        'views/public/facilities/index.blade.php',
-        'views/public/gallery/index.blade.php',
-        'views/public/home.blade.php',
-        'views/public/programs/index.blade.php',
-        'views/public/programs/show.blade.php',
+        'views/pages/public/about.blade.php',
+        'views/pages/public/facilities/index.blade.php',
+        'views/pages/public/gallery/index.blade.php',
+        'views/pages/public/home.blade.php',
+        'views/pages/public/programs/index.blade.php',
+        'views/pages/public/programs/show.blade.php',
     ] as $file) {
         expect(file_get_contents(resource_path($file)))
             ->not->toContain('public-chip')

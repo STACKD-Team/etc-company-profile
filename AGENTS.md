@@ -92,7 +92,7 @@ Aturan:
 - Jangan duplikasi markup navbar, sidebar, bottom navigation, atau footer.
 - Gunakan route name dari `WEB_ROUTES_ETC.md` untuk link. Fallback URL hanya untuk komponen navigasi reusable yang harus aman saat route belum tersedia.
 - Gunakan `@csrf`, `@method`, `@error`, `old()`, flash message, dan escape output dengan `{{ }}`.
-- Pisahkan view public/admin/student, misalnya `resources/views/public`, `resources/views/admin`, `resources/views/student`.
+- Page utama mengikuti struktur target `resources/views/pages/public`, `resources/views/pages/admin`, `resources/views/pages/student`, dan `resources/views/pages/instructor`. View flow lama yang belum dimigrasikan tetap dipisah per area.
 
 ## Desain
 
