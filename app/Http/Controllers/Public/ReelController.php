@@ -22,7 +22,7 @@ class ReelController extends Controller
                 ->values();
         }
 
-        return view('public.reels.index', [
+        return view('pages.public.reels.index', [
             'reels' => $reels,
         ]);
     }
@@ -31,6 +31,6 @@ class ReelController extends Controller
     {
         abort_unless($reel->is_published, 404);
 
-        return redirect()->route('public.reels.index');
+        return redirect()->route('public.reels.index', ['reel' => $reel->getKey()]);
     }
 }

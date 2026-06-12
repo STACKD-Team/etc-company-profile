@@ -39,7 +39,7 @@ php artisan route:list
 | GET | `/programs` | `public.programs.index` | `Public\ProgramController@index` | `web` | `<x-layouts.public>` daftar program |
 | GET | `/programs/{program}` | `public.programs.show` | `Public\ProgramController@show` | `web` | `<x-layouts.public>` detail program |
 | GET | `/reels` | `public.reels.index` | `Public\ReelController@index` | `web` | `<x-layouts.public>` feed reels |
-| GET | `/reels/{reel}` | `public.reels.show` | `Public\ReelController@show` | `web` | `<x-layouts.public>` detail/player reels |
+| GET | `/reels/{reel}` | `public.reels.show` | `Public\ReelController@show` | `web` | Redirect ke `/reels?reel={id}` agar feed membuka reel terpilih |
 | POST | `/reels/{reel}/views` | `public.reels.views.store` | `Public\ReelViewController@store` | `web`, `throttle:reels` | Increment view |
 | POST | `/reels/{reel}/likes` | `public.reels.likes.store` | `Public\ReelLikeController@store` | `web`, `throttle:reels` | Like/unlike reels |
 

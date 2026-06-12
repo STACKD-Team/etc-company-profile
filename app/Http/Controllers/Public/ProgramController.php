@@ -18,7 +18,7 @@ class ProgramController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('public.programs.index', [
+        return view('pages.public.programs.index', [
             'programs' => $programs,
             'categories' => Program::query()->where('is_active', true)->distinct()->orderBy('category')->pluck('category')->filter()->values(),
             'selectedCategory' => $request->string('category')->toString(),
@@ -38,7 +38,7 @@ class ProgramController extends Controller
             ->orderBy('start_date')
             ->first();
 
-        return view('public.programs.show', [
+        return view('pages.public.programs.show', [
             'program' => $program,
             'detailContent' => config('program_details.programs.' . $program->slug, config('program_details.default')),
             'featuredClass' => $featuredClass,

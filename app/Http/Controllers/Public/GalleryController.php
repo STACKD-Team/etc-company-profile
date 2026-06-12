@@ -10,7 +10,7 @@ class GalleryController extends Controller
 {
     public function index(PublicDiscoveryService $discovery): View
     {
-        return view('public.gallery.index', [
+        return view('pages.public.gallery.index', [
             'galleryItems' => $discovery->gallery(),
         ]);
     }

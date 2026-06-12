@@ -166,7 +166,7 @@ it('renders all Miftah pages through the shared public layout', function () {
         ->assertDontSee('Implementasi penuh');
 
     $this->get(route('public.reels.show', $reel))
-        ->assertRedirect(route('public.reels.index'));
+        ->assertRedirect(route('public.reels.index', ['reel' => $reel->getKey()]));
 });
 
 it('keeps program discovery using active database data and registration CTAs', function () {
@@ -254,7 +254,7 @@ it('shows only published reels, hides social controls, and keeps endpoints contr
         ->assertDontSee($draft->title);
 
     $this->get(route('public.reels.show', $published))
-        ->assertRedirect(route('public.reels.index'));
+        ->assertRedirect(route('public.reels.index', ['reel' => $published->getKey()]));
 
     $this->get(route('public.reels.show', $draft))->assertNotFound();
 
@@ -289,7 +289,7 @@ it('keeps Miftah public views on one shared layout and public controllers away f
         'programs/show.blade.php',
         'reels/index.blade.php',
     ] as $view) {
-        expect(file_get_contents(resource_path("views/public/{$view}")))->toContain('<x-layouts.public');
+        expect(file_get_contents(resource_path("views/pages/public/{$view}")))->toContain('<x-layouts.public');
     }
 
     foreach (glob(app_path('Http/Controllers/Public/*Controller.php')) as $controller) {

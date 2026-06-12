@@ -86,8 +86,9 @@ regresi saat shared component atau halaman public diubah.
   video full-screen dengan caption overlay seperti pengalaman Instagram Reels.
 - Wheel, keyboard, swipe, dan klik area kosong memindahkan tepat satu reel
   dengan transisi halus; klik pada video tetap melakukan pause/resume.
-- Reels hanya memiliki satu tampilan feed di `/reels`; URL detail lama seperti
-  `/reels/{reel}` mengalihkan pengunjung ke feed yang sama.
+- Reels hanya memiliki satu tampilan feed di `/reels`; URL detail seperti
+  `/reels/{reel}` mengalihkan pengunjung ke feed dengan reel tersebut sebagai
+  item pertama.
 - Ikon dan angka view/like tidak ditampilkan pada feed, detail, maupun preview
   reels di landing page.
 - View tetap dicatat melalui endpoint terkontrol tanpa menampilkan counternya.

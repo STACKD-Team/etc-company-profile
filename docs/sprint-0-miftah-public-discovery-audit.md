@@ -13,7 +13,7 @@ Dokumen ini adalah artefak Sprint 0 untuk area Miftah sesuai `context/PEMBAGIAN_
 
 | Route name | Method | URI | Controller | Middleware penting | View/response | Data source | Status | Gap Sprint berikutnya |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `public.home` | GET | `/` | `Public\HomeController@index` | `web` | `public.home` | `PublicDiscoveryService`, `programs`, `reels`, `users`, `contents` | Siap Sprint 0 | Polish value proposition dan CTA untuk Sprint 1. |
+| `public.home` | GET | `/` | `Public\HomeController@index` | `web` | `pages.public.home` | `PublicDiscoveryService`, `programs`, `reels`, `users`, `contents` | Siap Sprint 0 | Page dipindahkan ke konvensi Sprint 3. |
 | `public.about` | GET | `/about` | `Public\AboutController@index` | `web` | `public.about` | `contents` type `page`, settings | Siap Sprint 0 | Pastikan konten final ETC sudah dipublish. |
 | `public.team.index` | GET | `/team` | `Public\TeamController@index` | `web` | `public.team.index` | `users` role instructor | Siap Sprint 0 | Tambahkan foto/bio final saat data siap. |
 | `public.facilities.index` | GET | `/facilities` | `Public\FacilityController@index` | `web` | `public.facilities.index` | `contents` type `room` | Siap Sprint 0 | Lengkapi media fasilitas final. |
@@ -23,7 +23,7 @@ Dokumen ini adalah artefak Sprint 0 untuk area Miftah sesuai `context/PEMBAGIAN_
 | `public.faq.index` | GET | `/faq` | `Public\FaqController@index` | `web` | `public.faq.index` | `contents` page `faq`, FAQ fallback | Siap Sprint 0 | FAQ menjadi bahan knowledge RAG saat Sprint 3. |
 | `public.chatbot.messages.store` | POST | `/chatbot/messages` | `Public\ChatbotController@store` | `web`, `throttle:chatbot` | JSON | `StoreChatbotMessageRequest`, `PublicDiscoveryService`, `ChatbotLogService` | Siap Sprint 0 | Masih rule-based; perlu RAG NVIDIA + Qdrant di Sprint 3 bersama Mia. |
 | `public.reels.index` | GET | `/reels` | `Public\ReelController@index` | `web` | `public.reels.index` | published `reels` | Siap Sprint 0 | Redesign menjadi vertical short-video feed di Sprint 1. |
-| `public.reels.show` | GET | `/reels/{reel}` | `Public\ReelController@show` | `web` | Redirect `public.reels.index` | published `reels` | Compatibility route; semua reels memakai satu feed `/reels`. |
+| `public.reels.show` | GET | `/reels/{reel}` | `Public\ReelController@show` | `web` | Redirect `public.reels.index?reel={id}` | published `reels` | Compatibility route; feed tunggal membuka reel terpilih sebagai item pertama. |
 | `public.reels.views.store` | POST | `/reels/{reel}/views` | `Public\ReelViewController@store` | `web`, `throttle:reels` | JSON | `ReelService` | Siap Sprint 0 | Pertimbangkan de-dupe view lebih ketat di Sprint polish. |
 | `public.reels.likes.store` | POST | `/reels/{reel}/likes` | `Public\ReelLikeController@store` | `web`, `throttle:reels` | JSON | session liked reels, `ReelService` | Siap Sprint 0 | Pertimbangkan auth/session analytics jika dibutuhkan. |
 | `public.programs.index` | GET | `/programs` | `Public\ProgramController@index` | `web` | `public.programs.index` | active `programs` | Siap Sprint 0 | Filter/card bisa dipoles Sprint 1. |

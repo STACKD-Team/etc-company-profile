@@ -10,7 +10,7 @@ class HomeController extends Controller
 {
     public function index(PublicDiscoveryService $discovery): View
     {
-        return view('public.home', [
+        return view('pages.public.home', [
             'programs' => $discovery->programHighlights(),
             'partners' => $discovery->partners(),
             'reels' => $discovery->reels(4),
