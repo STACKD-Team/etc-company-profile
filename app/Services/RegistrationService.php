@@ -19,6 +19,7 @@ class RegistrationService extends BaseCrudService
 {
     public function __construct(
         protected MediaStorageService $mediaStorage,
+        protected MidtransPaymentService $midtransPayment,
     ) {}
 
     protected function modelClass(): string
@@ -44,8 +45,9 @@ class RegistrationService extends BaseCrudService
         }
 
         return DB::transaction(function () use ($applicantData): Registration {
-            $program = Program::query()->findOrFail($applicantData['program_id']);
+            $program = Program::query()->with('activePromotions')->findOrFail($applicantData['program_id']);
             $user = $this->storeStudentProfile($applicantData);
+            $paymentSnapshot = $this->midtransPayment->snapshotAmount($program);
 
             /** @var Registration $registration */
             $registration = Registration::query()->create([
@@ -57,7 +59,8 @@ class RegistrationService extends BaseCrudService
                 'applicant_phone' => $applicantData['mobile_phone'],
                 'preferred_days' => $applicantData['preferred_days'],
                 'preferred_time' => $applicantData['preferred_time'],
-                'payment_amount' => (float) $program->registration_fee + (float) $program->price,
+                ...$paymentSnapshot,
+                'payment_status' => 'waiting_payment',
                 'status' => 'pending_payment',
                 'notes' => json_encode([
                     'applying_for' => $applicantData['applying_for'],
@@ -66,7 +69,9 @@ class RegistrationService extends BaseCrudService
                 ], JSON_THROW_ON_ERROR),
             ]);
 
-            return $registration->load($this->defaultWith());
+            return $this->midtransPayment
+                ->createTransaction($registration)
+                ->load($this->defaultWith());
         });
     }
 

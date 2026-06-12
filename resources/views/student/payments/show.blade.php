@@ -4,7 +4,7 @@
     $originalAmount = (float) ($payment->payment_amount ?? 0);
     $discountAmount = 0;
     $finalAmount = max($originalAmount - $discountAmount, 0);
-    $proofUrl = $payment->payment_proof ? \Illuminate\Support\Facades\Storage::url($payment->payment_proof) : null;
+    $proofUrl = $payment->payment_proof ? app(\App\Services\MediaStorageService::class)->url($payment->payment_proof) : null;
     $isWaiting = in_array($payment->status, ['pending_payment', 'waiting_payment'], true);
 @endphp
 
