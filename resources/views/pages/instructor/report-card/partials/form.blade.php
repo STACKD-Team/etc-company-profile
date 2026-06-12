@@ -1,22 +1,4 @@
-@php
-    $studentName = $enrollment->user?->full_name ?? $enrollment->user?->name ?? '-';
-    $gradeOptions = ['A' => 'A', 'B' => 'B', 'C' => 'C', 'D' => 'D'];
-@endphp
-
-<x-layouts.dashboard
-    :title="$title"
-    :description="'Isi assessment untuk '.$studentName.'. Draft dapat dilanjutkan selama belum dipublish admin.'"
-    area="instructor"
-    active="reports"
->
-    <x-slot:eyebrow>Assessment Siswa</x-slot:eyebrow>
-    <x-slot:headerActions>
-        <x-ui.button :href="route('instructor.report-cards.index')" outlined icon="heroicon-m-arrow-left">
-            Kembali
-        </x-ui.button>
-    </x-slot:headerActions>
-
-    <form method="POST" action="{{ $action }}" class="space-y-6">
+<form method="POST" action="{{ $action }}" class="space-y-6">
         @csrf
         @if ($method !== 'POST')
             @method($method)
@@ -131,5 +113,4 @@
                 Simpan Draft Assessment
             </x-ui.button>
         </div>
-    </form>
-</x-layouts.dashboard>
+</form>

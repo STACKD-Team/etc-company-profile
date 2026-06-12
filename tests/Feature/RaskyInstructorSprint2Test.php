@@ -225,7 +225,7 @@ it('renders sortable instructor tables and keeps assessment forms on project fie
         ->assertDontSee('name="issued_at"', false)
         ->assertDontSee('name="is_published"', false);
 
-    $source = file_get_contents(resource_path('views/instructor/report-cards/form.blade.php'));
+    $source = file_get_contents(resource_path('views/pages/instructor/report-card/partials/form.blade.php'));
 
     expect($response->getContent())->toContain('fi-input')
         ->and($source)

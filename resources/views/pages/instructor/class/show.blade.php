@@ -79,7 +79,7 @@
                 ],
                 'action' => 'Aksi',
             ]"
-            row-view="instructor.partials.class-student-row"
+            row-view="pages.instructor.class.partials.student-row"
             empty="Belum ada siswa di kelas ini"
             empty-description="Enrollment siswa akan tampil setelah diproses admin."
             search-placeholder="Cari nama atau email siswa"

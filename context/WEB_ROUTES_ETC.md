@@ -174,12 +174,14 @@ Route Blade lama tetap tersedia untuk kompatibilitas link/test lama. Route name 
 | Method | URI | Route Name | Controller/Action | Middleware | Layout/Notes |
 | --- | --- | --- | --- | --- | --- |
 | GET | `/instructor/dashboard` | `instructor.dashboard` | `Instructor\DashboardController@index` | `web`, `auth`, `role:instructor` | `<x-layouts.dashboard area="instructor">` |
-| GET | `/instructor/classes` | `instructor.classes.index` | `Instructor\ClassController@index` | `web`, `auth`, `role:instructor` | List kelas instructor |
-| GET | `/instructor/classes/{class}` | `instructor.classes.show` | `Instructor\ClassController@show` | `web`, `auth`, `role:instructor` | Detail kelas instructor |
-| GET | `/instructor/students` | `instructor.students.index` | `Instructor\StudentController@index` | `web`, `auth`, `role:instructor` | List siswa instructor |
-| GET | `/instructor/report-cards` | `instructor.report-cards.index` | `Instructor\ReportCardController@index` | `web`, `auth`, `role:instructor` | List rapor instructor |
-| GET | `/instructor/enrollments/{enrollment}/report-card/create` | `instructor.report-cards.create` | `Instructor\ReportCardController@create` | `web`, `auth`, `role:instructor` | Form create rapor dari enrollment |
-| POST | `/instructor/enrollments/{enrollment}/report-card` | `instructor.report-cards.store` | `Instructor\ReportCardController@store` | `web`, `auth`, `role:instructor` | Simpan rapor instructor |
-| GET | `/instructor/report-cards/{reportCard}` | `instructor.report-cards.show` | `Instructor\ReportCardController@show` | `web`, `auth`, `role:instructor` | Detail rapor instructor |
-| GET | `/instructor/report-cards/{reportCard}/edit` | `instructor.report-cards.edit` | `Instructor\ReportCardController@edit` | `web`, `auth`, `role:instructor` | Form edit rapor instructor |
-| PUT | `/instructor/report-cards/{reportCard}` | `instructor.report-cards.update` | `Instructor\ReportCardController@update` | `web`, `auth`, `role:instructor` | Update rapor instructor |
+| GET | `/instructor/profile` | `instructor.profile.show` | `Instructor\ProfileController@show` | `web`, `auth`, `role:instructor` | Profil instructor |
+| PUT | `/instructor/profile` | `instructor.profile.update` | `Instructor\ProfileController@update` | `web`, `auth`, `role:instructor` | Update profil instructor |
+| GET | `/instructor/class` | `instructor.classes.index` | `Instructor\ClassController@index` | `web`, `auth`, `role:instructor` | List kelas instructor |
+| GET | `/instructor/class/{class}` | `instructor.classes.show` | `Instructor\ClassController@show` | `web`, `auth`, `role:instructor` | Detail kelas instructor |
+| GET | `/instructor/student` | `instructor.students.index` | `Instructor\StudentController@index` | `web`, `auth`, `role:instructor` | List siswa instructor |
+| GET | `/instructor/report-card` | `instructor.report-cards.index` | `Instructor\ReportCardController@index` | `web`, `auth`, `role:instructor` | List rapor instructor |
+| GET | `/instructor/enrollment/{enrollment}/report-card/create` | `instructor.report-cards.create` | `Instructor\ReportCardController@create` | `web`, `auth`, `role:instructor` | Form create rapor dari enrollment |
+| POST | `/instructor/enrollment/{enrollment}/report-card` | `instructor.report-cards.store` | `Instructor\ReportCardController@store` | `web`, `auth`, `role:instructor` | Simpan rapor instructor |
+| GET | `/instructor/report-card/{reportCard}` | `instructor.report-cards.show` | `Instructor\ReportCardController@show` | `web`, `auth`, `role:instructor` | Detail rapor instructor |
+| GET | `/instructor/report-card/{reportCard}/edit` | `instructor.report-cards.edit` | `Instructor\ReportCardController@edit` | `web`, `auth`, `role:instructor` | Form edit rapor instructor |
+| PUT | `/instructor/report-card/{reportCard}` | `instructor.report-cards.update` | `Instructor\ReportCardController@update` | `web`, `auth`, `role:instructor` | Update rapor instructor |
