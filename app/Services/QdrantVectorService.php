@@ -8,7 +8,7 @@ class QdrantVectorService
 {
     public function upsert(string $pointId, array $vector, array $payload): void
     {
-        if (! $this->configured()) {
+        if (! $this->isConfigured()) {
             return;
         }
 
@@ -29,7 +29,7 @@ class QdrantVectorService
      */
     public function search(array $vector, int $limit = 5): array
     {
-        if (! $this->configured()) {
+        if (! $this->isConfigured()) {
             return [];
         }
 
@@ -50,7 +50,7 @@ class QdrantVectorService
         ])->filter(fn (array $item): bool => $item['content'] !== '')->values()->all();
     }
 
-    protected function configured(): bool
+    public function isConfigured(): bool
     {
         return (bool) config('rag.qdrant.url');
     }

@@ -30,7 +30,7 @@
                 @endif
 
                 @if ($icon)
-                    <span class="grid h-10 w-10 place-items-center rounded-full bg-etc-surface text-etc-magenta ring-1 ring-etc-outline-variant/70">
+                    <span class="grid h-10 w-10 place-items-center rounded-selector bg-etc-surface text-etc-magenta ring-1 ring-etc-outline-variant/70">
                         {{
                             \Filament\Support\generate_icon_html(
                                 $icon,

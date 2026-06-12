@@ -42,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
                     950 => '39, 0, 22',
                 ],
             ])
+            ->viteTheme('resources/css/app.css')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([

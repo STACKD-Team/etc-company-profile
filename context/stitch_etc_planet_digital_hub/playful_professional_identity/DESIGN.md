@@ -36,9 +36,9 @@ typography:
     fontWeight: '400'
     lineHeight: '1.4-1.6'
 rounded:
-  box: 0.5rem
-  field: 0.25rem
-  selector: 0.5rem
+  box: 1rem
+  field: 2rem
+  selector: 1rem
 sizes:
   field:
     xs: 24px
@@ -98,9 +98,9 @@ Hierarchy is primarily established through **Tonal Layers**, using low-opacity M
 ## Shapes
 The shape language is consistently rounded to reinforce the "Playful" brand pillar. 
 
-- **Boxes:** Cards, panels, modals, drawers, alerts, and empty states use a `0.5rem` radius.
-- **Fields:** Buttons, icon buttons, inputs, selects, textareas, date fields, search fields, tabs, and pagination controls use a `0.25rem` radius.
-- **Selectors:** Checkboxes, radio controls, toggles, badges, and chips use a `0.5rem` radius.
+- **Boxes:** Cards, panels, modals, drawers, alerts, and empty states use a `1rem` radius.
+- **Fields:** Buttons, icon buttons, inputs, selects, textareas, date fields, search fields, tabs, and pagination controls use a `2rem` radius.
+- **Selectors:** Checkboxes, radio controls, toggles, badges, and chips use a `1rem` radius.
 - **Borders:** Every visible component border and focus border uses a `2px` width.
 
 Decorative blobs should be asymmetrical and organic, avoiding perfect circles to maintain a hand-drawn, inclusive feel.
@@ -108,11 +108,11 @@ Decorative blobs should be asymmetrical and organic, avoiding perfect circles to
 ## Components
 Consistent component behavior is vital for the trustworthy aspect of the "Playful Professional" style.
 
-- **Buttons:** Buttons use the shared field radius (`0.25rem`), 16px horizontal padding for text-bearing variants, and one of the fixed field heights: `xs` 24px, `sm` 32px, `md` 40px, `lg` 48px, or `xl` 56px. Primary buttons use Magenta with off-white text. Secondary buttons use Charcoal or an outline style.
-- **Input Fields:** Use `0.25rem` radius, 16px horizontal padding, a 2px Charcoal-opacity border, off-white background, Magenta focus border, the same fixed field height scale as buttons, and a 16px body text default.
-- **Cards:** Use `0.5rem` radius, a 2px Charcoal-opacity border, and subtle ambient shadow. Content within cards should have a minimum of 24px internal padding.
-- **Chips/Badges:** Use `0.5rem` radius, the fixed selector size scale (`xs` 16px through `xl` 32px), and tonal backgrounds derived from the three brand colors, except semantic status variants.
-- **Checkboxes & Radios:** Use `0.5rem` selector radius, the fixed selector size scale, and the primary brand color for the active state.
+- **Buttons:** Buttons use the shared field radius (`2rem`), 16px horizontal padding for text-bearing variants, and one of the fixed field heights: `xs` 24px, `sm` 32px, `md` 40px, `lg` 48px, or `xl` 56px. Primary buttons use Magenta with off-white text. Secondary buttons use Charcoal or an outline style.
+- **Input Fields:** Use `2rem` radius, 16px horizontal padding, a 2px Charcoal-opacity border, off-white background, Magenta focus border, the same fixed field height scale as buttons, and a 16px body text default.
+- **Cards:** Use `1rem` radius, a 2px Charcoal-opacity border, and subtle ambient shadow. Content within cards should have a minimum of 24px internal padding.
+- **Chips/Badges:** Use `1rem` radius, the fixed selector size scale (`xs` 16px through `xl` 32px), and tonal backgrounds derived from the three brand colors, except semantic status variants.
+- **Checkboxes & Radios:** Use `1rem` selector radius, the fixed selector size scale, and the primary brand color for the active state.
 - **Decorative Blobs:** Use these as background elements for "Hero" images or behind "Teacher Profiles" to create a sense of depth and personality.
 
 All component dimensions, padding, gaps, and icon sizes use the 4px base unit. Text-bearing field controls use 16px left and right padding. Field heights follow `xs` 24px, `sm` 32px, `md` 40px, `lg` 48px, and `xl` 56px. Selector dimensions follow `xs` 16px, `sm` 20px, `md` 24px, `lg` 28px, and `xl` 32px.

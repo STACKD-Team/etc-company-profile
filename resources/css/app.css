@@ -27,9 +27,9 @@
     --shadow-soft: 0 4px 14px rgb(39 23 28 / 7%);
     --shadow-panel: 0 10px 26px rgb(39 23 28 / 10%);
 
-    --radius-box: 0.5rem;
-    --radius-field: 0.25rem;
-    --radius-selector: 0.5rem;
+    --radius-box: 1rem;
+    --radius-field: 2rem;
+    --radius-selector: 1rem;
     --radius-card: var(--radius-box);
     --radius-pill: var(--radius-field);
     --border-component: 2px;
