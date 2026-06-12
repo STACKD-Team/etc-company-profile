@@ -55,7 +55,7 @@
             ],
             'action' => 'Aksi',
         ]"
-        row-view="instructor.partials.student-row"
+        row-view="pages.instructor.student.partials.row"
         empty="Belum ada siswa"
         empty-description="Siswa dari kelas yang kamu ajar akan tampil di sini."
         search-placeholder="Cari nama, email, atau kelas"

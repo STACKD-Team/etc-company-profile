@@ -18,6 +18,9 @@
 >
     <x-slot:eyebrow>Instructor Workspace</x-slot:eyebrow>
     <x-slot:headerActions>
+        <x-ui.button :href="route('instructor.profile.show')" outlined icon="heroicon-m-user-circle">
+            Profil Saya
+        </x-ui.button>
         <x-ui.button :href="route('instructor.report-cards.index')" icon="heroicon-m-pencil-square">
             Buka Assessment
         </x-ui.button>

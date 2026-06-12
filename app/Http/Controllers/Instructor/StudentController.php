@@ -13,7 +13,7 @@ class StudentController extends Controller
     {
         $instructorId = (int) $request->user()->id;
 
-        return view('instructor.students.index', [
+        return view('pages.instructor.student.index', [
             'students' => $panel->paginateStudents($instructorId, $request->validated()),
             'classOptions' => $panel->classOptions($instructorId),
             'studentOptions' => $panel->studentOptions($instructorId),

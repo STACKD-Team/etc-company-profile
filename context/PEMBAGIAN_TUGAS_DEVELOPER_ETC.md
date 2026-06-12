@@ -1041,6 +1041,7 @@ Acceptance criteria Mecca:
 Area milik Rasky:
 
 - Instructor dashboard
+- Instructor profile
 - Instructor classes
 - Instructor class detail
 - Instructor students
@@ -1049,6 +1050,8 @@ Area milik Rasky:
 Route terkait:
 
 - `instructor.dashboard`
+- `instructor.profile.show`
+- `instructor.profile.update`
 - `instructor.classes.index`
 - `instructor.classes.show`
 - `instructor.students.index`
@@ -1059,13 +1062,19 @@ Route terkait:
 - `instructor.report-cards.edit`
 - `instructor.report-cards.update`
 
-Route assessment instructor:
+Route profile dan assessment instructor:
 
-- `GET /instructor/enrollments/{enrollment}/report-card/create`
-- `POST /instructor/enrollments/{enrollment}/report-card`
-- `GET /instructor/report-cards/{reportCard}`
-- `GET /instructor/report-cards/{reportCard}/edit`
-- `PUT /instructor/report-cards/{reportCard}`
+- `GET /instructor/profile`
+- `PUT /instructor/profile`
+- `GET /instructor/enrollment/{enrollment}/report-card/create`
+- `POST /instructor/enrollment/{enrollment}/report-card`
+- `GET /instructor/report-card/{reportCard}`
+- `GET /instructor/report-card/{reportCard}/edit`
+- `PUT /instructor/report-card/{reportCard}`
+
+Page utama instructor menggunakan struktur role-specific di
+`resources/views/pages/instructor/` dengan resource singular `dashboard`,
+`profile`, `class`, `student`, dan `report-card`.
 
 Instructor hanya dapat membuat dan mengubah draft assessment untuk enrollment
 dari kelas yang diajar. Rapor yang sudah dipublish bersifat read-only dan

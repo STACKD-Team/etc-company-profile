@@ -49,7 +49,7 @@
             ],
             'action' => 'Aksi',
         ]"
-        row-view="instructor.partials.report-card-row"
+        row-view="pages.instructor.report-card.partials.row"
         empty="Belum ada siswa untuk dinilai"
         empty-description="Assessment tersedia setelah siswa masuk ke kelas yang kamu ajar."
         search-placeholder="Cari siswa atau kelas"

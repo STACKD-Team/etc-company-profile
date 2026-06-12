@@ -11,7 +11,7 @@ class DashboardController extends Controller
 {
     public function index(Request $request, InstructorPanelService $panel): View
     {
-        return view('instructor.dashboard', [
+        return view('pages.instructor.dashboard.index', [
             'instructor' => $request->user(),
             ...$panel->dashboard((int) $request->user()->id),
         ]);

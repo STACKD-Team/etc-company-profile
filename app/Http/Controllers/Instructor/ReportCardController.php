@@ -18,7 +18,7 @@ class ReportCardController extends Controller
     {
         $instructorId = (int) $request->user()->id;
 
-        return view('instructor.report-cards.index', [
+        return view('pages.instructor.report-card.index', [
             'assessments' => $panel->paginateAssessments($instructorId, $request->validated()),
             'classOptions' => $panel->classOptions($instructorId),
             'studentOptions' => $panel->studentOptions($instructorId),
@@ -30,12 +30,9 @@ class ReportCardController extends Controller
         $enrollment = $panel->ownedEnrollment((int) $request->user()->id, $enrollment);
         abort_if($enrollment->reportCard, 409, 'Assessment untuk siswa ini sudah tersedia.');
 
-        return view('instructor.report-cards.form', [
-            'title' => 'Mulai Assessment',
+        return view('pages.instructor.report-card.create', [
             'enrollment' => $enrollment,
             'reportCard' => new ReportCard,
-            'action' => route('instructor.report-cards.store', $enrollment),
-            'method' => 'POST',
         ]);
     }
 
@@ -55,7 +52,7 @@ class ReportCardController extends Controller
     {
         $reportCard = $panel->ownedReportCard((int) $request->user()->id, $reportCard);
 
-        return view('instructor.report-cards.show', [
+        return view('pages.instructor.report-card.show', [
             'reportCard' => $reportCard,
             'isComplete' => $panel->isAssessmentComplete($reportCard),
         ]);
@@ -66,12 +63,9 @@ class ReportCardController extends Controller
         $reportCard = $panel->ownedReportCard((int) $request->user()->id, $reportCard);
         abort_if($reportCard->is_published, 403, 'Rapor yang sudah dipublish tidak dapat diubah instructor.');
 
-        return view('instructor.report-cards.form', [
-            'title' => 'Edit Assessment',
+        return view('pages.instructor.report-card.edit', [
             'enrollment' => $reportCard->enrollment,
             'reportCard' => $reportCard,
-            'action' => route('instructor.report-cards.update', $reportCard),
-            'method' => 'PUT',
         ]);
     }
 

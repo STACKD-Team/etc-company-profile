@@ -50,7 +50,7 @@
             ],
             'action' => 'Aksi',
         ]"
-        row-view="instructor.partials.class-row"
+        row-view="pages.instructor.class.partials.row"
         empty="Belum ada kelas yang ditugaskan"
         empty-description="Kelas akan tampil setelah admin menugaskan instructor."
         search-placeholder="Cari nama kelas, program, atau ruangan"
