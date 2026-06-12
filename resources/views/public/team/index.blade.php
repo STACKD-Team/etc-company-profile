@@ -1,4 +1,5 @@
-<x-layouts.public title="Team Pengajar" navbar-active="about">
+<x-layouts.public title="Team Pengajar" :show-navbar="false" :show-footer="false" :show-chatbot="false">
+    <x-public-discovery.navbar active="team" />
     @php
         $media = app(\App\Services\PublicDiscoveryService::class);
         $assetUrl = static fn (?string $path) => $media->mediaUrl($path, 'images/Ms. Debby.jpeg');
@@ -38,4 +39,5 @@
             @endif
         </div>
     </section>
+    <x-public-discovery.page-end />
 </x-layouts.public>

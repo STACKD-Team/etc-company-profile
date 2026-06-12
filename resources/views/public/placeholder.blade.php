@@ -1,4 +1,5 @@
-<x-layouts.public :title="$title">
+<x-layouts.public :title="$title" :show-navbar="false" :show-footer="false" :show-chatbot="false">
+    <x-public-discovery.navbar />
     <section class="bg-etc-surface py-16">
         <div class="mx-auto max-w-[1200px] px-6 lg:px-8">
             <div class="rounded-card bg-white p-8 shadow-soft">
@@ -10,4 +11,5 @@
             </div>
         </div>
     </section>
+    <x-public-discovery.page-end />
 </x-layouts.public>

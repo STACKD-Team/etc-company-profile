@@ -35,16 +35,14 @@ it('renders all Miftah public discovery pages without foundation placeholders', 
             ->assertSee('data-chatbot-widget', false);
     }
 
-    foreach ([
-        '/reels',
-        "/reels/{$reel->id}",
-    ] as $uri) {
-        $this->get($uri)
-            ->assertOk()
-            ->assertDontSee('Fondasi halaman')
-            ->assertDontSee('Implementasi penuh')
-            ->assertDontSee('data-chatbot-widget', false);
-    }
+    $this->get('/reels')
+        ->assertOk()
+        ->assertDontSee('Fondasi halaman')
+        ->assertDontSee('Implementasi penuh')
+        ->assertDontSee('data-chatbot-widget', false);
+
+    $this->get("/reels/{$reel->id}")
+        ->assertRedirect('/reels');
 });
 
 it('connects public program CTAs into detail and the registration picker', function () {
@@ -59,23 +57,31 @@ it('connects public program CTAs into detail and the registration picker', funct
         'max_students' => 12,
         'price' => 1500000,
         'registration_fee' => 200000,
+        'thumbnail' => 'images/pu2-img.jpg',
         'is_active' => true,
     ]);
 
     $this->get('/')
         ->assertOk()
-        ->assertSee(route('registrations.programs.index'), false)
+        ->assertSee(route('public.programs.index'), false)
         ->assertSee(route('public.programs.show', $program), false);
 
     $this->get(route('public.programs.show', $program))
         ->assertOk()
-        ->assertSee(route('registrations.programs.index', ['program' => $program->id]), false);
+        ->assertSee(route('registrations.create', ['program' => $program->id]), false);
+
+    $this->get(route('public.programs.index'))
+        ->assertOk()
+        ->assertSee(route('registrations.create', ['program' => $program->id]), false)
+        ->assertDontSee(route('registrations.programs.index', ['program' => $program->id]), false);
+
+    $this->get(route('registrations.create', ['program' => $program->id]))
+        ->assertOk()
+        ->assertSee('value="'.$program->id.'" selected', false)
+        ->assertSee($program->name);
 
     $this->get(route('registrations.programs.index', ['program' => $program->id]))
-        ->assertOk()
-        ->assertSee('checked', false)
-        ->assertSee('/registration/form/'.$program->id, false)
-        ->assertDontSee(route('public.contact.index', ['program' => $program->id]), false);
+        ->assertRedirect(route('public.programs.index'));
 });
 
 it('stores valid contact messages and rejects invalid contact messages', function () {
@@ -127,7 +133,7 @@ it('only shows published reels publicly and hides unpublished reel detail', func
         ->assertSee($published->title)
         ->assertDontSee($draft->title);
 
-    $this->get("/reels/{$published->id}")->assertOk();
+    $this->get("/reels/{$published->id}")->assertRedirect('/reels');
     $this->get("/reels/{$draft->id}")->assertNotFound();
 });
 

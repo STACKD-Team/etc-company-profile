@@ -1,4 +1,5 @@
-<x-layouts.public title="Masuk">
+<x-layouts.public title="Masuk" :show-navbar="false" :show-footer="false" :show-chatbot="false">
+    <x-public-discovery.navbar />
     <section class="bg-etc-surface py-16">
         <div class="mx-auto grid max-w-[1000px] gap-8 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
             <div class="flex flex-col justify-center">
@@ -39,4 +40,5 @@
             </form>
         </div>
     </section>
+    <x-public-discovery.page-end />
 </x-layouts.public>
