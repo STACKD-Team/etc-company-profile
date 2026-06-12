@@ -15,7 +15,7 @@ class ReportCardController extends Controller
     {
         $studentId = (int) $request->user()->id;
 
-        return view('student.report-cards.index', [
+        return view('pages.student.report-card.index', [
             'student' => $request->user(),
             'reportCards' => $panel->paginateReportCards($studentId, $request->validated()),
             'programOptions' => $panel->reportProgramOptions($studentId),
@@ -28,7 +28,7 @@ class ReportCardController extends Controller
     {
         $reportCard = $panel->ownedPublishedReportCard((int) $request->user()->id, $reportCard);
 
-        return view('student.report-cards.show', [
+        return view('pages.student.report-card.show', [
             'student' => $request->user(),
             'reportCard' => $reportCard,
         ]);
