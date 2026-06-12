@@ -12,9 +12,13 @@ return new class extends Migration
             $table->string('midtrans_order_id', 120)->nullable()->after('payment_gateway_id')->index();
             $table->string('midtrans_snap_token', 255)->nullable()->after('midtrans_order_id');
             $table->string('midtrans_redirect_url', 500)->nullable()->after('midtrans_snap_token');
-            $table->string('payment_status', 40)->nullable()->after('midtrans_redirect_url')->index();
+            if (! Schema::hasColumn('registrations', 'payment_status')) {
+                $table->string('payment_status', 40)->nullable()->after('midtrans_redirect_url')->index();
+            }
             $table->text('payment_status_message')->nullable()->after('payment_status');
-            $table->timestamp('payment_expires_at')->nullable()->after('payment_status_message');
+            if (! Schema::hasColumn('registrations', 'payment_expires_at')) {
+                $table->timestamp('payment_expires_at')->nullable()->after('payment_status_message');
+            }
             $table->decimal('original_amount', 12, 2)->nullable()->after('payment_amount');
             $table->decimal('discount_amount', 12, 2)->nullable()->after('original_amount');
             $table->decimal('final_amount', 12, 2)->nullable()->after('discount_amount');
@@ -31,9 +35,7 @@ return new class extends Migration
                 'midtrans_order_id',
                 'midtrans_snap_token',
                 'midtrans_redirect_url',
-                'payment_status',
                 'payment_status_message',
-                'payment_expires_at',
                 'original_amount',
                 'discount_amount',
                 'final_amount',

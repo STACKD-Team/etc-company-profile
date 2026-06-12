@@ -6,6 +6,7 @@
     $finalAmount = max($originalAmount - $discountAmount, 0);
     $proofUrl = $payment->payment_proof ? app(\App\Services\MediaStorageService::class)->url($payment->payment_proof) : null;
     $isWaiting = in_array($payment->status, ['pending_payment', 'waiting_payment'], true);
+    $formatMoney = fn (float|int|null $amount): string => 'Rp '.number_format((float) $amount, 0, ',', '.');
 @endphp
 
 <x-layouts.dashboard title="Detail Pembayaran" area="student" active="payments" :user="$student">

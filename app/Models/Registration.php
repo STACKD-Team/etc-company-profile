@@ -33,10 +33,11 @@ class Registration extends Model
         'payment_promotion_id',
         'payment_promotion_title',
         'payment_gateway_id',
+        'payment_redirect_url',
+        'payment_snap_token',
         'midtrans_order_id',
         'midtrans_snap_token',
         'midtrans_redirect_url',
-        'payment_status',
         'payment_status_message',
         'payment_expires_at',
         'original_amount',
@@ -55,6 +56,9 @@ class Registration extends Model
         return [
             'placement_test_at' => 'datetime',
             'payment_amount' => 'decimal:2',
+            'payment_original_amount' => 'decimal:2',
+            'payment_discount_amount' => 'decimal:2',
+            'payment_final_amount' => 'decimal:2',
             'payment_expires_at' => 'datetime',
             'original_amount' => 'decimal:2',
             'discount_amount' => 'decimal:2',
@@ -81,6 +85,11 @@ class Registration extends Model
     public function programPromotion(): BelongsTo
     {
         return $this->belongsTo(ProgramPromotion::class);
+    }
+
+    public function paymentPromotion(): BelongsTo
+    {
+        return $this->belongsTo(ProgramPromotion::class, 'payment_promotion_id');
     }
 
     public function midtransNotifications(): HasMany

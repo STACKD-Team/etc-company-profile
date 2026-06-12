@@ -35,15 +35,18 @@ it('keeps admin content routes protected for admins', function () {
         ->and($route->gatherMiddleware())->toContain('auth')
         ->and($route->gatherMiddleware())->toContain('role:admin');
 
-    $this->get('/admin/reels')
+    $this->get(route('admin.reels.index', absolute: false))
         ->assertRedirect('/login');
+
+    $this->get('/admin/reels')
+        ->assertRedirect('/admin/login');
 });
 
 it('rejects authenticated users with the wrong role', function () {
     $student = User::factory()->create(['role' => 'student']);
 
     $this->actingAs($student)
-        ->get('/admin/reels')
+        ->get(route('admin.reels.index', absolute: false))
         ->assertForbidden();
 });
 

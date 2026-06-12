@@ -27,9 +27,9 @@
     --shadow-soft: 0 4px 14px rgb(39 23 28 / 7%);
     --shadow-panel: 0 10px 26px rgb(39 23 28 / 10%);
 
-    --radius-box: 1rem;
-    --radius-field: 2rem;
-    --radius-selector: 1rem;
+    --radius-box: 0.5rem;
+    --radius-field: 0.25rem;
+    --radius-selector: 0.5rem;
     --radius-card: var(--radius-box);
     --radius-pill: var(--radius-field);
     --border-component: 2px;
@@ -44,11 +44,11 @@
     --etc-selector-size-md: 24px;
     --etc-selector-size-lg: 28px;
     --etc-selector-size-xl: 32px;
-    --etc-size-xs: var(--etc-selector-size-xs);
+    --etc-size-xs: 16px;
     --etc-size-sm: var(--etc-selector-size-sm);
-    --etc-size-md: var(--etc-selector-size-md);
+    --etc-size-md: 24px;
     --etc-size-lg: var(--etc-selector-size-lg);
-    --etc-size-xl: var(--etc-selector-size-xl);
+    --etc-size-xl: 32px;
     --etc-font-size-body: 1rem;
     --etc-font-size-h1: 2rem;
     --etc-font-size-h1-lg: 2.25rem;

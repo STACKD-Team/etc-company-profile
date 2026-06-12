@@ -108,6 +108,7 @@
                                 class="flex min-h-[var(--etc-field-size-sm)] max-w-64 items-center gap-2 rounded-field px-4 py-1 text-left transition hover:bg-etc-surface-container"
                                 aria-label="Buka menu profil"
                                 data-dashboard-profile-trigger
+                                x-on:click.stop="profileMenuOpen = ! profileMenuOpen"
                                 x-bind:aria-expanded="profileMenuOpen"
                                 aria-haspopup="menu"
                                 aria-expanded="false"

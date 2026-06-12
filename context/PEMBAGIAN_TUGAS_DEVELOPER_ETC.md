@@ -463,13 +463,15 @@ Keputusan utama:
   - Instructor: `/instructor/dashboard`, `/instructor/profile`, `/instructor/class`, `/instructor/student`, `/instructor/report-card`.
   - Student: `/student/dashboard`, `/student/profile`, `/student/class`, `/student/report-card`, `/student/payment`.
 - Route aktual baru boleh diubah bertahap. Setiap perubahan route harus langsung dicatat ulang di `context/WEB_ROUTES_ETC.md`.
+- Untuk Sprint 3 Mia, admin CRUD/RD yang sudah berjalan di Filament tetap canonical di route aktual `/admin/...` dengan route name `filament.admin.resources.*`; route Blade lama dipertahankan di `/admin/legacy/...` sebagai compatibility layer sampai ada sprint migrasi URL khusus.
 - Struktur view target:
   - Admin pages: `resources/views/pages/admin/{resource}/index.blade.php`, `show.blade.php`, `create.blade.php`, `edit.blade.php`.
   - Instructor pages: `resources/views/pages/instructor/{resource}/index.blade.php`, `show.blade.php`, `create.blade.php`, `edit.blade.php`.
   - Student pages: `resources/views/pages/student/{resource}/index.blade.php`, `show.blade.php`, `create.blade.php`, `edit.blade.php`.
   - Public pages: `resources/views/pages/public/...`.
-  - Halaman role-specific tidak boleh memakai satu file view utama bersama walaupun resource dan URL mirip.
-  - Shared component boleh dipakai bersama, tetapi file page utama tetap dipisah per role agar ownership dan konflik kerja lebih aman.
+- Halaman role-specific tidak boleh memakai satu file view utama bersama walaupun resource dan URL mirip.
+- Shared component boleh dipakai bersama, tetapi file page utama tetap dipisah per role agar ownership dan konflik kerja lebih aman.
+- Untuk admin Mia yang memakai Filament Resource, class/resource di `app/Filament/Resources` menjadi page utama saat ini; migrasi Blade lama ke `resources/views/pages/admin/...` dicatat sebagai backlog bila halaman Blade kembali dipakai sebagai canonical surface.
 - Contoh struktur view role-specific:
   - `/admin/student` -> `resources/views/pages/admin/student/index.blade.php`.
   - `/admin/report-card/{reportCard}` -> `resources/views/pages/admin/report-card/show.blade.php`.

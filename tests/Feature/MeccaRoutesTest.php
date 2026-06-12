@@ -694,21 +694,21 @@ test('student payment detail shows midtrans snapshot and continue payment link',
 });
 
 test('admin academic mecca pages render for authenticated admin', function () {
-    $admin = User::factory()->create(['role' => 'admin']);
+    $admin = User::factory()->create(['role' => 'admin', 'is_active' => true]);
 
     $this->actingAs($admin)->get('/admin/students')->assertOk();
     $this->actingAs($admin)->get('/admin/instructors')->assertOk();
     $this->actingAs($admin)->get('/admin/programs')->assertOk();
     $this->actingAs($admin)->get('/admin/programs/create')->assertOk();
-    $this->actingAs($admin)->get('/admin/classes')->assertOk();
-    $this->actingAs($admin)->get('/admin/classes/create')->assertOk();
+    $this->actingAs($admin)->get('/admin/course-classes')->assertOk();
+    $this->actingAs($admin)->get('/admin/course-classes/create')->assertOk();
     $this->actingAs($admin)->get('/admin/enrollments')->assertOk();
 });
 
 test('admin academic routes require admin access', function () {
     $student = User::factory()->create(['role' => 'student']);
 
-    $this->get('/admin/programs')->assertRedirect('/login');
+    $this->get('/admin/programs')->assertRedirect('/admin/login');
 
     $this->actingAs($student)
         ->get('/admin/programs')
@@ -716,7 +716,7 @@ test('admin academic routes require admin access', function () {
 });
 
 test('admin student and instructor pages only expose matching roles', function () {
-    $admin = User::factory()->create(['role' => 'admin']);
+    $admin = User::factory()->create(['role' => 'admin', 'is_active' => true]);
     $student = User::factory()->create([
         'role' => 'student',
         'name' => 'Student Account',
