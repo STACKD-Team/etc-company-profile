@@ -15,7 +15,7 @@ class ClassController extends Controller
     {
         $studentId = (int) $request->user()->id;
 
-        return view('student.classes.index', [
+        return view('pages.student.class.index', [
             'student' => $request->user(),
             'enrollments' => $panel->paginateClasses($studentId, $request->validated()),
             'programOptions' => $panel->programOptions($studentId),
@@ -29,7 +29,7 @@ class ClassController extends Controller
     {
         $enrollment = $panel->ownedClassEnrollment((int) $request->user()->id, $class);
 
-        return view('student.classes.show', [
+        return view('pages.student.class.show', [
             'student' => $request->user(),
             'enrollment' => $enrollment,
             'class' => $class->load(['program', 'instructor']),

@@ -13,7 +13,7 @@ class LearningHistoryController extends Controller
     {
         $studentId = (int) $request->user()->id;
 
-        return view('student.learning-history', [
+        return view('pages.student.learning-history.index', [
             'student' => $request->user(),
             'enrollments' => $panel->paginateLearningHistory($studentId, $request->validated()),
             'programOptions' => $panel->programOptions($studentId),

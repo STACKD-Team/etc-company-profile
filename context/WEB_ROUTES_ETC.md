@@ -159,14 +159,14 @@ Route Blade lama tetap tersedia untuk kompatibilitas link/test lama. Route name 
 | GET | `/student/dashboard` | `student.dashboard` | `Student\DashboardController@index` | `web`, `auth`, `role:student` | `<x-layouts.dashboard area="student">` |
 | GET | `/student/profile` | `student.profile.show` | `Student\ProfileController@show` | `web`, `auth`, `role:student` | Profil siswa |
 | PUT | `/student/profile` | `student.profile.update` | `Student\ProfileController@update` | `web`, `auth`, `role:student` | Update profil siswa |
-| GET | `/student/classes` | `student.classes.index` | `Student\ClassController@index` | `web`, `auth`, `role:student` | List kelas siswa |
-| GET | `/student/classes/{class}` | `student.classes.show` | `Student\ClassController@show` | `web`, `auth`, `role:student` | Detail kelas siswa |
+| GET | `/student/class` | `student.classes.index` | `Student\ClassController@index` | `web`, `auth`, `role:student` | List kelas siswa; `/student/classes` legacy alias tanpa route name |
+| GET | `/student/class/{class}` | `student.classes.show` | `Student\ClassController@show` | `web`, `auth`, `role:student` | Detail kelas siswa; `/student/classes/{class}` legacy alias tanpa route name |
 | GET | `/student/learning-history` | `student.learning-history.index` | `Student\LearningHistoryController@index` | `web`, `auth`, `role:student` | Riwayat belajar |
-| GET | `/student/report-cards` | `student.report-cards.index` | `Student\ReportCardController@index` | `web`, `auth`, `role:student` | List rapor siswa |
-| GET | `/student/report-cards/{reportCard}` | `student.report-cards.show` | `Student\ReportCardController@show` | `web`, `auth`, `role:student` | Detail rapor siswa |
-| GET | `/student/report-cards/{reportCard}/download` | `student.report-cards.download` | `Student\ReportCardDownloadController` | `web`, `auth`, `role:student` | Download rapor siswa |
-| GET | `/student/payments` | `student.payments.index` | `Student\PaymentController@index` | `web`, `auth`, `role:student` | List pembayaran siswa |
-| GET | `/student/payments/{payment}` | `student.payments.show` | `Student\PaymentController@show` | `web`, `auth`, `role:student` | Detail pembayaran siswa |
+| GET | `/student/report-card` | `student.report-cards.index` | `Student\ReportCardController@index` | `web`, `auth`, `role:student` | List rapor siswa; `/student/report-cards` legacy alias tanpa route name |
+| GET | `/student/report-card/{reportCard}` | `student.report-cards.show` | `Student\ReportCardController@show` | `web`, `auth`, `role:student` | Detail rapor siswa; `/student/report-cards/{reportCard}` legacy alias tanpa route name |
+| GET | `/student/report-card/{reportCard}/download` | `student.report-cards.download` | `Student\ReportCardDownloadController` | `web`, `auth`, `role:student` | Download rapor siswa; `/student/report-cards/{reportCard}/download` legacy alias tanpa route name |
+| GET | `/student/payment` | `student.payments.index` | `Student\PaymentController@index` | `web`, `auth`, `role:student` | List pembayaran siswa; `/student/payments` legacy alias tanpa route name |
+| GET | `/student/payment/{payment}` | `student.payments.show` | `Student\PaymentController@show` | `web`, `auth`, `role:student` | Detail pembayaran siswa; `/student/payments/{payment}` legacy alias tanpa route name |
 | GET | `/student/help` | `student.help.index` | `Student\HelpController@index` | `web`, `auth`, `role:student` | Bantuan siswa |
 
 ## Instructor Routes

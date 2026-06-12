@@ -15,7 +15,7 @@ class PaymentController extends Controller
     {
         $studentId = (int) $request->user()->id;
 
-        return view('student.payments.index', [
+        return view('pages.student.payment.index', [
             'student' => $request->user(),
             'payments' => $panel->paginatePayments($studentId, $request->validated()),
             'programOptions' => $panel->programOptions($studentId),
@@ -31,7 +31,7 @@ class PaymentController extends Controller
     {
         $payment = $panel->ownedPayment((int) $request->user()->id, $payment);
 
-        return view('student.payments.show', [
+        return view('pages.student.payment.show', [
             'student' => $request->user(),
             'payment' => $payment,
             'summary' => $panel->paymentSummary($payment),

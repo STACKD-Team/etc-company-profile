@@ -35,7 +35,7 @@
             ],
             'action' => 'Aksi',
         ]"
-        row-view="student.classes.partials.row"
+        row-view="pages.student.class.partials.row"
         empty="Belum ada kelas"
         empty-description="Kelas akan tampil setelah admin memperbarui enrollment siswa."
         search-placeholder="Cari kelas, program, instructor, jadwal, atau ruangan"

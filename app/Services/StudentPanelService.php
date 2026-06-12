@@ -10,7 +10,6 @@ use App\Models\ReportCard;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
 
 class StudentPanelService
 {
@@ -40,14 +39,15 @@ class StudentPanelService
     public function paginatePayments(int $studentId, array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = $this->paymentsQuery($studentId)
-            ->with(['program', 'courseClass', 'paymentPromotion'])
+            ->with(['program', 'courseClass', 'programPromotion'])
             ->when($filters['search'] ?? null, function (Builder $query, string $search): void {
                 $query->where(function (Builder $query) use ($search): void {
                     $query
                         ->where('registration_code', 'like', '%'.$search.'%')
                         ->orWhere('applicant_name', 'like', '%'.$search.'%')
                         ->orWhere('payment_gateway_id', 'like', '%'.$search.'%')
-                        ->orWhere('payment_promotion_title', 'like', '%'.$search.'%')
+                        ->orWhere('midtrans_order_id', 'like', '%'.$search.'%')
+                        ->orWhere('program_promotion_title', 'like', '%'.$search.'%')
                         ->orWhereHas('program', fn (Builder $query) => $query->where('name', 'like', '%'.$search.'%'))
                         ->orWhereHas('courseClass', fn (Builder $query) => $query->where('name', 'like', '%'.$search.'%'));
                 });
@@ -123,7 +123,7 @@ class StudentPanelService
     {
         abort_unless((int) $payment->user_id === $studentId, 403);
 
-        return $payment->load(['program', 'courseClass', 'paymentPromotion']);
+        return $payment->load(['program', 'courseClass', 'programPromotion']);
     }
 
     public function ownedPublishedReportCard(int $studentId, ReportCard $reportCard): ReportCard
@@ -224,9 +224,9 @@ class StudentPanelService
 
     public function paymentSummary(Registration $payment): array
     {
-        $original = (float) ($payment->payment_original_amount ?? $payment->payment_amount ?? 0);
-        $discount = (float) ($payment->payment_discount_amount ?? 0);
-        $final = (float) ($payment->payment_final_amount ?? max($original - $discount, 0));
+        $original = (float) ($payment->original_amount ?? $payment->payment_amount ?? 0);
+        $discount = (float) ($payment->discount_amount ?? 0);
+        $final = (float) ($payment->final_amount ?? max($original - $discount, 0));
         $status = $this->paymentStatus($payment);
 
         return [
@@ -237,8 +237,10 @@ class StudentPanelService
             'original_amount' => $original,
             'discount_amount' => $discount,
             'final_amount' => $final,
-            'promotion_title' => $payment->payment_promotion_title ?: $payment->paymentPromotion?->title,
-            'can_continue' => filled($payment->payment_redirect_url)
+            'promotion_title' => $payment->program_promotion_title ?: $payment->programPromotion?->title,
+            'snap_token' => $payment->midtrans_snap_token,
+            'redirect_url' => $payment->midtrans_redirect_url,
+            'can_continue' => filled($payment->midtrans_redirect_url)
                 && in_array($status, ['waiting_payment', 'pending_payment'], true)
                 && (! $payment->payment_expires_at || $payment->payment_expires_at->isFuture()),
             'expires_at' => $payment->payment_expires_at,
@@ -320,10 +322,12 @@ class StudentPanelService
             ->where('user_id', $studentId)
             ->where(function (Builder $query): void {
                 $query->whereNotNull('payment_amount')
-                    ->orWhereNotNull('payment_original_amount')
-                    ->orWhereNotNull('payment_final_amount')
+                    ->orWhereNotNull('original_amount')
+                    ->orWhereNotNull('final_amount')
                     ->orWhereNotNull('payment_method')
                     ->orWhereNotNull('payment_gateway_id')
+                    ->orWhereNotNull('midtrans_order_id')
+                    ->orWhereNotNull('midtrans_redirect_url')
                     ->orWhereNotNull('payment_proof')
                     ->orWhereNotNull('paid_at')
                     ->orWhereIn('status', ['pending_payment', 'paid', 'placement_test', 'enrolled', 'rejected', 'cancelled']);

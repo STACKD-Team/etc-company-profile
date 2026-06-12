@@ -7,10 +7,10 @@
     };
     $statusLabel = $statusLabels[$paymentStatus] ?? str($paymentStatus)->replace('_', ' ')->headline();
     $statusColor = $statusColors[$paymentStatus] ?? 'primary';
-    $originalAmount = (float) ($item->payment_original_amount ?? $item->payment_amount ?? 0);
-    $discountAmount = (float) ($item->payment_discount_amount ?? 0);
-    $finalAmount = (float) ($item->payment_final_amount ?? max($originalAmount - $discountAmount, 0));
-    $promotionTitle = $item->payment_promotion_title ?: $item->paymentPromotion?->title;
+    $originalAmount = (float) ($item->original_amount ?? $item->payment_amount ?? 0);
+    $discountAmount = (float) ($item->discount_amount ?? 0);
+    $finalAmount = (float) ($item->final_amount ?? max($originalAmount - $discountAmount, 0));
+    $promotionTitle = $item->program_promotion_title ?: $item->programPromotion?->title;
 @endphp
 
 <tr class="group">

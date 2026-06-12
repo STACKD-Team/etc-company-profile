@@ -55,7 +55,7 @@ class DashboardController extends Controller
         $completedMeetings = $currentEnrollment ? min(12, $durationMeetings) : 0;
         $progressPercent = $currentEnrollment ? (int) round(($completedMeetings / $durationMeetings) * 100) : 0;
 
-        return view('student.dashboard', [
+        return view('pages.student.dashboard.index', [
             'student' => $student,
             'activeEnrollments' => $activeEnrollments,
             'currentEnrollment' => $currentEnrollment,

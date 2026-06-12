@@ -207,6 +207,8 @@ test('documented mecca route names are registered', function () {
         'student.classes.index',
         'student.classes.show',
         'student.learning-history.index',
+        'student.payments.index',
+        'student.payments.show',
         'student.report-cards.index',
         'student.report-cards.show',
         'student.report-cards.download',
@@ -265,13 +267,38 @@ test('student mecca pages render for authenticated student', function () {
         'issued_at' => now()->toDateString(),
     ]);
 
-    $this->actingAs($student)->get('/student/profile')->assertOk();
-    $this->actingAs($student)->get('/student/classes')->assertOk()->assertSee('Intermediate B1');
-    $this->actingAs($student)->get("/student/classes/{$class->id}")->assertOk()->assertSee('Intermediate B1');
-    $this->actingAs($student)->get('/student/learning-history')->assertOk();
+    $this->actingAs($student)->get(route('student.profile.show', [], false))->assertOk()->assertViewIs('pages.student.profile.show');
+    $this->actingAs($student)->get(route('student.classes.index', [], false))->assertOk()->assertViewIs('pages.student.class.index')->assertSee('Intermediate B1');
+    $this->actingAs($student)->get(route('student.classes.show', $class, false))->assertOk()->assertViewIs('pages.student.class.show')->assertSee('Intermediate B1');
+    $this->actingAs($student)->get(route('student.learning-history.index', [], false))->assertOk()->assertViewIs('pages.student.learning-history.index');
+    $this->actingAs($student)->get(route('student.report-cards.index', [], false))->assertOk()->assertViewIs('pages.student.report-card.index');
+    $this->actingAs($student)->get(route('student.report-cards.show', $reportCard, false))->assertOk()->assertViewIs('pages.student.report-card.show')->assertSee('Detail Rapor');
+    $this->actingAs($student)->get(route('student.help.index', [], false))->assertOk()->assertViewIs('pages.student.help.index');
+});
+
+test('student sprint three plural urls remain available as legacy aliases', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $class = createMeccaSprint4Class(['name' => 'Legacy Alias Class']);
+    $enrollment = createMeccaSprint4Enrollment($student, $class);
+    $reportCard = createMeccaSprint4ReportCard($enrollment);
+    $payment = Registration::query()->create([
+        'registration_code' => 'REG-LEGACY-ALIAS',
+        'user_id' => $student->id,
+        'program_id' => $class->program_id,
+        'class_id' => $class->id,
+        'applicant_name' => 'Legacy Alias Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_amount' => 1400000,
+        'status' => 'pending_payment',
+    ]);
+
+    $this->actingAs($student)->get('/student/classes')->assertOk()->assertSee('Legacy Alias Class');
+    $this->actingAs($student)->get("/student/classes/{$class->id}")->assertOk()->assertSee('Legacy Alias Class');
+    $this->actingAs($student)->get('/student/payments')->assertOk()->assertSee('REG-LEGACY-ALIAS');
+    $this->actingAs($student)->get("/student/payments/{$payment->id}")->assertOk()->assertSee('REG-LEGACY-ALIAS');
     $this->actingAs($student)->get('/student/report-cards')->assertOk();
     $this->actingAs($student)->get("/student/report-cards/{$reportCard->id}")->assertOk()->assertSee('Detail Rapor');
-    $this->actingAs($student)->get('/student/help')->assertOk();
 });
 
 test('student sprint four routes require student access', function () {
@@ -288,6 +315,18 @@ test('student sprint four routes require student access', function () {
         ['get', route('student.classes.index', [], false), []],
         ['get', route('student.classes.show', $class, false), []],
         ['get', route('student.learning-history.index', [], false), []],
+        ['get', route('student.payments.index', [], false), []],
+        ['get', route('student.payments.show', Registration::query()->create([
+            'registration_code' => 'REG-STUDENT-ACCESS',
+            'user_id' => $student->id,
+            'program_id' => $class->program_id,
+            'class_id' => $class->id,
+            'applicant_name' => 'Student Access',
+            'applicant_email' => $student->email,
+            'applicant_phone' => '081234567890',
+            'payment_amount' => 1400000,
+            'status' => 'pending_payment',
+        ]), false), []],
         ['get', route('student.report-cards.index', [], false), []],
         ['get', route('student.report-cards.show', $reportCard, false), []],
         ['get', route('student.report-cards.download', $reportCard, false), []],
@@ -580,10 +619,10 @@ test('student sprint two list tables support search filters sorting and paginati
         'payment_method' => 'qris',
         'payment_status' => 'paid',
         'payment_amount' => 1500000,
-        'payment_original_amount' => 1500000,
-        'payment_discount_amount' => 250000,
-        'payment_final_amount' => 1250000,
-        'payment_promotion_title' => 'Promo Mecca',
+        'original_amount' => 1500000,
+        'discount_amount' => 250000,
+        'final_amount' => 1250000,
+        'program_promotion_title' => 'Promo Mecca',
         'paid_at' => '2026-06-10 10:00:00',
         'status' => 'paid',
     ]);
@@ -666,13 +705,13 @@ test('student payment detail shows midtrans snapshot and continue payment link',
         'payment_method' => 'virtual_account',
         'payment_status' => 'waiting_payment',
         'payment_amount' => 1800000,
-        'payment_original_amount' => 1800000,
-        'payment_discount_amount' => 300000,
-        'payment_final_amount' => 1500000,
-        'payment_promotion_title' => 'Promo Snapshot',
+        'original_amount' => 1800000,
+        'discount_amount' => 300000,
+        'final_amount' => 1500000,
+        'program_promotion_title' => 'Promo Snapshot',
         'payment_gateway_id' => 'MIDTRANS-123',
-        'payment_redirect_url' => 'https://pay.example.test/snap',
-        'payment_snap_token' => 'SNAP-TOKEN-123',
+        'midtrans_redirect_url' => 'https://pay.example.test/snap',
+        'midtrans_snap_token' => 'SNAP-TOKEN-123',
         'payment_expires_at' => now()->addHour(),
         'status' => 'pending_payment',
     ]);
@@ -711,7 +750,7 @@ test('admin academic routes require admin access', function () {
     $this->get('/admin/programs')->assertRedirect('/admin/login');
 
     $this->actingAs($student)
-        ->get('/admin/programs')
+        ->get(route('admin.programs.index', [], false))
         ->assertForbidden();
 });
 
@@ -729,33 +768,33 @@ test('admin student and instructor pages only expose matching roles', function (
     ]);
 
     $this->actingAs($admin)
-        ->get('/admin/students')
+        ->get(route('admin.students.index', [], false))
         ->assertOk()
         ->assertSee('Mecca Student')
         ->assertDontSee('ETC Instructor');
 
     $this->actingAs($admin)
-        ->get("/admin/students/{$student->id}")
+        ->get(route('admin.students.show', $student, false))
         ->assertOk()
         ->assertSee('Mecca Student');
 
     $this->actingAs($admin)
-        ->get("/admin/students/{$instructor->id}")
+        ->get(route('admin.students.show', $instructor, false))
         ->assertNotFound();
 
     $this->actingAs($admin)
-        ->get('/admin/instructors')
+        ->get(route('admin.instructors.index', [], false))
         ->assertOk()
         ->assertSee('ETC Instructor')
         ->assertDontSee('Mecca Student');
 
     $this->actingAs($admin)
-        ->get("/admin/instructors/{$instructor->id}")
+        ->get(route('admin.instructors.show', $instructor, false))
         ->assertOk()
         ->assertSee('ETC Instructor');
 
     $this->actingAs($admin)
-        ->get("/admin/instructors/{$student->id}")
+        ->get(route('admin.instructors.show', $student, false))
         ->assertNotFound();
 });
 

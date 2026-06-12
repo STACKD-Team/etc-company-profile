@@ -35,7 +35,7 @@
             ],
             'action' => 'Aksi',
         ]"
-        row-view="student.partials.learning-history-row"
+        row-view="pages.student.learning-history.partials.row"
         empty="Belum ada riwayat pembelajaran"
         empty-description="Riwayat akan tampil setelah siswa masuk kelas."
         search-placeholder="Cari kelas, program, instructor, jadwal, atau ruangan"

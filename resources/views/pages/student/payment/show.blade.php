@@ -1,9 +1,7 @@
 @php
     $statusLabel = $statusLabels[$payment->status] ?? str($payment->status)->replace('_', ' ')->headline();
     $statusColor = $statusColors[$payment->status] ?? 'primary';
-    $originalAmount = (float) ($payment->payment_amount ?? 0);
-    $discountAmount = 0;
-    $finalAmount = max($originalAmount - $discountAmount, 0);
+    $formatMoney = static fn ($value) => 'Rp '.number_format((float) $value, 0, ',', '.');
     $proofUrl = $payment->payment_proof ? app(\App\Services\MediaStorageService::class)->url($payment->payment_proof) : null;
     $isWaiting = in_array($payment->status, ['pending_payment', 'waiting_payment'], true);
     $formatMoney = fn (float|int|null $amount): string => 'Rp '.number_format((float) $amount, 0, ',', '.');
@@ -43,7 +41,7 @@
                     </div>
                     <div class="rounded-box bg-etc-surface-container p-4">
                         <dt class="font-heading text-xs font-bold uppercase text-etc-on-muted">Snap Token</dt>
-                        <dd class="mt-2 break-words text-sm font-semibold text-etc-on-surface">{{ $payment->payment_snap_token ?? '-' }}</dd>
+                        <dd class="mt-2 break-words text-sm font-semibold text-etc-on-surface">{{ $summary['snap_token'] ?? '-' }}</dd>
                     </div>
                     <div class="rounded-box bg-etc-surface-container p-4">
                         <dt class="font-heading text-xs font-bold uppercase text-etc-on-muted">Tanggal Daftar</dt>
@@ -68,7 +66,7 @@
                 </dl>
 
                 @if ($summary['can_continue'])
-                    <x-ui.button :href="$payment->payment_redirect_url" target="_blank" class="mt-6" icon="heroicon-m-arrow-top-right-on-square">
+                    <x-ui.button :href="$summary['redirect_url']" target="_blank" class="mt-6" icon="heroicon-m-arrow-top-right-on-square">
                         Lanjutkan Pembayaran
                     </x-ui.button>
                 @endif

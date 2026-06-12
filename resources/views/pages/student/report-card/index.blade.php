@@ -31,7 +31,7 @@
             ],
             'action' => 'Aksi',
         ]"
-        row-view="student.report-cards.partials.row"
+        row-view="pages.student.report-card.partials.row"
         empty="Belum ada rapor yang dipublikasikan"
         empty-description="Rapor akan tampil setelah admin mempublish hasil pembelajaran."
         search-placeholder="Cari program, kelas, next class, atau komentar"
