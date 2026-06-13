@@ -110,12 +110,10 @@ class ContentController extends Controller
         unset($data['image'], $data['images']);
 
         $data['type'] = $contentType;
-        $data['slug'] = filled($data['slug'] ?? null) ? Str::slug($data['slug']) : Str::slug($data['title']);
+        $data['slug'] = Str::slug($data['title']);
         $data['display_order'] = $data['display_order'] ?? 0;
         $data['is_published'] = $request->boolean('is_published');
-        $data['meta'] = collect($data['meta'] ?? [])
-            ->filter(fn ($value): bool => filled($value))
-            ->all();
+        $data['meta'] = $this->metaPayload($contentType, $data['meta'] ?? []);
 
         return $data;
     }
@@ -181,5 +179,25 @@ class ContentController extends Controller
             ],
             default => [],
         };
+    }
+
+    /**
+     * @param array<string, mixed> $meta
+     * @return array<string, mixed>
+     */
+    private function metaPayload(string $contentType, array $meta): array
+    {
+        $allowed = match ($contentType) {
+            Content::TYPE_GALLERY => ['caption', 'alt_text', 'category', 'event_date', 'location'],
+            Content::TYPE_PARTNER => ['category', 'website', 'since'],
+            Content::TYPE_TESTIMONIAL => ['role', 'rating'],
+            default => [],
+        };
+
+        return collect($meta)
+            ->only($allowed)
+            ->filter(fn ($value): bool => filled($value))
+            ->map(fn ($value, string $key): mixed => $key === 'rating' ? (int) $value : $value)
+            ->all();
     }
 }

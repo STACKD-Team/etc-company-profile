@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\CourseClasses\Tables;
+namespace App\Filament\Resources\Rooms\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -8,38 +8,37 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
-class CourseClassesTable
+class RoomsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('program.name')
-                    ->searchable(),
-                TextColumn::make('instructor.name')
-                    ->searchable(),
+                ImageColumn::make('image')
+                    ->label('Gambar')
+                    ->getStateUsing(fn ($record) => app(\App\Services\MediaStorageService::class)->url($record->image)),
                 TextColumn::make('name')
-                    ->searchable(),
-                TextColumn::make('schedule_days')
-                    ->searchable(),
-                TextColumn::make('schedule_time')
-                    ->searchable(),
-                TextColumn::make('room.name')
                     ->label('Room')
-                    ->searchable(),
-                TextColumn::make('start_date')
-                    ->date()
+                    ->searchable()
                     ->sortable(),
-                TextColumn::make('end_date')
-                    ->date()
+                TextColumn::make('capacity')
+                    ->label('Kapasitas')
+                    ->numeric()
                     ->sortable(),
-                TextColumn::make('status')
-                    ->badge(),
+                IconColumn::make('is_active')
+                    ->label('Aktif')
+                    ->boolean(),
+                TextColumn::make('display_order')
+                    ->label('Urutan')
+                    ->numeric()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -54,14 +53,9 @@ class CourseClassesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('program_id')->relationship('program', 'name')->searchable()->preload(),
-                SelectFilter::make('room_id')->relationship('room', 'name')->searchable()->preload(),
-                SelectFilter::make('status')->options([
-                    'upcoming' => 'Upcoming',
-                    'ongoing' => 'Ongoing',
-                    'completed' => 'Completed',
-                    'cancelled' => 'Cancelled',
-                ]),
+                SelectFilter::make('is_active')
+                    ->label('Status')
+                    ->options(['1' => 'Aktif', '0' => 'Nonaktif']),
                 TrashedFilter::make(),
             ])
             ->recordActions([

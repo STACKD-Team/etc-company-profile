@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Contents\Tables;
 
+use App\Filament\Resources\Contents\Schemas\ContentForm;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -25,8 +26,6 @@ class ContentsTable
                     ->badge(),
                 TextColumn::make('title')
                     ->searchable(),
-                TextColumn::make('slug')
-                    ->searchable(),
                 TextColumn::make('display_order')
                     ->numeric()
                     ->sortable(),
@@ -43,14 +42,7 @@ class ContentsTable
             ])
             ->filters([
                 SelectFilter::make('type')
-                    ->options([
-                        'page' => 'Page',
-                        'gallery' => 'Gallery',
-                        'partner' => 'Kerja Sama ETC',
-                        'room' => 'Room',
-                        'team_member_extra' => 'Team member extra',
-                        'setting' => 'Setting',
-                    ]),
+                    ->options(ContentForm::typeOptions()),
                 SelectFilter::make('is_published')
                     ->options(['1' => 'Published', '0' => 'Draft']),
             ])

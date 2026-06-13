@@ -194,7 +194,7 @@ it('creates and updates cms contents with media and meta data', function () {
     $content->refresh();
 
     expect($content->type)->toBe('gallery')
-        ->and($content->slug)->toBe('studio-speaking')
+        ->and($content->slug)->toBe('open-house-gallery-updated')
         ->and($content->meta['location'])->toBe('Padang')
         ->and($content->is_published)->toBeFalse();
 });

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\CourseClass;
 use App\Models\Program;
 use App\Models\ProgramPromotion;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -82,6 +83,17 @@ class DatabaseSeeder extends Seeder
             ],
         );
 
+        $room = Room::query()->updateOrCreate(
+            ['name' => 'ETC Planet Room 1'],
+            [
+                'description' => 'Room utama untuk kelas conversation reguler.',
+                'capacity' => 12,
+                'facilities' => ['AC', 'Whiteboard', 'Projector'],
+                'is_active' => true,
+                'display_order' => 1,
+            ],
+        );
+
         CourseClass::query()->updateOrCreate(
             [
                 'program_id' => $englishConversation->id,
@@ -91,7 +103,7 @@ class DatabaseSeeder extends Seeder
                 'instructor_id' => $englishInstructor->id,
                 'schedule_days' => 'Senin - Kamis',
                 'schedule_time' => '16:00 - 17:30 WIB',
-                'room' => 'ETC Planet Room 1',
+                'room_id' => $room->id,
                 'start_date' => now()->addWeek()->toDateString(),
                 'status' => 'upcoming',
             ],
