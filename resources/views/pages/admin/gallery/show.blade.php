@@ -9,6 +9,23 @@
                 ? asset(ltrim($path, '/'))
                 : \Illuminate\Support\Facades\Storage::url($path);
         };
+
+        $details = [];
+
+        if ($contentType === \App\Models\Content::TYPE_PARTNER) {
+            $details = [
+                'Kategori' => $content->meta['category'] ?? null,
+                'Website' => $content->meta['website'] ?? null,
+                'Tahun kerja sama' => $content->meta['since'] ?? null,
+            ];
+        } elseif ($contentType === \App\Models\Content::TYPE_TESTIMONIAL) {
+            $details = [
+                'Role / asal' => $content->meta['role'] ?? null,
+                'Rating' => isset($content->meta['rating']) ? $content->meta['rating'].'/5' : null,
+            ];
+        }
+
+        $details = collect($details)->filter(fn ($value) => filled($value));
     @endphp
 
     @if (session('status'))
@@ -17,7 +34,7 @@
 
     <x-ui.resource-header
         :title="$content->title"
-        :subtitle="$content->slug ?: $pageTitle"
+        :subtitle="'Detail '.$pageTitle"
         :back-url="route($routeBase.'.index')"
     >
         <x-slot:status>
@@ -33,8 +50,6 @@
         <x-ui.detail-card :heading="'Detail '.$pageTitle">
             <x-ui.description-list>
                 <x-ui.description-item label="Judul" :value="$content->title" />
-                <x-ui.description-item label="Slug" :value="$content->slug ?: '-'" />
-                <x-ui.description-item label="Tipe" :value="str($content->type)->headline()" />
                 <x-ui.description-item label="Urutan" :value="(string) $content->display_order" />
                 <x-ui.description-item label="Status">
                     <x-ui.badge :status="$content->is_published ? 'published' : 'draft'">{{ $content->is_published ? 'Published' : 'Draft' }}</x-ui.badge>
@@ -47,12 +62,12 @@
                 <p class="mt-2 whitespace-pre-line text-sm leading-6 text-etc-on-muted">{{ $content->body ?: '-' }}</p>
             </div>
 
-            @if (($content->meta ?? []) !== [])
+            @if ($details->isNotEmpty())
                 <div class="mt-5 border-t-2 border-etc-outline-variant/60 pt-5">
                     <h2 class="font-heading text-sm font-bold text-etc-on-surface">Informasi Tambahan</h2>
                     <x-ui.description-list class="mt-4">
-                        @foreach ($content->meta as $key => $value)
-                            <x-ui.description-item :label="str($key)->replace('_', ' ')->headline()" :value="is_array($value) ? implode(', ', $value) : ($value ?: '-')" />
+                        @foreach ($details as $label => $value)
+                            <x-ui.description-item :label="$label" :value="$value" />
                         @endforeach
                     </x-ui.description-list>
                 </div>

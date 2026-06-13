@@ -9,6 +9,12 @@
             ? asset(ltrim($path, '/'))
             : \Illuminate\Support\Facades\Storage::url($path);
     };
+    $summary = match ($content->type) {
+        \App\Models\Content::TYPE_PARTNER => $content->meta['website'] ?? $content->body,
+        \App\Models\Content::TYPE_TESTIMONIAL => trim(collect([$content->meta['role'] ?? null, isset($content->meta['rating']) ? 'Rating '.$content->meta['rating'].'/5' : null])->filter()->implode(' - ')),
+        default => $content->body,
+    };
+    $summary = filled($summary) ? \Illuminate\Support\Str::limit($summary, 80) : 'Update '.$content->updated_at?->format('d M Y H:i');
 @endphp
 
 <tr>
@@ -23,11 +29,10 @@
             </div>
             <div class="min-w-0">
                 <p class="truncate font-heading font-bold text-etc-on-surface">{{ $content->title }}</p>
-                <p class="mt-1 truncate text-xs text-etc-on-muted">{{ $content->slug ?: '-' }}</p>
+                <p class="mt-1 truncate text-xs text-etc-on-muted">{{ $summary }}</p>
             </div>
         </div>
     </td>
-    <td class="py-4 pr-4"><x-ui.badge status="primary">{{ str($content->type)->replace('_', ' ')->headline() }}</x-ui.badge></td>
     <td class="py-4 pr-4 font-heading font-bold text-etc-on-surface">{{ (int) $content->display_order }}</td>
     <td class="py-4 pr-4"><x-ui.badge :status="$content->is_published ? 'published' : 'draft'">{{ $content->is_published ? 'Published' : 'Draft' }}</x-ui.badge></td>
     <td class="py-4 pr-4 text-etc-on-muted">{{ $content->updated_at?->format('d M Y H:i') ?? '-' }}</td>

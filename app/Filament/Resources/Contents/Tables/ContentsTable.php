@@ -22,8 +22,6 @@ class ContentsTable
                 ImageColumn::make('image')
                     ->label('Media')
                     ->getStateUsing(fn ($record) => app(\App\Services\MediaStorageService::class)->url($record->image)),
-                TextColumn::make('type')
-                    ->badge(),
                 TextColumn::make('title')
                     ->searchable(),
                 TextColumn::make('display_order')

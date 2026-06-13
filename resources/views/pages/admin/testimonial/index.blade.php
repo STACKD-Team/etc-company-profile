@@ -7,7 +7,6 @@
         :items="$contents"
         :columns="[
             'title' => ['label' => 'Konten', 'sortable' => true],
-            'type' => ['label' => 'Tipe'],
             'display_order' => ['label' => 'Urutan', 'sortable' => true],
             'is_published' => ['label' => 'Status', 'sortable' => true, 'filter' => ['type' => 'select', 'name' => 'is_published', 'options' => ['1' => 'Published', '0' => 'Draft']]],
             'updated_at' => ['label' => 'Update', 'sortable' => true],
@@ -16,7 +15,7 @@
         :row-view="$rowView"
         :empty="$pageTitle.' belum tersedia'"
         :empty-description="$pageTitle.' akan tampil setelah admin menambahkan data.'"
-        search-placeholder="Cari judul atau slug"
+        search-placeholder="Cari judul atau deskripsi"
     >
         <x-slot:actions>
             <x-ui.button :href="route($routeBase.'.create')" icon="heroicon-m-plus">Tambah {{ $pageTitle }}</x-ui.button>

@@ -167,6 +167,73 @@ it('keeps FAQ simple and validates testimonial rating from one to five', functio
     expect($testimonial->meta)->toBe(['role' => 'Parent', 'rating' => 5]);
 });
 
+it('keeps CMS admin surfaces friendly by hiding slug, redundant type, and raw metadata', function () {
+    $admin = User::factory()->create(['role' => 'admin', 'is_active' => true]);
+
+    $gallery = Content::query()->create([
+        'type' => Content::TYPE_GALLERY,
+        'title' => 'Polished Gallery Sprint 5',
+        'slug' => 'polished-gallery-sprint-5',
+        'body' => 'Ringkasan kegiatan speaking class.',
+        'meta' => ['caption' => 'Hidden internal caption', 'location' => 'Padang'],
+        'is_published' => true,
+    ]);
+
+    $partner = Content::query()->create([
+        'type' => Content::TYPE_PARTNER,
+        'title' => 'Polished Partner Sprint 5',
+        'slug' => 'polished-partner-sprint-5',
+        'body' => 'Partner sekolah aktif.',
+        'meta' => ['category' => 'Sekolah', 'website' => 'https://partner.example.test', 'since' => '2025'],
+        'is_published' => true,
+    ]);
+
+    $testimonial = Content::query()->create([
+        'type' => Content::TYPE_TESTIMONIAL,
+        'title' => 'Polished Testimonial Sprint 5',
+        'slug' => 'polished-testimonial-sprint-5',
+        'body' => 'Anak saya lebih percaya diri.',
+        'meta' => ['role' => 'Orang tua siswa', 'rating' => 5],
+        'is_published' => true,
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.gallery.index'))
+        ->assertOk()
+        ->assertSee('Cari judul atau deskripsi')
+        ->assertSee('Ringkasan kegiatan speaking class.')
+        ->assertDontSee('Cari judul atau slug')
+        ->assertDontSee('polished-gallery-sprint-5')
+        ->assertDontSee('Tipe');
+
+    $this->actingAs($admin)
+        ->get(route('admin.gallery.show', $gallery))
+        ->assertOk()
+        ->assertSee('Detail Gallery')
+        ->assertDontSee('Slug')
+        ->assertDontSee('slug')
+        ->assertDontSee('Tipe')
+        ->assertDontSee('Hidden internal caption')
+        ->assertDontSee('Location');
+
+    $this->actingAs($admin)
+        ->get(route('admin.partner.show', $partner))
+        ->assertOk()
+        ->assertSee('Kategori')
+        ->assertSee('Website')
+        ->assertSee('Tahun kerja sama')
+        ->assertDontSee('polished-partner-sprint-5')
+        ->assertDontSee('category');
+
+    $this->actingAs($admin)
+        ->get(route('admin.testimonial.show', $testimonial))
+        ->assertOk()
+        ->assertSee('Role / asal')
+        ->assertSee('Rating')
+        ->assertSee('5/5')
+        ->assertDontSee('polished-testimonial-sprint-5');
+});
+
 it('rejects legacy CMS type submissions and aligns Filament resources with Sprint 5 fields', function () {
     $admin = User::factory()->create(['role' => 'admin', 'is_active' => true]);
 
@@ -188,5 +255,6 @@ it('rejects legacy CMS type submissions and aligns Filament resources with Sprin
         ->and($contentForm)->not->toContain("'room' => 'Room'")
         ->and($contentForm)->not->toContain('team_member_extra')
         ->and($contentForm)->not->toContain("Textarea::make('meta')")
+        ->and($contentTable)->not->toContain("TextColumn::make('type')")
         ->and($contentTable)->not->toContain("'setting' => 'Setting'");
 });
