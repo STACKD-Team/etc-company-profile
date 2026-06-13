@@ -30,8 +30,22 @@ class KnowledgeSourceService
             'status' => 'processing',
             'is_active' => (bool) ($data['is_active'] ?? false),
             'uploaded_by' => $userId,
-            'extracted_text' => $this->extractor->extract($file),
         ]);
+
+        try {
+            $source->update([
+                'extracted_text' => $this->extractor->extract($file),
+                'error_message' => null,
+            ]);
+        } catch (Throwable $exception) {
+            $source->update([
+                'status' => 'failed',
+                'processed_at' => now(),
+                'error_message' => $exception->getMessage(),
+            ]);
+
+            return $source->refresh();
+        }
 
         if ($dispatch) {
             KnowledgeIndexingJob::dispatch($source);
@@ -48,6 +62,39 @@ class KnowledgeSourceService
         ]);
 
         KnowledgeIndexingJob::dispatch($source);
+
+        return $source->refresh();
+    }
+
+    public function publish(RagKnowledgeSource $source): RagKnowledgeSource
+    {
+        $source->update(['is_active' => true]);
+
+        return $source->refresh();
+    }
+
+    public function unpublish(RagKnowledgeSource $source): RagKnowledgeSource
+    {
+        $source->update(['is_active' => false]);
+
+        return $source->refresh();
+    }
+
+    public function archive(RagKnowledgeSource $source): RagKnowledgeSource
+    {
+        $source->update([
+            'status' => 'archived',
+            'is_active' => false,
+        ]);
+
+        return $source->refresh();
+    }
+
+    public function restore(RagKnowledgeSource $source): RagKnowledgeSource
+    {
+        $source->update([
+            'status' => $source->chunks()->exists() ? 'ready' : 'draft',
+        ]);
 
         return $source->refresh();
     }

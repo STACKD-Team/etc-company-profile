@@ -5,7 +5,7 @@
 
 <header class="page-header">
     <h1>Pendaftaran ETC Planet</h1>
-    <p>Selesaikan pembayaran awal, upload bukti, lalu konfirmasi agar admin bisa memverifikasi pendaftaran.</p>
+    <p>Selesaikan pembayaran otomatis melalui Midtrans. Status akan diperbarui dari notifikasi gateway setelah transaksi berhasil.</p>
 
     <div class="stepper" aria-label="Progress pendaftaran">
         <div class="step done">
@@ -53,30 +53,34 @@
 
         <div class="summary-row"><span>Biaya Pendaftaran</span><strong>{{ $paymentSummary['registrationFee'] }}</strong></div>
         <div class="summary-row"><span>Biaya Program</span><strong>{{ $paymentSummary['programFee'] }}</strong></div>
+        @if ((float) $registration->discount_amount > 0)
+            <div class="summary-row"><span>Promo</span><strong>{{ $paymentSummary['promotionTitle'] ?? 'Promo aktif' }}</strong></div>
+            <div class="summary-row"><span>Potongan</span><strong>- {{ $paymentSummary['discountAmount'] }}</strong></div>
+        @endif
 
         <div class="summary-total">
-            <strong>Total</strong>
-            <span>{{ $paymentSummary['total'] }}</span>
+            <strong>Total Midtrans</strong>
+            <span>{{ $paymentSummary['finalAmount'] }}</span>
         </div>
 
         <div class="summary-note">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-            <p>Status akan tetap menunggu verifikasi sampai admin ETC mengecek bukti pembayaran.</p>
+            <p>Status saat ini: {{ str($paymentSummary['status'])->replace('_', ' ')->headline() }}. Admin tidak perlu verifikasi manual untuk transaksi Midtrans sukses.</p>
         </div>
     </aside>
 
     <section class="payment-content">
-        <h2 class="section-title">Pilih Metode Pembayaran</h2>
+        <h2 class="section-title">Pembayaran Otomatis Midtrans</h2>
 
         <div class="method-grid">
-            <article class="method-card is-active" data-method="qris" onclick="selectMethod(this)">
+            <article class="method-card is-active">
                 <div class="method-head">
                     <div class="method-icon qris-icon">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z"/></svg>
                     </div>
                     <div class="method-copy">
-                        <h3>QRIS</h3>
-                        <p>Scan dengan e-Wallet/M-Banking</p>
+                        <h3>Midtrans Checkout</h3>
+                        <p>QRIS, virtual account, e-wallet, dan metode lain dari gateway</p>
                     </div>
                     <span class="radio-dot"></span>
                 </div>
@@ -89,43 +93,30 @@
                     </div>
                     <span class="timer">
                         <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>
-                        Manual Check
+                        {{ $paymentSummary['expiresAt'] ? 'Batas: '.$paymentSummary['expiresAt']->format('d M Y H:i') : 'Menunggu pembayaran' }}
                     </span>
                 </div>
             </article>
+        </div>
 
-            <article class="method-card" data-method="bank_transfer" onclick="selectMethod(this)">
-                <div class="method-head">
-                    <div class="method-icon bank-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10h18L12 4 3 10Z"/><path d="M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18"/></svg>
-                    </div>
-                    <div class="method-copy">
-                        <h3>Transfer Bank</h3>
-                        <p>Transfer manual ke rekening</p>
-                    </div>
-                    <span class="radio-dot"></span>
-                </div>
-                <div class="bank-box">
-                    <div class="bank-line"><span>Bank</span><strong>{{ $bankAccount['bank'] }}</strong></div>
-                    <div class="bank-line">
-                        <span>No. Rekening</span>
-                        <div class="account-number">
-                            <strong>{{ $bankAccount['number'] }}</strong>
-                            <button type="button" onclick="event.stopPropagation(); copyText('{{ $bankAccount['number'] }}')" aria-label="Salin nomor rekening">
-                                <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="bank-line"><span>A.N.</span><strong>{{ $bankAccount['holder'] }}</strong></div>
-                </div>
-            </article>
+        <div class="payment-actions">
+            @if ($paymentSummary['redirectUrl'])
+                <a class="confirm-button" href="{{ $paymentSummary['redirectUrl'] }}" target="_blank" rel="noopener">
+                    Lanjutkan ke Midtrans
+                    <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </a>
+            @else
+                <div class="payment-alert">Transaksi Midtrans belum memiliki URL pembayaran. Hubungi admin ETC atau coba refresh halaman ini.</div>
+            @endif
+            <a class="cancel-button" href="{{ route('registrations.confirmation.show', ['registration' => $registration]) }}">Lihat Status Pendaftaran</a>
         </div>
 
         <form class="upload-card" method="POST" action="{{ route('registrations.payment.proof.store', ['registration' => $registration]) }}" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="payment_method" class="payment-method-input" value="{{ old('payment_method', $registration->payment_method ?? 'qris') }}">
 
-            <h2 class="section-title">Upload Bukti Pembayaran</h2>
+            <h2 class="section-title">Fallback Legacy: Upload Bukti Manual</h2>
+            <p class="summary-note">Gunakan hanya jika admin ETC meminta arsip pembayaran manual. Alur utama tetap melalui Midtrans.</p>
             <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
                 <div class="upload-icon">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 0 1 1.2-9.86A6 6 0 0 1 19 11.5 3.75 3.75 0 0 1 18.25 19H17"/><path d="M12 12v8"/><path d="M8.5 15.5 12 12l3.5 3.5"/></svg>
@@ -143,7 +134,7 @@
                 <div class="proof-status">Bukti pembayaran sudah tersimpan. Upload ulang jika file sebelumnya salah.</div>
             @endif
 
-            <button class="upload-submit" type="submit">Upload Bukti Pembayaran</button>
+            <button class="upload-submit" type="submit">Upload Arsip Legacy</button>
         </form>
 
         <form class="payment-actions" method="POST" action="{{ route('registrations.payment.confirm', ['registration' => $registration]) }}">
@@ -153,13 +144,13 @@
                 <input type="checkbox" name="payment_confirmed" id="agree" value="1" required>
                 <span>
                     <strong>Saya sudah membayar</strong>
-                    Dengan mencentang, saya mengonfirmasi bahwa pembayaran telah berhasil dilakukan sejumlah tagihan.
+                    Konfirmasi legacy ini hanya dipakai jika pembayaran manual diminta oleh admin.
                 </span>
             </label>
             @error('payment_confirmed') <small class="field-error">{{ $message }}</small> @enderror
 
             <button class="confirm-button" type="submit">
-                Konfirmasi Pembayaran
+                Konfirmasi Legacy
                 <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
             </button>
             <a class="cancel-button" href="{{ route('registrations.create', ['program' => $registration->program?->slug]) }}">Kembali ke Form</a>

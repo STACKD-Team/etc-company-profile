@@ -6,11 +6,15 @@ use Illuminate\Support\Facades\Http;
 
 class QdrantVectorService
 {
+    protected bool $collectionEnsured = false;
+
     public function upsert(string $pointId, array $vector, array $payload): void
     {
         if (! $this->isConfigured()) {
             return;
         }
+
+        $this->ensureCollection(count($vector));
 
         Http::withHeaders($this->headers())
             ->timeout(30)
@@ -32,6 +36,8 @@ class QdrantVectorService
         if (! $this->isConfigured()) {
             return [];
         }
+
+        $this->ensureCollection(count($vector));
 
         $response = Http::withHeaders($this->headers())
             ->timeout(30)
@@ -65,5 +71,33 @@ class QdrantVectorService
         return array_filter([
             'api-key' => config('rag.qdrant.api_key'),
         ]);
+    }
+
+    protected function ensureCollection(int $vectorSize): void
+    {
+        if ($this->collectionEnsured) {
+            return;
+        }
+
+        $collectionUrl = $this->baseUrl().'/collections/'.config('rag.qdrant.collection');
+        $exists = Http::withHeaders($this->headers())
+            ->timeout(15)
+            ->get($collectionUrl);
+
+        if ($exists->status() === 404) {
+            Http::withHeaders($this->headers())
+                ->timeout(30)
+                ->put($collectionUrl, [
+                    'vectors' => [
+                        'size' => max(1, $vectorSize),
+                        'distance' => 'Cosine',
+                    ],
+                ])
+                ->throw();
+        } else {
+            $exists->throw();
+        }
+
+        $this->collectionEnsured = true;
     }
 }

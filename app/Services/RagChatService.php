@@ -16,7 +16,7 @@ class RagChatService
      */
     public function answer(string $message): array
     {
-        if (app()->environment('testing') || ! $this->qdrant->isConfigured()) {
+        if (! $this->qdrant->isConfigured()) {
             return [
                 'intent' => 'rag_fallback',
                 'reply' => 'Aku belum menemukan knowledge base yang cukup untuk menjawab itu dengan yakin. Silakan hubungi admin ETC Planet atau coba tanyakan tentang program, jadwal, biaya, dan pendaftaran.',

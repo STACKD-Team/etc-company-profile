@@ -6,6 +6,7 @@ use App\Models\RagKnowledgeSource;
 use App\Services\KnowledgeSourceService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -71,6 +72,25 @@ class RagKnowledgeSourcesTable
                     ->icon('heroicon-m-arrow-path')
                     ->requiresConfirmation()
                     ->action(fn (RagKnowledgeSource $record) => app(KnowledgeSourceService::class)->reindex($record)),
+                Action::make('publish')
+                    ->icon('heroicon-m-eye')
+                    ->visible(fn (RagKnowledgeSource $record): bool => ! $record->is_active)
+                    ->action(fn (RagKnowledgeSource $record) => app(KnowledgeSourceService::class)->publish($record)),
+                Action::make('unpublish')
+                    ->icon('heroicon-m-eye-slash')
+                    ->visible(fn (RagKnowledgeSource $record): bool => $record->is_active)
+                    ->requiresConfirmation()
+                    ->action(fn (RagKnowledgeSource $record) => app(KnowledgeSourceService::class)->unpublish($record)),
+                Action::make('archive')
+                    ->icon('heroicon-m-archive-box')
+                    ->visible(fn (RagKnowledgeSource $record): bool => $record->status !== 'archived')
+                    ->requiresConfirmation()
+                    ->action(fn (RagKnowledgeSource $record) => app(KnowledgeSourceService::class)->archive($record)),
+                Action::make('restore')
+                    ->icon('heroicon-m-arrow-uturn-left')
+                    ->visible(fn (RagKnowledgeSource $record): bool => $record->status === 'archived')
+                    ->action(fn (RagKnowledgeSource $record) => app(KnowledgeSourceService::class)->restore($record)),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

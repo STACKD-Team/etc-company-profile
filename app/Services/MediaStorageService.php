@@ -57,8 +57,8 @@ class MediaStorageService
             return $path;
         }
 
-        if ($this->hasCloudinaryPath($path)) {
-            return $this->cloudinary()->image($this->cloudinaryPublicId($path))->toUrl();
+        if (Str::startsWith($path, 'cloudinary://')) {
+            return $this->cloudinaryUrl($path);
         }
 
         if (Str::startsWith($path, ['images/', 'videos/', 'storage/'])) {
@@ -165,15 +165,41 @@ class MediaStorageService
         $storedPublicId = $result['public_id'] ?? $publicId;
         $version = $result['version'] ?? null;
 
-        return 'cloudinary://'.$storedPublicId.($version ? '?v='.$version : '');
+        return 'cloudinary://'.$resourceType.'/'.$storedPublicId.($version ? '?v='.$version : '');
     }
 
     protected function deleteFromCloudinary(string $path): void
     {
         $this->cloudinary()->uploadApi()->destroy($this->cloudinaryPublicId($path), [
-            'resource_type' => 'auto',
+            'resource_type' => $this->cloudinaryResourceTypeFromPath($path),
             'invalidate' => true,
         ]);
+    }
+
+    protected function cloudinaryUrl(string $path): string
+    {
+        $resourceType = $this->cloudinaryResourceTypeFromPath($path);
+        $publicId = $this->cloudinaryPublicId($path);
+
+        if ($resourceType === 'image') {
+            return $this->cloudinary()->image($publicId)->toUrl();
+        }
+
+        $cloudName = (string) config('cloudinary.cloud_name');
+
+        if ($cloudName === '' && config('cloudinary.url')) {
+            $cloudName = (string) parse_url((string) config('cloudinary.url'), PHP_URL_HOST);
+        }
+
+        $version = Str::contains($path, '?v=') ? 'v'.Str::after($path, '?v=').'/' : '';
+
+        return sprintf(
+            'https://res.cloudinary.com/%s/%s/upload/%s%s',
+            $cloudName,
+            $resourceType,
+            $version,
+            ltrim($publicId, '/'),
+        );
     }
 
     protected function cloudinary(): Cloudinary
@@ -210,7 +236,38 @@ class MediaStorageService
 
     protected function cloudinaryPublicId(string $path): string
     {
-        return Str::before(Str::after($path, 'cloudinary://'), '?');
+        $value = Str::before(Str::after($path, 'cloudinary://'), '?');
+
+        if (Str::startsWith($value, ['image/', 'video/', 'raw/'])) {
+            return Str::after($value, '/');
+        }
+
+        return $value;
+    }
+
+    protected function cloudinaryResourceTypeFromPath(string $path): string
+    {
+        $value = Str::before(Str::after($path, 'cloudinary://'), '?');
+
+        if (Str::startsWith($value, 'video/')) {
+            return 'video';
+        }
+
+        if (Str::startsWith($value, 'raw/')) {
+            return 'raw';
+        }
+
+        if (Str::startsWith($value, 'image/')) {
+            return 'image';
+        }
+
+        $extension = strtolower(pathinfo($value, PATHINFO_EXTENSION));
+
+        return match ($extension) {
+            'mp4', 'mov', 'webm', 'avi', 'mkv' => 'video',
+            'pdf', 'doc', 'docx', 'txt', 'md', 'csv', 'xls', 'xlsx', 'zip' => 'raw',
+            default => 'image',
+        };
     }
 
     protected function cloudinaryResourceType(?string $mimeType): string

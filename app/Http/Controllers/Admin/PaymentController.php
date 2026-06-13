@@ -19,6 +19,7 @@ class PaymentController extends Controller
             'payments' => $this->registrationService->paginatePaymentVerifications($request->only([
                 'search',
                 'status',
+                'payment_status',
                 'program_id',
                 'payment_method',
                 'created_from',
@@ -33,7 +34,13 @@ class PaymentController extends Controller
     public function show(Registration $payment): View
     {
         return view('pages.admin.payment.show', [
-            'payment' => $payment->load(['user', 'program', 'courseClass']),
+            'payment' => $payment->load([
+                'user',
+                'program',
+                'courseClass',
+                'programPromotion',
+                'midtransNotifications' => fn ($query) => $query->latest('received_at'),
+            ]),
         ]);
     }
 }

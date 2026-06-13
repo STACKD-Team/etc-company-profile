@@ -20,6 +20,7 @@ class EmbeddingService
             ->post(rtrim((string) config('rag.nvidia.base_url'), '/').'/embeddings', [
                 'model' => config('rag.nvidia.embedding_model'),
                 'input' => $text,
+                'input_type' => 'passage',
             ])
             ->throw()
             ->json();
