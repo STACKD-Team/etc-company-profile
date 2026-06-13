@@ -2,7 +2,7 @@
     <x-public-discovery.navbar active="home" />
     @php
         $media = app(\App\Services\PublicDiscoveryService::class);
-        $assetUrl = static fn (?string $path, string $fallback = 'images/hero-img.jpeg'): string => $media->mediaUrl($path, $fallback);
+        $assetUrl = static fn (?string $path, string $fallback = 'images/hero-img.jpeg', string $resourceType = 'image'): string => $media->mediaUrl($path, $fallback, $resourceType);
         $formatMoney = static fn ($value) => 'Rp '.number_format((float) $value, 0, ',', '.');
         $partners = $partners ?? collect();
         $testimonials = $testimonials ?? collect();
@@ -278,7 +278,13 @@
             </div>
 
             @if ($reels->isNotEmpty())
-                <div class="public-home-carousel public-home-carousel--four public-home-carousel--dark public-reveal" data-public-reveal data-public-carousel>
+                <div
+                    class="public-home-carousel public-home-carousel--four public-home-carousel--dark public-reveal"
+                    data-public-reveal
+                    data-public-carousel
+                    data-carousel-autoplay="false"
+                    data-home-reels-carousel
+                >
                     <div class="public-home-carousel__viewport" data-carousel-viewport tabindex="0" aria-label="Cuplikan reels ETC Planet">
                         <div class="public-home-carousel__track" data-carousel-track>
                     @foreach ($reels as $reel)
@@ -286,11 +292,12 @@
                             href="{{ route('public.reels.index', ['reel' => $reel->getKey()]) }}"
                             class="public-home-carousel__slide public-home-reel-card public-card-dark group overflow-hidden text-left"
                             data-carousel-slide
+                            data-home-reel-link
                             aria-label="Putar reel {{ $reel->title }}"
                         >
                             <div class="relative aspect-[9/14] overflow-hidden bg-black">
                                 <video preload="metadata" muted playsinline poster="{{ $assetUrl($reel->thumbnail_path, 'images/pu1-img (3).jpg') }}" class="h-full w-full object-cover opacity-90">
-                                    <source src="{{ $assetUrl($reel->video_path, 'videos/video1.mp4') }}" type="video/mp4">
+                                    <source src="{{ $assetUrl($reel->video_path, 'videos/video1.mp4', 'video') }}" type="video/mp4">
                                 </video>
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
                                 <x-ui.badge color="primary" class="absolute left-3 top-3 !bg-etc-magenta !text-white">{{ $reel->category }}</x-ui.badge>

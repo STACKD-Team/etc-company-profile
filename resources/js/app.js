@@ -571,6 +571,7 @@ function initPublicHomeCarousels() {
         let slides = [...carousel.querySelectorAll('[data-carousel-slide]')];
         const previous = carousel.querySelector('[data-carousel-prev]');
         const next = carousel.querySelector('[data-carousel-next]');
+        const autoplayEnabled = carousel.dataset.carouselAutoplay !== 'false';
 
         if (!viewport || !track || slides.length === 0) {
             return;
@@ -650,6 +651,13 @@ function initPublicHomeCarousels() {
             });
         };
 
+        const moveBy = (direction) => {
+            viewport.scrollBy({
+                left: slideStep() * direction,
+                behavior: reducedMotion ? 'auto' : 'smooth',
+            });
+        };
+
         const jumpTo = (index) => {
             const targetIndex = Math.max(0, Math.min(slides.length - 1, index));
             const previousScrollBehavior = viewport.style.scrollBehavior;
@@ -680,7 +688,7 @@ function initPublicHomeCarousels() {
 
         const scheduleLoopReset = () => {
             window.clearTimeout(loopResetTimer);
-            loopResetTimer = window.setTimeout(resetLoopPosition, 180);
+            loopResetTimer = window.setTimeout(resetLoopPosition, reducedMotion ? 0 : 520);
         };
 
         const stopAutoplay = () => {
@@ -693,7 +701,7 @@ function initPublicHomeCarousels() {
         const startAutoplay = () => {
             stopAutoplay();
 
-            if (reducedMotion || !isVisible || carousel.classList.contains('is-static')) {
+            if (!autoplayEnabled || reducedMotion || !isVisible || carousel.classList.contains('is-static')) {
                 return;
             }
 
@@ -708,13 +716,15 @@ function initPublicHomeCarousels() {
             resumeTimer = window.setTimeout(startAutoplay, 1800);
         };
 
-        previous?.addEventListener('click', () => {
-            goTo(currentIndex() - 1);
+        previous?.addEventListener('click', (event) => {
+            event.preventDefault();
+            moveBy(-1);
             pauseThenResume();
         });
 
-        next?.addEventListener('click', () => {
-            goTo(currentIndex() + 1);
+        next?.addEventListener('click', (event) => {
+            event.preventDefault();
+            moveBy(1);
             pauseThenResume();
         });
 
@@ -724,7 +734,7 @@ function initPublicHomeCarousels() {
             }
 
             event.preventDefault();
-            goTo(currentIndex() + (event.key === 'ArrowRight' ? 1 : -1));
+            moveBy(event.key === 'ArrowRight' ? 1 : -1);
             pauseThenResume();
         });
 
@@ -737,7 +747,6 @@ function initPublicHomeCarousels() {
             isDragging = false;
             pointerStartX = event.clientX;
             scrollStart = viewport.scrollLeft;
-            viewport.setPointerCapture?.(event.pointerId);
             stopAutoplay();
         });
 
@@ -748,9 +757,10 @@ function initPublicHomeCarousels() {
 
             const distance = event.clientX - pointerStartX;
 
-            if (Math.abs(distance) > 6) {
+            if (!isDragging && Math.abs(distance) > 6) {
                 isDragging = true;
                 viewport.classList.add('is-dragging');
+                viewport.setPointerCapture?.(event.pointerId);
             }
 
             if (isDragging) {
@@ -764,7 +774,9 @@ function initPublicHomeCarousels() {
             }
 
             isPointerDown = false;
-            viewport.releasePointerCapture?.(event.pointerId);
+            if (viewport.hasPointerCapture?.(event.pointerId)) {
+                viewport.releasePointerCapture(event.pointerId);
+            }
             viewport.classList.remove('is-dragging');
 
             if (isDragging) {
@@ -922,7 +934,6 @@ function initPublicReels() {
     let activeVideo = null;
     const indicatorTimers = new WeakMap();
     const soundControlTimers = new WeakMap();
-    const formatCounter = (value) => new Intl.NumberFormat('id-ID').format(Number(value) || 0);
 
     const syncSoundControls = () => {
         document.querySelectorAll('[data-reel-player]').forEach((player) => {
@@ -979,14 +990,6 @@ function initPublicReels() {
                 'Accept': 'application/json',
             },
         })
-            .then((response) => response.ok ? response.json() : null)
-            .then((data) => {
-                const counter = video.closest('[data-reel-slide]')?.querySelector('[data-reel-view-count]');
-
-                if (counter && data?.views_count !== undefined) {
-                    counter.textContent = formatCounter(data.views_count);
-                }
-            })
             .catch(() => {});
     };
 
@@ -1137,55 +1140,6 @@ function initPublicReels() {
             markViewed(video);
             playWithSound(video);
         }
-    });
-
-    document.querySelectorAll('[data-reel-like]').forEach((button) => {
-        button.addEventListener('click', async (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            if (!token || !button.dataset.likeEndpoint || button.disabled) {
-                return;
-            }
-
-            button.disabled = true;
-
-            try {
-                const response = await fetch(button.dataset.likeEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': token,
-                        'Accept': 'application/json',
-                    },
-                });
-                const data = response.ok ? await response.json() : null;
-
-                if (!data || data.liked === undefined) {
-                    return;
-                }
-
-                const liked = Boolean(data.liked);
-                const icon = button.querySelector('[data-reel-like-icon]');
-                const counter = button.querySelector('[data-reel-like-count]');
-                const reelTitle = button.closest('[data-reel-slide]')?.querySelector('h1')?.textContent?.trim() || 'ini';
-
-                button.classList.toggle('is-liked', liked);
-                button.setAttribute('aria-pressed', liked ? 'true' : 'false');
-                button.setAttribute('aria-label', `${liked ? 'Batal menyukai' : 'Sukai'} reel ${reelTitle}`);
-
-                if (icon) {
-                    icon.textContent = liked ? 'favorite' : 'favorite_border';
-                }
-
-                if (counter) {
-                    counter.textContent = formatCounter(data.likes_count);
-                }
-            } catch {
-                // Keep the current state when the interaction cannot be saved.
-            } finally {
-                button.disabled = false;
-            }
-        });
     });
 
     document.addEventListener('visibilitychange', () => {

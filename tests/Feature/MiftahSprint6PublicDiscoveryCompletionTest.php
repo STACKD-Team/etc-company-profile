@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('renders the Sprint 6 reel action rail with session-aware state', function () {
+it('keeps reel analytics controlled without exposing like or view controls', function () {
     $reel = Reel::query()->create([
         'title' => 'Sprint 6 Interactive Reel',
         'description' => 'Reel dengan action yang mudah dijangkau.',
@@ -22,18 +22,14 @@ it('renders the Sprint 6 reel action rail with session-aware state', function ()
         'published_at' => now(),
     ]);
 
-    $this->withSession(['liked_reels' => [$reel->id]])
-        ->get(route('public.reels.index'))
+    $this->get(route('public.reels.index'))
         ->assertOk()
-        ->assertSee('public-reel-actions', false)
-        ->assertSee('data-reel-view-count', false)
-        ->assertSee('data-reel-like', false)
-        ->assertSee('data-like-endpoint="'.route('public.reels.likes.store', $reel).'"', false)
-        ->assertSee('aria-pressed="true"', false)
-        ->assertSee('aria-live="polite"', false)
-        ->assertSee('favorite')
-        ->assertSee('12')
-        ->assertSee('4');
+        ->assertSee('data-view-endpoint="'.route('public.reels.views.store', $reel).'"', false)
+        ->assertDontSee('public-reel-actions', false)
+        ->assertDontSee('data-reel-view-count', false)
+        ->assertDontSee('data-reel-like', false)
+        ->assertDontSee('data-like-endpoint', false)
+        ->assertDontSee('favorite_border');
 });
 
 it('exposes clear enrollment, program, and consultation actions in the first viewport', function () {

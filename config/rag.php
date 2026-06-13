@@ -15,4 +15,5 @@ return [
     'chunk_size' => (int) env('RAG_CHUNK_SIZE', 1000),
     'chunk_overlap' => (int) env('RAG_CHUNK_OVERLAP', 150),
     'top_k' => (int) env('RAG_TOP_K', 5),
+    'min_score' => (float) env('RAG_MIN_SCORE', 0.60),
 ];
