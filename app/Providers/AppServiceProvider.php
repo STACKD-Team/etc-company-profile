@@ -2,10 +2,17 @@
 
 namespace App\Providers;
 
+use App\Models\CourseClass;
+use App\Models\Registration;
+use App\Models\ReportCard;
+use App\Policies\CourseClassPolicy;
+use App\Policies\RegistrationPolicy;
+use App\Policies\ReportCardPolicy;
 use App\Services\PublicDiscoveryService;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -25,6 +32,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(CourseClass::class, CourseClassPolicy::class);
+        Gate::policy(Registration::class, RegistrationPolicy::class);
+        Gate::policy(ReportCard::class, ReportCardPolicy::class);
+
         FilamentColor::register([
             'primary' => [
                 50 => '255, 230, 243',
