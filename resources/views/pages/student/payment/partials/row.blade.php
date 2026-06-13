@@ -10,7 +10,7 @@
     $originalAmount = (float) ($item->original_amount ?? $item->payment_amount ?? 0);
     $discountAmount = (float) ($item->discount_amount ?? 0);
     $finalAmount = (float) ($item->final_amount ?? max($originalAmount - $discountAmount, 0));
-    $promotionTitle = $item->program_promotion_title ?: $item->programPromotion?->title;
+    $promotionTitle = $item->program_promotion_title;
 @endphp
 
 <tr class="group">

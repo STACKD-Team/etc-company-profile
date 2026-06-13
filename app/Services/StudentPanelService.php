@@ -239,7 +239,7 @@ class StudentPanelService
             'original_amount' => $original,
             'discount_amount' => $discount,
             'final_amount' => $final,
-            'promotion_title' => $payment->program_promotion_title ?: $payment->programPromotion?->title,
+            'promotion_title' => $payment->program_promotion_title,
             'snap_token' => $payment->midtrans_snap_token,
             'redirect_url' => $payment->midtrans_redirect_url,
             'can_continue' => filled($payment->midtrans_redirect_url)
