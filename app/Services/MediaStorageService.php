@@ -47,7 +47,7 @@ class MediaStorageService
         return $path;
     }
 
-    public function url(?string $path): ?string
+    public function url(?string $path, string $resourceType = 'image'): ?string
     {
         if ($path === null || $path === '') {
             return null;
@@ -57,8 +57,18 @@ class MediaStorageService
             return $path;
         }
 
-        if ($this->hasCloudinaryPath($path)) {
-            return $this->cloudinary()->image($this->cloudinaryPublicId($path))->toUrl();
+        if (Str::startsWith($path, 'cloudinary://')) {
+            if (! $this->hasCloudinary()) {
+                return null;
+            }
+
+            $publicId = $this->cloudinaryPublicId($path);
+
+            return match ($resourceType) {
+                'video' => (string) $this->cloudinary()->video($publicId)->toUrl(),
+                'raw' => (string) $this->cloudinary()->raw($publicId)->toUrl(),
+                default => (string) $this->cloudinary()->image($publicId)->toUrl(),
+            };
         }
 
         if (Str::startsWith($path, ['images/', 'videos/', 'storage/'])) {

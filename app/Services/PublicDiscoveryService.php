@@ -10,11 +10,12 @@ use App\Models\Room;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PublicDiscoveryService
 {
+    public function __construct(private MediaStorageService $mediaStorage) {}
+
     /**
      * Ordered from the current canonical profile to supported legacy slugs.
      *
@@ -168,25 +169,14 @@ class PublicDiscoveryService
             ->all();
     }
 
-    public function mediaUrl(?string $path, string $fallback = 'images/hero-img.jpeg'): string
-    {
-        if (! $path) {
-            return asset($fallback);
-        }
+    public function mediaUrl(
+        ?string $path,
+        string $fallback = 'images/hero-img.jpeg',
+        string $resourceType = 'image',
+    ): string {
+        $url = $this->mediaStorage->url($path, $resourceType);
 
-        if (Str::startsWith($path, ['http://', 'https://'])) {
-            return $path;
-        }
-
-        if (Str::startsWith($path, ['/'])) {
-            return asset(ltrim($path, '/'));
-        }
-
-        if (Str::startsWith($path, ['images/', 'videos/', 'storage/'])) {
-            return asset($path);
-        }
-
-        return Storage::url($path);
+        return $url ?: asset(ltrim($fallback, '/'));
     }
 
     /**

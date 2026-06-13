@@ -52,7 +52,8 @@ class QdrantVectorService
 
     public function isConfigured(): bool
     {
-        return (bool) config('rag.qdrant.url');
+        return filled(config('rag.qdrant.url'))
+            && filled(config('rag.qdrant.collection'));
     }
 
     protected function baseUrl(): string

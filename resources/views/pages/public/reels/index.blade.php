@@ -8,13 +8,12 @@
 >
     @php
         $media = app(\App\Services\PublicDiscoveryService::class);
-        $assetUrl = static fn (?string $path, string $fallback = 'videos/video1.mp4'): string => $media->mediaUrl($path, $fallback);
+        $assetUrl = static fn (?string $path, string $fallback = 'videos/video1.mp4', string $resourceType = 'image'): string => $media->mediaUrl($path, $fallback, $resourceType);
     @endphp
 
     @if ($reels->isNotEmpty())
         <section class="public-reels-feed" data-vertical-reels-feed aria-label="ETC Planet Reels">
             @foreach ($reels as $reel)
-                @php($isLiked = in_array((int) $reel->getKey(), $likedReelIds ?? [], true))
                 <article class="public-reel-slide" data-reel-slide data-reel-id="{{ $reel->getKey() }}">
                     <x-ui.button
                         :href="route('public.home') . '#reels'"
@@ -49,7 +48,7 @@
                                 data-autoplay-reel="true"
                                 data-view-endpoint="{{ route('public.reels.views.store', $reel) }}"
                             >
-                                <source src="{{ $assetUrl($reel->video_path) }}" type="video/mp4">
+                                <source src="{{ $assetUrl($reel->video_path, 'videos/video1.mp4', 'video') }}" type="video/mp4">
                                 Browser kamu tidak mendukung pemutar video.
                             </video>
 
@@ -78,30 +77,6 @@
                             </div>
                         </div>
 
-                        <div class="public-reel-actions" aria-label="Statistik dan aksi reel">
-                            <div class="public-reel-action" title="Jumlah tayangan">
-                                <span class="public-reel-action__icon">
-                                    <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
-                                </span>
-                                <span data-reel-view-count aria-live="polite">{{ number_format((int) $reel->views_count) }}</span>
-                                <span class="sr-only">tayangan</span>
-                            </div>
-
-                            <x-ui.button
-                                type="button"
-                                color="gray"
-                                @class(['public-reel-action', 'is-liked' => $isLiked])
-                                data-reel-like
-                                data-like-endpoint="{{ route('public.reels.likes.store', $reel) }}"
-                                aria-pressed="{{ $isLiked ? 'true' : 'false' }}"
-                                aria-label="{{ $isLiked ? 'Batal menyukai' : 'Sukai' }} reel {{ $reel->title }}"
-                            >
-                                <span class="public-reel-action__icon">
-                                    <span class="material-symbols-outlined" data-reel-like-icon aria-hidden="true">{{ $isLiked ? 'favorite' : 'favorite_border' }}</span>
-                                </span>
-                                <span data-reel-like-count aria-live="polite">{{ number_format((int) $reel->likes_count) }}</span>
-                            </x-ui.button>
-                        </div>
                     </div>
                 </article>
             @endforeach
