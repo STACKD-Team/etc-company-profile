@@ -5,6 +5,7 @@
         $assetUrl = static fn (?string $path, string $fallback = 'images/hero-img.jpeg'): string => $media->mediaUrl($path, $fallback);
         $formatMoney = static fn ($value) => 'Rp '.number_format((float) $value, 0, ',', '.');
         $partners = $partners ?? collect();
+        $testimonials = $testimonials ?? collect();
     @endphp
 
     <section class="public-section bg-etc-surface">
@@ -222,7 +223,9 @@
                     <div class="public-home-carousel__viewport" data-carousel-viewport tabindex="0" aria-label="Daftar partner ETC Planet">
                         <div class="public-home-carousel__track" data-carousel-track>
                     @foreach ($partners as $partner)
-                        @php($website = $partner->meta['website'] ?? null)
+                        @php
+                            $website = $partner->meta['website'] ?? null;
+                        @endphp
                         <article class="public-home-carousel__slide public-home-partner-card public-card p-5" data-carousel-slide>
                             <div class="flex items-center gap-4">
                                 <img src="{{ $assetUrl($partner->image, 'images/hero-img.jpeg') }}" alt="Logo {{ $partner->title }}" class="h-14 w-14 rounded-card bg-etc-surface object-cover p-2 shadow-soft">
@@ -337,53 +340,59 @@
                 <p class="public-subtitle mt-4">Cerita pengalaman belajar dari siswa dan orang tua yang telah bertumbuh bersama ETC Planet.</p>
             </div>
 
-            <div class="public-home-carousel public-reveal" data-public-reveal data-public-carousel>
-                <div class="public-home-carousel__viewport" data-carousel-viewport tabindex="0" aria-label="Testimoni siswa ETC Planet">
-                    <div class="public-home-carousel__track" data-carousel-track>
-                @foreach ([
-                    [
-                        'initials' => 'AD',
-                        'name' => 'Andi Darmawan',
-                        'program' => 'TOEFL Preparation',
-                        'quote' => 'Skor TOEFL saya naik drastis setelah dua bulan ikut kelas intensif. Pengajarnya sangat membantu dan memberikan strategi menjawab soal yang mudah dipahami.',
-                    ],
-                    [
-                        'initials' => 'SN',
-                        'name' => 'Sarah Nabila',
-                        'program' => 'General English',
-                        'quote' => 'Belajar bahasa Inggris di ETC Planet tidak membosankan. Metodenya aktif, banyak praktik, dan membuat saya lebih percaya diri berbicara.',
-                    ],
-                    [
-                        'initials' => 'IB',
-                        'name' => 'Ibu Budi',
-                        'program' => 'Orang Tua Siswa Kids Class',
-                        'quote' => 'Anak saya jadi lebih percaya diri dan senang belajar. Gurunya sabar, komunikatif, dan perkembangan anak selalu disampaikan dengan jelas.',
-                    ],
-                ] as $testimonial)
-                    <article class="public-home-carousel__slide public-testimonial-card" data-carousel-slide>
-                        <span class="material-symbols-outlined public-testimonial-card__quote" aria-hidden="true">format_quote</span>
-                        <div class="flex items-center gap-4">
-                            <span class="public-testimonial-card__avatar">{{ $testimonial['initials'] }}</span>
-                            <div>
-                                <h3 class="font-heading text-base font-bold text-etc-on-surface">{{ $testimonial['name'] }}</h3>
-                                <p class="mt-1 text-xs text-etc-on-muted">{{ $testimonial['program'] }}</p>
+            @if ($testimonials->isNotEmpty())
+                <div class="public-home-carousel public-reveal" data-public-reveal data-public-carousel>
+                    <div class="public-home-carousel__viewport" data-carousel-viewport tabindex="0" aria-label="Testimoni siswa ETC Planet">
+                        <div class="public-home-carousel__track" data-carousel-track>
+                    @foreach ($testimonials as $testimonial)
+                        @php
+                            $rating = max(1, min(5, (int) ($testimonial->meta['rating'] ?? 5)));
+                            $initials = collect(preg_split('/\s+/', trim($testimonial->title)))
+                                ->filter()
+                                ->take(2)
+                                ->map(fn (string $part) => mb_strtoupper(mb_substr($part, 0, 1)))
+                                ->implode('');
+                        @endphp
+                        <article class="public-home-carousel__slide public-testimonial-card" data-carousel-slide data-testimonial-card>
+                            <span class="material-symbols-outlined public-testimonial-card__quote" aria-hidden="true">format_quote</span>
+                            <div class="flex items-center gap-4">
+                                @if ($testimonial->image)
+                                    <img src="{{ $assetUrl($testimonial->image, 'images/foto_profile.jpg') }}" alt="Foto {{ $testimonial->title }}" class="public-testimonial-card__avatar object-cover">
+                                @else
+                                    <span class="public-testimonial-card__avatar">{{ $initials ?: 'ETC' }}</span>
+                                @endif
+                                <div>
+                                    <h3 class="font-heading text-base font-bold text-etc-on-surface">{{ $testimonial->title }}</h3>
+                                    @if (filled($testimonial->meta['role'] ?? null))
+                                        <p class="mt-1 text-xs text-etc-on-muted">{{ $testimonial->meta['role'] }}</p>
+                                    @endif
+                                </div>
                             </div>
+                            <div class="public-testimonial-card__rating" aria-label="{{ $rating }} dari 5 bintang" data-testimonial-rating="{{ $rating }}">
+                                @for ($star = 1; $star <= 5; $star++)
+                                    <span class="material-symbols-outlined">{{ $star <= $rating ? 'star' : 'star_outline' }}</span>
+                                @endfor
+                            </div>
+                            <p class="relative mt-5 text-sm italic leading-7 text-etc-on-muted">"{{ $testimonial->body }}"</p>
+                        </article>
+                    @endforeach
                         </div>
-                        <div class="public-testimonial-card__rating" aria-label="5 dari 5 bintang">
-                            @for ($star = 0; $star < 5; $star++)
-                                <span class="material-symbols-outlined">star</span>
-                            @endfor
-                        </div>
-                        <p class="relative mt-5 text-sm italic leading-7 text-etc-on-muted">“{{ $testimonial['quote'] }}”</p>
-                    </article>
-                @endforeach
+                    </div>
+                    <div class="public-home-carousel__controls" data-carousel-controls>
+                        <x-ui.icon-button icon="heroicon-m-chevron-left" label="Testimoni sebelumnya" size="xl" class="public-home-carousel__arrow" data-carousel-prev />
+                        <x-ui.icon-button icon="heroicon-m-chevron-right" label="Testimoni berikutnya" size="xl" class="public-home-carousel__arrow" data-carousel-next />
                     </div>
                 </div>
-                <div class="public-home-carousel__controls" data-carousel-controls>
-                    <x-ui.icon-button icon="heroicon-m-chevron-left" label="Testimoni sebelumnya" size="xl" class="public-home-carousel__arrow" data-carousel-prev />
-                    <x-ui.icon-button icon="heroicon-m-chevron-right" label="Testimoni berikutnya" size="xl" class="public-home-carousel__arrow" data-carousel-next />
+            @else
+                <div class="mt-10">
+                    <x-ui.empty-state
+                        heading="Testimoni belum tersedia"
+                        description="Cerita siswa dan orang tua akan tampil setelah dipublikasikan."
+                        icon="heroicon-o-chat-bubble-bottom-center-text"
+                        contained
+                    />
                 </div>
-            </div>
+            @endif
         </div>
     </section>
 
@@ -448,44 +457,55 @@
                 <p class="public-subtitle mx-auto mt-4 max-w-2xl">Temukan jawaban singkat seputar program, jadwal, biaya, pendaftaran, dan placement test ETC Planet.</p>
             </div>
 
-            <div class="public-faq-list mt-12" data-public-faq>
-                @foreach ($faqs as $index => $faq)
-                    <article class="public-faq-item public-reveal" data-public-reveal data-faq-item>
-                        <x-ui.button
-                            type="button"
-                            color="gray"
-                            class="public-faq-question"
-                            data-faq-toggle
-                            aria-expanded="false"
-                            aria-controls="home-faq-answer-{{ $index }}"
-                        >
-                            <span>{{ $faq['question'] }}</span>
-                            <span class="material-symbols-outlined public-faq-arrow" data-faq-arrow>expand_more</span>
-                        </x-ui.button>
+            @if ($faqs !== [])
+                <div class="public-faq-list mt-12" data-public-faq>
+                    @foreach ($faqs as $index => $faq)
+                        <article class="public-faq-item public-reveal" data-public-reveal data-faq-item>
+                            <x-ui.button
+                                type="button"
+                                color="gray"
+                                class="public-faq-question"
+                                data-faq-toggle
+                                aria-expanded="false"
+                                aria-controls="home-faq-answer-{{ $index }}"
+                            >
+                                <span>{{ $faq['question'] }}</span>
+                                <span class="material-symbols-outlined public-faq-arrow" data-faq-arrow>expand_more</span>
+                            </x-ui.button>
 
-                        <div
-                            id="home-faq-answer-{{ $index }}"
-                            class="public-faq-answer hidden"
-                            data-faq-answer
-                        >
-                            <p>{{ $faq['answer'] }}</p>
-                        </div>
-                    </article>
-                @endforeach
-            </div>
+                            <div
+                                id="home-faq-answer-{{ $index }}"
+                                class="public-faq-answer hidden"
+                                data-faq-answer
+                            >
+                                <p>{{ $faq['answer'] }}</p>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
 
-            <div class="mt-8 text-center public-reveal" data-public-reveal>
-                <x-ui.button
-                    :href="route('public.faq.index')"
-                    color="gray"
-                    size="xl"
-                    icon="heroicon-m-arrow-right"
-                    icon-position="after"
-                    class="public-section-action public-section-action--light"
-                >
-                    Lihat Semua FAQ
-                </x-ui.button>
-            </div>
+                <div class="mt-8 text-center public-reveal" data-public-reveal>
+                    <x-ui.button
+                        :href="route('public.faq.index')"
+                        color="gray"
+                        size="xl"
+                        icon="heroicon-m-arrow-right"
+                        icon-position="after"
+                        class="public-section-action public-section-action--light"
+                    >
+                        Lihat Semua FAQ
+                    </x-ui.button>
+                </div>
+            @else
+                <div class="mt-10">
+                    <x-ui.empty-state
+                        heading="FAQ belum tersedia"
+                        description="Pertanyaan dan jawaban resmi ETC Planet akan tampil setelah dipublikasikan."
+                        icon="heroicon-o-question-mark-circle"
+                        contained
+                    />
+                </div>
+            @endif
         </div>
     </section>
     <x-public-discovery.page-end />

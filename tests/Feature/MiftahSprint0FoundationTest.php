@@ -101,7 +101,7 @@ it('renders all Miftah pages through the shared public layout', function () {
     Content::query()->create([
         'type' => 'profile',
         'title' => 'Tentang ETC Planet',
-        'slug' => 'about',
+        'slug' => 'etc-profile',
         'body' => 'Profil ETC Planet.',
         'meta' => ['vision' => 'Belajar bahasa yang menyenangkan.', 'mission' => ['Kelas aktif'], 'values' => ['Friendly']],
         'is_published' => true,

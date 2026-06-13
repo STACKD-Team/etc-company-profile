@@ -5,6 +5,7 @@ use App\Models\ContactMessage;
 use App\Models\Content;
 use App\Models\Reel;
 use App\Models\User;
+use Database\Seeders\PublicDiscoverySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Route;
@@ -256,16 +257,15 @@ it('lists contact messages, marks detail as read, and filters chatbot logs', fun
         ->assertDontSee('Ada program apa?');
 });
 
-it('updates settings through contents and exposes updated public contact data', function () {
+it('updates per-slug profile settings and exposes their overrides publicly', function () {
     Storage::fake('public');
     $admin = User::factory()->create(['role' => 'admin']);
 
-    $this->seed(\Database\Seeders\PublicDiscoverySeeder::class);
+    $this->seed(PublicDiscoverySeeder::class);
 
     $this->actingAs($admin)
         ->get(route('admin.profile.index'))
-        ->assertOk()
-        ->assertSee('Jl. S. Parman');
+        ->assertOk();
 
     $this->actingAs($admin)
         ->put(route('admin.profile.update'), [
@@ -291,7 +291,10 @@ it('updates settings through contents and exposes updated public contact data', 
         ->assertOk()
         ->assertSee('Jl. Sprint 6 No. 1, Padang')
         ->assertSee('+62 812-9999-0000')
-        ->assertSee('sprint6@etcplanet.test');
+        ->assertSee('sprint6@etcplanet.test')
+        ->assertDontSee('Jl. S. Parman No. 202B, Ulak Karang Selatan, Padang')
+        ->assertDontSee('+62 812-0000-0000')
+        ->assertDontSee('hello@etcplanet.test');
 });
 
 it('keeps all documented Miftah sprint 6 route names registered', function () {

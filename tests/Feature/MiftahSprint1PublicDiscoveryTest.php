@@ -3,8 +3,8 @@
 use App\Models\Content;
 use App\Models\Program;
 use App\Models\ProgramPromotion;
-use App\Models\Registration;
 use App\Models\Reel;
+use App\Models\Registration;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -312,13 +312,25 @@ it('shows Miftah discovery destinations in the public navbar', function () {
 });
 
 it('renders a public discovery footer with real website destinations only', function () {
+    Content::query()->create([
+        'type' => 'profile',
+        'title' => 'ETC Planet',
+        'slug' => 'etc-profile',
+        'body' => 'Profil resmi ETC Planet.',
+        'meta' => [
+            'address' => 'Jl. S. Parman No. 202B, Ulak Karang Selatan, Padang',
+            'instagram' => 'https://www.instagram.com/etcplanet/',
+        ],
+        'is_published' => true,
+    ]);
+
     $response = $this->get(route('public.home'))
         ->assertOk()
         ->assertSee('Jl. S. Parman No. 202B, Ulak Karang Selatan, Padang')
         ->assertSee('Education Tutorial Centre Padang')
         ->assertDontSee('English Training Center')
         ->assertSee('https://www.instagram.com/etcplanet/', false)
-        ->assertSee('@etcplanet')
+        ->assertSee('Instagram')
         ->assertDontSee('Kebijakan Privasi')
         ->assertDontSee('Syarat &amp; Ketentuan', false)
         ->assertDontSee('Karir')
@@ -444,6 +456,31 @@ it('uses the same Miftah public chrome on every guest authentication page', func
 it('renders the refined home discovery sections from the Stitch reference', function () {
     miftahSprint1Program();
 
+    foreach ([
+        ['name' => 'Andi Darmawan', 'slug' => 'andi-darmawan'],
+        ['name' => 'Sarah Nabila', 'slug' => 'sarah-nabila'],
+        ['name' => 'Ibu Budi', 'slug' => 'ibu-budi'],
+    ] as $index => $testimonial) {
+        Content::query()->create([
+            'type' => 'testimonial',
+            'title' => $testimonial['name'],
+            'slug' => $testimonial['slug'],
+            'body' => 'Cerita pengalaman belajar bersama ETC Planet.',
+            'meta' => ['role' => 'Siswa ETC Planet', 'rating' => 5],
+            'display_order' => $index + 1,
+            'is_published' => true,
+        ]);
+    }
+
+    Content::query()->create([
+        'type' => 'faq',
+        'title' => 'Bagaimana cara mendaftar?',
+        'slug' => 'cara-mendaftar-home',
+        'body' => 'Pilih program lalu lengkapi formulir pendaftaran.',
+        'display_order' => 1,
+        'is_published' => true,
+    ]);
+
     $this->get(route('public.home'))
         ->assertOk()
         ->assertSee('public-home-stats', false)
@@ -548,6 +585,15 @@ it('keeps the public discovery chatbot local and interactive without editing sha
 });
 
 it('renders FAQ as a clean collapsed accordion with arrow controls', function () {
+    Content::query()->create([
+        'type' => 'faq',
+        'title' => 'Apakah placement test dilakukan secara online?',
+        'slug' => 'placement-test-offline',
+        'body' => 'Tidak. Placement test dilaksanakan secara offline di ETC Planet.',
+        'display_order' => 1,
+        'is_published' => true,
+    ]);
+
     $this->get(route('public.faq.index'))
         ->assertOk()
         ->assertSee('data-public-faq', false)
@@ -563,7 +609,7 @@ it('renders FAQ as a clean collapsed accordion with arrow controls', function ()
     expect($scriptSource)
         ->toContain('function initPublicFaq()')
         ->toContain('setOpen(item, opening)')
-        ->not->toContain("items.forEach((candidate) => setOpen(candidate, candidate === item && opening))");
+        ->not->toContain('items.forEach((candidate) => setOpen(candidate, candidate === item && opening))');
 });
 
 it('keeps reel playback feedback brief and provides a temporary mute toggle', function () {

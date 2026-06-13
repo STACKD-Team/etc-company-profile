@@ -11,7 +11,7 @@ class AboutController extends Controller
     public function index(PublicDiscoveryService $discovery): View
     {
         return view('pages.public.about', [
-            'page' => $discovery->page('about'),
+            'profile' => $discovery->profile(),
             'settings' => $discovery->settings(),
         ]);
     }
