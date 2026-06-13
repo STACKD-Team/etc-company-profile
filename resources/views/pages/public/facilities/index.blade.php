@@ -22,7 +22,9 @@
                             <img src="{{ $assetUrl($room->image) }}" alt="{{ $room->name }}" class="h-56 w-full object-cover">
                             <div class="p-5">
                                 <h2 class="font-heading text-xl font-bold">{{ $room->name }}</h2>
-                                <p class="mt-3 min-h-20 text-sm leading-7 text-etc-on-muted">{{ $room->description }}</p>
+                                @if ($room->description)
+                                    <p class="mt-3 min-h-20 text-sm leading-7 text-etc-on-muted">{{ $room->description }}</p>
+                                @endif
                                 @if ($room->facilities)
                                     <div class="mt-5 flex flex-wrap gap-2">
                                         @foreach ($room->facilities as $facility)

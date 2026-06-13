@@ -5,7 +5,9 @@ use App\Models\ContactMessage;
 use App\Models\Content;
 use App\Models\Program;
 use App\Models\Reel;
+use App\Models\Room;
 use App\Models\User;
+use Database\Seeders\PublicDiscoverySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -178,10 +180,13 @@ it('toggles reel likes in the session without going negative', function () {
 });
 
 it('loads public discovery seed data idempotently', function () {
-    $this->seed(\Database\Seeders\PublicDiscoverySeeder::class);
-    $this->seed(\Database\Seeders\PublicDiscoverySeeder::class);
+    $this->seed(PublicDiscoverySeeder::class);
+    $this->seed(PublicDiscoverySeeder::class);
 
-    expect(Content::query()->where('type', 'profile')->where('slug', 'about')->count())->toBe(1)
+    expect(Content::query()->where('type', Content::TYPE_PROFILE)->where('slug', 'etc-profile')->count())->toBe(1)
+        ->and(Content::query()->where('type', Content::TYPE_FAQ)->count())->toBe(4)
+        ->and(Content::query()->where('type', Content::TYPE_TESTIMONIAL)->count())->toBe(3)
+        ->and(Room::query()->count())->toBe(3)
         ->and(Reel::query()->where('is_published', true)->count())->toBeGreaterThan(0)
         ->and(User::query()->instructors()->where('show_on_team_page', true)->count())->toBeGreaterThan(0);
 });

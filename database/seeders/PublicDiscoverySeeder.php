@@ -13,19 +13,20 @@ class PublicDiscoverySeeder extends Seeder
 {
     public function run(): void
     {
-        $this->seedPages();
-        $this->seedSettings();
+        $this->seedProfile();
+        $this->seedFaqs();
         $this->seedRooms();
         $this->seedGallery();
         $this->seedPartners();
+        $this->seedTestimonials();
         $this->seedInstructors();
         $this->seedReels();
     }
 
-    protected function seedPages(): void
+    protected function seedProfile(): void
     {
         Content::query()->updateOrCreate(
-            ['type' => Content::TYPE_PROFILE, 'slug' => 'about'],
+            ['type' => Content::TYPE_PROFILE, 'slug' => 'etc-profile'],
             [
                 'title' => 'Tentang ETC Planet',
                 'body' => "ETC Planet adalah lembaga kursus bahasa di Padang yang membantu siswa belajar dengan cara yang ramah, terarah, dan menyenangkan.\n\nKami menggabungkan kelas kecil, pengajar berpengalaman, dan placement test offline agar setiap siswa masuk ke level yang sesuai.",
@@ -38,45 +39,50 @@ class PublicDiscoverySeeder extends Seeder
                         'Menjaga proses belajar tetap terukur melalui kelas kecil dan evaluasi berkala.',
                     ],
                     'values' => ['Friendly', 'Focused', 'Practical', 'Progressive'],
+                    'address' => 'Jl. S. Parman No. 202B, Ulak Karang Selatan, Padang',
+                    'phone' => '+62 812-0000-0000',
+                    'whatsapp' => '+62 812-0000-0000',
+                    'email' => 'hello@etcplanet.test',
+                    'instagram' => 'https://www.instagram.com/etcplanet/',
+                    'hours' => 'Senin-Sabtu, 09.00-18.30',
+                    'map_url' => 'https://maps.google.com/?q=Jl.+S.+Parman+No.+202B+Padang',
                 ],
                 'display_order' => 1,
                 'is_published' => true,
             ],
         );
-
-        foreach ([
-            ['question' => 'Bagaimana cara mendaftar di ETC Planet?', 'answer' => 'Untuk Sprint 1, calon siswa dapat mengirim pesan melalui form kontak. Tim ETC akan membantu memilih program, jadwal, dan tahap berikutnya.'],
-            ['question' => 'Apakah ada placement test?', 'answer' => 'Ya. Placement test tetap dilakukan offline agar level kelas yang dipilih lebih tepat.'],
-            ['question' => 'Berapa biaya pendaftaran?', 'answer' => 'Biaya pendaftaran awal adalah Rp 200.000. Biaya program menyesuaikan kelas yang dipilih.'],
-            ['question' => 'Apakah jadwal bisa request?', 'answer' => 'Bisa. Calon siswa dapat menyampaikan preferensi jadwal saat konsultasi awal.'],
-        ] as $index => $faq) {
-            Content::query()->updateOrCreate(
-                ['type' => Content::TYPE_FAQ, 'title' => $faq['question']],
-                [
-                    'slug' => 'faq-'.crc32($faq['question']),
-                    'body' => $faq['answer'],
-                    'meta' => [],
-                    'display_order' => $index + 1,
-                    'is_published' => true,
-                ],
-            );
-        }
     }
 
-    protected function seedSettings(): void
+    protected function seedFaqs(): void
     {
         foreach ([
-            ['title' => 'Address', 'slug' => 'address', 'value' => 'Jl. S. Parman No. 202B, Ulak Karang Selatan, Padang'],
-            ['title' => 'Phone', 'slug' => 'phone', 'value' => '+62 812-0000-0000'],
-            ['title' => 'Email', 'slug' => 'email', 'value' => 'hello@etcplanet.test'],
-            ['title' => 'Instagram', 'slug' => 'instagram', 'value' => 'https://www.instagram.com/etcplanet/'],
-            ['title' => 'Hours', 'slug' => 'hours', 'value' => 'Senin-Sabtu, 09.00-18.30'],
-        ] as $index => $setting) {
+            [
+                'slug' => 'cara-mendaftar',
+                'question' => 'Bagaimana cara mendaftar di ETC Planet?',
+                'answer' => 'Pilih program, isi formulir pendaftaran online, lalu ikuti instruksi pembayaran dan placement test.',
+            ],
+            [
+                'slug' => 'placement-test',
+                'question' => 'Apakah ada placement test?',
+                'answer' => 'Ya. Placement test dilakukan offline agar siswa ditempatkan pada level kelas yang tepat.',
+            ],
+            [
+                'slug' => 'biaya-pendaftaran',
+                'question' => 'Berapa biaya pendaftaran?',
+                'answer' => 'Biaya pendaftaran dan harga program dapat dilihat pada halaman program yang aktif.',
+            ],
+            [
+                'slug' => 'request-jadwal',
+                'question' => 'Apakah jadwal bisa request?',
+                'answer' => 'Bisa. Calon siswa dapat menyampaikan preferensi jadwal saat mengisi formulir pendaftaran.',
+            ],
+        ] as $index => $faq) {
             Content::query()->updateOrCreate(
-                ['type' => Content::TYPE_PROFILE, 'slug' => $setting['slug']],
+                ['type' => Content::TYPE_FAQ, 'slug' => $faq['slug']],
                 [
-                    'title' => $setting['title'],
-                    'meta' => ['value' => $setting['value']],
+                    'title' => $faq['question'],
+                    'body' => $faq['answer'],
+                    'meta' => [],
                     'display_order' => $index + 1,
                     'is_published' => true,
                 ],
@@ -88,34 +94,34 @@ class PublicDiscoverySeeder extends Seeder
     {
         foreach ([
             [
-                'title' => 'Hard Rock Room',
-                'slug' => 'hard-rock-room',
-                'body' => 'Ruang kelas energik untuk kelas conversation, teen, dan latihan speaking.',
+                'name' => 'Hard Rock Room',
+                'description' => 'Ruang kelas energik untuk kelas conversation, teen, dan latihan speaking.',
                 'image' => 'images/pu1-img.jpg',
-                'meta' => ['capacity' => 12, 'facility' => ['AC', 'Projector', 'Whiteboard', 'Speaking cards']],
+                'capacity' => 12,
+                'facilities' => ['AC', 'Projector', 'Whiteboard', 'Speaking cards'],
             ],
             [
-                'title' => 'Disneyland Room',
-                'slug' => 'disneyland-room',
-                'body' => 'Ruang belajar hangat untuk kids class dan aktivitas bahasa yang lebih playful.',
+                'name' => 'Disneyland Room',
+                'description' => 'Ruang belajar hangat untuk kids class dan aktivitas bahasa yang lebih playful.',
                 'image' => 'images/pu1-img (5).jpg',
-                'meta' => ['capacity' => 10, 'facility' => ['AC', 'Learning props', 'Whiteboard', 'Reading corner']],
+                'capacity' => 10,
+                'facilities' => ['AC', 'Learning props', 'Whiteboard', 'Reading corner'],
             ],
             [
-                'title' => 'Louis Vuitton Room',
-                'slug' => 'louis-vuitton-room',
-                'body' => 'Ruang fokus untuk kelas persiapan tes dan private coaching.',
+                'name' => 'Louis Vuitton Room',
+                'description' => 'Ruang fokus untuk kelas persiapan tes dan private coaching.',
                 'image' => 'images/pu2-img.jpg',
-                'meta' => ['capacity' => 8, 'facility' => ['AC', 'Projector', 'Audio system', 'Test prep setup']],
+                'capacity' => 8,
+                'facilities' => ['AC', 'Projector', 'Audio system', 'Test prep setup'],
             ],
         ] as $index => $room) {
             Room::query()->updateOrCreate(
-                ['name' => $room['title']],
+                ['name' => $room['name']],
                 [
-                    'description' => $room['body'],
+                    'description' => $room['description'],
                     'image' => $room['image'],
-                    'capacity' => $room['meta']['capacity'] ?? null,
-                    'facilities' => $room['meta']['facility'] ?? [],
+                    'capacity' => $room['capacity'],
+                    'facilities' => $room['facilities'],
                     'display_order' => $index + 1,
                     'is_active' => true,
                 ],
@@ -198,6 +204,42 @@ class PublicDiscoverySeeder extends Seeder
                     'body' => $partner['body'],
                     'image' => $partner['image'],
                     'meta' => $partner['meta'],
+                    'display_order' => $index + 1,
+                    'is_published' => true,
+                ],
+            );
+        }
+    }
+
+    protected function seedTestimonials(): void
+    {
+        foreach ([
+            [
+                'title' => 'Andi Darmawan',
+                'slug' => 'testimoni-andi-darmawan',
+                'body' => 'Skor TOEFL saya meningkat setelah mengikuti kelas intensif. Strategi menjawab soal dijelaskan dengan mudah dipahami.',
+                'image' => null,
+                'meta' => ['role' => 'Siswa TOEFL Preparation', 'rating' => 5],
+            ],
+            [
+                'title' => 'Sarah Nabila',
+                'slug' => 'testimoni-sarah-nabila',
+                'body' => 'Metode belajarnya aktif dan banyak praktik sehingga saya lebih percaya diri berbicara bahasa Inggris.',
+                'image' => 'images/profile_sarah.jpg',
+                'meta' => ['role' => 'Siswa General English', 'rating' => 5],
+            ],
+            [
+                'title' => 'Ibu Budi',
+                'slug' => 'testimoni-ibu-budi',
+                'body' => 'Pengajarnya sabar dan komunikatif. Perkembangan belajar anak juga disampaikan dengan jelas.',
+                'image' => null,
+                'meta' => ['role' => 'Orang Tua Siswa Kids Class', 'rating' => 4],
+            ],
+        ] as $index => $testimonial) {
+            Content::query()->updateOrCreate(
+                ['type' => Content::TYPE_TESTIMONIAL, 'slug' => $testimonial['slug']],
+                [
+                    ...$testimonial,
                     'display_order' => $index + 1,
                     'is_published' => true,
                 ],

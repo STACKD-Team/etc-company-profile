@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Services\PublicDiscoveryService;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -44,6 +46,10 @@ class AppServiceProvider extends ServiceProvider
                 return Limit::perMinute($limit)->by($request->user()?->id ?: $request->ip());
             });
         }
+
+        View::composer('components.public-discovery.footer', function ($view): void {
+            $view->with('profileSettings', app(PublicDiscoveryService::class)->settings());
+        });
     }
 
     /**

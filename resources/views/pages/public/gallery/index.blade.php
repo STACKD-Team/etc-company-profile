@@ -30,9 +30,11 @@
                             <div class="relative bg-black">
                                 <img src="{{ $assetUrl($images->first()) }}" alt="{{ $item->meta['alt'] ?? $item->title }}" class="h-64 w-full object-cover opacity-95">
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-                                <x-ui.badge color="primary" class="absolute bottom-4 left-4 !bg-etc-surface !text-etc-magenta">
-                                    {{ $item->meta['category'] ?? 'Kegiatan' }}
-                                </x-ui.badge>
+                                @if (filled($item->meta['category'] ?? null))
+                                    <x-ui.badge color="primary" class="absolute bottom-4 left-4 !bg-etc-surface !text-etc-magenta">
+                                        {{ $item->meta['category'] }}
+                                    </x-ui.badge>
+                                @endif
                             </div>
 
                             @if ($images->count() > 1)
@@ -44,13 +46,19 @@
                             @endif
 
                             <div class="p-5">
-                                <p class="font-heading text-xs font-bold uppercase tracking-[0.16em] text-etc-magenta">{{ $item->meta['event_date'] ?? 'ETC Planet' }}</p>
+                                @if (filled($item->meta['event_date'] ?? null))
+                                    <p class="font-heading text-xs font-bold uppercase tracking-[0.16em] text-etc-magenta">{{ $item->meta['event_date'] }}</p>
+                                @endif
                                 <h2 class="mt-3 font-heading text-xl font-bold text-white">{{ $item->title }}</h2>
-                                <p class="mt-3 text-sm leading-7 text-white/75">{{ $item->body ?: 'Dokumentasi kegiatan belajar ETC Planet.' }}</p>
-                                <p class="mt-5 flex items-center gap-2 text-sm text-white/60">
-                                    <span class="material-symbols-outlined text-base">location_on</span>
-                                    {{ $item->meta['location'] ?? 'ETC Planet Padang' }}
-                                </p>
+                                @if ($item->body)
+                                    <p class="mt-3 text-sm leading-7 text-white/75">{{ $item->body }}</p>
+                                @endif
+                                @if (filled($item->meta['location'] ?? null))
+                                    <p class="mt-5 flex items-center gap-2 text-sm text-white/60">
+                                        <span class="material-symbols-outlined text-base">location_on</span>
+                                        {{ $item->meta['location'] }}
+                                    </p>
+                                @endif
                             </div>
                         </article>
                     @endforeach

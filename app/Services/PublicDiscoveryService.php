@@ -7,19 +7,40 @@ use App\Models\Program;
 use App\Models\Reel;
 use App\Models\Room;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PublicDiscoveryService
 {
-    public function page(string $slug): ?Content
+    /**
+     * Ordered from the current canonical profile to supported legacy slugs.
+     *
+     * @var list<string>
+     */
+    private const PROFILE_SLUGS = [
+        'etc-profile',
+        'about',
+        'company-profile',
+    ];
+
+    public function profile(): ?Content
     {
-        return Content::query()
+        $profiles = Content::query()
             ->where('type', Content::TYPE_PROFILE)
-            ->where('slug', $slug)
+            ->whereIn('slug', self::PROFILE_SLUGS)
             ->where('is_published', true)
-            ->first();
+            ->get()
+            ->keyBy('slug');
+
+        foreach (self::PROFILE_SLUGS as $slug) {
+            if ($profiles->has($slug)) {
+                return $profiles->get($slug);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -48,6 +69,14 @@ class PublicDiscoveryService
     public function partners(): Collection
     {
         return $this->publishedContent('partner')->get();
+    }
+
+    /**
+     * @return Collection<int, Content>
+     */
+    public function testimonials(): Collection
+    {
+        return $this->publishedContent('testimonial')->get();
     }
 
     /**
@@ -103,26 +132,38 @@ class PublicDiscoveryService
      */
     public function settings(): array
     {
-        return Content::query()
+        $profile = $this->profile();
+        $settings = is_array($profile?->meta) ? $profile->meta : [];
+
+        if ($profile?->body && blank($settings['general_info'] ?? null)) {
+            $settings['general_info'] = $profile->body;
+        }
+
+        Content::query()
             ->where('type', Content::TYPE_PROFILE)
             ->where('is_published', true)
+            ->whereNotIn('slug', self::PROFILE_SLUGS)
+            ->orderBy('display_order')
+            ->orderBy('title')
             ->get()
-            ->mapWithKeys(function (Content $content): array {
+            ->each(function (Content $content) use (&$settings): void {
+                $key = $content->slug ?: Str::slug($content->title, '_');
+
                 if ($content->slug === 'qris' && $content->image) {
-                    return ['qris' => $this->mediaUrl($content->image)];
+                    $settings[$key] = $this->mediaUrl($content->image);
+
+                    return;
                 }
 
-                if ($content->slug === 'company-profile' && is_array($content->meta)) {
-                    return collect($content->meta)
-                        ->filter(fn ($value): bool => is_scalar($value) && filled($value))
-                        ->all();
-                }
-
-                $value = $content->meta['value'] ?? $content->body ?? null;
+                $hasExplicitValue = is_array($content->meta) && array_key_exists('value', $content->meta);
+                $value = $hasExplicitValue ? $content->meta['value'] : $content->body;
                 $value ??= $content->image ? $this->mediaUrl($content->image) : null;
 
-                return [$content->slug ?: Str::slug($content->title) => $value];
-            })
+                $settings[$key] = $value;
+            });
+
+        return collect($settings)
+            ->filter(fn (mixed $value): bool => is_array($value) ? $value !== [] : filled($value))
             ->all();
     }
 
@@ -152,7 +193,7 @@ class PublicDiscoveryService
      */
     public function faqItems(): array
     {
-        $items = Content::query()
+        return Content::query()
             ->where('type', Content::TYPE_FAQ)
             ->where('is_published', true)
             ->orderBy('display_order')
@@ -163,21 +204,6 @@ class PublicDiscoveryService
                 'answer' => (string) $content->body,
             ])
             ->all();
-
-        if ($items !== []) {
-            return $items;
-        }
-
-        return [
-            [
-                'question' => 'Bagaimana cara mendaftar?',
-                'answer' => 'Hubungi tim ETC Planet melalui form kontak. Tim kami akan membantu memilih program dan jadwal yang sesuai.',
-            ],
-            [
-                'question' => 'Apakah placement test dilakukan online?',
-                'answer' => 'Placement test tetap dilakukan offline di ETC Planet agar hasil penempatan kelas lebih akurat.',
-            ],
-        ];
     }
 
     /**
@@ -200,6 +226,14 @@ class PublicDiscoveryService
     {
         $text = Str::of($message)->lower()->toString();
         $settings = $this->settings();
+        $faqAnswer = $this->matchingFaqAnswer($text);
+
+        if ($faqAnswer !== null) {
+            return [
+                'intent' => 'faq',
+                'reply' => $faqAnswer,
+            ];
+        }
 
         if (Str::contains($text, ['harga', 'biaya', 'bayar', 'qris', 'transfer'])) {
             return [
@@ -234,9 +268,26 @@ class PublicDiscoveryService
         }
 
         if (Str::contains($text, ['alamat', 'lokasi', 'kontak', 'wa', 'whatsapp', 'instagram'])) {
+            $address = $settings['address'] ?? null;
+            $contact = $settings['whatsapp'] ?? $settings['phone'] ?? null;
+            $instagram = $settings['instagram'] ?? null;
+
+            if (! $address && ! $contact && ! $instagram) {
+                return [
+                    'intent' => 'contact',
+                    'reply' => 'Informasi kontak ETC Planet belum dipublikasikan. Silakan gunakan form kontak agar tim ETC dapat menghubungi kamu.',
+                ];
+            }
+
+            $parts = array_filter([
+                $address ? 'ETC Planet berlokasi di '.$address.'.' : null,
+                $contact ? 'Kamu dapat menghubungi '.$contact.' untuk konsultasi.' : null,
+                $instagram ? 'Instagram ETC Planet: '.$instagram.'.' : null,
+            ]);
+
             return [
                 'intent' => 'contact',
-                'reply' => 'ETC Planet berlokasi di '.($settings['address'] ?? 'Jl. S. Parman No. 202B, Padang').'. Kamu juga bisa menghubungi '.($settings['phone'] ?? '+62 812-0000-0000').' untuk konsultasi cepat.',
+                'reply' => implode(' ', $parts),
             ];
         }
 
@@ -246,12 +297,68 @@ class PublicDiscoveryService
         ];
     }
 
-    protected function publishedContent(string $type)
+    protected function publishedContent(string $type): Builder
     {
         return Content::query()
             ->where('type', $type)
             ->where('is_published', true)
             ->orderBy('display_order')
             ->orderBy('title');
+    }
+
+    protected function matchingFaqAnswer(string $message): ?string
+    {
+        $messageWords = $this->searchableWords($message);
+
+        if ($messageWords === []) {
+            return null;
+        }
+
+        $match = collect($this->faqItems())
+            ->map(function (array $faq) use ($messageWords): array {
+                $questionWords = $this->searchableWords($faq['question']);
+
+                return [
+                    'answer' => $faq['answer'],
+                    'score' => count(array_intersect($messageWords, $questionWords)),
+                ];
+            })
+            ->sortByDesc('score')
+            ->first();
+
+        return ($match['score'] ?? 0) >= 2 ? $match['answer'] : null;
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function searchableWords(string $value): array
+    {
+        $stopWords = [
+            'adalah',
+            'anda',
+            'atau',
+            'bagaimana',
+            'dalam',
+            'dengan',
+            'dari',
+            'ingin',
+            'kamu',
+            'kami',
+            'saya',
+            'tentang',
+            'untuk',
+            'yang',
+        ];
+
+        return Str::of($value)
+            ->lower()
+            ->replaceMatches('/[^\pL\pN]+/u', ' ')
+            ->explode(' ')
+            ->map(fn (string $word): string => trim($word))
+            ->filter(fn (string $word): bool => mb_strlen($word) >= 4 && ! in_array($word, $stopWords, true))
+            ->unique()
+            ->values()
+            ->all();
     }
 }
