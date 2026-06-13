@@ -29,6 +29,25 @@ class QdrantVectorService
     }
 
     /**
+     * @param array<int, string> $pointIds
+     */
+    public function delete(array $pointIds): void
+    {
+        $pointIds = array_values(array_filter($pointIds));
+
+        if (! $this->isConfigured() || $pointIds === []) {
+            return;
+        }
+
+        Http::withHeaders($this->headers())
+            ->timeout(30)
+            ->post($this->baseUrl().'/collections/'.config('rag.qdrant.collection').'/points/delete?wait=true', [
+                'points' => $pointIds,
+            ])
+            ->throw();
+    }
+
+    /**
      * @return array<int, array{content: string, score: float, metadata: array}>
      */
     public function search(array $vector, int $limit = 5): array
@@ -37,14 +56,18 @@ class QdrantVectorService
             return [];
         }
 
-        $this->ensureCollection(count($vector));
-
         $response = Http::withHeaders($this->headers())
             ->timeout(30)
             ->post($this->baseUrl().'/collections/'.config('rag.qdrant.collection').'/points/search', [
                 'vector' => $vector,
                 'limit' => $limit,
                 'with_payload' => true,
+                'filter' => [
+                    'must' => [
+                        ['key' => 'is_active', 'match' => ['value' => true]],
+                        ['key' => 'status', 'match' => ['value' => 'ready']],
+                    ],
+                ],
             ])
             ->throw()
             ->json('result', []);

@@ -78,7 +78,7 @@ class MidtransPaymentService
         return DB::transaction(function () use ($payload): MidtransNotification {
             $orderId = (string) ($payload['order_id'] ?? '');
             $transactionStatus = (string) ($payload['transaction_status'] ?? 'unknown');
-            $transactionId = (string) ($payload['transaction_id'] ?? '');
+            $transactionId = (string) ($payload['transaction_id'] ?? $payload['order_id'] ?? '');
 
             if ($orderId === '') {
                 throw new RuntimeException('Midtrans notification order_id is missing.');
@@ -165,8 +165,12 @@ class MidtransPaymentService
     {
         $signature = (string) ($payload['signature_key'] ?? '');
 
-        if ($signature === '' || ! $this->isConfigured()) {
-            return ! $this->isConfigured();
+        if (! $this->isConfigured()) {
+            return true;
+        }
+
+        if ($signature === '') {
+            return false;
         }
 
         $expected = hash('sha512',

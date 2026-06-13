@@ -70,11 +70,17 @@ class KnowledgeSourceService
     {
         $source->update(['is_active' => true]);
 
+        if ($source->chunks()->exists()) {
+            return $this->indexNow($source->refresh());
+        }
+
         return $source->refresh();
     }
 
     public function unpublish(RagKnowledgeSource $source): RagKnowledgeSource
     {
+        $this->deleteQdrantPoints($source);
+
         $source->update(['is_active' => false]);
 
         return $source->refresh();
@@ -82,6 +88,8 @@ class KnowledgeSourceService
 
     public function archive(RagKnowledgeSource $source): RagKnowledgeSource
     {
+        $this->deleteQdrantPoints($source);
+
         $source->update([
             'status' => 'archived',
             'is_active' => false,
@@ -96,7 +104,9 @@ class KnowledgeSourceService
             'status' => $source->chunks()->exists() ? 'ready' : 'draft',
         ]);
 
-        return $source->refresh();
+        return $source->is_active && $source->chunks()->exists()
+            ? $this->indexNow($source->refresh())
+            : $source->refresh();
     }
 
     public function indexNow(RagKnowledgeSource $source): RagKnowledgeSource
@@ -108,14 +118,23 @@ class KnowledgeSourceService
                 throw new \RuntimeException('Tidak ada teks yang bisa diindeks dari knowledge source ini.');
             }
 
+            $chunks = $this->chunks($text);
+
+            if ($chunks === []) {
+                throw new \RuntimeException('Tidak ada chunk yang bisa diindeks dari knowledge source ini.');
+            }
+
+            $this->deleteQdrantPoints($source);
             $source->chunks()->delete();
 
-            foreach ($this->chunks($text) as $index => $chunk) {
+            foreach ($chunks as $index => $chunk) {
                 $pointId = (string) Str::uuid();
                 $metadata = [
                     'source_id' => $source->id,
                     'title' => $source->title,
                     'chunk_index' => $index,
+                    'status' => 'ready',
+                    'is_active' => (bool) $source->is_active,
                 ];
                 $vector = $this->embeddings->embed($chunk);
 
@@ -130,6 +149,11 @@ class KnowledgeSourceService
 
                 $this->qdrant->upsert($pointId, $vector, [
                     'content' => $chunk,
+                    'source_id' => $source->id,
+                    'title' => $source->title,
+                    'chunk_index' => $index,
+                    'status' => 'ready',
+                    'is_active' => (bool) $source->is_active,
                     'metadata' => $metadata,
                 ]);
             }
@@ -169,5 +193,16 @@ class KnowledgeSourceService
         }
 
         return $chunks;
+    }
+
+    protected function deleteQdrantPoints(RagKnowledgeSource $source): void
+    {
+        $pointIds = $source->chunks()
+            ->pluck('qdrant_point_id')
+            ->filter()
+            ->values()
+            ->all();
+
+        $this->qdrant->delete($pointIds);
     }
 }
