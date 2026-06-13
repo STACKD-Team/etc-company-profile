@@ -21,7 +21,6 @@ class StoreCourseClassRequest extends FormRequest
             'name' => ['required', 'string', 'max:100'],
             'schedule_days' => ['nullable', 'string', 'max:50'],
             'schedule_time' => ['nullable', 'string', 'max:50'],
-            'room' => ['nullable', 'string', 'max:50'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'status' => ['nullable', Rule::in(['upcoming', 'ongoing', 'completed', 'cancelled'])],

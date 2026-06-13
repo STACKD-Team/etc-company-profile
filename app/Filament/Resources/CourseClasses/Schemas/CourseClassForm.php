@@ -28,7 +28,11 @@ class CourseClassForm
                     ->default(null),
                 TextInput::make('schedule_time')
                     ->default(null),
-                TextInput::make('room')
+                Select::make('room_id')
+                    ->label('Room')
+                    ->relationship('room', 'name')
+                    ->searchable()
+                    ->preload()
                     ->default(null),
                 DatePicker::make('start_date'),
                 DatePicker::make('end_date'),

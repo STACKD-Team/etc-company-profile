@@ -33,12 +33,12 @@ class SettingResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('type', 'setting');
+        return parent::getEloquentQuery()->where('type', Content::TYPE_PROFILE);
     }
 
     public static function form(Schema $schema): Schema
     {
-        return ContentForm::configure($schema);
+        return ContentForm::configure($schema, Content::TYPE_PROFILE);
     }
 
     public static function infolist(Schema $schema): Schema

@@ -20,8 +20,6 @@
 
 <x-ui.panel :heading="'Detail '.$pageTitle" description="Kelola konten public dengan form yang sederhana untuk admin." class="min-w-0">
     <div class="grid gap-5 md:grid-cols-2">
-        <x-ui.field name="slug" label="Slug" :value="$content->slug" />
-
         <div class="md:col-span-2">
             <x-ui.field name="title" :label="$isFaq ? 'Pertanyaan' : ($isTestimonial ? 'Nama' : 'Judul')" :value="$content->title" required />
         </div>
@@ -49,7 +47,13 @@
                 <h2 class="font-heading text-base font-bold text-etc-on-surface">Informasi Tambahan</h2>
             <div class="mt-4 grid gap-4 md:grid-cols-2">
                 @foreach ($metaFields as $key => $label)
-                    <x-ui.field :name="'meta['.$key.']'" :label="$label" :value="old('meta.'.$key, $content->meta[$key] ?? '')" size="sm" />
+                    @if ($key === 'rating')
+                        <x-ui.number-field :name="'meta['.$key.']'" :label="$label" :value="old('meta.'.$key, $content->meta[$key] ?? 5)" min="1" max="5" required />
+                    @elseif ($key === 'website')
+                        <x-ui.field :name="'meta['.$key.']'" :label="$label" type="url" :value="old('meta.'.$key, $content->meta[$key] ?? '')" size="sm" />
+                    @else
+                        <x-ui.field :name="'meta['.$key.']'" :label="$label" :value="old('meta.'.$key, $content->meta[$key] ?? '')" size="sm" />
+                    @endif
                 @endforeach
             </div>
             </div>

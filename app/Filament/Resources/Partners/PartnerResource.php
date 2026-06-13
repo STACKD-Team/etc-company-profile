@@ -40,7 +40,7 @@ class PartnerResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return ContentForm::configure($schema);
+        return ContentForm::configure($schema, Content::TYPE_PARTNER);
     }
 
     public static function infolist(Schema $schema): Schema

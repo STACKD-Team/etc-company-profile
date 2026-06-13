@@ -22,7 +22,8 @@ class CourseClassInfolist
                     ->placeholder('-'),
                 TextEntry::make('schedule_time')
                     ->placeholder('-'),
-                TextEntry::make('room')
+                TextEntry::make('room.name')
+                    ->label('Room')
                     ->placeholder('-'),
                 TextEntry::make('start_date')
                     ->date()

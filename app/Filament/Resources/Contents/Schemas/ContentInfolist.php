@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Contents\Schemas;
 
+use App\Models\Content;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -16,8 +17,6 @@ class ContentInfolist
                 TextEntry::make('type')
                     ->badge(),
                 TextEntry::make('title'),
-                TextEntry::make('slug')
-                    ->placeholder('-'),
                 TextEntry::make('body')
                     ->placeholder('-')
                     ->columnSpanFull(),
@@ -26,9 +25,26 @@ class ContentInfolist
                 TextEntry::make('images')
                     ->placeholder('-')
                     ->columnSpanFull(),
-                TextEntry::make('meta')
+                TextEntry::make('meta.category')
+                    ->label('Kategori')
                     ->placeholder('-')
-                    ->columnSpanFull(),
+                    ->visible(fn (Content $record): bool => $record->type === Content::TYPE_PARTNER),
+                TextEntry::make('meta.website')
+                    ->label('Website')
+                    ->placeholder('-')
+                    ->visible(fn (Content $record): bool => $record->type === Content::TYPE_PARTNER),
+                TextEntry::make('meta.since')
+                    ->label('Tahun kerja sama')
+                    ->placeholder('-')
+                    ->visible(fn (Content $record): bool => $record->type === Content::TYPE_PARTNER),
+                TextEntry::make('meta.role')
+                    ->label('Role / asal')
+                    ->placeholder('-')
+                    ->visible(fn (Content $record): bool => $record->type === Content::TYPE_TESTIMONIAL),
+                TextEntry::make('meta.rating')
+                    ->label('Rating')
+                    ->placeholder('-')
+                    ->visible(fn (Content $record): bool => $record->type === Content::TYPE_TESTIMONIAL),
                 TextEntry::make('display_order')
                     ->numeric()
                     ->placeholder('-'),
