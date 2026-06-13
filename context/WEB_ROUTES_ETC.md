@@ -85,9 +85,12 @@ Route admin Sprint 4 Mia canonical memakai Blade di `resources/views/pages/admin
 | --- | --- | --- | --- | --- | --- |
 | GET | `/admin/dashboard` | `admin.dashboard` | `Admin\DashboardController@index` | `web`, `auth`, `role:admin` | Dashboard admin Blade |
 | GET | `/admin/registration` | `admin.registration.index` | `Admin\RegistrationController@index` | `web`, `auth`, `role:admin` | List pendaftaran |
+| GET | `/admin/registration/create` | `admin.registration.create` | `Admin\RegistrationController@create` | `web`, `auth`, `role:admin` | Create pendaftaran manual admin |
+| POST | `/admin/registration` | `admin.registration.store` | `Admin\RegistrationController@store` | `web`, `auth`, `role:admin` | Store pendaftaran manual admin |
 | GET | `/admin/registration/{registration}` | `admin.registration.show` | `Admin\RegistrationController@show` | `web`, `auth`, `role:admin` | Detail pendaftaran |
 | GET | `/admin/registration/{registration}/edit` | `admin.registration.edit` | `Admin\RegistrationController@edit` | `web`, `auth`, `role:admin` | Edit pendaftaran |
 | PUT | `/admin/registration/{registration}` | `admin.registration.update` | `Admin\RegistrationController@update` | `web`, `auth`, `role:admin` | Update pendaftaran |
+| DELETE | `/admin/registration/{registration}` | `admin.registration.destroy` | `Admin\RegistrationController@destroy` | `web`, `auth`, `role:admin` | Soft delete pendaftaran |
 | GET | `/admin/payment` | `admin.payment.index` | `Admin\PaymentController@index` | `web`, `auth`, `role:admin` | Monitoring pembayaran RD |
 | GET | `/admin/payment/{payment}` | `admin.payment.show` | `Admin\PaymentController@show` | `web`, `auth`, `role:admin` | Detail pembayaran RD |
 | POST | `/admin/payment/{payment}/verify` | `admin.payment.verify` | `Admin\PaymentVerificationController@verify` | `web`, `auth`, `role:admin` | Verifikasi pembayaran |
@@ -96,37 +99,55 @@ Route admin Sprint 4 Mia canonical memakai Blade di `resources/views/pages/admin
 | GET | `/admin/placement-test/{registration}` | `admin.placement-test.show` | `Admin\PlacementTestController@show` | `web`, `auth`, `role:admin` | Detail placement test |
 | POST | `/admin/placement-test/{registration}/schedule` | `admin.placement-test.schedule` | `Admin\PlacementTestScheduleController@store` | `web`, `auth`, `role:admin` | Jadwalkan placement test |
 | POST | `/admin/placement-test/{registration}/result` | `admin.placement-test.result.store` | `Admin\PlacementTestResultController@store` | `web`, `auth`, `role:admin` | Simpan hasil placement test |
+| DELETE | `/admin/placement-test/{registration}/clear` | `admin.placement-test.clear` | `Admin\PlacementTestClearController` | `web`, `auth`, `role:admin` | Clear jadwal/hasil placement test |
 | GET | `/admin/student` | `admin.student.index` | `Admin\StudentController@index` | `web`, `auth`, `role:admin` | List siswa |
+| GET | `/admin/student/create` | `admin.student.create` | `Admin\StudentController@create` | `web`, `auth`, `role:admin` | Create siswa |
+| POST | `/admin/student` | `admin.student.store` | `Admin\StudentController@store` | `web`, `auth`, `role:admin` | Store siswa |
 | GET | `/admin/student/{student}` | `admin.student.show` | `Admin\StudentController@show` | `web`, `auth`, `role:admin` | Detail siswa |
+| GET | `/admin/student/{student}/edit` | `admin.student.edit` | `Admin\StudentController@edit` | `web`, `auth`, `role:admin` | Edit siswa |
+| PUT | `/admin/student/{student}` | `admin.student.update` | `Admin\StudentController@update` | `web`, `auth`, `role:admin` | Update siswa |
+| DELETE | `/admin/student/{student}` | `admin.student.destroy` | `Admin\StudentController@destroy` | `web`, `auth`, `role:admin` | Soft delete siswa |
 | GET | `/admin/instructor` | `admin.instructor.index` | `Admin\InstructorController@index` | `web`, `auth`, `role:admin` | List instructor |
+| GET | `/admin/instructor/create` | `admin.instructor.create` | `Admin\InstructorController@create` | `web`, `auth`, `role:admin` | Create instructor |
+| POST | `/admin/instructor` | `admin.instructor.store` | `Admin\InstructorController@store` | `web`, `auth`, `role:admin` | Store instructor |
 | GET | `/admin/instructor/{instructor}` | `admin.instructor.show` | `Admin\InstructorController@show` | `web`, `auth`, `role:admin` | Detail instructor |
+| GET | `/admin/instructor/{instructor}/edit` | `admin.instructor.edit` | `Admin\InstructorController@edit` | `web`, `auth`, `role:admin` | Edit instructor |
+| PUT | `/admin/instructor/{instructor}` | `admin.instructor.update` | `Admin\InstructorController@update` | `web`, `auth`, `role:admin` | Update instructor |
+| DELETE | `/admin/instructor/{instructor}` | `admin.instructor.destroy` | `Admin\InstructorController@destroy` | `web`, `auth`, `role:admin` | Soft delete instructor |
 | GET | `/admin/program` | `admin.program.index` | `Admin\ProgramController@index` | `web`, `auth`, `role:admin` | List program |
 | GET | `/admin/program/create` | `admin.program.create` | `Admin\ProgramController@create` | `web`, `auth`, `role:admin` | Create program |
 | POST | `/admin/program` | `admin.program.store` | `Admin\ProgramController@store` | `web`, `auth`, `role:admin` | Store program |
 | GET | `/admin/program/{program}` | `admin.program.show` | `Admin\ProgramController@show` | `web`, `auth`, `role:admin` | Detail program dengan kelas, pendaftaran, dan promo terkait |
 | GET | `/admin/program/{program}/edit` | `admin.program.edit` | `Admin\ProgramController@edit` | `web`, `auth`, `role:admin` | Edit program |
 | PUT | `/admin/program/{program}` | `admin.program.update` | `Admin\ProgramController@update` | `web`, `auth`, `role:admin` | Update program |
+| DELETE | `/admin/program/{program}` | `admin.program.destroy` | `Admin\ProgramController@destroy` | `web`, `auth`, `role:admin` | Soft delete program |
 | GET | `/admin/class` | `admin.class.index` | `Admin\ClassController@index` | `web`, `auth`, `role:admin` | List kelas |
 | GET | `/admin/class/create` | `admin.class.create` | `Admin\ClassController@create` | `web`, `auth`, `role:admin` | Create kelas |
 | POST | `/admin/class` | `admin.class.store` | `Admin\ClassController@store` | `web`, `auth`, `role:admin` | Store kelas |
 | GET | `/admin/class/{class}` | `admin.class.show` | `Admin\ClassController@show` | `web`, `auth`, `role:admin` | Detail kelas dengan enrollment dan link rapor |
 | GET | `/admin/class/{class}/edit` | `admin.class.edit` | `Admin\ClassController@edit` | `web`, `auth`, `role:admin` | Edit kelas |
 | PUT | `/admin/class/{class}` | `admin.class.update` | `Admin\ClassController@update` | `web`, `auth`, `role:admin` | Update kelas |
+| DELETE | `/admin/class/{class}` | `admin.class.destroy` | `Admin\ClassController@destroy` | `web`, `auth`, `role:admin` | Soft delete kelas |
 | GET | `/admin/room` | `admin.room.index` | `Admin\RoomController@index` | `web`, `auth`, `role:admin` | List room |
 | GET | `/admin/room/create` | `admin.room.create` | `Admin\RoomController@create` | `web`, `auth`, `role:admin` | Create room |
 | POST | `/admin/room` | `admin.room.store` | `Admin\RoomController@store` | `web`, `auth`, `role:admin` | Store room |
 | GET | `/admin/room/{room}` | `admin.room.show` | `Admin\RoomController@show` | `web`, `auth`, `role:admin` | Detail room |
 | GET | `/admin/room/{room}/edit` | `admin.room.edit` | `Admin\RoomController@edit` | `web`, `auth`, `role:admin` | Edit room |
 | PUT/PATCH | `/admin/room/{room}` | `admin.room.update` | `Admin\RoomController@update` | `web`, `auth`, `role:admin` | Update room |
+| DELETE | `/admin/room/{room}` | `admin.room.destroy` | `Admin\RoomController@destroy` | `web`, `auth`, `role:admin` | Soft delete room |
 | GET | `/admin/enrollment` | `admin.enrollment.index` | `Admin\EnrollmentController@index` | `web`, `auth`, `role:admin` | List enrollment; create via form/modal context |
 | POST | `/admin/enrollment` | `admin.enrollment.store` | `Admin\EnrollmentController@store` | `web`, `auth`, `role:admin` | Store enrollment |
 | GET | `/admin/enrollment/{enrollment}` | `admin.enrollment.show` | `Admin\EnrollmentController@show` | `web`, `auth`, `role:admin` | Detail enrollment dengan student, class, dan rapor |
+| GET | `/admin/enrollment/{enrollment}/edit` | `admin.enrollment.edit` | `Admin\EnrollmentController@edit` | `web`, `auth`, `role:admin` | Edit enrollment |
+| PUT | `/admin/enrollment/{enrollment}` | `admin.enrollment.update` | `Admin\EnrollmentController@update` | `web`, `auth`, `role:admin` | Update enrollment |
+| DELETE | `/admin/enrollment/{enrollment}` | `admin.enrollment.destroy` | `Admin\EnrollmentController@destroy` | `web`, `auth`, `role:admin` | Soft delete enrollment |
 | GET | `/admin/report-card` | `admin.report-card.index` | `Admin\ReportCardController@index` | `web`, `auth`, `role:admin` | List rapor |
 | GET | `/admin/report-card/create` | `admin.report-card.create` | `Admin\ReportCardController@create` | `web`, `auth`, `role:admin` | Create rapor |
 | POST | `/admin/report-card` | `admin.report-card.store` | `Admin\ReportCardController@store` | `web`, `auth`, `role:admin` | Store rapor |
 | GET | `/admin/report-card/{reportCard}` | `admin.report-card.show` | `Admin\ReportCardController@show` | `web`, `auth`, `role:admin` | Detail rapor |
 | GET | `/admin/report-card/{reportCard}/edit` | `admin.report-card.edit` | `Admin\ReportCardController@edit` | `web`, `auth`, `role:admin` | Edit rapor |
 | PUT | `/admin/report-card/{reportCard}` | `admin.report-card.update` | `Admin\ReportCardController@update` | `web`, `auth`, `role:admin` | Update rapor |
+| DELETE | `/admin/report-card/{reportCard}` | `admin.report-card.destroy` | `Admin\ReportCardController@destroy` | `web`, `auth`, `role:admin` | Soft delete rapor |
 | POST | `/admin/report-card/{reportCard}/publish` | `admin.report-card.publish` | `Admin\ReportCardPublishController@store` | `web`, `auth`, `role:admin` | Publish rapor |
 | GET | `/admin/reel` | `admin.reel.index` | `Admin\ReelController@index` | `web`, `auth`, `role:admin` | List reels |
 | GET | `/admin/reel/create` | `admin.reel.create` | `Admin\ReelController@create` | `web`, `auth`, `role:admin` | Create reel |
@@ -134,14 +155,35 @@ Route admin Sprint 4 Mia canonical memakai Blade di `resources/views/pages/admin
 | GET | `/admin/reel/{reel}` | `admin.reel.show` | `Admin\ReelController@show` | `web`, `auth`, `role:admin` | Detail reel |
 | GET | `/admin/reel/{reel}/edit` | `admin.reel.edit` | `Admin\ReelController@edit` | `web`, `auth`, `role:admin` | Edit reel |
 | PUT | `/admin/reel/{reel}` | `admin.reel.update` | `Admin\ReelController@update` | `web`, `auth`, `role:admin` | Update reel |
+| DELETE | `/admin/reel/{reel}` | `admin.reel.destroy` | `Admin\ReelController@destroy` | `web`, `auth`, `role:admin` | Soft delete reel |
 | GET | `/admin/gallery` | `admin.gallery.index` | `Admin\ContentController@index` | `web`, `auth`, `role:admin` | Gallery CMS |
+| GET | `/admin/gallery/create` | `admin.gallery.create` | `Admin\ContentController@create` | `web`, `auth`, `role:admin` | Create gallery CMS |
+| POST | `/admin/gallery` | `admin.gallery.store` | `Admin\ContentController@store` | `web`, `auth`, `role:admin` | Store gallery CMS |
 | GET | `/admin/gallery/{content}` | `admin.gallery.show` | `Admin\ContentController@show` | `web`, `auth`, `role:admin` | Detail gallery CMS |
+| GET | `/admin/gallery/{content}/edit` | `admin.gallery.edit` | `Admin\ContentController@edit` | `web`, `auth`, `role:admin` | Edit gallery CMS |
+| PUT | `/admin/gallery/{content}` | `admin.gallery.update` | `Admin\ContentController@update` | `web`, `auth`, `role:admin` | Update gallery CMS |
+| DELETE | `/admin/gallery/{content}` | `admin.gallery.destroy` | `Admin\ContentController@destroy` | `web`, `auth`, `role:admin` | Soft delete gallery CMS |
 | GET | `/admin/partner` | `admin.partner.index` | `Admin\ContentController@index` | `web`, `auth`, `role:admin` | Partner CMS |
+| GET | `/admin/partner/create` | `admin.partner.create` | `Admin\ContentController@create` | `web`, `auth`, `role:admin` | Create partner CMS |
+| POST | `/admin/partner` | `admin.partner.store` | `Admin\ContentController@store` | `web`, `auth`, `role:admin` | Store partner CMS |
 | GET | `/admin/partner/{content}` | `admin.partner.show` | `Admin\ContentController@show` | `web`, `auth`, `role:admin` | Detail partner CMS |
+| GET | `/admin/partner/{content}/edit` | `admin.partner.edit` | `Admin\ContentController@edit` | `web`, `auth`, `role:admin` | Edit partner CMS |
+| PUT | `/admin/partner/{content}` | `admin.partner.update` | `Admin\ContentController@update` | `web`, `auth`, `role:admin` | Update partner CMS |
+| DELETE | `/admin/partner/{content}` | `admin.partner.destroy` | `Admin\ContentController@destroy` | `web`, `auth`, `role:admin` | Soft delete partner CMS |
 | GET | `/admin/testimonial` | `admin.testimonial.index` | `Admin\ContentController@index` | `web`, `auth`, `role:admin` | Testimonial CMS |
+| GET | `/admin/testimonial/create` | `admin.testimonial.create` | `Admin\ContentController@create` | `web`, `auth`, `role:admin` | Create testimonial CMS |
+| POST | `/admin/testimonial` | `admin.testimonial.store` | `Admin\ContentController@store` | `web`, `auth`, `role:admin` | Store testimonial CMS |
 | GET | `/admin/testimonial/{content}` | `admin.testimonial.show` | `Admin\ContentController@show` | `web`, `auth`, `role:admin` | Detail testimonial CMS |
+| GET | `/admin/testimonial/{content}/edit` | `admin.testimonial.edit` | `Admin\ContentController@edit` | `web`, `auth`, `role:admin` | Edit testimonial CMS |
+| PUT | `/admin/testimonial/{content}` | `admin.testimonial.update` | `Admin\ContentController@update` | `web`, `auth`, `role:admin` | Update testimonial CMS |
+| DELETE | `/admin/testimonial/{content}` | `admin.testimonial.destroy` | `Admin\ContentController@destroy` | `web`, `auth`, `role:admin` | Soft delete testimonial CMS |
 | GET | `/admin/faq` | `admin.faq.index` | `Admin\ContentController@index` | `web`, `auth`, `role:admin` | FAQ CMS |
+| GET | `/admin/faq/create` | `admin.faq.create` | `Admin\ContentController@create` | `web`, `auth`, `role:admin` | Create FAQ CMS |
+| POST | `/admin/faq` | `admin.faq.store` | `Admin\ContentController@store` | `web`, `auth`, `role:admin` | Store FAQ CMS |
 | GET | `/admin/faq/{content}` | `admin.faq.show` | `Admin\ContentController@show` | `web`, `auth`, `role:admin` | Detail FAQ CMS |
+| GET | `/admin/faq/{content}/edit` | `admin.faq.edit` | `Admin\ContentController@edit` | `web`, `auth`, `role:admin` | Edit FAQ CMS |
+| PUT | `/admin/faq/{content}` | `admin.faq.update` | `Admin\ContentController@update` | `web`, `auth`, `role:admin` | Update FAQ CMS |
+| DELETE | `/admin/faq/{content}` | `admin.faq.destroy` | `Admin\ContentController@destroy` | `web`, `auth`, `role:admin` | Soft delete FAQ CMS |
 | GET | `/admin/profile` | `admin.profile.index` | `Admin\SettingController@index` | `web`, `auth`, `role:admin` | Profile/settings CMS |
 | PUT | `/admin/profile` | `admin.profile.update` | `Admin\SettingController@update` | `web`, `auth`, `role:admin` | Update profile/settings |
 | GET | `/admin/contact-message` | `admin.contact-message.index` | `Admin\ContactMessageController@index` | `web`, `auth`, `role:admin` | Pesan kontak RD |

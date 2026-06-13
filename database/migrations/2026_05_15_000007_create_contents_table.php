@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('display_order')->nullable()->default(0);
             $table->boolean('is_published')->nullable()->default(true);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index('type', 'idx_contents_type');
             $table->index('slug', 'idx_contents_slug');

@@ -21,6 +21,7 @@ Route::prefix('admin')
         Route::get('/report-card/{reportCard}', [ReportCardController::class, 'show'])->name('report-card.show');
         Route::get('/report-card/{reportCard}/edit', [ReportCardController::class, 'edit'])->name('report-card.edit');
         Route::put('/report-card/{reportCard}', [ReportCardController::class, 'update'])->name('report-card.update');
+        Route::delete('/report-card/{reportCard}', [ReportCardController::class, 'destroy'])->name('report-card.destroy');
         Route::post('/report-card/{reportCard}/publish', [ReportCardPublishController::class, 'store'])->name('report-card.publish');
 
         Route::get('/exports/students', [StudentExportController::class, 'index'])->name('exports.students');

@@ -26,14 +26,19 @@
             ['label' => 'Room', 'route' => 'admin.room.index', 'url' => '#', 'key' => 'rooms', 'icon' => 'meeting_room'],
             ['label' => 'Enrollment', 'route' => 'admin.enrollment.index', 'url' => '#', 'key' => 'enrollments', 'icon' => 'how_to_reg'],
             ['label' => 'Rapor', 'route' => 'admin.report-card.index', 'url' => '#', 'key' => 'reports', 'icon' => 'description'],
-            ['label' => 'Export Siswa', 'route' => 'admin.exports.students', 'url' => '#', 'key' => 'student_exports', 'icon' => 'table_view'],
-            ['label' => 'Export Rapor', 'route' => 'admin.exports.report-cards', 'url' => '#', 'key' => 'report_exports', 'icon' => 'file_save'],
-            ['label' => 'Reels', 'route' => 'admin.reel.index', 'url' => '#', 'key' => 'reels', 'icon' => 'smart_display'],
-            ['label' => 'Gallery', 'route' => 'admin.gallery.index', 'url' => '#', 'key' => 'gallery', 'icon' => 'photo_library'],
-            ['label' => 'Partner', 'route' => 'admin.partner.index', 'url' => '#', 'key' => 'partner', 'icon' => 'handshake'],
-            ['label' => 'Testimonial', 'route' => 'admin.testimonial.index', 'url' => '#', 'key' => 'testimonial', 'icon' => 'reviews'],
-            ['label' => 'FAQ', 'route' => 'admin.faq.index', 'url' => '#', 'key' => 'faq', 'icon' => 'quiz'],
-            ['label' => 'Profile', 'route' => 'admin.profile.index', 'url' => '#', 'key' => 'profile', 'icon' => 'settings'],
+            [
+                'label' => 'CMS',
+                'key' => 'cms',
+                'icon' => 'widgets',
+                'children' => [
+                    ['label' => 'Reels', 'route' => 'admin.reel.index', 'url' => '#', 'key' => 'reels', 'icon' => 'smart_display'],
+                    ['label' => 'Gallery', 'route' => 'admin.gallery.index', 'url' => '#', 'key' => 'gallery', 'icon' => 'photo_library'],
+                    ['label' => 'Partner', 'route' => 'admin.partner.index', 'url' => '#', 'key' => 'partner', 'icon' => 'handshake'],
+                    ['label' => 'Testimonial', 'route' => 'admin.testimonial.index', 'url' => '#', 'key' => 'testimonial', 'icon' => 'reviews'],
+                    ['label' => 'FAQ', 'route' => 'admin.faq.index', 'url' => '#', 'key' => 'faq', 'icon' => 'quiz'],
+                    ['label' => 'Profile', 'route' => 'admin.profile.index', 'url' => '#', 'key' => 'profile', 'icon' => 'settings'],
+                ],
+            ],
             ['label' => 'Pesan Kontak', 'route' => 'admin.contact-message.index', 'url' => '#', 'key' => 'contact_messages', 'icon' => 'inbox'],
             ['label' => 'Chatbot Logs', 'route' => 'admin.chatbot-log.index', 'url' => '#', 'key' => 'chatbot_logs', 'icon' => 'forum'],
         ],
@@ -57,6 +62,13 @@
         $item['key'] ??= str($item['label'] ?? 'item')->slug()->toString();
         $item['url'] = $routeUrl($item['route'] ?? null, $item['url'] ?? '#');
         $item['icon'] ??= 'circle';
+        $item['children'] = collect($item['children'] ?? [])->map(function (array $child) use ($routeUrl) {
+            $child['key'] ??= str($child['label'] ?? 'item')->slug()->toString();
+            $child['url'] = $routeUrl($child['route'] ?? null, $child['url'] ?? '#');
+            $child['icon'] ??= 'circle';
+
+            return $child;
+        })->all();
 
         return $item;
     });
@@ -64,9 +76,16 @@
     $currentActive = $active ?: $items->first(function (array $item) {
         $routeName = $item['route'] ?? null;
 
-        return $routeName
+        return ($routeName
             && \Illuminate\Support\Facades\Route::has($routeName)
-            && request()->routeIs($routeName);
+            && request()->routeIs($routeName))
+            || collect($item['children'] ?? [])->contains(function (array $child): bool {
+                $routeName = $child['route'] ?? null;
+
+                return $routeName
+                    && \Illuminate\Support\Facades\Route::has($routeName)
+                    && request()->routeIs($routeName);
+            });
     })['key'] ?? 'dashboard';
 @endphp
 
@@ -112,29 +131,66 @@
 
     <nav aria-label="Navigasi dashboard" class="flex-1 space-y-1">
         @foreach ($items as $item)
-            @php($isActive = $currentActive === $item['key'])
-            <a
-                href="{{ $item['url'] }}"
-                x-tooltip="{
-                    content: sidebarCollapsed && ! sidebarMobileOpen ? @js($item['label']) : '',
-                    theme: $store.theme,
-                }"
-                @class([
-                    'flex min-h-[var(--etc-field-size-sm)] items-center gap-3 rounded-field px-4 py-1.5 font-heading text-sm font-bold transition duration-200',
-                    'bg-etc-surface-container text-etc-magenta shadow-soft ring-1 ring-etc-magenta/20' => $isActive,
-                    'text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-on-surface' => ! $isActive,
-                ])
-                @if ($isActive) aria-current="page" @endif
-                aria-label="{{ $item['label'] }}"
-                data-sidebar-nav-link
-            >
-                @if ($item['svg'] ?? null)
-                    <x-ui.icon :name="$item['svg']" class="h-5 w-5 shrink-0" />
-                @else
-                    <span class="material-symbols-outlined shrink-0 text-[20px]" @if ($isActive) style="font-variation-settings: 'FILL' 1;" @endif>{{ $item['icon'] }}</span>
-                @endif
-                <span class="truncate" data-sidebar-label>{{ $item['label'] }}</span>
-            </a>
+            @php
+                $children = collect($item['children'] ?? []);
+                $isActive = $currentActive === $item['key'] || $children->contains(fn (array $child) => $currentActive === $child['key']);
+            @endphp
+
+            @if ($children->isNotEmpty())
+                <details class="group" @if ($isActive) open @endif data-sidebar-nav-group>
+                    <summary
+                        @class([
+                            'flex min-h-[var(--etc-field-size-sm)] cursor-pointer list-none items-center gap-3 rounded-field px-4 py-1.5 font-heading text-sm font-bold transition duration-200 [&::-webkit-details-marker]:hidden',
+                            'bg-etc-surface-container text-etc-magenta shadow-soft ring-1 ring-etc-magenta/20' => $isActive,
+                            'text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-on-surface' => ! $isActive,
+                        ])
+                    >
+                        <span class="material-symbols-outlined shrink-0 text-[20px]" @if ($isActive) style="font-variation-settings: 'FILL' 1;" @endif>{{ $item['icon'] }}</span>
+                        <span class="truncate" data-sidebar-label>{{ $item['label'] }}</span>
+                        <span class="material-symbols-outlined ml-auto text-[18px]" data-sidebar-label>expand_more</span>
+                    </summary>
+                    <div class="mt-1 space-y-1 pl-7" data-sidebar-label>
+                        @foreach ($children as $child)
+                            @php($childActive = $currentActive === $child['key'])
+                            <a
+                                href="{{ $child['url'] }}"
+                                @class([
+                                    'flex min-h-9 items-center gap-2 rounded-field px-3 py-1.5 font-heading text-xs font-bold transition',
+                                    'bg-etc-surface-container text-etc-magenta' => $childActive,
+                                    'text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-on-surface' => ! $childActive,
+                                ])
+                                @if ($childActive) aria-current="page" @endif
+                            >
+                                <span class="material-symbols-outlined shrink-0 text-[18px]">{{ $child['icon'] }}</span>
+                                <span class="truncate">{{ $child['label'] }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </details>
+            @else
+                <a
+                    href="{{ $item['url'] }}"
+                    x-tooltip="{
+                        content: sidebarCollapsed && ! sidebarMobileOpen ? @js($item['label']) : '',
+                        theme: $store.theme,
+                    }"
+                    @class([
+                        'flex min-h-[var(--etc-field-size-sm)] items-center gap-3 rounded-field px-4 py-1.5 font-heading text-sm font-bold transition duration-200',
+                        'bg-etc-surface-container text-etc-magenta shadow-soft ring-1 ring-etc-magenta/20' => $isActive,
+                        'text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-on-surface' => ! $isActive,
+                    ])
+                    @if ($isActive) aria-current="page" @endif
+                    aria-label="{{ $item['label'] }}"
+                    data-sidebar-nav-link
+                >
+                    @if ($item['svg'] ?? null)
+                        <x-ui.icon :name="$item['svg']" class="h-5 w-5 shrink-0" />
+                    @else
+                        <span class="material-symbols-outlined shrink-0 text-[20px]" @if ($isActive) style="font-variation-settings: 'FILL' 1;" @endif>{{ $item['icon'] }}</span>
+                    @endif
+                    <span class="truncate" data-sidebar-label>{{ $item['label'] }}</span>
+                </a>
+            @endif
         @endforeach
     </nav>
 </aside>

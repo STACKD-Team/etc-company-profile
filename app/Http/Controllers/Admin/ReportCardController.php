@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\DestroyAdminResourceRequest;
 use App\Http\Requests\Admin\SaveReportCardRequest;
 use App\Models\Enrollment;
 use App\Models\ReportCard;
@@ -33,6 +34,7 @@ class ReportCardController extends Controller
                 'total_score' => ['label' => 'Total', 'sortable' => true],
                 'is_published' => ['label' => 'Status', 'sortable' => true, 'filter' => ['type' => 'select', 'name' => 'is_published', 'options' => ['1' => 'Published', '0' => 'Draft']]],
                 'issued_at' => ['label' => 'Terbit', 'sortable' => true, 'filter' => ['type' => 'date', 'name' => 'issued_from']],
+                'actions' => 'Aksi',
             ],
             'rowView' => 'pages.admin.placement-test.partials.report-card-row',
             'empty' => 'Belum ada rapor.',
@@ -94,5 +96,13 @@ class ReportCardController extends Controller
         $reportCards->update($reportCard, $request->validated());
 
         return redirect()->route('admin.report-card.show', $reportCard)->with('status', 'Rapor diperbarui.');
+    }
+
+    public function destroy(DestroyAdminResourceRequest $request, ReportCard $reportCard, ReportCardService $reportCards): RedirectResponse
+    {
+        $request->validated();
+        $reportCards->delete($reportCard);
+
+        return to_route('admin.report-card.index')->with('status', 'Rapor berhasil dihapus.');
     }
 }

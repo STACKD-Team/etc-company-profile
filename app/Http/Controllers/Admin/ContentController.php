@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\DestroyAdminResourceRequest;
 use App\Http\Requests\Admin\StoreContentRequest;
 use App\Http\Requests\Admin\UpdateContentRequest;
 use App\Models\Content;
@@ -90,6 +91,17 @@ class ContentController extends Controller
         );
 
         return to_route('admin.'.$contentType.'.show', $content)->with('status', $this->label($contentType).' berhasil diperbarui.');
+    }
+
+    public function destroy(DestroyAdminResourceRequest $request, Content $content, ?string $contentType = null): RedirectResponse
+    {
+        $contentType = $this->contentType($request, $contentType);
+        abort_unless($content->type === $contentType, 404);
+
+        $request->validated();
+        $this->contents->delete($content);
+
+        return to_route('admin.'.$contentType.'.index')->with('status', $this->label($contentType).' berhasil dihapus.');
     }
 
     private function payload(Request $request, string $contentType): array

@@ -22,6 +22,7 @@ return new class extends Migration
                 $table->boolean('is_active')->default(true);
                 $table->integer('display_order')->default(0);
                 $table->timestamps();
+                $table->softDeletes();
 
                 $table->index('name', 'idx_rooms_name');
                 $table->index('is_active', 'idx_rooms_is_active');

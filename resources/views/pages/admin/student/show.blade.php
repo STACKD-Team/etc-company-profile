@@ -7,6 +7,10 @@
         <x-slot:status>
             <x-ui.badge :status="$student->is_active ? 'active' : 'inactive'">{{ $student->is_active ? 'Aktif' : 'Nonaktif' }}</x-ui.badge>
         </x-slot:status>
+        <x-slot:actions>
+            <x-ui.button :href="route('admin.student.edit', $student)" icon="heroicon-m-pencil-square">Edit</x-ui.button>
+            <x-ui.delete-action :action="route('admin.student.destroy', $student)" heading="Hapus siswa?" />
+        </x-slot:actions>
     </x-ui.resource-header>
 
     <div class="grid gap-4 md:grid-cols-3">

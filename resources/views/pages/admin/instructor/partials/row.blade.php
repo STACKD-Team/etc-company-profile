@@ -10,6 +10,9 @@
     <td class="py-4 pr-4 font-heading font-bold text-etc-on-surface">{{ number_format((int) $instructor->classes_taught_count) }}</td>
     <td class="py-4 pr-4 text-etc-on-muted">{{ $instructor->created_at?->format('d M Y') ?? '-' }}</td>
     <td class="py-4 pr-4">
-        <x-ui.button :href="route('admin.instructor.show', $instructor)" size="sm" outlined>Detail</x-ui.button>
+        <div class="flex flex-wrap gap-2">
+            <x-ui.button :href="route('admin.instructor.show', $instructor)" size="sm" outlined>Detail</x-ui.button>
+            <x-ui.button :href="route('admin.instructor.edit', $instructor)" size="sm" color="gray" outlined>Edit</x-ui.button>
+        </div>
     </td>
 </tr>

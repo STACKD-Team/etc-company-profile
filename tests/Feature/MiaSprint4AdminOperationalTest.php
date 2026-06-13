@@ -72,11 +72,47 @@ it('redirects old plural admin URLs only after admin access is satisfied', funct
 it('keeps RD admin resources without create edit or delete surfaces', function () {
     expect(Route::has('admin.payment.create'))->toBeFalse()
         ->and(Route::has('admin.payment.edit'))->toBeFalse()
+        ->and(Route::has('admin.payment.destroy'))->toBeFalse()
         ->and(Route::has('admin.contact-message.create'))->toBeFalse()
         ->and(Route::has('admin.contact-message.edit'))->toBeFalse()
+        ->and(Route::has('admin.contact-message.destroy'))->toBeFalse()
         ->and(Route::has('admin.chatbot-log.create'))->toBeFalse()
         ->and(Route::has('admin.chatbot-log.edit'))->toBeFalse()
-        ->and(Route::has('admin.enrollment.create'))->toBeFalse();
+        ->and(Route::has('admin.chatbot-log.destroy'))->toBeFalse()
+        ->and(Route::has('admin.enrollment.create'))->toBeFalse()
+        ->and(Route::has('admin.enrollment.store'))->toBeTrue()
+        ->and(Route::has('admin.enrollment.edit'))->toBeTrue()
+        ->and(Route::has('admin.enrollment.update'))->toBeTrue()
+        ->and(Route::has('admin.enrollment.destroy'))->toBeTrue();
+});
+
+it('registers complete Sprint 4 CRUD route surfaces for admin resources', function () {
+    foreach ([
+        'student',
+        'instructor',
+        'registration',
+        'program',
+        'class',
+        'room',
+        'enrollment',
+        'report-card',
+        'reel',
+        'gallery',
+        'partner',
+        'testimonial',
+        'faq',
+    ] as $resource) {
+        expect(Route::has('admin.'.$resource.'.index'))->toBeTrue($resource.' index')
+            ->and(Route::has('admin.'.$resource.'.show'))->toBeTrue($resource.' show')
+            ->and(Route::has('admin.'.$resource.'.create'))->toBe($resource !== 'enrollment', $resource.' create')
+            ->and(Route::has('admin.'.$resource.'.store'))->toBeTrue($resource.' store')
+            ->and(Route::has('admin.'.$resource.'.edit'))->toBeTrue($resource.' edit')
+            ->and(Route::has('admin.'.$resource.'.update'))->toBeTrue($resource.' update')
+            ->and(Route::has('admin.'.$resource.'.destroy'))->toBeTrue($resource.' destroy');
+    }
+
+    expect(Route::has('admin.enrollment.create'))->toBeFalse()
+        ->and(Route::has('admin.placement-test.clear'))->toBeTrue();
 });
 
 it('renders sprint four detail pages with related operational links', function () {
@@ -206,6 +242,47 @@ it('uses only Sprint 4 CMS content types for admin-managed content', function ()
         Content::TYPE_TESTIMONIAL,
     ])
         ->and(Content::query()->whereIn('type', Content::TYPES)->count())->toBe(5);
+});
+
+it('soft deletes Sprint 4 CRUD resources from admin destroy routes', function () {
+    $admin = User::factory()->create(['role' => 'admin', 'is_active' => true]);
+    $student = User::factory()->create(['role' => 'student', 'is_active' => true]);
+    $program = Program::query()->create([
+        'name' => 'Soft Delete Program',
+        'slug' => 'soft-delete-program',
+        'category' => 'english',
+    ]);
+    $room = Room::query()->create(['name' => 'Soft Delete Room']);
+    $content = Content::query()->create([
+        'type' => Content::TYPE_GALLERY,
+        'title' => 'Soft Delete Gallery',
+        'slug' => 'soft-delete-gallery',
+    ]);
+
+    $this->actingAs($admin)->delete(route('admin.student.destroy', $student), ['confirm' => '1'])->assertRedirect(route('admin.student.index'));
+    $this->actingAs($admin)->delete(route('admin.program.destroy', $program), ['confirm' => '1'])->assertRedirect(route('admin.program.index'));
+    $this->actingAs($admin)->delete(route('admin.room.destroy', $room), ['confirm' => '1'])->assertRedirect(route('admin.room.index'));
+    $this->actingAs($admin)->delete(route('admin.gallery.destroy', $content), ['confirm' => '1'])->assertRedirect(route('admin.gallery.index'));
+
+    expect(User::withTrashed()->find($student->id)->trashed())->toBeTrue()
+        ->and(Program::withTrashed()->find($program->id)->trashed())->toBeTrue()
+        ->and(Room::withTrashed()->find($room->id)->trashed())->toBeTrue()
+        ->and(Content::withTrashed()->find($content->id)->trashed())->toBeTrue();
+});
+
+it('renders Sprint 4 enrollment modal and CMS sidebar grouping', function () {
+    $admin = User::factory()->create(['role' => 'admin', 'is_active' => true]);
+
+    $this->actingAs($admin)->get(route('admin.enrollment.index'))
+        ->assertOk()
+        ->assertSee('create-enrollment-modal', false)
+        ->assertSee('Assign Siswa ke Kelas');
+
+    $this->actingAs($admin)->get(route('admin.dashboard'))
+        ->assertOk()
+        ->assertSee('data-sidebar-nav-group', false)
+        ->assertSee('CMS')
+        ->assertDontSee('Export Siswa');
 });
 
 function sprintFourRouteParameters(string $routeName): array

@@ -35,6 +35,7 @@ return new class extends Migration
             $table->string('pdf_path')->nullable();
             $table->boolean('is_published')->nullable()->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

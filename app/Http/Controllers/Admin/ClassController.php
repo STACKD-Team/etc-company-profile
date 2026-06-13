@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\DestroyAdminResourceRequest;
 use App\Http\Requests\Admin\StoreCourseClassRequest;
 use App\Models\CourseClass;
 use App\Models\Program;
@@ -62,6 +63,14 @@ class ClassController extends Controller
         $this->classService->update($class, $request->validated());
 
         return to_route('admin.class.show', $class)->with('status', 'Kelas berhasil diperbarui.');
+    }
+
+    public function destroy(DestroyAdminResourceRequest $request, CourseClass $class): RedirectResponse
+    {
+        $request->validated();
+        $this->classService->delete($class);
+
+        return to_route('admin.class.index')->with('status', 'Kelas berhasil dihapus.');
     }
 
     private function formData(CourseClass $class): array

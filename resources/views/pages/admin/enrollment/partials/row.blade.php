@@ -13,6 +13,9 @@
     <td class="py-4 pr-4 text-etc-on-muted">{{ $enrollment->completed_at?->format('d M Y') ?? '-' }}</td>
     <td class="py-4 pr-4"><x-ui.badge :status="$enrollment->status" /></td>
     <td class="py-4 pr-4">
-        <x-ui.button :href="route('admin.enrollment.show', $enrollment)" size="sm" outlined>Detail</x-ui.button>
+        <div class="flex flex-wrap gap-2">
+            <x-ui.button :href="route('admin.enrollment.show', $enrollment)" size="sm" outlined>Detail</x-ui.button>
+            <x-ui.button :href="route('admin.enrollment.edit', $enrollment)" size="sm" color="gray" outlined>Edit</x-ui.button>
+        </div>
     </td>
 </tr>

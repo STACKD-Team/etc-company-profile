@@ -1,9 +1,12 @@
 <?php
 
 use App\Models\CourseClass;
+use App\Models\Content;
 use App\Models\Enrollment;
 use App\Models\Program;
 use App\Models\Registration;
+use App\Models\Reel;
+use App\Models\ReportCard;
 use App\Models\User;
 use App\Services\ChatbotLogService;
 use App\Services\ContactMessageService;
@@ -200,9 +203,9 @@ it('performs CRUD operations through all model services', function () {
     $programs->delete($program);
     $users->delete($student);
 
-    expect($reportCard->fresh())->toBeNull()
-        ->and($reel->fresh())->toBeNull()
-        ->and($content->fresh())->toBeNull()
+    expect(ReportCard::withTrashed()->find($reportCard->id)->trashed())->toBeTrue()
+        ->and(Reel::withTrashed()->find($reel->id)->trashed())->toBeTrue()
+        ->and(Content::withTrashed()->find($content->id)->trashed())->toBeTrue()
         ->and($message->fresh())->toBeNull()
         ->and($log->fresh())->toBeNull()
         ->and(Registration::withTrashed()->find($registration->id)->trashed())->toBeTrue()

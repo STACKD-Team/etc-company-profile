@@ -25,6 +25,7 @@
         </x-slot:status>
         <x-slot:actions>
             <x-ui.button :href="route('admin.reel.edit', $reel)" icon="heroicon-m-pencil-square">Edit</x-ui.button>
+            <x-ui.delete-action :action="route('admin.reel.destroy', $reel)" heading="Hapus reel?" />
         </x-slot:actions>
     </x-ui.resource-header>
 

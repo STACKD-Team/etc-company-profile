@@ -7,6 +7,10 @@
         <x-slot:status>
             <x-ui.badge :status="$instructor->show_on_team_page ? 'published' : 'draft'">{{ $instructor->show_on_team_page ? 'Tampil di Team' : 'Internal' }}</x-ui.badge>
         </x-slot:status>
+        <x-slot:actions>
+            <x-ui.button :href="route('admin.instructor.edit', $instructor)" icon="heroicon-m-pencil-square">Edit</x-ui.button>
+            <x-ui.delete-action :action="route('admin.instructor.destroy', $instructor)" heading="Hapus instructor?" />
+        </x-slot:actions>
     </x-ui.resource-header>
 
     <div class="grid gap-4 md:grid-cols-3">

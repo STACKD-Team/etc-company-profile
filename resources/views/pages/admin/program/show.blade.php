@@ -13,6 +13,7 @@
         </x-slot:status>
         <x-slot:actions>
             <x-ui.button :href="route('admin.program.edit', $program)" icon="heroicon-m-pencil-square">Edit</x-ui.button>
+            <x-ui.delete-action :action="route('admin.program.destroy', $program)" heading="Hapus program?" />
         </x-slot:actions>
     </x-ui.resource-header>
 

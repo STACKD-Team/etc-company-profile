@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\DestroyAdminResourceRequest;
 use App\Http\Requests\Admin\StoreRoomRequest;
 use App\Models\Room;
 use App\Services\RoomService;
@@ -50,5 +51,13 @@ class RoomController extends Controller
         $this->rooms->updateWithImage($room, $request->validated(), $request->file('image'));
 
         return to_route('admin.room.show', $room)->with('status', 'Room berhasil diperbarui.');
+    }
+
+    public function destroy(DestroyAdminResourceRequest $request, Room $room): RedirectResponse
+    {
+        $request->validated();
+        $this->rooms->delete($room);
+
+        return to_route('admin.room.index')->with('status', 'Room berhasil dihapus.');
     }
 }

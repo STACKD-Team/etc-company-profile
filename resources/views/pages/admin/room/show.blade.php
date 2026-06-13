@@ -10,6 +10,7 @@
     >
         <x-slot:actions>
             <x-ui.button :href="route('admin.room.edit', $room)" icon="heroicon-m-pencil-square">Edit</x-ui.button>
+            <x-ui.delete-action :action="route('admin.room.destroy', $room)" heading="Hapus room?" />
         </x-slot:actions>
     </x-ui.resource-header>
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\DestroyAdminResourceRequest;
 use App\Http\Requests\Admin\UpdateRegistrationRequest;
 use App\Models\Program;
 use App\Models\Registration;
@@ -39,6 +40,21 @@ class RegistrationController extends Controller
         ]);
     }
 
+    public function create(): View
+    {
+        return view('pages.admin.registration.create', [
+            'registration' => new Registration(['status' => 'pending_payment']),
+            'programs' => Program::query()->orderBy('name')->get(),
+        ]);
+    }
+
+    public function store(UpdateRegistrationRequest $request): RedirectResponse
+    {
+        $registration = $this->registrationService->createFromOnlineForm($request->validated());
+
+        return to_route('admin.registration.show', $registration)->with('status', 'Pendaftaran berhasil dibuat.');
+    }
+
     public function edit(Registration $registration): View
     {
         return view('pages.admin.registration.edit', [
@@ -52,5 +68,13 @@ class RegistrationController extends Controller
         $this->registrationService->update($registration, $request->validated());
 
         return to_route('admin.registration.show', $registration)->with('status', 'Data pendaftaran berhasil diperbarui.');
+    }
+
+    public function destroy(DestroyAdminResourceRequest $request, Registration $registration): RedirectResponse
+    {
+        $request->validated();
+        $this->registrationService->delete($registration);
+
+        return to_route('admin.registration.index')->with('status', 'Pendaftaran berhasil dihapus.');
     }
 }

@@ -29,5 +29,9 @@
         empty="Belum ada pendaftaran"
         empty-description="Pendaftaran baru akan tampil setelah calon siswa mengirim formulir."
         search-placeholder="Cari nama atau email"
-    />
+    >
+        <x-slot:actions>
+            <x-ui.button :href="route('admin.registration.create')" icon="heroicon-m-plus">Tambah Pendaftaran</x-ui.button>
+        </x-slot:actions>
+    </x-ui.data-table>
 </x-layouts.dashboard>

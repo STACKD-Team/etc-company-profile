@@ -25,6 +25,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/reel/{reel}', [ReelController::class, 'show'])->name('reel.show');
     Route::get('/reel/{reel}/edit', [ReelController::class, 'edit'])->name('reel.edit');
     Route::put('/reel/{reel}', [ReelController::class, 'update'])->name('reel.update');
+    Route::delete('/reel/{reel}', [ReelController::class, 'destroy'])->name('reel.destroy');
 
     foreach (['gallery', 'partner', 'testimonial', 'faq'] as $type) {
         Route::get('/'.$type, [ContentController::class, 'index'])->defaults('contentType', $type)->name($type.'.index');
@@ -33,6 +34,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::get('/'.$type.'/{content}', [ContentController::class, 'show'])->defaults('contentType', $type)->name($type.'.show');
         Route::get('/'.$type.'/{content}/edit', [ContentController::class, 'edit'])->defaults('contentType', $type)->name($type.'.edit');
         Route::put('/'.$type.'/{content}', [ContentController::class, 'update'])->defaults('contentType', $type)->name($type.'.update');
+        Route::delete('/'.$type.'/{content}', [ContentController::class, 'destroy'])->defaults('contentType', $type)->name($type.'.destroy');
     }
 
     Route::get('/contact-message', [ContactMessageController::class, 'index'])->name('contact-message.index');

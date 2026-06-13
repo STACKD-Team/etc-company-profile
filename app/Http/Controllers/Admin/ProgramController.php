@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\DestroyAdminResourceRequest;
 use App\Http\Requests\Admin\StoreProgramRequest;
 use App\Http\Requests\Admin\UpdateProgramRequest;
 use App\Models\Program;
@@ -68,5 +69,13 @@ class ProgramController extends Controller
         $this->programService->update($program, $data);
 
         return to_route('admin.program.show', $program)->with('status', 'Program berhasil diperbarui.');
+    }
+
+    public function destroy(DestroyAdminResourceRequest $request, Program $program): RedirectResponse
+    {
+        $request->validated();
+        $this->programService->delete($program);
+
+        return to_route('admin.program.index')->with('status', 'Program berhasil dihapus.');
     }
 }

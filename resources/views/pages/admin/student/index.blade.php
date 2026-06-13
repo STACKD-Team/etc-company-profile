@@ -13,5 +13,19 @@
         empty="Belum ada siswa"
         empty-description="Siswa akan tampil setelah pendaftaran diproses menjadi akun siswa."
         search-placeholder="Cari nama, email, atau no induk"
-    />
+    >
+        <x-slot:actions>
+            <x-ui.button :href="route('admin.student.create')" icon="heroicon-m-plus">Tambah Siswa</x-ui.button>
+            <x-ui.modal id="student-export-modal" heading="Export Siswa" description="Filter dan unduh rekap siswa dari halaman Data Siswa." icon="heroicon-o-table-cells">
+                <x-slot:trigger>
+                    <x-ui.button type="button" outlined icon="heroicon-m-arrow-down-tray">Export</x-ui.button>
+                </x-slot:trigger>
+                <form method="POST" action="{{ route('admin.exports.students.download') }}" class="space-y-4">
+                    @csrf
+                    <x-ui.field name="year" label="Tahun" type="number" :value="now()->year" />
+                    <x-ui.button type="submit" icon="heroicon-m-arrow-down-tray">Download</x-ui.button>
+                </form>
+            </x-ui.modal>
+        </x-slot:actions>
+    </x-ui.data-table>
 </x-layouts.dashboard>

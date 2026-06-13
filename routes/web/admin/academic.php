@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ClassController;
 use App\Http\Controllers\Admin\EnrollmentController;
 use App\Http\Controllers\Admin\InstructorController;
+use App\Http\Controllers\Admin\PlacementTestClearController;
 use App\Http\Controllers\Admin\PlacementTestController;
 use App\Http\Controllers\Admin\PlacementTestResultController;
 use App\Http\Controllers\Admin\PlacementTestScheduleController;
@@ -40,12 +41,23 @@ Route::prefix('admin')
         Route::get('/placement-test/{registration}', [PlacementTestController::class, 'show'])->name('placement-test.show');
         Route::post('/placement-test/{registration}/schedule', [PlacementTestScheduleController::class, 'store'])->name('placement-test.schedule');
         Route::post('/placement-test/{registration}/result', [PlacementTestResultController::class, 'store'])->name('placement-test.result.store');
+        Route::delete('/placement-test/{registration}/clear', PlacementTestClearController::class)->name('placement-test.clear');
 
         Route::get('/student', [StudentController::class, 'index'])->name('student.index');
+        Route::get('/student/create', [StudentController::class, 'create'])->name('student.create');
+        Route::post('/student', [StudentController::class, 'store'])->name('student.store');
         Route::get('/student/{student}', [StudentController::class, 'show'])->name('student.show');
+        Route::get('/student/{student}/edit', [StudentController::class, 'edit'])->name('student.edit');
+        Route::put('/student/{student}', [StudentController::class, 'update'])->name('student.update');
+        Route::delete('/student/{student}', [StudentController::class, 'destroy'])->name('student.destroy');
 
         Route::get('/instructor', [InstructorController::class, 'index'])->name('instructor.index');
+        Route::get('/instructor/create', [InstructorController::class, 'create'])->name('instructor.create');
+        Route::post('/instructor', [InstructorController::class, 'store'])->name('instructor.store');
         Route::get('/instructor/{instructor}', [InstructorController::class, 'show'])->name('instructor.show');
+        Route::get('/instructor/{instructor}/edit', [InstructorController::class, 'edit'])->name('instructor.edit');
+        Route::put('/instructor/{instructor}', [InstructorController::class, 'update'])->name('instructor.update');
+        Route::delete('/instructor/{instructor}', [InstructorController::class, 'destroy'])->name('instructor.destroy');
 
         Route::get('/program', [ProgramController::class, 'index'])->name('program.index');
         Route::get('/program/create', [ProgramController::class, 'create'])->name('program.create');
@@ -53,6 +65,7 @@ Route::prefix('admin')
         Route::get('/program/{program}', [ProgramController::class, 'show'])->name('program.show');
         Route::get('/program/{program}/edit', [ProgramController::class, 'edit'])->name('program.edit');
         Route::put('/program/{program}', [ProgramController::class, 'update'])->name('program.update');
+        Route::delete('/program/{program}', [ProgramController::class, 'destroy'])->name('program.destroy');
 
         Route::get('/class', [ClassController::class, 'index'])->name('class.index');
         Route::get('/class/create', [ClassController::class, 'create'])->name('class.create');
@@ -60,10 +73,14 @@ Route::prefix('admin')
         Route::get('/class/{class}', [ClassController::class, 'show'])->name('class.show');
         Route::get('/class/{class}/edit', [ClassController::class, 'edit'])->name('class.edit');
         Route::put('/class/{class}', [ClassController::class, 'update'])->name('class.update');
+        Route::delete('/class/{class}', [ClassController::class, 'destroy'])->name('class.destroy');
 
-        Route::resource('room', RoomController::class)->except(['destroy']);
+        Route::resource('room', RoomController::class);
 
         Route::get('/enrollment', [EnrollmentController::class, 'index'])->name('enrollment.index');
         Route::post('/enrollment', [EnrollmentController::class, 'store'])->name('enrollment.store');
         Route::get('/enrollment/{enrollment}', [EnrollmentController::class, 'show'])->name('enrollment.show');
+        Route::get('/enrollment/{enrollment}/edit', [EnrollmentController::class, 'edit'])->name('enrollment.edit');
+        Route::put('/enrollment/{enrollment}', [EnrollmentController::class, 'update'])->name('enrollment.update');
+        Route::delete('/enrollment/{enrollment}', [EnrollmentController::class, 'destroy'])->name('enrollment.destroy');
     });

@@ -25,6 +25,7 @@
         </x-slot:status>
         <x-slot:actions>
             <x-ui.button :href="route($routeBase.'.edit', $content)" icon="heroicon-m-pencil-square">Edit</x-ui.button>
+            <x-ui.delete-action :action="route($routeBase.'.destroy', $content)" :heading="'Hapus '.$pageTitle.'?'" />
         </x-slot:actions>
     </x-ui.resource-header>
 

@@ -11,6 +11,10 @@
         <x-slot:status>
             <x-ui.badge :status="$enrollment->status" />
         </x-slot:status>
+        <x-slot:actions>
+            <x-ui.button :href="route('admin.enrollment.edit', $enrollment)" icon="heroicon-m-pencil-square">Edit</x-ui.button>
+            <x-ui.delete-action :action="route('admin.enrollment.destroy', $enrollment)" heading="Hapus enrollment?" />
+        </x-slot:actions>
     </x-ui.resource-header>
 
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">

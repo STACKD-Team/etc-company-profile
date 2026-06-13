@@ -13,5 +13,9 @@
         empty="Belum ada instruktur"
         empty-description="Instructor akan tampil setelah akun role instructor dibuat."
         search-placeholder="Cari nama atau email instruktur"
-    />
+    >
+        <x-slot:actions>
+            <x-ui.button :href="route('admin.instructor.create')" icon="heroicon-m-plus">Tambah Instructor</x-ui.button>
+        </x-slot:actions>
+    </x-ui.data-table>
 </x-layouts.dashboard>

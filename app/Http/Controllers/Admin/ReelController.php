@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\DestroyAdminResourceRequest;
 use App\Http\Requests\Admin\StoreReelRequest;
 use App\Http\Requests\Admin\UpdateReelRequest;
 use App\Models\Reel;
@@ -70,6 +71,14 @@ class ReelController extends Controller
         $this->reels->updateWithMedia($reel, $data, $request->file('video'), $request->file('thumbnail'));
 
         return to_route('admin.reel.show', $reel)->with('status', 'Reel berhasil diperbarui.');
+    }
+
+    public function destroy(DestroyAdminResourceRequest $request, Reel $reel): RedirectResponse
+    {
+        $request->validated();
+        $this->reels->delete($reel);
+
+        return to_route('admin.reel.index')->with('status', 'Reel berhasil dihapus.');
     }
 
     private function payload(Request $request): array

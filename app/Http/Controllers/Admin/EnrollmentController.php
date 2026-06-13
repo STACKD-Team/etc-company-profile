@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\DestroyAdminResourceRequest;
 use App\Http\Requests\Admin\StoreEnrollmentRequest;
 use App\Models\CourseClass;
 use App\Models\Enrollment;
@@ -32,6 +33,22 @@ class EnrollmentController extends Controller
         return to_route('admin.enrollment.show', $enrollment)->with('status', 'Siswa berhasil dimasukkan ke kelas.');
     }
 
+    public function edit(Enrollment $enrollment): View
+    {
+        return view('pages.admin.enrollment.edit', [
+            'enrollment' => $enrollment,
+            'students' => User::query()->students()->orderBy('full_name')->get(),
+            'classes' => CourseClass::query()->with('program')->orderBy('name')->get(),
+        ]);
+    }
+
+    public function update(StoreEnrollmentRequest $request, Enrollment $enrollment): RedirectResponse
+    {
+        $this->enrollmentService->update($enrollment, $request->validated());
+
+        return to_route('admin.enrollment.show', $enrollment)->with('status', 'Enrollment berhasil diperbarui.');
+    }
+
     public function show(Enrollment $enrollment): View
     {
         $enrollment->load([
@@ -43,5 +60,13 @@ class EnrollmentController extends Controller
         ]);
 
         return view('pages.admin.enrollment.show', compact('enrollment'));
+    }
+
+    public function destroy(DestroyAdminResourceRequest $request, Enrollment $enrollment): RedirectResponse
+    {
+        $request->validated();
+        $this->enrollmentService->delete($enrollment);
+
+        return to_route('admin.enrollment.index')->with('status', 'Enrollment berhasil dihapus.');
     }
 }

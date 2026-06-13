@@ -12,7 +12,10 @@ Route::prefix('admin')
         Route::redirect('/registrations/{registration}/edit', '/admin/registration/{registration}/edit')->name('legacy.registrations.edit');
 
         Route::get('/registration', [RegistrationController::class, 'index'])->name('registration.index');
+        Route::get('/registration/create', [RegistrationController::class, 'create'])->name('registration.create');
+        Route::post('/registration', [RegistrationController::class, 'store'])->name('registration.store');
         Route::get('/registration/{registration}', [RegistrationController::class, 'show'])->name('registration.show');
         Route::get('/registration/{registration}/edit', [RegistrationController::class, 'edit'])->name('registration.edit');
         Route::put('/registration/{registration}', [RegistrationController::class, 'update'])->name('registration.update');
+        Route::delete('/registration/{registration}', [RegistrationController::class, 'destroy'])->name('registration.destroy');
     });
