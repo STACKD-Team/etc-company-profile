@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Content;
+use App\Models\CourseClass;
 use App\Models\Program;
 use App\Models\Reel;
 use App\Models\Room;
@@ -207,15 +208,25 @@ class PublicDiscoveryService
     }
 
     /**
-     * @return array<string, int|string>
+     * @return array<string, int|string|null>
      */
     public function stats(): array
     {
+        $testimonialRatings = $this->testimonials()
+            ->map(function (Content $testimonial): ?int {
+                $rating = $testimonial->meta['rating'] ?? null;
+
+                return is_numeric($rating) ? max(1, min(5, (int) $rating)) : null;
+            })
+            ->filter(fn (?int $rating): bool => $rating !== null);
+
         return [
             'students' => User::query()->students()->count(),
             'instructors' => User::query()->instructors()->where('is_active', true)->count(),
             'programs' => Program::query()->where('is_active', true)->count(),
-            'satisfaction' => '98%',
+            'satisfaction' => $testimonialRatings->isNotEmpty()
+                ? (int) round(($testimonialRatings->average() / 5) * 100).'%'
+                : null,
         ];
     }
 
@@ -238,7 +249,7 @@ class PublicDiscoveryService
         if (Str::contains($text, ['harga', 'biaya', 'bayar', 'qris', 'transfer'])) {
             return [
                 'intent' => 'pricing',
-                'reply' => 'Biaya pendaftaran ETC Planet mulai dari Rp 200.000. Biaya program bergantung pada kelas yang dipilih, dan tim kami bisa memberi rincian setelah kamu memilih program.',
+                'reply' => $this->pricingReply(),
             ];
         }
 
@@ -252,7 +263,7 @@ class PublicDiscoveryService
         if (Str::contains($text, ['jadwal', 'hari', 'jam', 'schedule'])) {
             return [
                 'intent' => 'schedule',
-                'reply' => 'Jadwal umum tersedia Senin-Sabtu dengan beberapa pilihan jam belajar. Jika jadwal reguler tidak cocok, kamu bisa request schedule saat konsultasi.',
+                'reply' => $this->scheduleReply(),
             ];
         }
 
@@ -263,7 +274,7 @@ class PublicDiscoveryService
                 'intent' => 'program',
                 'reply' => $programs !== ''
                     ? 'Program yang sedang tersedia antara lain '.$programs.'. Kamu bisa konsultasi dulu agar level dan target belajarmu lebih pas.'
-                    : 'ETC Planet menyediakan kelas bahasa untuk anak, remaja, dewasa, private, dan persiapan TOEFL/TOEIC/IELTS.',
+                    : 'Program ETC Planet belum dipublikasikan. Silakan gunakan form kontak agar tim ETC dapat membantu memilih kelas yang sesuai.',
             ];
         }
 
@@ -327,6 +338,77 @@ class PublicDiscoveryService
             ->first();
 
         return ($match['score'] ?? 0) >= 2 ? $match['answer'] : null;
+    }
+
+    protected function pricingReply(): string
+    {
+        $programs = Program::query()
+            ->where('is_active', true)
+            ->get(['name', 'price', 'registration_fee']);
+
+        if ($programs->isEmpty()) {
+            return 'Informasi biaya program belum dipublikasikan. Silakan gunakan form kontak agar tim ETC dapat memberikan rincian terbaru.';
+        }
+
+        $registrationFees = $programs
+            ->pluck('registration_fee')
+            ->map(fn (mixed $fee): float => (float) $fee)
+            ->filter(fn (float $fee): bool => $fee > 0);
+        $programPrices = $programs
+            ->pluck('price')
+            ->map(fn (mixed $price): float => (float) $price)
+            ->filter(fn (float $price): bool => $price > 0);
+        $parts = [];
+
+        if ($registrationFees->isNotEmpty()) {
+            $parts[] = 'Biaya pendaftaran mulai dari '.$this->rupiah((float) $registrationFees->min()).'.';
+        }
+
+        if ($programPrices->isNotEmpty()) {
+            $minimum = (float) $programPrices->min();
+            $maximum = (float) $programPrices->max();
+            $parts[] = $minimum === $maximum
+                ? 'Biaya program saat ini '.$this->rupiah($minimum).'.'
+                : 'Biaya program aktif berkisar '.$this->rupiah($minimum).' sampai '.$this->rupiah($maximum).'.';
+        }
+
+        $parts[] = 'Buka halaman Program untuk melihat harga dan promo aktif setiap kelas.';
+
+        return implode(' ', $parts);
+    }
+
+    protected function scheduleReply(): string
+    {
+        $schedules = CourseClass::query()
+            ->with('program:id,name')
+            ->whereIn('status', ['ongoing', 'upcoming'])
+            ->where(function (Builder $query): void {
+                $query->whereNotNull('schedule_days')
+                    ->orWhereNotNull('schedule_time');
+            })
+            ->orderByRaw("CASE WHEN status = 'ongoing' THEN 0 ELSE 1 END")
+            ->orderBy('start_date')
+            ->limit(3)
+            ->get()
+            ->map(function (CourseClass $class): string {
+                $schedule = collect([$class->schedule_days, $class->schedule_time])
+                    ->filter()
+                    ->implode(', ');
+
+                return ($class->program?->name ?? $class->name).': '.$schedule;
+            })
+            ->filter();
+
+        if ($schedules->isEmpty()) {
+            return 'Jadwal kelas aktif belum dipublikasikan. Kamu dapat memilih preferensi hari dan jam saat mendaftar atau menghubungi tim ETC.';
+        }
+
+        return 'Jadwal kelas yang tersedia: '.$schedules->implode('; ').'. Jadwal dapat berubah mengikuti kuota kelas.';
+    }
+
+    protected function rupiah(float $amount): string
+    {
+        return 'Rp '.number_format($amount, 0, ',', '.');
     }
 
     /**

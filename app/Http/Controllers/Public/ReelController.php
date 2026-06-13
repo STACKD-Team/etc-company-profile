@@ -24,6 +24,11 @@ class ReelController extends Controller
 
         return view('pages.public.reels.index', [
             'reels' => $reels,
+            'likedReelIds' => collect($request->session()->get('liked_reels', []))
+                ->map(fn (mixed $id): int => (int) $id)
+                ->unique()
+                ->values()
+                ->all(),
         ]);
     }
 

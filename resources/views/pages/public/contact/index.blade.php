@@ -5,12 +5,16 @@
         $defaultMessage = $selectedProgram
             ? 'Halo ETC Planet, saya ingin konsultasi tentang program '.$selectedProgram->name.'.'
             : '';
+        $whatsapp = $settings['whatsapp'] ?? $settings['phone'] ?? null;
+        $whatsappNumber = filled($whatsapp)
+            ? preg_replace('/\D+/', '', preg_replace('/^0/', '62', (string) $whatsapp))
+            : null;
         $contactItems = collect([
-            ['icon' => 'location_on', 'label' => 'Alamat', 'value' => $settings['address'] ?? null],
-            ['icon' => 'call', 'label' => 'WhatsApp', 'value' => $settings['whatsapp'] ?? $settings['phone'] ?? null],
-            ['icon' => 'mail', 'label' => 'Email', 'value' => $settings['email'] ?? null],
-            ['icon' => 'photo_camera', 'label' => 'Instagram', 'value' => $settings['instagram'] ?? null],
-            ['icon' => 'schedule', 'label' => 'Jam Operasional', 'value' => $settings['hours'] ?? null],
+            ['icon' => 'location_on', 'label' => 'Alamat', 'value' => $settings['address'] ?? null, 'url' => $settings['map_url'] ?? null],
+            ['icon' => 'call', 'label' => 'WhatsApp', 'value' => $whatsapp, 'url' => $whatsappNumber ? 'https://wa.me/'.$whatsappNumber : null],
+            ['icon' => 'mail', 'label' => 'Email', 'value' => $settings['email'] ?? null, 'url' => filled($settings['email'] ?? null) ? 'mailto:'.$settings['email'] : null],
+            ['icon' => 'photo_camera', 'label' => 'Instagram', 'value' => $settings['instagram'] ?? null, 'url' => $settings['instagram'] ?? null],
+            ['icon' => 'schedule', 'label' => 'Jam Operasional', 'value' => $settings['hours'] ?? null, 'url' => null],
         ])->filter(fn (array $item) => filled($item['value']));
     @endphp
 
@@ -28,7 +32,20 @@
                                 <span class="material-symbols-outlined text-2xl text-etc-magenta">{{ $info['icon'] }}</span>
                                 <div>
                                     <p class="font-heading text-sm font-bold">{{ $info['label'] }}</p>
-                                    <p class="mt-1 text-sm leading-6 text-etc-on-muted">{{ $info['value'] }}</p>
+                                    @if ($info['url'])
+                                        <x-ui.button
+                                            :href="$info['url']"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            color="gray"
+                                            size="sm"
+                                            class="mt-1 !min-h-0 !justify-start !rounded-none !bg-transparent !p-0 !text-left !text-sm !font-normal !leading-6 !text-etc-on-muted !shadow-none hover:!bg-transparent hover:!text-etc-magenta"
+                                        >
+                                            {{ $info['value'] }}
+                                        </x-ui.button>
+                                    @else
+                                        <p class="mt-1 text-sm leading-6 text-etc-on-muted">{{ $info['value'] }}</p>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach

@@ -11,6 +11,7 @@ class HomeController extends Controller
     public function index(PublicDiscoveryService $discovery): View
     {
         return view('pages.public.home', [
+            'profile' => $discovery->profile(),
             'programs' => $discovery->programHighlights(),
             'partners' => $discovery->partners(),
             'testimonials' => $discovery->testimonials(),
