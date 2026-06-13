@@ -20,8 +20,8 @@ class ReportCardController extends Controller
 
         return view('pages.instructor.report-card.index', [
             'assessments' => $panel->paginateAssessments($instructorId, $request->validated()),
-            'classOptions' => $panel->classOptions($instructorId),
-            'studentOptions' => $panel->studentOptions($instructorId),
+            'classOptions' => $panel->assessmentClassOptions($instructorId),
+            'studentOptions' => $panel->assessmentStudentOptions($instructorId),
         ]);
     }
 
@@ -50,18 +50,19 @@ class ReportCardController extends Controller
 
     public function show(Request $request, ReportCard $reportCard, InstructorPanelService $panel): View
     {
-        $reportCard = $panel->ownedReportCard((int) $request->user()->id, $reportCard);
+        $instructorId = (int) $request->user()->id;
+        $reportCard = $panel->viewableReportCard($instructorId, $reportCard);
 
         return view('pages.instructor.report-card.show', [
             'reportCard' => $reportCard,
             'isComplete' => $panel->isAssessmentComplete($reportCard),
+            'canEdit' => $panel->canEditReportCard($instructorId, $reportCard),
         ]);
     }
 
     public function edit(Request $request, ReportCard $reportCard, InstructorPanelService $panel): View
     {
-        $reportCard = $panel->ownedReportCard((int) $request->user()->id, $reportCard);
-        abort_if($reportCard->is_published, 403, 'Rapor yang sudah dipublish tidak dapat diubah instructor.');
+        $reportCard = $panel->editableReportCard((int) $request->user()->id, $reportCard);
 
         return view('pages.instructor.report-card.edit', [
             'enrollment' => $reportCard->enrollment,

@@ -18,14 +18,24 @@
         </x-ui.badge>
     </td>
     <td class="py-4 pr-4">
-        <x-ui.icon-button
-            :href="$reportCard
-                ? route($reportCard->is_published ? 'instructor.report-cards.show' : 'instructor.report-cards.edit', $reportCard)
-                : route('instructor.report-cards.create', $item)"
-            :icon="$reportCard?->is_published ? 'heroicon-m-eye' : 'heroicon-m-pencil-square'"
-            :label="$reportCard ? ($reportCard->is_published ? 'Lihat assessment siswa' : 'Edit assessment siswa') : 'Mulai assessment siswa'"
-            size="sm"
-            outlined
-        />
+        @if ($reportCard && ! $item->can_edit_assessment)
+            <x-ui.icon-button
+                :href="route('instructor.report-cards.show', $reportCard)"
+                icon="heroicon-m-eye"
+                label="Lihat assessment siswa"
+                size="sm"
+                outlined
+            />
+        @else
+            <x-ui.icon-button
+                :href="$reportCard
+                    ? route('instructor.report-cards.edit', $reportCard)
+                    : route('instructor.report-cards.create', $item)"
+                icon="heroicon-m-pencil-square"
+                :label="$reportCard ? 'Edit assessment siswa' : 'Mulai assessment siswa'"
+                size="sm"
+                outlined
+            />
+        @endif
     </td>
 </tr>
