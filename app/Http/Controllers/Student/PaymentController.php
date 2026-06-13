@@ -7,6 +7,7 @@ use App\Http\Requests\Student\TableQueryRequest;
 use App\Models\Registration;
 use App\Services\StudentPanelService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class PaymentController extends Controller
@@ -29,6 +30,8 @@ class PaymentController extends Controller
 
     public function show(Request $request, Registration $payment, StudentPanelService $panel): View
     {
+        Gate::forUser($request->user())->authorize('view', $payment);
+
         $payment = $panel->ownedPayment((int) $request->user()->id, $payment);
 
         return view('pages.student.payment.show', [

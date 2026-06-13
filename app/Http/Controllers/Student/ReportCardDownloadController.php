@@ -7,6 +7,7 @@ use App\Models\ReportCard;
 use App\Services\MediaStorageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -15,6 +16,8 @@ class ReportCardDownloadController extends Controller
 {
     public function __invoke(Request $request, ReportCard $reportCard, MediaStorageService $mediaStorage): StreamedResponse|BinaryFileResponse|RedirectResponse
     {
+        Gate::forUser($request->user())->authorize('download', $reportCard);
+
         $reportCard->load('enrollment');
 
         abort_unless($reportCard->is_published && $reportCard->enrollment?->user_id === $request->user()->id, 403);

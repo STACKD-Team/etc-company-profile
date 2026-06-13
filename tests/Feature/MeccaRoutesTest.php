@@ -277,6 +277,71 @@ test('student mecca pages render for authenticated student', function () {
     $this->actingAs($student)->get(route('student.help.index', [], false))->assertOk()->assertViewIs('pages.student.help.index');
 });
 
+test('student sprint six detail pages use shared detail components', function () {
+    collect([
+        resource_path('views/pages/student/class/show.blade.php'),
+        resource_path('views/pages/student/payment/show.blade.php'),
+        resource_path('views/pages/student/report-card/show.blade.php'),
+    ])->each(function (string $path): void {
+        $source = file_get_contents($path);
+
+        expect($source)
+            ->toContain('<x-ui.resource-header')
+            ->toContain('<x-ui.detail-card')
+            ->toContain('<x-ui.description-list')
+            ->toContain('<x-ui.description-item');
+    });
+});
+
+test('student sprint six policies scope class payment and report access', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $otherStudent = User::factory()->create(['role' => 'student']);
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $ownedClass = createMeccaSprint4Class(['name' => 'Policy Owned Class']);
+    $otherClass = createMeccaSprint4Class(['name' => 'Policy Other Class']);
+    $ownedEnrollment = createMeccaSprint4Enrollment($student, $ownedClass);
+    $otherEnrollment = createMeccaSprint4Enrollment($otherStudent, $otherClass);
+    $ownedReport = createMeccaSprint4ReportCard($ownedEnrollment, ['is_published' => true]);
+    $ownedDraftReport = createMeccaSprint4ReportCard(
+        createMeccaSprint4Enrollment($student, createMeccaSprint4Class(['name' => 'Policy Draft Class'])),
+        ['is_published' => false]
+    );
+    $otherReport = createMeccaSprint4ReportCard($otherEnrollment, ['is_published' => true]);
+    $ownedPayment = Registration::query()->create([
+        'registration_code' => 'REG-POLICY-OWNED',
+        'user_id' => $student->id,
+        'program_id' => $ownedClass->program_id,
+        'class_id' => $ownedClass->id,
+        'applicant_name' => 'Policy Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_amount' => 1400000,
+        'status' => 'pending_payment',
+    ]);
+    $otherPayment = Registration::query()->create([
+        'registration_code' => 'REG-POLICY-OTHER',
+        'user_id' => $otherStudent->id,
+        'program_id' => $otherClass->program_id,
+        'class_id' => $otherClass->id,
+        'applicant_name' => 'Other Policy Student',
+        'applicant_email' => $otherStudent->email,
+        'applicant_phone' => '081234567890',
+        'payment_amount' => 1400000,
+        'status' => 'pending_payment',
+    ]);
+
+    expect(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $ownedClass))->toBeTrue()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $otherClass))->toBeFalse()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $ownedPayment))->toBeTrue()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $otherPayment))->toBeFalse()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $ownedReport))->toBeTrue()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('download', $ownedReport))->toBeTrue()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $ownedDraftReport))->toBeFalse()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $otherReport))->toBeFalse()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($admin)->allows('view', $ownedClass))->toBeFalse();
+});
+
 test('student sprint three plural urls remain available as legacy aliases', function () {
     $student = User::factory()->create(['role' => 'student']);
     $class = createMeccaSprint4Class(['name' => 'Legacy Alias Class']);

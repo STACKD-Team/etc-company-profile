@@ -7,6 +7,7 @@ use App\Http\Requests\Student\TableQueryRequest;
 use App\Models\CourseClass;
 use App\Services\StudentPanelService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class ClassController extends Controller
@@ -27,6 +28,8 @@ class ClassController extends Controller
 
     public function show(Request $request, CourseClass $class, StudentPanelService $panel): View
     {
+        abort_if(Gate::forUser($request->user())->inspect('view', $class)->denied(), 404);
+
         $enrollment = $panel->ownedClassEnrollment((int) $request->user()->id, $class);
 
         return view('pages.student.class.show', [

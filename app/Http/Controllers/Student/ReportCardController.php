@@ -7,6 +7,7 @@ use App\Http\Requests\Student\TableQueryRequest;
 use App\Models\ReportCard;
 use App\Services\StudentPanelService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class ReportCardController extends Controller
@@ -26,6 +27,8 @@ class ReportCardController extends Controller
 
     public function show(Request $request, ReportCard $reportCard, StudentPanelService $panel): View
     {
+        Gate::forUser($request->user())->authorize('view', $reportCard);
+
         $reportCard = $panel->ownedPublishedReportCard((int) $request->user()->id, $reportCard);
 
         return view('pages.student.report-card.show', [
