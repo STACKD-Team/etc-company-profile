@@ -302,6 +302,7 @@ function initPublicChatbot() {
     const submit = widget.querySelector('[data-chatbot-submit]');
     const isPublicDiscoveryChatbot = widget.classList.contains('public-discovery-chatbot');
     let sessionId = window.localStorage?.getItem('etc_public_chatbot_session') || null;
+    let lastFocusedElement = null;
 
     const setOpen = (isOpen) => {
         panel?.classList.toggle('hidden', !isOpen);
@@ -310,7 +311,10 @@ function initPublicChatbot() {
         toggle?.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 
         if (isOpen) {
+            lastFocusedElement = document.activeElement;
             input?.focus();
+        } else if (lastFocusedElement instanceof HTMLElement) {
+            lastFocusedElement.focus();
         }
     };
 
@@ -381,6 +385,12 @@ function initPublicChatbot() {
 
     toggle?.addEventListener('click', () => setOpen(panel?.classList.contains('hidden') ?? true));
     close?.addEventListener('click', () => setOpen(false));
+    widget.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !panel?.classList.contains('hidden')) {
+            event.preventDefault();
+            setOpen(false);
+        }
+    });
 
     widget.querySelectorAll('[data-chatbot-suggestion]').forEach((suggestion) => {
         suggestion.addEventListener('click', () => {
@@ -912,6 +922,7 @@ function initPublicReels() {
     let activeVideo = null;
     const indicatorTimers = new WeakMap();
     const soundControlTimers = new WeakMap();
+    const formatCounter = (value) => new Intl.NumberFormat('id-ID').format(Number(value) || 0);
 
     const syncSoundControls = () => {
         document.querySelectorAll('[data-reel-player]').forEach((player) => {
@@ -967,7 +978,16 @@ function initPublicReels() {
                 'X-CSRF-TOKEN': token,
                 'Accept': 'application/json',
             },
-        }).catch(() => {});
+        })
+            .then((response) => response.ok ? response.json() : null)
+            .then((data) => {
+                const counter = video.closest('[data-reel-slide]')?.querySelector('[data-reel-view-count]');
+
+                if (counter && data?.views_count !== undefined) {
+                    counter.textContent = formatCounter(data.views_count);
+                }
+            })
+            .catch(() => {});
     };
 
     const playWithSound = async (video) => {
@@ -1054,6 +1074,17 @@ function initPublicReels() {
             togglePlayback(video);
         });
 
+        player.addEventListener('keydown', (event) => {
+            if (!video || event.target.closest('[data-reel-sound-control]') || !['Enter', ' '].includes(event.key)) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+            showSoundControl(player);
+            togglePlayback(video);
+        });
+
         player.querySelector('[data-reel-sound-toggle]')?.addEventListener('click', (event) => {
             event.stopPropagation();
             preferredMuted = !preferredMuted;
@@ -1106,6 +1137,55 @@ function initPublicReels() {
             markViewed(video);
             playWithSound(video);
         }
+    });
+
+    document.querySelectorAll('[data-reel-like]').forEach((button) => {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!token || !button.dataset.likeEndpoint || button.disabled) {
+                return;
+            }
+
+            button.disabled = true;
+
+            try {
+                const response = await fetch(button.dataset.likeEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json',
+                    },
+                });
+                const data = response.ok ? await response.json() : null;
+
+                if (!data || data.liked === undefined) {
+                    return;
+                }
+
+                const liked = Boolean(data.liked);
+                const icon = button.querySelector('[data-reel-like-icon]');
+                const counter = button.querySelector('[data-reel-like-count]');
+                const reelTitle = button.closest('[data-reel-slide]')?.querySelector('h1')?.textContent?.trim() || 'ini';
+
+                button.classList.toggle('is-liked', liked);
+                button.setAttribute('aria-pressed', liked ? 'true' : 'false');
+                button.setAttribute('aria-label', `${liked ? 'Batal menyukai' : 'Sukai'} reel ${reelTitle}`);
+
+                if (icon) {
+                    icon.textContent = liked ? 'favorite' : 'favorite_border';
+                }
+
+                if (counter) {
+                    counter.textContent = formatCounter(data.likes_count);
+                }
+            } catch {
+                // Keep the current state when the interaction cannot be saved.
+            } finally {
+                button.disabled = false;
+            }
+        });
     });
 
     document.addEventListener('visibilitychange', () => {

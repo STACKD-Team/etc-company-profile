@@ -6,6 +6,13 @@
         $formatMoney = static fn ($value) => 'Rp '.number_format((float) $value, 0, ',', '.');
         $partners = $partners ?? collect();
         $testimonials = $testimonials ?? collect();
+        $heroImage = $assetUrl($profile?->image, 'images/hero-img.jpeg');
+        $statItems = collect([
+            ['value' => $stats['students'], 'label' => 'Siswa Terdata'],
+            ['value' => $stats['instructors'], 'label' => 'Instruktur'],
+            ['value' => $stats['programs'], 'label' => 'Program Aktif'],
+            ['value' => $stats['satisfaction'], 'label' => 'Kepuasan Siswa'],
+        ])->filter(fn (array $stat): bool => filled($stat['value']));
     @endphp
 
     <section class="public-section bg-etc-surface">
@@ -18,12 +25,15 @@
                     Kursus bahasa untuk anak, remaja, mahasiswa, dan profesional dengan kelas kecil, instructor aktif, dan placement test offline agar siswa mulai dari level yang tepat.
                 </p>
 
-                <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                <div class="mt-8 flex flex-col flex-wrap gap-3 sm:flex-row">
                     <x-ui.button :href="route('public.programs.index')" size="xl" icon="heroicon-m-arrow-right" icon-position="after">
                         Daftar Sekarang
                     </x-ui.button>
                     <x-ui.button :href="route('public.programs.index')" color="gray" outlined size="xl">
                         Lihat Program
+                    </x-ui.button>
+                    <x-ui.button :href="route('public.contact.index')" color="gray" outlined size="xl" icon="heroicon-m-chat-bubble-left-right">
+                        Tanya ETC
                     </x-ui.button>
                 </div>
 
@@ -43,7 +53,7 @@
 
             <div class="relative mx-auto w-full max-w-[440px] public-reveal" data-public-reveal>
                 <div class="absolute -left-8 top-12 h-32 w-32 rounded-[54%_46%_39%_61%] bg-etc-surface-high"></div>
-                <img src="{{ asset('images/hero-img.jpeg') }}" alt="Guru ETC Planet mengajar siswa di kelas" class="relative aspect-[4/5] w-full rounded-card border-2 border-etc-outline-variant object-cover shadow-panel">
+                <img src="{{ $heroImage }}" alt="Suasana belajar ETC Planet" class="relative aspect-[4/5] w-full rounded-card border-2 border-etc-outline-variant object-cover shadow-panel" data-home-hero-image>
                 <div class="public-card absolute -bottom-5 left-4 right-4 flex items-center gap-4 p-4 md:left-auto md:right-6 md:w-72">
                     <span class="flex h-10 w-10 items-center justify-center rounded-selector bg-etc-surface-container text-etc-magenta">
                         <span class="material-symbols-outlined">verified</span>
@@ -59,12 +69,7 @@
 
     <section class="public-home-stats">
         <div class="public-shell public-home-stats__grid">
-            @foreach ([
-                ['value' => $stats['students'], 'label' => 'Siswa Terdata'],
-                ['value' => $stats['instructors'], 'label' => 'Instruktur'],
-                ['value' => $stats['programs'], 'label' => 'Program Aktif'],
-                ['value' => $stats['satisfaction'], 'label' => 'Kepuasan Siswa'],
-            ] as $stat)
+            @foreach ($statItems as $stat)
                 @php
                     $counterValue = (string) $stat['value'];
                     $counterTarget = (float) preg_replace('/[^\d.]/', '', $counterValue);

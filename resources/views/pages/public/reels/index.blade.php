@@ -14,6 +14,7 @@
     @if ($reels->isNotEmpty())
         <section class="public-reels-feed" data-vertical-reels-feed aria-label="ETC Planet Reels">
             @foreach ($reels as $reel)
+                @php($isLiked = in_array((int) $reel->getKey(), $likedReelIds ?? [], true))
                 <article class="public-reel-slide" data-reel-slide data-reel-id="{{ $reel->getKey() }}">
                     <x-ui.button
                         :href="route('public.home') . '#reels'"
@@ -32,7 +33,13 @@
                             <p class="mt-4 text-sm leading-7 text-white/70">{{ $reel->description ?: 'Cuplikan kegiatan dan suasana belajar ETC Planet.' }}</p>
                         </aside>
 
-                        <div class="public-reel-video-frame" data-reel-player>
+                        <div
+                            class="public-reel-video-frame"
+                            data-reel-player
+                            role="button"
+                            tabindex="0"
+                            aria-label="Putar atau jeda reel {{ $reel->title }}"
+                        >
                             <video
                                 autoplay
                                 playsinline
@@ -69,6 +76,31 @@
                                 <h1 class="mt-2 max-w-[18rem] font-heading text-2xl font-bold leading-tight text-white">{{ $reel->title }}</h1>
                                 <p class="mt-2 line-clamp-3 max-w-[20rem] text-sm leading-6 text-white/75">{{ $reel->description ?: 'Cuplikan kegiatan dan suasana belajar ETC Planet.' }}</p>
                             </div>
+                        </div>
+
+                        <div class="public-reel-actions" aria-label="Statistik dan aksi reel">
+                            <div class="public-reel-action" title="Jumlah tayangan">
+                                <span class="public-reel-action__icon">
+                                    <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
+                                </span>
+                                <span data-reel-view-count aria-live="polite">{{ number_format((int) $reel->views_count) }}</span>
+                                <span class="sr-only">tayangan</span>
+                            </div>
+
+                            <x-ui.button
+                                type="button"
+                                color="gray"
+                                @class(['public-reel-action', 'is-liked' => $isLiked])
+                                data-reel-like
+                                data-like-endpoint="{{ route('public.reels.likes.store', $reel) }}"
+                                aria-pressed="{{ $isLiked ? 'true' : 'false' }}"
+                                aria-label="{{ $isLiked ? 'Batal menyukai' : 'Sukai' }} reel {{ $reel->title }}"
+                            >
+                                <span class="public-reel-action__icon">
+                                    <span class="material-symbols-outlined" data-reel-like-icon aria-hidden="true">{{ $isLiked ? 'favorite' : 'favorite_border' }}</span>
+                                </span>
+                                <span data-reel-like-count aria-live="polite">{{ number_format((int) $reel->likes_count) }}</span>
+                            </x-ui.button>
                         </div>
                     </div>
                 </article>
