@@ -60,7 +60,7 @@ class InstructorPanelService
                 ->latest('enrolled_at')
                 ->take(5)
                 ->get()
-                ->each(fn (Enrollment $enrollment) => $this->decorateAssessment($enrollment)),
+                ->each(fn (Enrollment $enrollment) => $this->decorateAssessment($enrollment, $instructorId)),
         ];
     }
 
@@ -163,12 +163,12 @@ class InstructorPanelService
         ], 'enrolled_at')
             ->paginate($this->perPage($filters))
             ->withQueryString()
-            ->through(fn (Enrollment $enrollment) => $this->decorateAssessment($enrollment));
+            ->through(fn (Enrollment $enrollment) => $this->decorateAssessment($enrollment, $instructorId));
     }
 
     public function paginateAssessments(int $instructorId, array $filters): LengthAwarePaginator
     {
-        $query = $this->enrollmentsQuery($instructorId)
+        $query = $this->viewableAssessmentsQuery($instructorId)
             ->with(['user', 'courseClass', 'reportCard'])
             ->when($filters['search'] ?? null, function (Builder $query, string $search): void {
                 $query->where(function (Builder $query) use ($search): void {
@@ -214,12 +214,28 @@ class InstructorPanelService
         ], 'enrolled_at')
             ->paginate($this->perPage($filters))
             ->withQueryString()
-            ->through(fn (Enrollment $enrollment) => $this->decorateAssessment($enrollment));
+            ->through(fn (Enrollment $enrollment) => $this->decorateAssessment($enrollment, $instructorId));
     }
 
     public function classOptions(int $instructorId): array
     {
         return $this->classesQuery($instructorId)
+            ->orderBy('name')
+            ->pluck('name', 'id')
+            ->all();
+    }
+
+    public function assessmentClassOptions(int $instructorId): array
+    {
+        return CourseClass::query()
+            ->where(function (Builder $query) use ($instructorId): void {
+                $query
+                    ->where('instructor_id', $instructorId)
+                    ->orWhereHas(
+                        'enrollments.reportCard',
+                        fn (Builder $query) => $query->where('instructor_id', $instructorId),
+                    );
+            })
             ->orderBy('name')
             ->pluck('name', 'id')
             ->all();
@@ -242,6 +258,31 @@ class InstructorPanelService
                 $query
                     ->when($classId, fn (Builder $query, int $classId) => $query->where('class_id', $classId))
                     ->whereHas('courseClass', fn (Builder $query) => $query->where('instructor_id', $instructorId));
+            })
+            ->orderByRaw('coalesce(full_name, name)')
+            ->get(['id', 'name', 'full_name', 'email'])
+            ->mapWithKeys(fn (User $student) => [
+                $student->id => ($student->full_name ?: $student->name).' - '.$student->email,
+            ])
+            ->all();
+    }
+
+    public function assessmentStudentOptions(int $instructorId): array
+    {
+        return User::query()
+            ->students()
+            ->whereHas('enrollments', function (Builder $query) use ($instructorId): void {
+                $query->where(function (Builder $query) use ($instructorId): void {
+                    $query
+                        ->whereHas(
+                            'courseClass',
+                            fn (Builder $query) => $query->where('instructor_id', $instructorId),
+                        )
+                        ->orWhereHas(
+                            'reportCard',
+                            fn (Builder $query) => $query->where('instructor_id', $instructorId),
+                        );
+                });
             })
             ->orderByRaw('coalesce(full_name, name)')
             ->get(['id', 'name', 'full_name', 'email'])
@@ -297,7 +338,7 @@ class InstructorPanelService
         ], 'enrolled_at')
             ->paginate($this->perPage($filters))
             ->withQueryString()
-            ->through(fn (Enrollment $enrollment) => $this->decorateAssessment($enrollment));
+            ->through(fn (Enrollment $enrollment) => $this->decorateAssessment($enrollment, $instructorId));
     }
 
     public function ownedEnrollment(int $instructorId, Enrollment $enrollment): Enrollment
@@ -308,12 +349,32 @@ class InstructorPanelService
         return $enrollment;
     }
 
-    public function ownedReportCard(int $instructorId, ReportCard $reportCard): ReportCard
+    public function viewableReportCard(int $instructorId, ReportCard $reportCard): ReportCard
     {
         $reportCard->loadMissing(['enrollment.user', 'enrollment.courseClass.program']);
-        abort_unless((int) $reportCard->enrollment?->courseClass?->instructor_id === $instructorId, 403);
+        abort_unless(
+            (int) $reportCard->enrollment?->courseClass?->instructor_id === $instructorId
+                || (int) $reportCard->instructor_id === $instructorId,
+            403,
+        );
 
         return $reportCard;
+    }
+
+    public function editableReportCard(int $instructorId, ReportCard $reportCard): ReportCard
+    {
+        $reportCard->loadMissing(['enrollment.user', 'enrollment.courseClass.program']);
+        abort_unless($this->canEditReportCard($instructorId, $reportCard), 403);
+
+        return $reportCard;
+    }
+
+    public function canEditReportCard(int $instructorId, ReportCard $reportCard): bool
+    {
+        $reportCard->loadMissing('enrollment.courseClass');
+
+        return ! $reportCard->is_published
+            && (int) $reportCard->enrollment?->courseClass?->instructor_id === $instructorId;
     }
 
     public function createDraft(int $instructorId, Enrollment $enrollment, array $data): ReportCard
@@ -331,8 +392,7 @@ class InstructorPanelService
 
     public function updateDraft(int $instructorId, ReportCard $reportCard, array $data): ReportCard
     {
-        $reportCard = $this->ownedReportCard($instructorId, $reportCard);
-        abort_if($reportCard->is_published, 403, 'Rapor yang sudah dipublish tidak dapat diubah instructor.');
+        $reportCard = $this->editableReportCard($instructorId, $reportCard);
 
         return DB::transaction(function () use ($reportCard, $data): ReportCard {
             $reportCard->update($this->assessmentData($data));
@@ -391,9 +451,15 @@ class InstructorPanelService
         return $assessment;
     }
 
-    private function decorateAssessment(Enrollment $enrollment): Enrollment
+    private function decorateAssessment(Enrollment $enrollment, int $instructorId): Enrollment
     {
         $enrollment->setAttribute('assessment_state', $this->assessmentState($enrollment->reportCard));
+        $enrollment->setAttribute(
+            'can_edit_assessment',
+            $enrollment->reportCard
+                ? $this->canEditReportCard($instructorId, $enrollment->reportCard)
+                : (int) $enrollment->courseClass?->instructor_id === $instructorId,
+        );
 
         return $enrollment;
     }
@@ -407,6 +473,22 @@ class InstructorPanelService
     {
         return Enrollment::query()
             ->whereHas('courseClass', fn (Builder $query) => $query->where('instructor_id', $instructorId));
+    }
+
+    private function viewableAssessmentsQuery(int $instructorId): Builder
+    {
+        return Enrollment::query()
+            ->where(function (Builder $query) use ($instructorId): void {
+                $query
+                    ->whereHas(
+                        'courseClass',
+                        fn (Builder $query) => $query->where('instructor_id', $instructorId),
+                    )
+                    ->orWhereHas(
+                        'reportCard',
+                        fn (Builder $query) => $query->where('instructor_id', $instructorId),
+                    );
+            });
     }
 
     private function incompleteAssessmentsQuery(int $instructorId): Builder

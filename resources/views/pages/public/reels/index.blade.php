@@ -8,7 +8,7 @@
 >
     @php
         $media = app(\App\Services\PublicDiscoveryService::class);
-        $assetUrl = static fn (?string $path, string $fallback = 'videos/video1.mp4'): string => $media->mediaUrl($path, $fallback);
+        $assetUrl = static fn (?string $path, string $fallback = 'videos/video1.mp4', string $resourceType = 'image'): string => $media->mediaUrl($path, $fallback, $resourceType);
     @endphp
 
     @if ($reels->isNotEmpty())
@@ -32,7 +32,13 @@
                             <p class="mt-4 text-sm leading-7 text-white/70">{{ $reel->description ?: 'Cuplikan kegiatan dan suasana belajar ETC Planet.' }}</p>
                         </aside>
 
-                        <div class="public-reel-video-frame" data-reel-player>
+                        <div
+                            class="public-reel-video-frame"
+                            data-reel-player
+                            role="button"
+                            tabindex="0"
+                            aria-label="Putar atau jeda reel {{ $reel->title }}"
+                        >
                             <video
                                 autoplay
                                 playsinline
@@ -42,7 +48,7 @@
                                 data-autoplay-reel="true"
                                 data-view-endpoint="{{ route('public.reels.views.store', $reel) }}"
                             >
-                                <source src="{{ $assetUrl($reel->video_path) }}" type="video/mp4">
+                                <source src="{{ $assetUrl($reel->video_path, 'videos/video1.mp4', 'video') }}" type="video/mp4">
                                 Browser kamu tidak mendukung pemutar video.
                             </video>
 
@@ -70,6 +76,7 @@
                                 <p class="mt-2 line-clamp-3 max-w-[20rem] text-sm leading-6 text-white/75">{{ $reel->description ?: 'Cuplikan kegiatan dan suasana belajar ETC Planet.' }}</p>
                             </div>
                         </div>
+
                     </div>
                 </article>
             @endforeach

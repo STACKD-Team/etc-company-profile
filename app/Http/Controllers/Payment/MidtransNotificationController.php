@@ -11,7 +11,7 @@ class MidtransNotificationController extends Controller
 {
     public function __invoke(Request $request, MidtransPaymentService $payments): JsonResponse
     {
-        $validated = $request->validate([
+        $request->validate([
             'order_id' => ['required', 'string', 'max:180'],
             'transaction_status' => ['required', 'string', 'max:60'],
             'signature_key' => ['nullable', 'string'],
@@ -23,7 +23,7 @@ class MidtransNotificationController extends Controller
             'status_message' => ['nullable', 'string'],
         ]);
 
-        $notification = $payments->handleNotification($validated);
+        $notification = $payments->handleNotification($request->all());
 
         return response()->json([
             'status' => $notification->processing_status,

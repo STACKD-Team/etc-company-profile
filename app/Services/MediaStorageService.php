@@ -47,7 +47,7 @@ class MediaStorageService
         return $path;
     }
 
-    public function url(?string $path): ?string
+    public function url(?string $path, string $resourceType = 'image'): ?string
     {
         if ($path === null || $path === '') {
             return null;
@@ -57,8 +57,8 @@ class MediaStorageService
             return $path;
         }
 
-        if ($this->hasCloudinaryPath($path)) {
-            return $this->cloudinary()->image($this->cloudinaryPublicId($path))->toUrl();
+        if (Str::startsWith($path, 'cloudinary://')) {
+            return $this->cloudinaryUrl($path, $resourceType);
         }
 
         if (Str::startsWith($path, ['images/', 'videos/', 'storage/'])) {
@@ -165,15 +165,37 @@ class MediaStorageService
         $storedPublicId = $result['public_id'] ?? $publicId;
         $version = $result['version'] ?? null;
 
-        return 'cloudinary://'.$storedPublicId.($version ? '?v='.$version : '');
+        return 'cloudinary://'.$resourceType.'/'.$storedPublicId.($version ? '?v='.$version : '');
     }
 
     protected function deleteFromCloudinary(string $path): void
     {
         $this->cloudinary()->uploadApi()->destroy($this->cloudinaryPublicId($path), [
-            'resource_type' => 'auto',
+            'resource_type' => $this->cloudinaryResourceTypeFromPath($path),
             'invalidate' => true,
         ]);
+    }
+
+    protected function cloudinaryUrl(string $path, string $resourceTypeHint = 'image'): string
+    {
+        $resourceType = $this->cloudinaryResourceTypeFromPath($path, $resourceTypeHint);
+        $publicId = $this->cloudinaryPublicId($path);
+
+        $cloudName = $this->cloudinaryCloudName();
+
+        if ($cloudName === '') {
+            return '';
+        }
+
+        $version = Str::contains($path, '?v=') ? 'v'.Str::after($path, '?v=').'/' : '';
+
+        return sprintf(
+            'https://res.cloudinary.com/%s/%s/upload/%s%s',
+            $cloudName,
+            $resourceType,
+            $version,
+            ltrim($publicId, '/'),
+        );
     }
 
     protected function cloudinary(): Cloudinary
@@ -196,6 +218,10 @@ class MediaStorageService
 
     protected function hasCloudinary(): bool
     {
+        if (app()->runningUnitTests()) {
+            return false;
+        }
+
         return class_exists(Cloudinary::class)
             && (
                 (bool) config('cloudinary.url')
@@ -205,12 +231,69 @@ class MediaStorageService
 
     protected function hasCloudinaryPath(string $path): bool
     {
-        return Str::startsWith($path, 'cloudinary://') && $this->hasCloudinary();
+        return Str::startsWith($path, 'cloudinary://') && class_exists(Cloudinary::class) && $this->hasCloudinary();
+    }
+
+    protected function cloudinaryCloudName(): string
+    {
+        $cloudName = (string) config('cloudinary.cloud_name');
+
+        if ($cloudName !== '') {
+            return $cloudName;
+        }
+
+        $url = (string) config('cloudinary.url');
+
+        if ($url === '') {
+            return '';
+        }
+
+        $host = (string) parse_url($url, PHP_URL_HOST);
+
+        if ($host !== '') {
+            return Str::before($host, '.');
+        }
+
+        $parts = parse_url($url);
+        $user = $parts['user'] ?? null;
+
+        return is_string($user) ? $user : '';
     }
 
     protected function cloudinaryPublicId(string $path): string
     {
-        return Str::before(Str::after($path, 'cloudinary://'), '?');
+        $value = Str::before(Str::after($path, 'cloudinary://'), '?');
+
+        if (Str::startsWith($value, ['image/', 'video/', 'raw/'])) {
+            return Str::after($value, '/');
+        }
+
+        return $value;
+    }
+
+    protected function cloudinaryResourceTypeFromPath(string $path, string $resourceTypeHint = 'image'): string
+    {
+        $value = Str::before(Str::after($path, 'cloudinary://'), '?');
+
+        if (Str::startsWith($value, 'video/')) {
+            return 'video';
+        }
+
+        if (Str::startsWith($value, 'raw/')) {
+            return 'raw';
+        }
+
+        if (Str::startsWith($value, 'image/')) {
+            return 'image';
+        }
+
+        $extension = strtolower(pathinfo($value, PATHINFO_EXTENSION));
+
+        return match ($extension) {
+            'mp4', 'mov', 'webm', 'avi', 'mkv' => 'video',
+            'pdf', 'doc', 'docx', 'txt', 'md', 'csv', 'xls', 'xlsx', 'zip' => 'raw',
+            default => $resourceTypeHint,
+        };
     }
 
     protected function cloudinaryResourceType(?string $mimeType): string

@@ -5,7 +5,14 @@
         data-chatbot-endpoint="{{ route('public.chatbot.messages.store') }}"
         aria-label="Chatbot ETC Planet"
     >
-        <div class="public-discovery-chatbot__panel hidden" data-chatbot-panel>
+        <div
+            id="public-discovery-chatbot-panel"
+            class="public-discovery-chatbot__panel hidden"
+            data-chatbot-panel
+            role="dialog"
+            aria-modal="false"
+            aria-label="Percakapan dengan chatbot ETC Planet"
+        >
             <div class="public-discovery-chatbot__header">
                 <div class="flex items-center gap-3">
                     <span class="public-discovery-chatbot__avatar">
@@ -26,7 +33,7 @@
                 />
             </div>
 
-            <div class="public-discovery-chatbot__messages" data-chatbot-messages>
+            <div class="public-discovery-chatbot__messages" data-chatbot-messages role="log" aria-live="polite" aria-relevant="additions">
                 <div class="public-discovery-chatbot__bot-row">
                     <span class="public-discovery-chatbot__mini-avatar">
                         <span class="material-symbols-outlined">smart_toy</span>
@@ -83,6 +90,7 @@
             class="public-discovery-chatbot__toggle"
             data-chatbot-toggle
             aria-expanded="false"
+            aria-controls="public-discovery-chatbot-panel"
             aria-label="Buka chatbot"
         >
             <span class="material-symbols-outlined">smart_toy</span>

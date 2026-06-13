@@ -6,13 +6,20 @@ use Illuminate\Support\Facades\Http;
 
 class EmbeddingService
 {
+    public function isConfigured(): bool
+    {
+        return filled(config('rag.nvidia.api_key'))
+            && filled(config('rag.nvidia.base_url'))
+            && filled(config('rag.nvidia.embedding_model'));
+    }
+
     /**
      * @return array<int, float>
      */
     public function embed(string $text): array
     {
-        if (! config('rag.nvidia.api_key')) {
-            return $this->deterministicEmbedding($text);
+        if (! $this->isConfigured()) {
+            return $this->localEmbedding($text);
         }
 
         $response = Http::withToken((string) config('rag.nvidia.api_key'))
@@ -20,25 +27,32 @@ class EmbeddingService
             ->post(rtrim((string) config('rag.nvidia.base_url'), '/').'/embeddings', [
                 'model' => config('rag.nvidia.embedding_model'),
                 'input' => $text,
+                'input_type' => 'passage',
             ])
             ->throw()
             ->json();
 
-        return array_map('floatval', $response['data'][0]['embedding'] ?? $this->deterministicEmbedding($text));
+        $embedding = data_get($response, 'data.0.embedding');
+
+        if (! is_array($embedding) || $embedding === []) {
+            throw new \RuntimeException('NVIDIA embedding response is invalid.');
+        }
+
+        return array_map('floatval', $embedding);
     }
 
     /**
      * @return array<int, float>
      */
-    protected function deterministicEmbedding(string $text): array
+    protected function localEmbedding(string $text): array
     {
         $hash = hash('sha256', $text);
-        $values = [];
+        $vector = [];
 
-        for ($i = 0; $i < 32; $i += 2) {
-            $values[] = (hexdec(substr($hash, $i, 2)) / 255) * 2 - 1;
+        for ($offset = 0; $offset < 32; $offset += 2) {
+            $vector[] = round(hexdec(substr($hash, $offset, 2)) / 255, 6);
         }
 
-        return $values;
+        return $vector;
     }
 }

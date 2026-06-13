@@ -78,7 +78,7 @@ class MidtransPaymentService
         return DB::transaction(function () use ($payload): MidtransNotification {
             $orderId = (string) ($payload['order_id'] ?? '');
             $transactionStatus = (string) ($payload['transaction_status'] ?? 'unknown');
-            $transactionId = (string) ($payload['transaction_id'] ?? '');
+            $transactionId = (string) ($payload['transaction_id'] ?? $payload['order_id'] ?? '');
 
             if ($orderId === '') {
                 throw new RuntimeException('Midtrans notification order_id is missing.');
@@ -110,8 +110,6 @@ class MidtransPaymentService
             );
 
             if (! $notification->wasRecentlyCreated) {
-                $notification->update(['processing_status' => 'ignored']);
-
                 return $notification->refresh();
             }
 
@@ -124,6 +122,7 @@ class MidtransPaymentService
                     throw new RuntimeException('Registration for Midtrans order was not found.');
                 }
 
+                $this->assertGrossAmountMatches($registration, $payload);
                 $this->applyStatus($registration, $payload);
 
                 $notification->update([
@@ -166,8 +165,12 @@ class MidtransPaymentService
     {
         $signature = (string) ($payload['signature_key'] ?? '');
 
-        if ($signature === '' || ! $this->isConfigured()) {
-            return ! $this->isConfigured();
+        if (! $this->isConfigured()) {
+            return true;
+        }
+
+        if ($signature === '') {
+            return false;
         }
 
         $expected = hash('sha512',
@@ -190,25 +193,55 @@ class MidtransPaymentService
             'payment_method' => $paymentType,
             'payment_amount' => $amount,
             'payment_gateway_id' => $payload['transaction_id'] ?? $registration->payment_gateway_id,
-            'payment_status' => $transactionStatus,
+            'payment_status' => $this->normalizedPaymentStatus($transactionStatus, $fraudStatus),
             'payment_status_message' => $fraudStatus ? "Fraud status: {$fraudStatus}" : null,
         ];
 
         if (in_array($transactionStatus, ['settlement', 'capture'], true) && ! in_array($fraudStatus, ['deny', 'challenge'], true)) {
             $data['status'] = 'paid';
             $data['paid_at'] = $registration->paid_at ?? now();
-            $data['payment_status'] = 'paid';
-        } elseif ($transactionStatus === 'pending') {
-            $data['payment_status'] = 'waiting_payment';
         } elseif ($transactionStatus === 'expire') {
-            $data['payment_status'] = 'expired';
             $data['status'] = 'cancelled';
         } elseif (in_array($transactionStatus, ['cancel', 'deny', 'failure'], true)) {
-            $data['payment_status'] = 'failed';
             $data['status'] = 'rejected';
         }
 
         $registration->update($data);
+    }
+
+    protected function assertGrossAmountMatches(Registration $registration, array $payload): void
+    {
+        if (! isset($payload['gross_amount'])) {
+            return;
+        }
+
+        $expected = round((float) ($registration->final_amount ?: $registration->payment_amount ?: 0), 2);
+        $actual = round((float) $payload['gross_amount'], 2);
+
+        if (abs($expected - $actual) > 0.01) {
+            throw new RuntimeException("Midtrans gross amount mismatch. Expected {$expected}, got {$actual}.");
+        }
+    }
+
+    protected function normalizedPaymentStatus(string $transactionStatus, string $fraudStatus = ''): string
+    {
+        if (in_array($transactionStatus, ['settlement', 'capture'], true) && ! in_array($fraudStatus, ['deny', 'challenge'], true)) {
+            return 'paid';
+        }
+
+        if ($transactionStatus === 'pending') {
+            return 'waiting_payment';
+        }
+
+        if ($transactionStatus === 'expire') {
+            return 'expired';
+        }
+
+        if (in_array($transactionStatus, ['cancel', 'deny', 'failure'], true)) {
+            return 'failed';
+        }
+
+        return 'waiting_payment';
     }
 
     protected function configureSdk(): void

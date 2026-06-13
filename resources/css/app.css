@@ -2040,20 +2040,6 @@
         transition: opacity 160ms ease, transform 160ms ease;
     }
 
-    .public-reel-action {
-        display: grid;
-        justify-items: center;
-        gap: 0.25rem;
-        border: 0;
-        background: transparent;
-        padding: 0;
-        color: inherit;
-        font-family: var(--font-heading);
-        font-size: var(--etc-font-size-caption);
-        font-weight: 700;
-        line-height: var(--etc-leading-tight);
-    }
-
     .public-reel-playback-indicator.is-visible {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
@@ -2119,14 +2105,16 @@
 
         .public-reel-overlay {
             display: block;
-            padding-right: 1.25rem;
+            padding-right: 5.25rem;
             padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
         }
 
         .public-reel-sound-control {
             right: 1rem;
-            bottom: max(1rem, env(safe-area-inset-bottom));
+            top: max(4.25rem, env(safe-area-inset-top));
+            bottom: auto;
         }
+
     }
 
     @media (max-width: 640px) {

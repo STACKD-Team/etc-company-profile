@@ -302,6 +302,7 @@ function initPublicChatbot() {
     const submit = widget.querySelector('[data-chatbot-submit]');
     const isPublicDiscoveryChatbot = widget.classList.contains('public-discovery-chatbot');
     let sessionId = window.localStorage?.getItem('etc_public_chatbot_session') || null;
+    let lastFocusedElement = null;
 
     const setOpen = (isOpen) => {
         panel?.classList.toggle('hidden', !isOpen);
@@ -310,7 +311,10 @@ function initPublicChatbot() {
         toggle?.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 
         if (isOpen) {
+            lastFocusedElement = document.activeElement;
             input?.focus();
+        } else if (lastFocusedElement instanceof HTMLElement) {
+            lastFocusedElement.focus();
         }
     };
 
@@ -381,6 +385,12 @@ function initPublicChatbot() {
 
     toggle?.addEventListener('click', () => setOpen(panel?.classList.contains('hidden') ?? true));
     close?.addEventListener('click', () => setOpen(false));
+    widget.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !panel?.classList.contains('hidden')) {
+            event.preventDefault();
+            setOpen(false);
+        }
+    });
 
     widget.querySelectorAll('[data-chatbot-suggestion]').forEach((suggestion) => {
         suggestion.addEventListener('click', () => {
@@ -561,6 +571,7 @@ function initPublicHomeCarousels() {
         let slides = [...carousel.querySelectorAll('[data-carousel-slide]')];
         const previous = carousel.querySelector('[data-carousel-prev]');
         const next = carousel.querySelector('[data-carousel-next]');
+        const autoplayEnabled = carousel.dataset.carouselAutoplay !== 'false';
 
         if (!viewport || !track || slides.length === 0) {
             return;
@@ -640,6 +651,13 @@ function initPublicHomeCarousels() {
             });
         };
 
+        const moveBy = (direction) => {
+            viewport.scrollBy({
+                left: slideStep() * direction,
+                behavior: reducedMotion ? 'auto' : 'smooth',
+            });
+        };
+
         const jumpTo = (index) => {
             const targetIndex = Math.max(0, Math.min(slides.length - 1, index));
             const previousScrollBehavior = viewport.style.scrollBehavior;
@@ -670,7 +688,7 @@ function initPublicHomeCarousels() {
 
         const scheduleLoopReset = () => {
             window.clearTimeout(loopResetTimer);
-            loopResetTimer = window.setTimeout(resetLoopPosition, 180);
+            loopResetTimer = window.setTimeout(resetLoopPosition, reducedMotion ? 0 : 520);
         };
 
         const stopAutoplay = () => {
@@ -683,7 +701,7 @@ function initPublicHomeCarousels() {
         const startAutoplay = () => {
             stopAutoplay();
 
-            if (reducedMotion || !isVisible || carousel.classList.contains('is-static')) {
+            if (!autoplayEnabled || reducedMotion || !isVisible || carousel.classList.contains('is-static')) {
                 return;
             }
 
@@ -698,13 +716,15 @@ function initPublicHomeCarousels() {
             resumeTimer = window.setTimeout(startAutoplay, 1800);
         };
 
-        previous?.addEventListener('click', () => {
-            goTo(currentIndex() - 1);
+        previous?.addEventListener('click', (event) => {
+            event.preventDefault();
+            moveBy(-1);
             pauseThenResume();
         });
 
-        next?.addEventListener('click', () => {
-            goTo(currentIndex() + 1);
+        next?.addEventListener('click', (event) => {
+            event.preventDefault();
+            moveBy(1);
             pauseThenResume();
         });
 
@@ -714,7 +734,7 @@ function initPublicHomeCarousels() {
             }
 
             event.preventDefault();
-            goTo(currentIndex() + (event.key === 'ArrowRight' ? 1 : -1));
+            moveBy(event.key === 'ArrowRight' ? 1 : -1);
             pauseThenResume();
         });
 
@@ -727,7 +747,6 @@ function initPublicHomeCarousels() {
             isDragging = false;
             pointerStartX = event.clientX;
             scrollStart = viewport.scrollLeft;
-            viewport.setPointerCapture?.(event.pointerId);
             stopAutoplay();
         });
 
@@ -738,9 +757,10 @@ function initPublicHomeCarousels() {
 
             const distance = event.clientX - pointerStartX;
 
-            if (Math.abs(distance) > 6) {
+            if (!isDragging && Math.abs(distance) > 6) {
                 isDragging = true;
                 viewport.classList.add('is-dragging');
+                viewport.setPointerCapture?.(event.pointerId);
             }
 
             if (isDragging) {
@@ -754,7 +774,9 @@ function initPublicHomeCarousels() {
             }
 
             isPointerDown = false;
-            viewport.releasePointerCapture?.(event.pointerId);
+            if (viewport.hasPointerCapture?.(event.pointerId)) {
+                viewport.releasePointerCapture(event.pointerId);
+            }
             viewport.classList.remove('is-dragging');
 
             if (isDragging) {
@@ -967,7 +989,8 @@ function initPublicReels() {
                 'X-CSRF-TOKEN': token,
                 'Accept': 'application/json',
             },
-        }).catch(() => {});
+        })
+            .catch(() => {});
     };
 
     const playWithSound = async (video) => {
@@ -1050,6 +1073,17 @@ function initPublicReels() {
                 return;
             }
 
+            showSoundControl(player);
+            togglePlayback(video);
+        });
+
+        player.addEventListener('keydown', (event) => {
+            if (!video || event.target.closest('[data-reel-sound-control]') || !['Enter', ' '].includes(event.key)) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
             showSoundControl(player);
             togglePlayback(video);
         });

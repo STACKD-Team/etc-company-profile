@@ -6,11 +6,15 @@ use Illuminate\Support\Facades\Http;
 
 class QdrantVectorService
 {
+    protected bool $collectionEnsured = false;
+
     public function upsert(string $pointId, array $vector, array $payload): void
     {
         if (! $this->isConfigured()) {
             return;
         }
+
+        $this->ensureCollection(count($vector));
 
         Http::withHeaders($this->headers())
             ->timeout(30)
@@ -20,6 +24,25 @@ class QdrantVectorService
                     'vector' => $vector,
                     'payload' => $payload,
                 ]],
+            ])
+            ->throw();
+    }
+
+    /**
+     * @param array<int, string> $pointIds
+     */
+    public function delete(array $pointIds): void
+    {
+        $pointIds = array_values(array_filter($pointIds));
+
+        if (! $this->isConfigured() || $pointIds === []) {
+            return;
+        }
+
+        Http::withHeaders($this->headers())
+            ->timeout(30)
+            ->post($this->baseUrl().'/collections/'.config('rag.qdrant.collection').'/points/delete?wait=true', [
+                'points' => $pointIds,
             ])
             ->throw();
     }
@@ -39,6 +62,12 @@ class QdrantVectorService
                 'vector' => $vector,
                 'limit' => $limit,
                 'with_payload' => true,
+                'filter' => [
+                    'must' => [
+                        ['key' => 'is_active', 'match' => ['value' => true]],
+                        ['key' => 'status', 'match' => ['value' => 'ready']],
+                    ],
+                ],
             ])
             ->throw()
             ->json('result', []);
@@ -52,7 +81,8 @@ class QdrantVectorService
 
     public function isConfigured(): bool
     {
-        return (bool) config('rag.qdrant.url');
+        return filled(config('rag.qdrant.url'))
+            && filled(config('rag.qdrant.collection'));
     }
 
     protected function baseUrl(): string
@@ -65,5 +95,33 @@ class QdrantVectorService
         return array_filter([
             'api-key' => config('rag.qdrant.api_key'),
         ]);
+    }
+
+    protected function ensureCollection(int $vectorSize): void
+    {
+        if ($this->collectionEnsured) {
+            return;
+        }
+
+        $collectionUrl = $this->baseUrl().'/collections/'.config('rag.qdrant.collection');
+        $exists = Http::withHeaders($this->headers())
+            ->timeout(15)
+            ->get($collectionUrl);
+
+        if ($exists->status() === 404) {
+            Http::withHeaders($this->headers())
+                ->timeout(30)
+                ->put($collectionUrl, [
+                    'vectors' => [
+                        'size' => max(1, $vectorSize),
+                        'distance' => 'Cosine',
+                    ],
+                ])
+                ->throw();
+        } else {
+            $exists->throw();
+        }
+
+        $this->collectionEnsured = true;
     }
 }

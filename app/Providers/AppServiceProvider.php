@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->registerVendorFallbackAutoloaders();
     }
 
     /**
@@ -78,5 +78,80 @@ class AppServiceProvider extends ServiceProvider
             'upload' => 10,
             'payment' => 10,
         ];
+    }
+
+    protected function registerVendorFallbackAutoloaders(): void
+    {
+        spl_autoload_register(static function (string $class): void {
+            static $cloudinaryClassFiles = null;
+
+            $prefixes = [
+                'Midtrans\\' => [base_path('vendor/midtrans/midtrans-php/Midtrans')],
+                'SnapBi\\' => [base_path('vendor/midtrans/midtrans-php/SnapBi')],
+                'Cloudinary\\' => [
+                    base_path('vendor/cloudinary/cloudinary_php/src'),
+                    base_path('vendor/cloudinary/transformation-builder-sdk/src'),
+                ],
+            ];
+
+            foreach ($prefixes as $prefix => $directories) {
+                if (! str_starts_with($class, $prefix)) {
+                    continue;
+                }
+
+                $relative = str_replace('\\', DIRECTORY_SEPARATOR, substr($class, strlen($prefix))).'.php';
+
+                foreach ($directories as $directory) {
+                    $path = $directory.DIRECTORY_SEPARATOR.$relative;
+
+                    if (is_file($path)) {
+                        require_once $path;
+
+                        return;
+                    }
+                }
+
+                if ($prefix === 'Cloudinary\\') {
+                    $cloudinaryClassFiles ??= self::cloudinaryClassFiles($directories);
+                    $shortName = substr($class, (int) strrpos($class, '\\') + 1);
+                    $path = $cloudinaryClassFiles[$shortName] ?? null;
+
+                    if (is_string($path) && is_file($path)) {
+                        require_once $path;
+
+                        return;
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * @param array<int, string> $directories
+     * @return array<string, string>
+     */
+    protected static function cloudinaryClassFiles(array $directories): array
+    {
+        $files = [];
+
+        foreach ($directories as $directory) {
+            if (! is_dir($directory)) {
+                continue;
+            }
+
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS),
+            );
+
+            foreach ($iterator as $file) {
+                if (! $file instanceof \SplFileInfo || $file->getExtension() !== 'php') {
+                    continue;
+                }
+
+                $files[$file->getBasename('.php')] ??= $file->getPathname();
+            }
+        }
+
+        return $files;
     }
 }

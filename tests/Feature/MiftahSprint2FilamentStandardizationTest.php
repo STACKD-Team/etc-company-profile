@@ -130,7 +130,7 @@ it('renders the complete Miftah public discovery surface after standardization',
         ->assertRedirect(route('public.reels.index', ['reel' => $reel->getKey()]));
 });
 
-it('keeps Miftah reels vertical, sound ready, and free from view or like controls', function () {
+it('keeps Miftah reels vertical, sound ready, and equipped with controlled social actions', function () {
     $reel = Reel::query()->create([
         'title' => 'Sprint 2 Sound Reel',
         'description' => 'Reel vertikal dengan audio aktif.',
@@ -150,12 +150,12 @@ it('keeps Miftah reels vertical, sound ready, and free from view or like control
         ->assertSee('data-reel-player', false)
         ->assertSee('data-reel-playback-indicator', false)
         ->assertSee('public-reel-caption-panel', false)
-        ->assertDontSee('Klik video untuk pause atau lanjutkan.')
+        ->assertDontSee('data-reel-view-count', false)
         ->assertDontSee('data-like-endpoint', false)
         ->assertDontSee('public-reel-actions', false)
-        ->assertDontSee('muted', false)
-        ->assertDontSee('visibility')
-        ->assertDontSee('favorite');
+        ->assertDontSee('favorite_border')
+        ->assertDontSee('Klik video untuk pause atau lanjutkan.')
+        ->assertDontSee('muted', false);
 
     $this->get(route('public.reels.show', $reel))
         ->assertRedirect(route('public.reels.index', ['reel' => $reel->getKey()]));
@@ -176,5 +176,7 @@ it('keeps Miftah reels vertical, sound ready, and free from view or like control
         ->toContain("feed.addEventListener('touchstart'")
         ->toContain("feed.addEventListener('touchend'")
         ->toContain("feed.addEventListener('click'")
-        ->toContain('feed.scrollTo({');
+        ->toContain('feed.scrollTo({')
+        ->not->toContain("document.querySelectorAll('[data-reel-like]')")
+        ->toContain("player.addEventListener('keydown'");
 });

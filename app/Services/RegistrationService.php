@@ -275,8 +275,9 @@ class RegistrationService extends BaseCrudService
 
     protected function applyFilters(Builder $query, array $filters): Builder
     {
-        $query = $this->whereLike($query, ['applicant_name', 'applicant_email'], $filters['search'] ?? null)
+        $query = $this->whereLike($query, ['registration_code', 'applicant_name', 'applicant_email', 'midtrans_order_id', 'payment_gateway_id', 'program_promotion_title'], $filters['search'] ?? null)
             ->when($filters['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $status))
+            ->when($filters['payment_status'] ?? null, fn (Builder $query, string $status) => $query->where('payment_status', $status))
             ->when($filters['payment_method'] ?? null, fn (Builder $query, string $method) => $query->where('payment_method', $method))
             ->when($filters['program_id'] ?? null, fn (Builder $query, int|string $programId) => $query->where('program_id', $programId))
             ->when($filters['class_id'] ?? null, fn (Builder $query, int|string $classId) => $query->where('class_id', $classId));

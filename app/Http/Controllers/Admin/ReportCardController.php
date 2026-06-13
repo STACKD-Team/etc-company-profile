@@ -24,7 +24,7 @@ class ReportCardController extends Controller
             $filters['is_published'] = $request->boolean('is_published');
         }
 
-        return view('pages.admin.placement-test.index', [
+        return view('pages.admin.report-card.index', [
             'title' => 'Rapor',
             'active' => 'reports',
             'items' => $reportCards->adminPaginate($filters, 10),
@@ -36,7 +36,7 @@ class ReportCardController extends Controller
                 'issued_at' => ['label' => 'Terbit', 'sortable' => true, 'filter' => ['type' => 'date', 'name' => 'issued_from']],
                 'actions' => 'Aksi',
             ],
-            'rowView' => 'pages.admin.placement-test.partials.report-card-row',
+            'rowView' => 'pages.admin.report-card.partials.row',
             'empty' => 'Belum ada rapor.',
             'emptyDescription' => 'Rapor akan tampil setelah dibuat dari enrollment siswa.',
             'searchPlaceholder' => 'Cari siswa atau kelas',
@@ -49,7 +49,7 @@ class ReportCardController extends Controller
 
     public function create(): View
     {
-        return view('pages.admin.placement-test.report-card-form', [
+        return view('pages.admin.report-card.form', [
             'title' => 'Buat Rapor',
             'reportCard' => new ReportCard,
             'enrollments' => Enrollment::query()->with('user', 'courseClass')->latest()->get(),
@@ -71,7 +71,7 @@ class ReportCardController extends Controller
     {
         $reportCard->load('enrollment.user', 'enrollment.courseClass', 'instructor', 'academicDirector', 'managingDirector');
 
-        return view('pages.admin.placement-test.report-card-preview', [
+        return view('pages.admin.report-card.show', [
             'title' => 'Preview Rapor',
             'reportCard' => $reportCard,
             'documentHtml' => $documents->reportCardHtml($reportCard),
@@ -80,7 +80,7 @@ class ReportCardController extends Controller
 
     public function edit(ReportCard $reportCard): View
     {
-        return view('pages.admin.placement-test.report-card-form', [
+        return view('pages.admin.report-card.form', [
             'title' => 'Edit Rapor',
             'reportCard' => $reportCard,
             'enrollments' => Enrollment::query()->with('user', 'courseClass')->latest()->get(),

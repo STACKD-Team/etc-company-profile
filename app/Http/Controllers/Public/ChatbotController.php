@@ -8,7 +8,9 @@ use App\Services\ChatbotLogService;
 use App\Services\PublicDiscoveryService;
 use App\Services\RagChatService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Throwable;
 
 class ChatbotController extends Controller
 {
@@ -22,7 +24,14 @@ class ChatbotController extends Controller
         $sessionId = $data['session_id'] ?? $request->session()->get('public_chatbot_session_id') ?? (string) Str::uuid();
         $request->session()->put('public_chatbot_session_id', $sessionId);
 
-        $answer = $rag->answer($data['message']);
+        try {
+            $answer = $rag->answer($data['message']);
+        } catch (Throwable $exception) {
+            Log::warning('Public chatbot could not start the RAG flow.', [
+                'exception' => $exception::class,
+            ]);
+            $answer = ['intent' => 'rag_fallback'];
+        }
 
         if ($answer['intent'] === 'rag_fallback') {
             $answer = $discovery->answerChatbot($data['message']);

@@ -14,11 +14,11 @@
         <x-ui.button :href="route('instructor.report-cards.index')" outlined icon="heroicon-m-arrow-left">
             Kembali
         </x-ui.button>
-        @unless ($reportCard->is_published)
+        @if ($canEdit)
             <x-ui.button :href="route('instructor.report-cards.edit', $reportCard)" icon="heroicon-m-pencil-square">
                 Edit Draft
             </x-ui.button>
-        @endunless
+        @endif
     </x-slot:headerActions>
 
     @if (session('status'))
@@ -29,6 +29,10 @@
         @if ($reportCard->is_published)
             <x-ui.alert status="info" title="Rapor sudah dipublish">
                 Rapor ini hanya dapat ditinjau oleh instructor. Perubahan dan publish tetap menjadi kewenangan admin.
+            </x-ui.alert>
+        @elseif (! $canEdit)
+            <x-ui.alert status="info" title="Assessment hanya dapat ditinjau">
+                Kamu tetap dapat melihat assessment yang pernah dibuat, tetapi pengeditan mengikuti instructor kelas saat ini.
             </x-ui.alert>
         @endif
 
