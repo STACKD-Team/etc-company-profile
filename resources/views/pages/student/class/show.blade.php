@@ -39,7 +39,7 @@
                 </div>
                 <div class="rounded-box bg-etc-surface-container p-4">
                     <dt class="text-sm font-bold text-etc-on-muted">Ruangan</dt>
-                    <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $class->room ?? '-' }}</dd>
+                    <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $class->room_label ?? '-' }}</dd>
                 </div>
                 <div class="rounded-box bg-etc-surface-container p-4">
                     <dt class="text-sm font-bold text-etc-on-muted">Status Kelas</dt>

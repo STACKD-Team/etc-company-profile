@@ -181,7 +181,7 @@ it('loads public discovery seed data idempotently', function () {
     $this->seed(\Database\Seeders\PublicDiscoverySeeder::class);
     $this->seed(\Database\Seeders\PublicDiscoverySeeder::class);
 
-    expect(Content::query()->where('type', 'page')->where('slug', 'about')->count())->toBe(1)
+    expect(Content::query()->where('type', 'profile')->where('slug', 'about')->count())->toBe(1)
         ->and(Reel::query()->where('is_published', true)->count())->toBeGreaterThan(0)
         ->and(User::query()->instructors()->where('show_on_team_page', true)->count())->toBeGreaterThan(0);
 });

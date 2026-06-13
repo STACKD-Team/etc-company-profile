@@ -42,7 +42,7 @@ class ContentService extends BaseCrudService
     public function settings(array $slugs = []): Collection
     {
         return Content::query()
-            ->where('type', 'setting')
+            ->where('type', Content::TYPE_PROFILE)
             ->when($slugs !== [], fn (Builder $query) => $query->whereIn('slug', $slugs))
             ->get()
             ->keyBy('slug');
@@ -57,7 +57,7 @@ class ContentService extends BaseCrudService
         DB::transaction(function () use ($values, $labels, $qrisImage): void {
             foreach ($labels as $slug => $title) {
                 $content = Content::query()->firstOrNew([
-                    'type' => 'setting',
+                    'type' => Content::TYPE_PROFILE,
                     'slug' => $slug,
                 ]);
 

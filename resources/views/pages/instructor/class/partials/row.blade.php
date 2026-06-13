@@ -6,7 +6,7 @@
     <td class="py-4 pr-4">
         <span class="block">{{ $item->schedule_days ?? '-' }}</span>
         <span class="mt-1 block text-xs text-etc-on-muted">{{ $item->schedule_time ?? '-' }}</span>
-        <span class="mt-1 block text-xs text-etc-on-muted">{{ $item->room ?? '-' }}</span>
+        <span class="mt-1 block text-xs text-etc-on-muted">{{ $item->room_label ?? '-' }}</span>
     </td>
     <td class="py-4 pr-4">{{ $item->enrollments_count }}</td>
     <td class="py-4 pr-4"><x-ui.badge :status="$item->status" /></td>

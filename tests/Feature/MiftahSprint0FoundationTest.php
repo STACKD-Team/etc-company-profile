@@ -5,6 +5,7 @@ use App\Models\ContactMessage;
 use App\Models\Content;
 use App\Models\Program;
 use App\Models\Reel;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
@@ -98,7 +99,7 @@ it('renders all Miftah pages through the shared public layout', function () {
     $reel = miftahSprint0Reel();
 
     Content::query()->create([
-        'type' => 'page',
+        'type' => 'profile',
         'title' => 'Tentang ETC Planet',
         'slug' => 'about',
         'body' => 'Profil ETC Planet.',
@@ -107,21 +108,19 @@ it('renders all Miftah pages through the shared public layout', function () {
     ]);
 
     Content::query()->create([
-        'type' => 'page',
-        'title' => 'FAQ ETC Planet',
-        'slug' => 'faq',
-        'body' => 'Pertanyaan umum.',
-        'meta' => ['items' => [['question' => 'Bagaimana cara daftar?', 'answer' => 'Pilih program lalu isi form.']]],
+        'type' => 'faq',
+        'title' => 'Bagaimana cara daftar?',
+        'slug' => 'faq-daftar',
+        'body' => 'Pilih program lalu isi form.',
+        'meta' => [],
         'is_published' => true,
     ]);
 
-    Content::query()->create([
-        'type' => 'room',
-        'title' => 'Ruang Belajar',
-        'slug' => 'ruang-belajar',
-        'body' => 'Ruang belajar nyaman.',
-        'meta' => ['facilities' => ['AC', 'Projector']],
-        'is_published' => true,
+    Room::query()->create([
+        'name' => 'Ruang Belajar',
+        'description' => 'Ruang belajar nyaman.',
+        'facilities' => ['AC', 'Projector'],
+        'is_active' => true,
     ]);
 
     Content::query()->create([

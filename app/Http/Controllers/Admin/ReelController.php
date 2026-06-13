@@ -19,7 +19,7 @@ class ReelController extends Controller
 
     public function index(Request $request): View
     {
-        return view('admin.reels.index', [
+        return view('pages.admin.reel.index', [
             'reels' => $this->reels->adminPaginate($this->filters($request), 12),
             'categories' => self::CATEGORIES,
         ]);
@@ -27,7 +27,7 @@ class ReelController extends Controller
 
     public function create(): View
     {
-        return view('admin.reels.create', [
+        return view('pages.admin.reel.create', [
             'reel' => new Reel(['category' => 'edukasi']),
             'categories' => self::CATEGORIES,
         ]);
@@ -41,14 +41,22 @@ class ReelController extends Controller
             $data['published_at'] = now();
         }
 
-        $this->reels->createWithMedia($data, $request->file('video'), $request->file('thumbnail'));
+        $reel = $this->reels->createWithMedia($data, $request->file('video'), $request->file('thumbnail'));
 
-        return to_route('admin.reels.index')->with('status', 'Reel berhasil diupload.');
+        return to_route('admin.reel.show', $reel)->with('status', 'Reel berhasil diupload.');
+    }
+
+    public function show(Reel $reel): View
+    {
+        return view('pages.admin.reel.show', [
+            'reel' => $reel,
+            'categories' => self::CATEGORIES,
+        ]);
     }
 
     public function edit(Reel $reel): View
     {
-        return view('admin.reels.edit', [
+        return view('pages.admin.reel.edit', [
             'reel' => $reel,
             'categories' => self::CATEGORIES,
         ]);
@@ -61,7 +69,7 @@ class ReelController extends Controller
 
         $this->reels->updateWithMedia($reel, $data, $request->file('video'), $request->file('thumbnail'));
 
-        return to_route('admin.reels.index')->with('status', 'Reel berhasil diperbarui.');
+        return to_route('admin.reel.show', $reel)->with('status', 'Reel berhasil diperbarui.');
     }
 
     private function payload(Request $request): array

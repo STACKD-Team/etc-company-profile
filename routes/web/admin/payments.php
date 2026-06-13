@@ -8,8 +8,11 @@ Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth', 'role:admin'])
     ->group(function (): void {
-        Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
-        Route::get('/payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
-        Route::post('/payments/{payment}/verify', [PaymentVerificationController::class, 'verify'])->name('payments.verify');
-        Route::post('/payments/{payment}/reject', [PaymentVerificationController::class, 'reject'])->name('payments.reject');
+        Route::redirect('/payments', '/admin/payment')->name('legacy.payments.index');
+        Route::redirect('/payments/{payment}', '/admin/payment/{payment}')->name('legacy.payments.show');
+
+        Route::get('/payment', [PaymentController::class, 'index'])->name('payment.index');
+        Route::get('/payment/{payment}', [PaymentController::class, 'show'])->name('payment.show');
+        Route::post('/payment/{payment}/verify', [PaymentVerificationController::class, 'verify'])->name('payment.verify');
+        Route::post('/payment/{payment}/reject', [PaymentVerificationController::class, 'reject'])->name('payment.reject');
     });

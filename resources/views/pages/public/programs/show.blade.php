@@ -181,8 +181,8 @@
                         <div class="mt-6 rounded-card bg-etc-surface-container p-4">
                             <p class="font-heading text-lg font-bold">{{ $scheduleDays }}</p>
                             <p class="mt-1 text-sm text-etc-on-muted">{{ $scheduleTime }}</p>
-                            @if ($featuredClass?->room)
-                                <x-ui.badge color="gray" class="mt-4">{{ $featuredClass->room }}</x-ui.badge>
+                            @if ($featuredClass?->room_label)
+                                <x-ui.badge color="gray" class="mt-4">{{ $featuredClass->room_label }}</x-ui.badge>
                             @endif
                         </div>
                     </article>

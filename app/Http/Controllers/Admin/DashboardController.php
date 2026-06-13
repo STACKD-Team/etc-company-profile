@@ -10,7 +10,7 @@ class DashboardController extends Controller
 {
     public function index(AdminDashboardService $dashboard): View
     {
-        return view('admin.dashboard', [
+        return view('pages.admin.dashboard.index', [
             'summary' => $dashboard->summary(),
             'latestRegistrations' => $dashboard->latestRegistrations(),
         ]);

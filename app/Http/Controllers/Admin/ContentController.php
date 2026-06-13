@@ -14,62 +14,90 @@ use Illuminate\View\View;
 
 class ContentController extends Controller
 {
-    private const TYPES = ['page', 'gallery', 'partner', 'room', 'team_member_extra', 'setting'];
+    private const TYPES = \App\Models\Content::TYPES;
 
     public function __construct(private ContentService $contents) {}
 
-    public function index(Request $request): View
+    public function index(Request $request, ?string $contentType = null): View
     {
-        return view('admin.contents.index', [
+        $contentType = $this->contentType($request, $contentType);
+
+        return view($this->viewName($contentType, 'index'), [
             'contents' => $this->contents->adminPaginate($this->filters($request), 12),
             'types' => self::TYPES,
+            ...$this->viewData($contentType),
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request, ?string $contentType = null): View
     {
-        return view('admin.contents.create', [
-            'content' => new Content(['type' => 'page', 'is_published' => true]),
+        $contentType = $this->contentType($request, $contentType);
+
+        return view($this->viewName($contentType, 'create'), [
+            'content' => new Content(['type' => $contentType, 'is_published' => true]),
             'types' => self::TYPES,
+            ...$this->viewData($contentType),
         ]);
     }
 
-    public function store(StoreContentRequest $request): RedirectResponse
+    public function store(StoreContentRequest $request, ?string $contentType = null): RedirectResponse
     {
-        $this->contents->createWithMedia(
-            $this->payload($request),
+        $contentType = $this->contentType($request, $contentType);
+
+        $content = $this->contents->createWithMedia(
+            $this->payload($request, $contentType),
             $request->file('image'),
             $request->file('images', []),
         );
 
-        return to_route('admin.contents.index')->with('status', 'Konten berhasil dibuat.');
+        return to_route('admin.'.$contentType.'.show', $content)->with('status', $this->label($contentType).' berhasil dibuat.');
     }
 
-    public function edit(Content $content): View
+    public function show(Request $request, Content $content, ?string $contentType = null): View
     {
-        return view('admin.contents.edit', [
+        $contentType = $this->contentType($request, $contentType);
+        abort_unless($content->type === $contentType, 404);
+
+        return view($this->viewName($contentType, 'show'), [
             'content' => $content,
             'types' => self::TYPES,
+            ...$this->viewData($contentType),
         ]);
     }
 
-    public function update(UpdateContentRequest $request, Content $content): RedirectResponse
+    public function edit(Request $request, Content $content, ?string $contentType = null): View
     {
+        $contentType = $this->contentType($request, $contentType);
+        abort_unless($content->type === $contentType, 404);
+
+        return view($this->viewName($contentType, 'edit'), [
+            'content' => $content,
+            'types' => self::TYPES,
+            ...$this->viewData($contentType),
+        ]);
+    }
+
+    public function update(UpdateContentRequest $request, Content $content, ?string $contentType = null): RedirectResponse
+    {
+        $contentType = $this->contentType($request, $contentType);
+        abort_unless($content->type === $contentType, 404);
+
         $this->contents->updateWithMedia(
             $content,
-            $this->payload($request),
+            $this->payload($request, $contentType),
             $request->file('image'),
             $request->file('images', []),
         );
 
-        return to_route('admin.contents.index')->with('status', 'Konten berhasil diperbarui.');
+        return to_route('admin.'.$contentType.'.show', $content)->with('status', $this->label($contentType).' berhasil diperbarui.');
     }
 
-    private function payload(Request $request): array
+    private function payload(Request $request, string $contentType): array
     {
         $data = $request->validated();
         unset($data['image'], $data['images']);
 
+        $data['type'] = $contentType;
         $data['slug'] = filled($data['slug'] ?? null) ? Str::slug($data['slug']) : Str::slug($data['title']);
         $data['display_order'] = $data['display_order'] ?? 0;
         $data['is_published'] = $request->boolean('is_published');
@@ -83,11 +111,63 @@ class ContentController extends Controller
     private function filters(Request $request): array
     {
         $filters = $request->only(['search', 'type', 'sort', 'direction']);
+        $filters['type'] = $this->contentType($request, $filters['type'] ?? null);
 
         if ($request->filled('is_published')) {
             $filters['is_published'] = $request->boolean('is_published');
         }
 
         return $filters;
+    }
+
+    private function contentType(Request $request, ?string $contentType = null): string
+    {
+        $contentType = $contentType ?: $request->route('contentType') ?: Content::TYPE_GALLERY;
+        abort_unless(in_array($contentType, [Content::TYPE_GALLERY, Content::TYPE_PARTNER, Content::TYPE_TESTIMONIAL, Content::TYPE_FAQ], true), 404);
+
+        return $contentType;
+    }
+
+    private function viewData(string $contentType): array
+    {
+        return [
+            'contentType' => $contentType,
+            'pageTitle' => $this->label($contentType),
+            'routeBase' => 'admin.'.$contentType,
+            'viewBase' => 'pages.admin.'.$contentType,
+            'rowView' => 'pages.admin.'.$contentType.'.partials.row',
+            'metaFields' => $this->metaFields($contentType),
+        ];
+    }
+
+    private function viewName(string $contentType, string $page): string
+    {
+        return 'pages.admin.'.$contentType.'.'.$page;
+    }
+
+    private function label(string $contentType): string
+    {
+        return match ($contentType) {
+            Content::TYPE_PARTNER => 'Partner',
+            Content::TYPE_TESTIMONIAL => 'Testimonial',
+            Content::TYPE_FAQ => 'FAQ',
+            default => 'Gallery',
+        };
+    }
+
+    private function metaFields(string $contentType): array
+    {
+        return match ($contentType) {
+            Content::TYPE_PARTNER => [
+                'category' => 'Kategori',
+                'website' => 'Link Website',
+                'since' => 'Tahun Kerja Sama',
+            ],
+            Content::TYPE_TESTIMONIAL => [
+                'role' => 'Role',
+                'rating' => 'Rating',
+            ],
+            default => [],
+        };
     }
 }

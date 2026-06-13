@@ -19,7 +19,7 @@ it('protects all Miftah sprint 6 admin pages', function () {
         'video_path' => 'videos/video1.mp4',
     ]);
     $content = Content::query()->create([
-        'type' => 'page',
+        'type' => 'gallery',
         'title' => 'Protected Content',
         'slug' => 'protected-content',
     ]);
@@ -30,16 +30,16 @@ it('protects all Miftah sprint 6 admin pages', function () {
     ]);
 
     $urls = [
-        route('admin.reels.index'),
-        route('admin.reels.create'),
-        route('admin.reels.edit', $reel),
-        route('admin.contents.index'),
-        route('admin.contents.create'),
-        route('admin.contents.edit', $content),
-        route('admin.contact-messages.index'),
-        route('admin.contact-messages.show', $message),
-        route('admin.chatbot-logs.index'),
-        route('admin.settings.index'),
+        route('admin.reel.index'),
+        route('admin.reel.create'),
+        route('admin.reel.edit', $reel),
+        route('admin.gallery.index'),
+        route('admin.gallery.create'),
+        route('admin.gallery.edit', $content),
+        route('admin.contact-message.index'),
+        route('admin.contact-message.show', $message),
+        route('admin.chatbot-log.index'),
+        route('admin.profile.index'),
     ];
 
     foreach ($urls as $url) {
@@ -60,7 +60,7 @@ it('renders every Miftah sprint 6 admin page without placeholders', function () 
         'published_at' => now(),
     ]);
     $content = Content::query()->create([
-        'type' => 'room',
+        'type' => 'gallery',
         'title' => 'Studio Conversation',
         'slug' => 'studio-conversation',
         'body' => 'Ruang kelas nyaman.',
@@ -80,16 +80,16 @@ it('renders every Miftah sprint 6 admin page without placeholders', function () 
     ]);
 
     foreach ([
-        route('admin.reels.index') => 'Admin Reels',
-        route('admin.reels.create') => 'Tambah Reel',
-        route('admin.reels.edit', $reel) => 'Edit Reel',
-        route('admin.contents.index') => 'CMS Konten',
-        route('admin.contents.create') => 'Tambah Konten',
-        route('admin.contents.edit', $content) => 'Edit Konten',
-        route('admin.contact-messages.index') => 'Pesan Kontak',
-        route('admin.contact-messages.show', $message) => 'Detail Pesan',
-        route('admin.chatbot-logs.index') => 'Chatbot Logs',
-        route('admin.settings.index') => 'Settings',
+        route('admin.reel.index') => 'Admin Reels',
+        route('admin.reel.create') => 'Tambah Reel',
+        route('admin.reel.edit', $reel) => 'Edit Reel',
+        route('admin.gallery.index') => 'Gallery',
+        route('admin.gallery.create') => 'Tambah Gallery',
+        route('admin.gallery.edit', $content) => 'Edit Gallery',
+        route('admin.contact-message.index') => 'Pesan Kontak',
+        route('admin.contact-message.show', $message) => 'Detail Pesan',
+        route('admin.chatbot-log.index') => 'Chatbot Logs',
+        route('admin.profile.index') => 'Profile',
     ] as $url => $text) {
         $this->actingAs($admin)
             ->get($url)
@@ -105,7 +105,7 @@ it('creates and updates reels with media and publish state', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $this->actingAs($admin)
-        ->post(route('admin.reels.store'), [
+        ->post(route('admin.reel.store'), [
             'title' => 'Class Activity Reel',
             'description' => 'Dokumentasi kelas speaking.',
             'category' => 'dokumentasi',
@@ -114,7 +114,7 @@ it('creates and updates reels with media and publish state', function () {
             'video' => UploadedFile::fake()->create('activity.mp4', 1000, 'video/mp4'),
             'thumbnail' => UploadedFile::fake()->image('activity.jpg'),
         ])
-        ->assertRedirect(route('admin.reels.index'))
+        ->assertRedirect(route('admin.reel.show', 1))
         ->assertSessionHasNoErrors();
 
     $reel = Reel::query()->where('title', 'Class Activity Reel')->firstOrFail();
@@ -128,13 +128,13 @@ it('creates and updates reels with media and publish state', function () {
     Storage::disk('public')->assertExists($reel->thumbnail_path);
 
     $this->actingAs($admin)
-        ->put(route('admin.reels.update', $reel), [
+        ->put(route('admin.reel.update', $reel), [
             'title' => 'Class Activity Reel Updated',
             'description' => 'Update caption.',
             'category' => 'event',
             'duration_seconds' => 55,
         ])
-        ->assertRedirect(route('admin.reels.index'))
+        ->assertRedirect(route('admin.reel.show', $reel))
         ->assertSessionHasNoErrors();
 
     $reel->refresh();
@@ -150,7 +150,7 @@ it('creates and updates cms contents with media and meta data', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $this->actingAs($admin)
-        ->post(route('admin.contents.store'), [
+        ->post(route('admin.gallery.store'), [
             'type' => 'gallery',
             'title' => 'Open House Gallery',
             'slug' => 'open-house-gallery',
@@ -167,7 +167,7 @@ it('creates and updates cms contents with media and meta data', function () {
                 UploadedFile::fake()->image('gallery-2.jpg'),
             ],
         ])
-        ->assertRedirect(route('admin.contents.index'))
+        ->assertRedirect(route('admin.gallery.show', 1))
         ->assertSessionHasNoErrors();
 
     $content = Content::query()->where('slug', 'open-house-gallery')->firstOrFail();
@@ -178,25 +178,24 @@ it('creates and updates cms contents with media and meta data', function () {
         ->and($content->images)->toHaveCount(2);
 
     $this->actingAs($admin)
-        ->put(route('admin.contents.update', $content), [
-            'type' => 'room',
-            'title' => 'Studio Speaking',
+        ->put(route('admin.gallery.update', $content), [
+            'type' => 'faq',
+            'title' => 'Open House Gallery Updated',
             'slug' => 'studio-speaking',
-            'body' => 'Ruang speaking baru.',
+            'body' => 'Dokumentasi open house diperbarui.',
             'display_order' => 1,
             'meta' => [
-                'capacity' => '12',
-                'facility' => 'AC, Projector, Whiteboard',
+                'location' => 'Padang',
             ],
         ])
-        ->assertRedirect(route('admin.contents.index'))
+        ->assertRedirect(route('admin.gallery.show', $content))
         ->assertSessionHasNoErrors();
 
     $content->refresh();
 
-    expect($content->type)->toBe('room')
+    expect($content->type)->toBe('gallery')
         ->and($content->slug)->toBe('studio-speaking')
-        ->and($content->meta['capacity'])->toBe('12')
+        ->and($content->meta['location'])->toBe('Padang')
         ->and($content->is_published)->toBeFalse();
 });
 
@@ -204,12 +203,12 @@ it('validates invalid reel and content submissions', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $this->actingAs($admin)
-        ->post(route('admin.reels.store'), [])
+        ->post(route('admin.reel.store'), [])
         ->assertSessionHasErrors(['title', 'video']);
 
     $this->actingAs($admin)
-        ->post(route('admin.contents.store'), [])
-        ->assertSessionHasErrors(['type', 'title']);
+        ->post(route('admin.gallery.store'), [])
+        ->assertSessionHasErrors(['title']);
 });
 
 it('lists contact messages, marks detail as read, and filters chatbot logs', function () {
@@ -238,20 +237,20 @@ it('lists contact messages, marks detail as read, and filters chatbot logs', fun
     ]);
 
     $this->actingAs($admin)
-        ->get(route('admin.contact-messages.index', ['search' => 'Calon']))
+        ->get(route('admin.contact-message.index', ['search' => 'Calon']))
         ->assertOk()
         ->assertSee('Calon Siswa')
         ->assertSee('Baru');
 
     $this->actingAs($admin)
-        ->get(route('admin.contact-messages.show', $message))
+        ->get(route('admin.contact-message.show', $message))
         ->assertOk()
         ->assertSee('Apakah ada kelas weekend?');
 
     expect($message->refresh()->is_read)->toBeTrue();
 
     $this->actingAs($admin)
-        ->get(route('admin.chatbot-logs.index', ['intent' => 'pricing']))
+        ->get(route('admin.chatbot-log.index', ['intent' => 'pricing']))
         ->assertOk()
         ->assertSee('Berapa biaya pendaftaran?')
         ->assertDontSee('Ada program apa?');
@@ -264,12 +263,12 @@ it('updates settings through contents and exposes updated public contact data', 
     $this->seed(\Database\Seeders\PublicDiscoverySeeder::class);
 
     $this->actingAs($admin)
-        ->get(route('admin.settings.index'))
+        ->get(route('admin.profile.index'))
         ->assertOk()
         ->assertSee('Jl. S. Parman');
 
     $this->actingAs($admin)
-        ->put(route('admin.settings.update'), [
+        ->put(route('admin.profile.update'), [
             'address' => 'Jl. Sprint 6 No. 1, Padang',
             'phone' => '+62 812-9999-0000',
             'email' => 'sprint6@etcplanet.test',
@@ -281,12 +280,12 @@ it('updates settings through contents and exposes updated public contact data', 
             'payment_notes' => 'Konfirmasi pembayaran ke admin.',
             'qris' => UploadedFile::fake()->image('qris.png'),
         ])
-        ->assertRedirect(route('admin.settings.index'))
+        ->assertRedirect(route('admin.profile.index'))
         ->assertSessionHasNoErrors();
 
-    expect(Content::query()->where('type', 'setting')->where('slug', 'address')->first()?->meta['value'])->toBe('Jl. Sprint 6 No. 1, Padang')
-        ->and(Content::query()->where('type', 'setting')->where('slug', 'bank_name')->first()?->meta['value'])->toBe('BCA')
-        ->and(Content::query()->where('type', 'setting')->where('slug', 'qris')->first()?->image)->toStartWith('settings/');
+    expect(Content::query()->where('type', 'profile')->where('slug', 'address')->first()?->meta['value'])->toBe('Jl. Sprint 6 No. 1, Padang')
+        ->and(Content::query()->where('type', 'profile')->where('slug', 'bank_name')->first()?->meta['value'])->toBe('BCA')
+        ->and(Content::query()->where('type', 'profile')->where('slug', 'qris')->first()?->image)->toStartWith('settings/');
 
     $this->get(route('public.contact.index'))
         ->assertOk()
@@ -297,21 +296,21 @@ it('updates settings through contents and exposes updated public contact data', 
 
 it('keeps all documented Miftah sprint 6 route names registered', function () {
     foreach ([
-        'admin.reels.index',
-        'admin.reels.create',
-        'admin.reels.store',
-        'admin.reels.edit',
-        'admin.reels.update',
-        'admin.contents.index',
-        'admin.contents.create',
-        'admin.contents.store',
-        'admin.contents.edit',
-        'admin.contents.update',
-        'admin.contact-messages.index',
-        'admin.contact-messages.show',
-        'admin.chatbot-logs.index',
-        'admin.settings.index',
-        'admin.settings.update',
+        'admin.reel.index',
+        'admin.reel.create',
+        'admin.reel.store',
+        'admin.reel.edit',
+        'admin.reel.update',
+        'admin.gallery.index',
+        'admin.gallery.create',
+        'admin.gallery.store',
+        'admin.gallery.edit',
+        'admin.gallery.update',
+        'admin.contact-message.index',
+        'admin.contact-message.show',
+        'admin.chatbot-log.index',
+        'admin.profile.index',
+        'admin.profile.update',
     ] as $routeName) {
         expect(Route::has($routeName))->toBeTrue($routeName);
     }

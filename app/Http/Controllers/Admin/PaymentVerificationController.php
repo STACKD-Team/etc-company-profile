@@ -24,13 +24,13 @@ class PaymentVerificationController extends Controller
             true,
         );
 
-        return to_route('admin.payments.show', $payment)->with('status', 'Pembayaran berhasil diverifikasi.');
+        return to_route('admin.payment.show', $payment)->with('status', 'Pembayaran berhasil diverifikasi.');
     }
 
     public function reject(RejectPaymentRequest $request, Registration $payment): RedirectResponse
     {
         $this->registrationService->reject($payment, $request->validated('notes'));
 
-        return to_route('admin.payments.show', $payment)->with('status', 'Pembayaran ditolak dan catatan tersimpan.');
+        return to_route('admin.payment.show', $payment)->with('status', 'Pembayaran ditolak dan catatan tersimpan.');
     }
 }

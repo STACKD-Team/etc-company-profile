@@ -133,7 +133,7 @@ it('performs CRUD operations through all model services', function () {
     ]);
 
     $content = $contents->create([
-        'type' => 'page',
+        'type' => 'profile',
         'title' => 'Tentang ETC',
         'slug' => 'tentang-etc',
         'body' => 'Profil ETC Planet.',

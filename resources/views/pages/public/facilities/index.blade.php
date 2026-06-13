@@ -19,19 +19,21 @@
                 <div class="grid gap-5 md:grid-cols-3">
                     @foreach ($rooms as $room)
                         <article class="public-card overflow-hidden public-reveal" data-public-reveal>
-                            <img src="{{ $assetUrl($room->image) }}" alt="{{ $room->title }}" class="h-56 w-full object-cover">
+                            <img src="{{ $assetUrl($room->image) }}" alt="{{ $room->name }}" class="h-56 w-full object-cover">
                             <div class="p-5">
-                                <h2 class="font-heading text-xl font-bold">{{ $room->title }}</h2>
-                                <p class="mt-3 min-h-20 text-sm leading-7 text-etc-on-muted">{{ $room->body }}</p>
-                                <div class="mt-5 flex flex-wrap gap-2">
-                                    @foreach (($room->meta['facility'] ?? []) as $facility)
-                                        <x-ui.badge color="gray">{{ $facility }}</x-ui.badge>
-                                    @endforeach
-                                </div>
-                                @if ($room->meta['capacity'] ?? null)
+                                <h2 class="font-heading text-xl font-bold">{{ $room->name }}</h2>
+                                <p class="mt-3 min-h-20 text-sm leading-7 text-etc-on-muted">{{ $room->description }}</p>
+                                @if ($room->facilities)
+                                    <div class="mt-5 flex flex-wrap gap-2">
+                                        @foreach ($room->facilities as $facility)
+                                            <x-ui.badge color="gray">{{ $facility }}</x-ui.badge>
+                                        @endforeach
+                                    </div>
+                                @endif
+                                @if ($room->capacity)
                                     <p class="mt-5 flex items-center gap-2 text-sm font-bold text-etc-magenta">
                                         <span class="material-symbols-outlined text-base">groups</span>
-                                        Kapasitas {{ $room->meta['capacity'] }} siswa
+                                        Kapasitas {{ $room->capacity }} siswa
                                     </p>
                                 @endif
                             </div>

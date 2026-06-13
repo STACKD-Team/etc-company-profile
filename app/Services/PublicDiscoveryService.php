@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Content;
 use App\Models\Program;
 use App\Models\Reel;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
@@ -15,18 +16,22 @@ class PublicDiscoveryService
     public function page(string $slug): ?Content
     {
         return Content::query()
-            ->where('type', 'page')
+            ->where('type', Content::TYPE_PROFILE)
             ->where('slug', $slug)
             ->where('is_published', true)
             ->first();
     }
 
     /**
-     * @return Collection<int, Content>
+     * @return Collection<int, Room>
      */
     public function rooms(): Collection
     {
-        return $this->publishedContent('room')->get();
+        return Room::query()
+            ->where('is_active', true)
+            ->orderBy('display_order')
+            ->orderBy('name')
+            ->get();
     }
 
     /**
@@ -99,12 +104,18 @@ class PublicDiscoveryService
     public function settings(): array
     {
         return Content::query()
-            ->where('type', 'setting')
+            ->where('type', Content::TYPE_PROFILE)
             ->where('is_published', true)
             ->get()
             ->mapWithKeys(function (Content $content): array {
                 if ($content->slug === 'qris' && $content->image) {
                     return ['qris' => $this->mediaUrl($content->image)];
+                }
+
+                if ($content->slug === 'company-profile' && is_array($content->meta)) {
+                    return collect($content->meta)
+                        ->filter(fn ($value): bool => is_scalar($value) && filled($value))
+                        ->all();
                 }
 
                 $value = $content->meta['value'] ?? $content->body ?? null;
@@ -141,11 +152,20 @@ class PublicDiscoveryService
      */
     public function faqItems(): array
     {
-        $page = $this->page('faq');
-        $items = $page?->meta['items'] ?? [];
+        $items = Content::query()
+            ->where('type', Content::TYPE_FAQ)
+            ->where('is_published', true)
+            ->orderBy('display_order')
+            ->orderBy('title')
+            ->get()
+            ->map(fn (Content $content): array => [
+                'question' => $content->title,
+                'answer' => (string) $content->body,
+            ])
+            ->all();
 
-        if (is_array($items) && $items !== []) {
-            return array_values(array_filter($items, fn ($item): bool => is_array($item) && isset($item['question'], $item['answer'])));
+        if ($items !== []) {
+            return $items;
         }
 
         return [

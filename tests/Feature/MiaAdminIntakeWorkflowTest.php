@@ -10,24 +10,24 @@ uses(RefreshDatabase::class);
 
 test('documented mia sprint three route names are registered', function () {
     collect([
-        'admin.registrations.index',
-        'admin.registrations.show',
-        'admin.registrations.edit',
-        'admin.registrations.update',
-        'admin.payments.index',
-        'admin.payments.show',
-        'admin.payments.verify',
-        'admin.payments.reject',
+        'admin.registration.index',
+        'admin.registration.show',
+        'admin.registration.edit',
+        'admin.registration.update',
+        'admin.payment.index',
+        'admin.payment.show',
+        'admin.payment.verify',
+        'admin.payment.reject',
     ])->each(fn (string $routeName) => expect(Route::has($routeName))->toBeTrue($routeName));
 });
 
 test('mia admin intake pages require admin role', function () {
     $student = User::factory()->create(['role' => 'student']);
 
-    $this->get(route('admin.registrations.index'))->assertRedirect('/login');
+    $this->get(route('admin.registration.index'))->assertRedirect('/login');
 
     $this->actingAs($student)
-        ->get(route('admin.registrations.index'))
+        ->get(route('admin.registration.index'))
         ->assertForbidden();
 });
 
@@ -39,24 +39,24 @@ test('admin can list show edit and update mia registration data', function () {
     $registration = createMiaRegistration($program);
 
     $this->actingAs($admin)
-        ->get(route('admin.registrations.index'))
+        ->get(route('admin.registration.index'))
         ->assertOk()
         ->assertSee('Mia Applicant')
         ->assertSee($registration->registration_code);
 
     $this->actingAs($admin)
-        ->get(route('admin.registrations.show', $registration))
+        ->get(route('admin.registration.show', $registration))
         ->assertOk()
         ->assertSee('Mia Applicant')
         ->assertSee('General English');
 
     $this->actingAs($admin)
-        ->get(route('admin.registrations.edit', $registration))
+        ->get(route('admin.registration.edit', $registration))
         ->assertOk()
         ->assertSee('Edit Pendaftaran');
 
     $this->actingAs($admin)
-        ->put(route('admin.registrations.update', $registration), [
+        ->put(route('admin.registration.update', $registration), [
             'program_id' => $program->id,
             'applicant_name' => 'Mia Updated Applicant',
             'applicant_email' => 'mia.updated@example.test',
@@ -69,7 +69,7 @@ test('admin can list show edit and update mia registration data', function () {
             'notes' => 'Admin correction',
         ])
         ->assertSessionHasNoErrors()
-        ->assertRedirect(route('admin.registrations.show', $registration));
+        ->assertRedirect(route('admin.registration.show', $registration));
 
     $registration->refresh();
 
@@ -90,24 +90,24 @@ test('admin can view verify and reject mia registration payments', function () {
     ]);
 
     $this->actingAs($admin)
-        ->get(route('admin.payments.index'))
+        ->get(route('admin.payment.index'))
         ->assertOk()
         ->assertSee('Mia Applicant')
         ->assertSee('Transfer Bank');
 
     $this->actingAs($admin)
-        ->get(route('admin.payments.show', ['payment' => $registration]))
+        ->get(route('admin.payment.show', ['payment' => $registration]))
         ->assertOk()
         ->assertSee('Detail Pembayaran')
         ->assertSee($registration->registration_code);
 
     $this->actingAs($admin)
-        ->post(route('admin.payments.verify', ['payment' => $registration]), [
+        ->post(route('admin.payment.verify', ['payment' => $registration]), [
             'payment_amount' => 1500000,
             'payment_method' => 'bank_transfer',
         ])
         ->assertSessionHasNoErrors()
-        ->assertRedirect(route('admin.payments.show', ['payment' => $registration]));
+        ->assertRedirect(route('admin.payment.show', ['payment' => $registration]));
 
     $registration->refresh();
 
@@ -117,11 +117,11 @@ test('admin can view verify and reject mia registration payments', function () {
         ->and((float) $registration->payment_amount)->toBe(1500000.0);
 
     $this->actingAs($admin)
-        ->post(route('admin.payments.reject', ['payment' => $registration]), [
+        ->post(route('admin.payment.reject', ['payment' => $registration]), [
             'notes' => 'Bukti pembayaran tidak valid.',
         ])
         ->assertSessionHasNoErrors()
-        ->assertRedirect(route('admin.payments.show', ['payment' => $registration]));
+        ->assertRedirect(route('admin.payment.show', ['payment' => $registration]));
 
     $registration->refresh();
 

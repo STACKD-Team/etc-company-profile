@@ -5,8 +5,8 @@
 ])
 
 @php
-    $hasSlot = ! $slot->isEmpty();
-    $displayValue = $hasSlot ? null : filled($value) ? $value : $empty;
+$hasSlot = ! $slot->isEmpty();
+$displayValue = $hasSlot ? null : (filled($value) ? $value : $empty);
 @endphp
 
 <div {{ $attributes->class('min-w-0 space-y-1') }}>

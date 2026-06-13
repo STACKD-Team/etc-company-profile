@@ -22,17 +22,17 @@ it('registers the implemented Rasky web route names after sprint merge', functio
         'auth.password.reset',
         'auth.password.update',
         'admin.dashboard',
-        'admin.placement-tests.index',
-        'admin.placement-tests.show',
-        'admin.placement-tests.schedule',
-        'admin.placement-tests.result.store',
-        'admin.report-cards.index',
-        'admin.report-cards.create',
-        'admin.report-cards.store',
-        'admin.report-cards.show',
-        'admin.report-cards.edit',
-        'admin.report-cards.update',
-        'admin.report-cards.publish',
+        'admin.placement-test.index',
+        'admin.placement-test.show',
+        'admin.placement-test.schedule',
+        'admin.placement-test.result.store',
+        'admin.report-card.index',
+        'admin.report-card.create',
+        'admin.report-card.store',
+        'admin.report-card.show',
+        'admin.report-card.edit',
+        'admin.report-card.update',
+        'admin.report-card.publish',
         'admin.exports.students',
         'admin.exports.students.download',
         'admin.exports.report-cards',
@@ -117,7 +117,7 @@ it('allows an admin to login and reach the admin dashboard', function () {
         'email' => 'admin@etcplanet.test',
         'password' => 'password',
     ])
-        ->assertRedirect(route('admin.dashboard'));
+        ->assertRedirect('/admin/dashboard');
 
     $this->assertAuthenticated();
 
@@ -173,9 +173,9 @@ it('allows admin users to open Rasky admin GET pages', function () {
 
     foreach ([
         route('admin.dashboard'),
-        route('admin.placement-tests.index'),
-        route('admin.report-cards.index'),
-        route('admin.report-cards.create'),
+        route('admin.placement-test.index'),
+        route('admin.report-card.index'),
+        route('admin.report-card.create'),
         route('admin.exports.students'),
         route('admin.exports.report-cards'),
     ] as $url) {
@@ -190,13 +190,13 @@ it('renders the Rasky placement detail workflow forms for admin users', function
     [$registration, $courseClass] = createRaskyPlacementFixture();
 
     $this->actingAs($admin)
-        ->get(route('admin.placement-tests.show', $registration))
+        ->get(route('admin.placement-test.show', $registration))
         ->assertOk()
         ->assertSee('Jadwal Placement Test')
         ->assertSee('Hasil dan Rekomendasi Kelas')
         ->assertSee($courseClass->name)
-        ->assertSee(route('admin.placement-tests.schedule', $registration), false)
-        ->assertSee(route('admin.placement-tests.result.store', $registration), false);
+        ->assertSee(route('admin.placement-test.schedule', $registration), false)
+        ->assertSee(route('admin.placement-test.result.store', $registration), false);
 });
 
 it('protects the Rasky placement workflow from guests and non admin users', function () {
@@ -205,19 +205,19 @@ it('protects the Rasky placement workflow from guests and non admin users', func
         'role' => 'student',
     ]);
 
-    $this->get(route('admin.placement-tests.show', $registration))
+    $this->get(route('admin.placement-test.show', $registration))
         ->assertRedirect(route('auth.login'));
 
-    $this->post(route('admin.placement-tests.schedule', $registration), [
+    $this->post(route('admin.placement-test.schedule', $registration), [
         'placement_test_at' => '2026-05-20 10:00:00',
     ])->assertRedirect(route('auth.login'));
 
     $this->actingAs($student)
-        ->get(route('admin.placement-tests.show', $registration))
+        ->get(route('admin.placement-test.show', $registration))
         ->assertForbidden();
 
     $this->actingAs($student)
-        ->post(route('admin.placement-tests.result.store', $registration), [
+        ->post(route('admin.placement-test.result.store', $registration), [
             'placement_test_result' => 'Ready for Teen 4.',
         ])
         ->assertForbidden();
@@ -230,10 +230,10 @@ it('allows admin users to schedule a placement test', function () {
     [$registration] = createRaskyPlacementFixture();
 
     $this->actingAs($admin)
-        ->post(route('admin.placement-tests.schedule', $registration), [
+        ->post(route('admin.placement-test.schedule', $registration), [
             'placement_test_at' => '2026-05-20 10:00:00',
         ])
-        ->assertRedirect(route('admin.placement-tests.show', $registration))
+        ->assertRedirect(route('admin.placement-test.show', $registration))
         ->assertSessionHasNoErrors();
 
     $registration->refresh();
@@ -249,9 +249,9 @@ it('validates placement test schedule input', function () {
     [$registration] = createRaskyPlacementFixture();
 
     $this->actingAs($admin)
-        ->from(route('admin.placement-tests.show', $registration))
-        ->post(route('admin.placement-tests.schedule', $registration), [])
-        ->assertRedirect(route('admin.placement-tests.show', $registration))
+        ->from(route('admin.placement-test.show', $registration))
+        ->post(route('admin.placement-test.schedule', $registration), [])
+        ->assertRedirect(route('admin.placement-test.show', $registration))
         ->assertSessionHasErrors(['placement_test_at']);
 });
 
@@ -262,11 +262,11 @@ it('allows admin users to store placement result and assign a class without crea
     [$registration, $courseClass] = createRaskyPlacementFixture();
 
     $this->actingAs($admin)
-        ->post(route('admin.placement-tests.result.store', $registration), [
+        ->post(route('admin.placement-test.result.store', $registration), [
             'placement_test_result' => 'Student is ready for Teen 4.',
             'class_id' => $courseClass->id,
         ])
-        ->assertRedirect(route('admin.placement-tests.show', $registration))
+        ->assertRedirect(route('admin.placement-test.show', $registration))
         ->assertSessionHasNoErrors();
 
     $registration->refresh();
@@ -284,12 +284,12 @@ it('validates placement test result input', function () {
     [$registration] = createRaskyPlacementFixture();
 
     $this->actingAs($admin)
-        ->from(route('admin.placement-tests.show', $registration))
-        ->post(route('admin.placement-tests.result.store', $registration), [
+        ->from(route('admin.placement-test.show', $registration))
+        ->post(route('admin.placement-test.result.store', $registration), [
             'placement_test_result' => '',
             'class_id' => 999999,
         ])
-        ->assertRedirect(route('admin.placement-tests.show', $registration))
+        ->assertRedirect(route('admin.placement-test.show', $registration))
         ->assertSessionHasErrors(['placement_test_result', 'class_id']);
 });
 
@@ -315,22 +315,22 @@ it('allows admin users to create preview and publish a complete report card', fu
     [$reportCardData] = createRaskyReportCardFixture();
 
     $this->actingAs($admin)
-        ->get(route('admin.report-cards.create'))
+        ->get(route('admin.report-card.create'))
         ->assertOk()
         ->assertSee('Written Test')
         ->assertSee('Overall Class Assessment')
         ->assertSee('Managing Director');
 
     $response = $this->actingAs($admin)
-        ->post(route('admin.report-cards.store'), $reportCardData)
+        ->post(route('admin.report-card.store'), $reportCardData)
         ->assertSessionHasNoErrors();
 
     $reportCard = ReportCard::query()->firstOrFail();
 
-    $response->assertRedirect(route('admin.report-cards.show', $reportCard));
+    $response->assertRedirect(route('admin.report-card.show', $reportCard));
 
     $this->actingAs($admin)
-        ->get(route('admin.report-cards.show', $reportCard))
+        ->get(route('admin.report-card.show', $reportCard))
         ->assertOk()
         ->assertSee('STUDENT EVALUATION')
         ->assertSee('WRITTEN TEST')
@@ -338,8 +338,8 @@ it('allows admin users to create preview and publish a complete report card', fu
         ->assertSee('Publish');
 
     $this->actingAs($admin)
-        ->post(route('admin.report-cards.publish', $reportCard))
-        ->assertRedirect(route('admin.report-cards.show', $reportCard));
+        ->post(route('admin.report-card.publish', $reportCard))
+        ->assertRedirect(route('admin.report-card.show', $reportCard));
 
     expect($reportCard->refresh()->is_published)->toBeTrue();
 });
@@ -350,12 +350,12 @@ it('validates complete report card input', function () {
     ]);
 
     $this->actingAs($admin)
-        ->from(route('admin.report-cards.create'))
-        ->post(route('admin.report-cards.store'), [
+        ->from(route('admin.report-card.create'))
+        ->post(route('admin.report-card.store'), [
             'score_listening' => 99,
             'grade_pronunciation' => 'Z',
         ])
-        ->assertRedirect(route('admin.report-cards.create'))
+        ->assertRedirect(route('admin.report-card.create'))
         ->assertSessionHasErrors(['enrollment_id', 'score_listening', 'grade_pronunciation']);
 });
 

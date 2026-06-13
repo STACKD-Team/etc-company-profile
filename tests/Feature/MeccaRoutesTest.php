@@ -213,22 +213,22 @@ test('documented mecca route names are registered', function () {
         'student.report-cards.show',
         'student.report-cards.download',
         'student.help.index',
-        'admin.students.index',
-        'admin.students.show',
-        'admin.instructors.index',
-        'admin.instructors.show',
-        'admin.programs.index',
-        'admin.programs.create',
-        'admin.programs.store',
-        'admin.programs.edit',
-        'admin.programs.update',
-        'admin.classes.index',
-        'admin.classes.create',
-        'admin.classes.store',
-        'admin.classes.edit',
-        'admin.classes.update',
-        'admin.enrollments.index',
-        'admin.enrollments.store',
+        'admin.student.index',
+        'admin.student.show',
+        'admin.instructor.index',
+        'admin.instructor.show',
+        'admin.program.index',
+        'admin.program.create',
+        'admin.program.store',
+        'admin.program.edit',
+        'admin.program.update',
+        'admin.class.index',
+        'admin.class.create',
+        'admin.class.store',
+        'admin.class.edit',
+        'admin.class.update',
+        'admin.enrollment.index',
+        'admin.enrollment.store',
     ])->each(fn (string $routeName) => expect(\Illuminate\Support\Facades\Route::has($routeName))->toBeTrue());
 });
 
@@ -735,22 +735,27 @@ test('student payment detail shows midtrans snapshot and continue payment link',
 test('admin academic mecca pages render for authenticated admin', function () {
     $admin = User::factory()->create(['role' => 'admin', 'is_active' => true]);
 
-    $this->actingAs($admin)->get('/admin/students')->assertOk();
-    $this->actingAs($admin)->get('/admin/instructors')->assertOk();
-    $this->actingAs($admin)->get('/admin/programs')->assertOk();
-    $this->actingAs($admin)->get('/admin/programs/create')->assertOk();
-    $this->actingAs($admin)->get('/admin/course-classes')->assertOk();
-    $this->actingAs($admin)->get('/admin/course-classes/create')->assertOk();
-    $this->actingAs($admin)->get('/admin/enrollments')->assertOk();
+    $this->actingAs($admin)->get('/admin/student')->assertOk();
+    $this->actingAs($admin)->get('/admin/instructor')->assertOk();
+    $this->actingAs($admin)->get('/admin/program')->assertOk();
+    $this->actingAs($admin)->get('/admin/program/create')->assertOk();
+    $this->actingAs($admin)->get('/admin/class')->assertOk();
+    $this->actingAs($admin)->get('/admin/class/create')->assertOk();
+    $this->actingAs($admin)->get('/admin/enrollment')->assertOk();
+
+    $this->actingAs($admin)->get('/admin/students')->assertRedirect('/admin/student');
+    $this->actingAs($admin)->get('/admin/programs/create')->assertRedirect('/admin/program/create');
+    $this->actingAs($admin)->get('/admin/course-classes')->assertRedirect('/admin/class');
+    $this->actingAs($admin)->get('/admin/classes/create')->assertRedirect('/admin/class/create');
 });
 
 test('admin academic routes require admin access', function () {
     $student = User::factory()->create(['role' => 'student']);
 
-    $this->get('/admin/programs')->assertRedirect('/admin/login');
+    $this->get('/admin/programs')->assertRedirect('/login');
 
     $this->actingAs($student)
-        ->get(route('admin.programs.index', [], false))
+        ->get(route('admin.program.index', [], false))
         ->assertForbidden();
 });
 
@@ -768,33 +773,33 @@ test('admin student and instructor pages only expose matching roles', function (
     ]);
 
     $this->actingAs($admin)
-        ->get(route('admin.students.index', [], false))
+        ->get(route('admin.student.index', [], false))
         ->assertOk()
         ->assertSee('Mecca Student')
         ->assertDontSee('ETC Instructor');
 
     $this->actingAs($admin)
-        ->get(route('admin.students.show', $student, false))
+        ->get(route('admin.student.show', $student, false))
         ->assertOk()
         ->assertSee('Mecca Student');
 
     $this->actingAs($admin)
-        ->get(route('admin.students.show', $instructor, false))
+        ->get(route('admin.student.show', $instructor, false))
         ->assertNotFound();
 
     $this->actingAs($admin)
-        ->get(route('admin.instructors.index', [], false))
+        ->get(route('admin.instructor.index', [], false))
         ->assertOk()
         ->assertSee('ETC Instructor')
         ->assertDontSee('Mecca Student');
 
     $this->actingAs($admin)
-        ->get(route('admin.instructors.show', $instructor, false))
+        ->get(route('admin.instructor.show', $instructor, false))
         ->assertOk()
         ->assertSee('ETC Instructor');
 
     $this->actingAs($admin)
-        ->get(route('admin.instructors.show', $student, false))
+        ->get(route('admin.instructor.show', $student, false))
         ->assertNotFound();
 });
 
@@ -802,7 +807,7 @@ test('admin can create and update programs', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $this->actingAs($admin)
-        ->post(route('admin.programs.store'), [
+        ->post(route('admin.program.store'), [
             'name' => 'Academic English',
             'slug' => 'academic-english',
             'category' => 'english',
@@ -815,14 +820,14 @@ test('admin can create and update programs', function () {
             'registration_fee' => 200000,
             'is_active' => '1',
         ])
-        ->assertRedirect(route('admin.programs.index'));
+        ->assertRedirect(route('admin.program.show', 'academic-english'));
 
     $program = Program::query()->where('slug', 'academic-english')->firstOrFail();
 
     expect($program->is_active)->toBeTrue();
 
     $this->actingAs($admin)
-        ->put(route('admin.programs.update', $program), [
+        ->put(route('admin.program.update', $program), [
             'name' => 'Academic English Updated',
             'slug' => 'academic-english',
             'category' => 'test_prep',
@@ -834,7 +839,7 @@ test('admin can create and update programs', function () {
             'price' => 1750000,
             'registration_fee' => 250000,
         ])
-        ->assertRedirect(route('admin.programs.index'));
+        ->assertRedirect(route('admin.program.show', $program));
 
     $program->refresh();
 
@@ -874,8 +879,8 @@ test('admin can create and update classes with instructor role validation', func
     ];
 
     $this->actingAs($admin)
-        ->post(route('admin.classes.store'), $classPayload)
-        ->assertRedirect(route('admin.classes.index'));
+        ->post(route('admin.class.store'), $classPayload)
+        ->assertRedirect(route('admin.class.show', 1));
 
     $class = CourseClass::query()->where('name', 'Teen B1')->firstOrFail();
 
@@ -884,17 +889,17 @@ test('admin can create and update classes with instructor role validation', func
         ->and($class->status)->toBe('upcoming');
 
     $this->actingAs($admin)
-        ->put(route('admin.classes.update', $class), array_merge($classPayload, [
+        ->put(route('admin.class.update', $class), array_merge($classPayload, [
             'name' => 'Teen B2',
             'status' => 'ongoing',
         ]))
-        ->assertRedirect(route('admin.classes.index'));
+        ->assertRedirect(route('admin.class.show', $class));
 
     expect($class->refresh()->name)->toBe('Teen B2')
         ->and($class->status)->toBe('ongoing');
 
     $this->actingAs($admin)
-        ->post(route('admin.classes.store'), array_merge($classPayload, [
+        ->post(route('admin.class.store'), array_merge($classPayload, [
             'name' => 'Invalid Instructor Class',
             'instructor_id' => $student->id,
         ]))
@@ -932,8 +937,8 @@ test('admin can assign student enrollments and duplicate assignments are rejecte
     ];
 
     $this->actingAs($admin)
-        ->post(route('admin.enrollments.store'), $payload)
-        ->assertRedirect(route('admin.enrollments.index'));
+        ->post(route('admin.enrollment.store'), $payload)
+        ->assertRedirect(route('admin.enrollment.show', 1));
 
     $enrollment = Enrollment::query()
         ->where('user_id', $student->id)
@@ -944,7 +949,7 @@ test('admin can assign student enrollments and duplicate assignments are rejecte
         ->and($enrollment->status)->toBe('active');
 
     $this->actingAs($admin)
-        ->post(route('admin.enrollments.store'), $payload)
+        ->post(route('admin.enrollment.store'), $payload)
         ->assertSessionHasErrors('class_id');
 });
 
@@ -971,7 +976,7 @@ test('admin enrollment rejects non student users', function () {
     ]);
 
     $this->actingAs($admin)
-        ->post(route('admin.enrollments.store'), [
+        ->post(route('admin.enrollment.store'), [
             'user_id' => $instructor->id,
             'class_id' => $class->id,
             'enrolled_at' => '2026-06-12',

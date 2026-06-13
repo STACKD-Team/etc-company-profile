@@ -13,6 +13,6 @@ class ReportCardPublishController extends Controller
     {
         $reportCards->publish($reportCard);
 
-        return redirect()->route('admin.report-cards.show', $reportCard)->with('status', 'Rapor sudah dipublish.');
+        return redirect()->route('admin.report-card.show', $reportCard)->with('status', 'Rapor sudah dipublish.');
     }
 }

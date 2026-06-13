@@ -105,7 +105,7 @@ abstract class Controller
     protected function fallbackRouteForAction(string $routeName): string
     {
         return match (true) {
-            Str::startsWith($routeName, 'admin.') => 'admin.reels.index',
+            Str::startsWith($routeName, 'admin.') => 'admin.reel.index',
             default => 'public.home',
         };
     }

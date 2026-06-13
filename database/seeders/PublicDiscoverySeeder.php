@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Content;
 use App\Models\Reel;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -24,7 +25,7 @@ class PublicDiscoverySeeder extends Seeder
     protected function seedPages(): void
     {
         Content::query()->updateOrCreate(
-            ['type' => 'page', 'slug' => 'about'],
+            ['type' => Content::TYPE_PROFILE, 'slug' => 'about'],
             [
                 'title' => 'Tentang ETC Planet',
                 'body' => "ETC Planet adalah lembaga kursus bahasa di Padang yang membantu siswa belajar dengan cara yang ramah, terarah, dan menyenangkan.\n\nKami menggabungkan kelas kecil, pengajar berpengalaman, dan placement test offline agar setiap siswa masuk ke level yang sesuai.",
@@ -43,35 +44,23 @@ class PublicDiscoverySeeder extends Seeder
             ],
         );
 
-        Content::query()->updateOrCreate(
-            ['type' => 'page', 'slug' => 'faq'],
-            [
-                'title' => 'FAQ ETC Planet',
-                'body' => 'Pertanyaan yang paling sering ditanyakan calon siswa dan orang tua sebelum bergabung dengan ETC Planet.',
-                'meta' => [
-                    'items' => [
-                        [
-                            'question' => 'Bagaimana cara mendaftar di ETC Planet?',
-                            'answer' => 'Untuk Sprint 1, calon siswa dapat mengirim pesan melalui form kontak. Tim ETC akan membantu memilih program, jadwal, dan tahap berikutnya.',
-                        ],
-                        [
-                            'question' => 'Apakah ada placement test?',
-                            'answer' => 'Ya. Placement test tetap dilakukan offline agar level kelas yang dipilih lebih tepat.',
-                        ],
-                        [
-                            'question' => 'Berapa biaya pendaftaran?',
-                            'answer' => 'Biaya pendaftaran awal adalah Rp 200.000. Biaya program menyesuaikan kelas yang dipilih.',
-                        ],
-                        [
-                            'question' => 'Apakah jadwal bisa request?',
-                            'answer' => 'Bisa. Calon siswa dapat menyampaikan preferensi jadwal saat konsultasi awal.',
-                        ],
-                    ],
+        foreach ([
+            ['question' => 'Bagaimana cara mendaftar di ETC Planet?', 'answer' => 'Untuk Sprint 1, calon siswa dapat mengirim pesan melalui form kontak. Tim ETC akan membantu memilih program, jadwal, dan tahap berikutnya.'],
+            ['question' => 'Apakah ada placement test?', 'answer' => 'Ya. Placement test tetap dilakukan offline agar level kelas yang dipilih lebih tepat.'],
+            ['question' => 'Berapa biaya pendaftaran?', 'answer' => 'Biaya pendaftaran awal adalah Rp 200.000. Biaya program menyesuaikan kelas yang dipilih.'],
+            ['question' => 'Apakah jadwal bisa request?', 'answer' => 'Bisa. Calon siswa dapat menyampaikan preferensi jadwal saat konsultasi awal.'],
+        ] as $index => $faq) {
+            Content::query()->updateOrCreate(
+                ['type' => Content::TYPE_FAQ, 'title' => $faq['question']],
+                [
+                    'slug' => 'faq-'.crc32($faq['question']),
+                    'body' => $faq['answer'],
+                    'meta' => [],
+                    'display_order' => $index + 1,
+                    'is_published' => true,
                 ],
-                'display_order' => 1,
-                'is_published' => true,
-            ],
-        );
+            );
+        }
     }
 
     protected function seedSettings(): void
@@ -84,7 +73,7 @@ class PublicDiscoverySeeder extends Seeder
             ['title' => 'Hours', 'slug' => 'hours', 'value' => 'Senin-Sabtu, 09.00-18.30'],
         ] as $index => $setting) {
             Content::query()->updateOrCreate(
-                ['type' => 'setting', 'slug' => $setting['slug']],
+                ['type' => Content::TYPE_PROFILE, 'slug' => $setting['slug']],
                 [
                     'title' => $setting['title'],
                     'meta' => ['value' => $setting['value']],
@@ -120,15 +109,15 @@ class PublicDiscoverySeeder extends Seeder
                 'meta' => ['capacity' => 8, 'facility' => ['AC', 'Projector', 'Audio system', 'Test prep setup']],
             ],
         ] as $index => $room) {
-            Content::query()->updateOrCreate(
-                ['type' => 'room', 'slug' => $room['slug']],
+            Room::query()->updateOrCreate(
+                ['name' => $room['title']],
                 [
-                    'title' => $room['title'],
-                    'body' => $room['body'],
+                    'description' => $room['body'],
                     'image' => $room['image'],
-                    'meta' => $room['meta'],
+                    'capacity' => $room['meta']['capacity'] ?? null,
+                    'facilities' => $room['meta']['facility'] ?? [],
                     'display_order' => $index + 1,
-                    'is_published' => true,
+                    'is_active' => true,
                 ],
             );
         }
@@ -163,7 +152,7 @@ class PublicDiscoverySeeder extends Seeder
             ],
         ] as $index => $item) {
             Content::query()->updateOrCreate(
-                ['type' => 'gallery', 'slug' => $item['slug']],
+                ['type' => Content::TYPE_GALLERY, 'slug' => $item['slug']],
                 [
                     'title' => $item['title'],
                     'body' => $item['body'],
@@ -203,7 +192,7 @@ class PublicDiscoverySeeder extends Seeder
             ],
         ] as $index => $partner) {
             Content::query()->updateOrCreate(
-                ['type' => 'partner', 'slug' => $partner['slug']],
+                ['type' => Content::TYPE_PARTNER, 'slug' => $partner['slug']],
                 [
                     'title' => $partner['title'],
                     'body' => $partner['body'],
