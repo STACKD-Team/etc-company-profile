@@ -15,6 +15,7 @@
     <td class="py-4 pr-4 text-etc-on-muted">
         <span class="block">{{ $class?->name ?? 'Kelas ETC' }}</span>
         <span class="mt-1 block text-xs">{{ $class?->instructor?->full_name ?? $class?->instructor?->name ?? 'Instruktur belum ditentukan' }}</span>
+        <span class="mt-1 block text-xs font-semibold">Ruangan: {{ $class?->room_label ?? 'Belum ditentukan' }}</span>
     </td>
     <td class="py-4 pr-4">{{ $item->issued_at?->format('d M Y') ?? '-' }}</td>
     <td class="py-4 pr-4">

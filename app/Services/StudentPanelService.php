@@ -80,7 +80,7 @@ class StudentPanelService
     public function paginateReportCards(int $studentId, array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = ReportCard::query()
-            ->with(['enrollment.courseClass.program', 'enrollment.courseClass.instructor', 'instructor'])
+            ->with(['enrollment.courseClass.program', 'enrollment.courseClass.instructor', 'enrollment.courseClass.room', 'instructor'])
             ->where('is_published', true)
             ->whereHas('enrollment', fn (Builder $query) => $query->where('user_id', $studentId))
             ->when($filters['search'] ?? null, function (Builder $query, string $search): void {
@@ -115,7 +115,7 @@ class StudentPanelService
     public function ownedClassEnrollment(int $studentId, CourseClass $class): Enrollment
     {
         return $this->enrollmentsQuery($studentId)
-            ->with(['courseClass.program', 'courseClass.instructor', 'reportCard'])
+            ->with(['courseClass.program', 'courseClass.instructor', 'courseClass.room', 'reportCard'])
             ->where('class_id', $class->id)
             ->firstOrFail();
     }
@@ -132,6 +132,7 @@ class StudentPanelService
         $reportCard->load([
             'enrollment.courseClass.program',
             'enrollment.courseClass.instructor',
+            'enrollment.courseClass.room',
             'instructor',
             'academicDirector',
             'managingDirector',

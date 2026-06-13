@@ -32,7 +32,7 @@ class ClassController extends Controller
         return view('pages.student.class.show', [
             'student' => $request->user(),
             'enrollment' => $enrollment,
-            'class' => $class->load(['program', 'instructor']),
+            'class' => $class->load(['program', 'instructor', 'room']),
         ]);
     }
 }

@@ -4,6 +4,7 @@
     $className = $activeCourseClass?->name ? "{$activeProgram?->name} - {$activeCourseClass->name}" : $courseName;
     $instructor = $activeCourseClass?->instructor;
     $instructorName = $instructor?->full_name ?? $instructor?->name ?? 'Instruktur belum ditentukan';
+    $roomName = $activeCourseClass?->room_label ?? 'Ruangan belum ditentukan';
     $schedule = $activeCourseClass?->schedule_days && $activeCourseClass?->schedule_time
         ? $activeCourseClass->schedule_days.', '.$activeCourseClass->schedule_time
         : 'Jadwal belum ditentukan';
@@ -85,7 +86,7 @@
                                 <h3 class="font-heading text-2xl font-bold text-etc-on-surface">{{ $className }}</h3>
                                 <p class="mt-3 text-sm leading-6 text-etc-on-muted">{{ $activeProgram?->description ?? 'Detail kelas akan diperbarui oleh admin.' }}</p>
 
-                                <dl class="mt-5 grid gap-3 sm:grid-cols-2">
+                                <dl class="mt-5 grid gap-3 sm:grid-cols-3">
                                     <div class="rounded-box bg-etc-surface-container p-4">
                                         <dt class="text-xs font-bold uppercase text-etc-on-muted">Instruktur</dt>
                                         <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $instructorName }}</dd>
@@ -93,6 +94,10 @@
                                     <div class="rounded-box bg-etc-surface-container p-4">
                                         <dt class="text-xs font-bold uppercase text-etc-on-muted">Jadwal</dt>
                                         <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $schedule }}</dd>
+                                    </div>
+                                    <div class="rounded-box bg-etc-surface-container p-4">
+                                        <dt class="text-xs font-bold uppercase text-etc-on-muted">Ruangan</dt>
+                                        <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $roomName }}</dd>
                                     </div>
                                 </dl>
 
@@ -144,6 +149,7 @@
                                     </div>
                                     <p class="mt-2 truncate font-heading text-sm font-bold text-etc-on-surface">{{ $historyClass?->program?->name }} - {{ $historyClass?->name }}</p>
                                     <p class="mt-1 text-xs text-etc-on-muted">{{ $enrollment->enrolled_at?->format('d M Y') ?? '-' }} sampai {{ $enrollment->completed_at?->format('d M Y') ?? 'sekarang' }}</p>
+                                    <p class="mt-1 text-xs font-semibold text-etc-on-muted">Ruangan: {{ $historyClass?->room_label ?? 'Belum ditentukan' }}</p>
                                 </div>
                                 <x-ui.button :href="route('student.learning-history.index')" outlined size="sm">Lihat</x-ui.button>
                             </article>

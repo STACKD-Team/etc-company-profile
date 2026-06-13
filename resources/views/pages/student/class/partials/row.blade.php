@@ -9,6 +9,7 @@
     <td class="py-4 pr-4">
         <p class="font-heading font-bold text-etc-on-surface">{{ $class?->name ?? 'Kelas ETC' }}</p>
         <p class="mt-1 text-xs text-etc-on-muted">{{ $class?->schedule_days ?? 'Jadwal belum ditentukan' }} {{ $class?->schedule_time ? '- '.$class->schedule_time : '' }}</p>
+        <p class="mt-1 text-xs font-semibold text-etc-on-muted">Ruangan: {{ $class?->room_label ?? 'Belum ditentukan' }}</p>
     </td>
     <td class="py-4 pr-4 text-etc-on-muted">{{ $program?->name ?? '-' }}</td>
     <td class="py-4 pr-4 text-etc-on-muted">{{ $instructor?->full_name ?? $instructor?->name ?? 'Belum ditentukan' }}</td>

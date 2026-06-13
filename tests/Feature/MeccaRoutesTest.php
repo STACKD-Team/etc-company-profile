@@ -5,6 +5,7 @@ use App\Models\Enrollment;
 use App\Models\Program;
 use App\Models\Registration;
 use App\Models\ReportCard;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -498,6 +499,101 @@ test('student learning history shows all owned enrollments and published report 
         ->assertSee('Rapor Published')
         ->assertSee(route('student.report-cards.show', $publishedReport, false), false)
         ->assertDontSee('Other Student History Class');
+});
+
+test('student sprint five rooms render from room relation and remain scoped in search', function () {
+    $student = User::factory()->create(['role' => 'student', 'full_name' => 'Room Relation Student']);
+    $otherStudent = User::factory()->create(['role' => 'student', 'full_name' => 'Other Room Student']);
+    $instructor = User::factory()->create(['role' => 'instructor', 'full_name' => 'Room Instructor']);
+    $program = createMeccaSprint4Program(['name' => 'Room Relation Program', 'slug' => 'room-relation-program']);
+    $room = Room::query()->create([
+        'name' => 'Mecca Sprint 5 Room',
+        'description' => 'Room from rooms table.',
+        'capacity' => 12,
+        'is_active' => true,
+        'display_order' => 1,
+    ]);
+    $hiddenRoom = Room::query()->create([
+        'name' => 'Hidden Sprint 5 Room',
+        'capacity' => 8,
+        'is_active' => true,
+        'display_order' => 2,
+    ]);
+
+    $ownedClass = CourseClass::query()->create([
+        'program_id' => $program->id,
+        'instructor_id' => $instructor->id,
+        'room_id' => $room->id,
+        'name' => 'Room Relation Class',
+        'schedule_days' => 'Tue-Thu',
+        'schedule_time' => '16.00-17.30',
+        'status' => 'ongoing',
+    ]);
+    $otherOwnedClass = CourseClass::query()->create([
+        'program_id' => $program->id,
+        'instructor_id' => $instructor->id,
+        'room_id' => $hiddenRoom->id,
+        'name' => 'Different Room Class',
+        'schedule_days' => 'Fri',
+        'schedule_time' => '13.00-14.30',
+        'status' => 'ongoing',
+    ]);
+    $otherStudentClass = CourseClass::query()->create([
+        'program_id' => $program->id,
+        'instructor_id' => $instructor->id,
+        'room_id' => $room->id,
+        'name' => 'Other Student Same Room Class',
+        'schedule_days' => 'Sat',
+        'schedule_time' => '09.00-10.30',
+        'status' => 'ongoing',
+    ]);
+
+    $enrollment = createMeccaSprint4Enrollment($student, $ownedClass, ['status' => 'active']);
+    createMeccaSprint4Enrollment($student, $otherOwnedClass, ['status' => 'completed']);
+    createMeccaSprint4Enrollment($otherStudent, $otherStudentClass, ['status' => 'active']);
+    $reportCard = createMeccaSprint4ReportCard($enrollment, ['pdf_path' => 'report-cards/room-relation.pdf']);
+
+    $this->actingAs($student)
+        ->get(route('student.dashboard', [], false))
+        ->assertOk()
+        ->assertSee('Room Relation Class')
+        ->assertSee('Mecca Sprint 5 Room')
+        ->assertDontSee('Other Student Same Room Class');
+
+    $this->actingAs($student)
+        ->get(route('student.classes.index', ['search' => 'Mecca Sprint 5 Room'], false))
+        ->assertOk()
+        ->assertViewHas('enrollments', fn ($enrollments) => collect($enrollments->items())->pluck('id')->all() === [$enrollment->id])
+        ->assertSee('data-student-classes-table', false)
+        ->assertSee('Room Relation Class')
+        ->assertSee('Mecca Sprint 5 Room')
+        ->assertDontSee('Other Student Same Room Class');
+
+    $this->actingAs($student)
+        ->get(route('student.classes.show', $ownedClass, false))
+        ->assertOk()
+        ->assertSee('Room Relation Class')
+        ->assertSee('Mecca Sprint 5 Room');
+
+    $this->actingAs($student)
+        ->get(route('student.learning-history.index', ['search' => 'Mecca Sprint 5 Room'], false))
+        ->assertOk()
+        ->assertViewHas('enrollments', fn ($enrollments) => collect($enrollments->items())->pluck('id')->all() === [$enrollment->id])
+        ->assertSee('Room Relation Class')
+        ->assertSee('Mecca Sprint 5 Room')
+        ->assertDontSee('Other Student Same Room Class');
+
+    $this->actingAs($student)
+        ->get(route('student.report-cards.index', [], false))
+        ->assertOk()
+        ->assertSee('Room Relation Program')
+        ->assertSee('Mecca Sprint 5 Room');
+
+    $this->actingAs($student)
+        ->get(route('student.report-cards.show', $reportCard, false))
+        ->assertOk()
+        ->assertSee('Room Relation Class')
+        ->assertSee('Mecca Sprint 5 Room');
 });
 
 test('student report cards only expose published reports owned by the authenticated student', function () {

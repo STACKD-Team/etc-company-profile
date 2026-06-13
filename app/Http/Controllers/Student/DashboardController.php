@@ -16,19 +16,19 @@ class DashboardController extends Controller
         $student = $request->user();
 
         $activeEnrollments = $student->enrollments()
-            ->with(['courseClass.program', 'courseClass.instructor'])
+            ->with(['courseClass.program', 'courseClass.instructor', 'courseClass.room'])
             ->where('status', 'active')
             ->latest('enrolled_at')
             ->get();
 
         $currentEnrollment = $activeEnrollments->first()
             ?? $student->enrollments()
-                ->with(['courseClass.program', 'courseClass.instructor'])
+                ->with(['courseClass.program', 'courseClass.instructor', 'courseClass.room'])
                 ->latest('enrolled_at')
                 ->first();
 
         $publishedReports = ReportCard::query()
-            ->with(['enrollment.courseClass.program'])
+            ->with(['enrollment.courseClass.program', 'enrollment.courseClass.room'])
             ->where('is_published', true)
             ->whereHas('enrollment', fn ($query) => $query->where('user_id', $student->id))
             ->latest('issued_at')
@@ -44,7 +44,7 @@ class DashboardController extends Controller
         $latestPayment = $payments->first();
 
         $recentLearningHistory = $student->enrollments()
-            ->with(['courseClass.program', 'courseClass.instructor', 'reportCard'])
+            ->with(['courseClass.program', 'courseClass.instructor', 'courseClass.room', 'reportCard'])
             ->latest('enrolled_at')
             ->take(3)
             ->get();

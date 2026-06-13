@@ -26,7 +26,7 @@
                         <x-ui.badge status="success">Final Grade {{ $reportCard->final_grade ?? '-' }}</x-ui.badge>
                     </div>
                     <h2 class="mt-4 font-heading text-2xl font-black text-etc-on-surface">{{ $class?->program?->name ?? 'Rapor ETC Planet' }}</h2>
-                    <p class="mt-2 text-sm text-etc-on-muted">{{ $class?->name ?? 'Kelas ETC' }} - diterbitkan {{ $reportCard->issued_at?->format('d M Y') ?? '-' }}</p>
+                    <p class="mt-2 text-sm text-etc-on-muted">{{ $class?->name ?? 'Kelas ETC' }} - {{ $class?->room_label ?? 'Ruangan belum ditentukan' }} - diterbitkan {{ $reportCard->issued_at?->format('d M Y') ?? '-' }}</p>
                 </div>
                 <div class="rounded-box bg-etc-surface-container p-4 shadow-soft">
                     <p class="text-xs font-bold uppercase text-etc-on-muted">Total Score</p>
