@@ -17,6 +17,7 @@ class StoreCourseClassRequest extends FormRequest
         return [
             'program_id' => ['required', 'exists:programs,id'],
             'instructor_id' => ['nullable', Rule::exists('users', 'id')->where('role', 'instructor')],
+            'room_id' => ['nullable', 'exists:rooms,id'],
             'name' => ['required', 'string', 'max:100'],
             'schedule_days' => ['nullable', 'string', 'max:50'],
             'schedule_time' => ['nullable', 'string', 'max:50'],

@@ -1,0 +1,35 @@
+@php
+    $statuses = collect(['pending_payment', 'paid', 'placement_test', 'enrolled', 'rejected', 'cancelled'])
+        ->mapWithKeys(fn ($status) => [$status => str($status)->replace('_', ' ')->headline()->toString()])
+        ->all();
+    $days = ['mon_wed' => 'Mon-Wed', 'tue_thu' => 'Tues-Thurs', 'wed_fri' => 'Wed-Fri', 'sat_sun' => 'Sat-Sun', 'request' => 'Request Schedule'];
+    $methods = ['qris' => 'QRIS', 'bank_transfer' => 'Transfer Bank', 'virtual_account' => 'Virtual Account', 'ewallet' => 'E-Wallet', 'manual' => 'Manual'];
+@endphp
+
+<x-layouts.dashboard title="Edit Pendaftaran" area="admin" active="registrations">
+    <x-ui.panel heading="Data Pendaftaran" description="Perbarui koreksi data intake tanpa mengubah workflow pembayaran manual Sprint 1.">
+        <form method="POST" action="{{ route('admin.registration.update', $registration) }}" class="grid gap-5 md:grid-cols-2">
+            @csrf
+            @method('PUT')
+
+            <x-ui.field name="applicant_name" label="Nama Pendaftar" :value="$registration->applicant_name" required />
+            <x-ui.email-field name="applicant_email" label="Email" :value="$registration->applicant_email" required />
+            <x-ui.phone-field name="applicant_phone" label="No HP" :value="$registration->applicant_phone" required />
+            <x-ui.select name="program_id" label="Program" :value="$registration->program_id" :options="$programs->pluck('name', 'id')->all()" required />
+            <x-ui.select name="preferred_days" label="Preferensi Hari" :value="$registration->preferred_days" placeholder="Belum dipilih" :options="$days" />
+            <x-ui.field name="preferred_time" label="Preferensi Jam" :value="$registration->preferred_time" />
+            <x-ui.select name="payment_method" label="Metode Pembayaran" :value="$registration->payment_method" placeholder="Belum dikonfirmasi" :options="$methods" />
+            <x-ui.currency-field name="payment_amount" label="Nominal Pembayaran" :value="$registration->payment_amount" />
+            <x-ui.select name="status" label="Status" :value="$registration->status" :options="$statuses" required />
+
+            <div class="md:col-span-2">
+                <x-ui.textarea name="notes" label="Catatan" rows="4" :value="$registration->notes" />
+            </div>
+
+            <div class="flex flex-wrap gap-3 md:col-span-2">
+                <x-ui.button type="submit" icon="heroicon-m-check">Simpan</x-ui.button>
+                <x-ui.button :href="route('admin.registration.show', $registration)" outlined color="gray">Batal</x-ui.button>
+            </div>
+        </form>
+    </x-ui.panel>
+</x-layouts.dashboard>

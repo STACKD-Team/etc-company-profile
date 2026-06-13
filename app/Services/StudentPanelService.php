@@ -10,13 +10,14 @@ use App\Models\ReportCard;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Schema;
 
 class StudentPanelService
 {
     public function paginateClasses(int $studentId, array $filters, int $perPage = 10): LengthAwarePaginator
     {
         $query = $this->enrollmentsQuery($studentId)
-            ->with(['courseClass.program', 'courseClass.instructor', 'reportCard'])
+            ->with(['courseClass.program', 'courseClass.instructor', 'courseClass.room', 'reportCard'])
             ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applyEnrollmentSearch($query, $search))
             ->when($filters['program_id'] ?? null, fn (Builder $query, int|string $programId) => $query->whereHas('courseClass', fn (Builder $query) => $query->where('program_id', $programId)))
             ->when($filters['class_id'] ?? null, fn (Builder $query, int|string $classId) => $query->where('class_id', $classId))
@@ -336,14 +337,20 @@ class StudentPanelService
 
     private function applyEnrollmentSearch(Builder $query, string $search): void
     {
-        $query->where(function (Builder $query) use ($search): void {
+        $hasLegacyRoomColumn = Schema::hasColumn('classes', 'room');
+
+        $query->where(function (Builder $query) use ($search, $hasLegacyRoomColumn): void {
             $query
-                ->whereHas('courseClass', function (Builder $query) use ($search): void {
+                ->whereHas('courseClass', function (Builder $query) use ($search, $hasLegacyRoomColumn): void {
                     $query
                         ->where('name', 'like', '%'.$search.'%')
                         ->orWhere('schedule_days', 'like', '%'.$search.'%')
                         ->orWhere('schedule_time', 'like', '%'.$search.'%')
-                        ->orWhere('room', 'like', '%'.$search.'%');
+                        ->orWhereHas('room', fn (Builder $query) => $query->where('name', 'like', '%'.$search.'%'));
+
+                    if ($hasLegacyRoomColumn) {
+                        $query->orWhere('room', 'like', '%'.$search.'%');
+                    }
                 })
                 ->orWhereHas('courseClass.program', fn (Builder $query) => $query->where('name', 'like', '%'.$search.'%'))
                 ->orWhereHas('courseClass.instructor', function (Builder $query) use ($search): void {

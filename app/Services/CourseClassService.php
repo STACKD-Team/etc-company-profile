@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\CourseClass;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Schema;
 
 class CourseClassService extends BaseCrudService
 {
@@ -15,7 +16,7 @@ class CourseClassService extends BaseCrudService
 
     protected function defaultWith(): array
     {
-        return ['program', 'instructor'];
+        return ['program', 'instructor', 'room'];
     }
 
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
@@ -35,14 +36,20 @@ class CourseClassService extends BaseCrudService
 
     protected function applyFilters(Builder $query, array $filters): Builder
     {
+        $hasLegacyRoomColumn = Schema::hasColumn('classes', 'room');
+
         $query
-            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $query->where(function (Builder $query) use ($search): void {
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $query->where(function (Builder $query) use ($search, $hasLegacyRoomColumn): void {
                 $query->where('name', 'like', '%'.$search.'%')
-                    ->orWhere('room', 'like', '%'.$search.'%')
+                    ->orWhereHas('room', fn (Builder $query) => $query->where('name', 'like', '%'.$search.'%'))
                     ->orWhereHas('program', fn (Builder $query) => $query->where('name', 'like', '%'.$search.'%'))
                     ->orWhereHas('instructor', fn (Builder $query) => $query
                         ->where('name', 'like', '%'.$search.'%')
                         ->orWhere('full_name', 'like', '%'.$search.'%'));
+
+                if ($hasLegacyRoomColumn) {
+                    $query->orWhere('room', 'like', '%'.$search.'%');
+                }
             }))
             ->when($filters['program_id'] ?? null, fn (Builder $query, int|string $programId) => $query->where('program_id', $programId))
             ->when($filters['instructor_id'] ?? null, fn (Builder $query, int|string $instructorId) => $query->where('instructor_id', $instructorId))

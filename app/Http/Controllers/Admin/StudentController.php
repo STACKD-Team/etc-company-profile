@@ -35,14 +35,14 @@ class StudentController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        return view('admin.students.index', compact('students'));
+        return view('pages.admin.student.index', compact('students'));
     }
 
     public function show(User $student): View
     {
         abort_unless($student->role === 'student', 404);
 
-        return view('admin.students.show', [
+        return view('pages.admin.student.show', [
             'student' => $student->load(['enrollments.courseClass.program', 'enrollments.courseClass.instructor', 'enrollments.reportCard', 'registrations.program']),
         ]);
     }

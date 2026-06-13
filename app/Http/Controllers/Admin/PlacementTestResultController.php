@@ -22,6 +22,6 @@ class PlacementTestResultController extends Controller
             $registrations->assignClass($registration->refresh(), $validated['class_id']);
         }
 
-        return redirect()->route('admin.placement-tests.show', $registration)->with('status', 'Hasil placement test tersimpan.');
+        return redirect()->route('admin.placement-test.show', $registration)->with('status', 'Hasil placement test tersimpan.');
     }
 }

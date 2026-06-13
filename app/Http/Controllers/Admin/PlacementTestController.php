@@ -39,7 +39,7 @@ class PlacementTestController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('admin.rasky.index', [
+        return view('pages.admin.placement-test.index', [
             'title' => 'Placement Test',
             'active' => 'placement',
             'items' => $items,
@@ -50,7 +50,7 @@ class PlacementTestController extends Controller
                 'status' => ['label' => 'Status', 'sortable' => true, 'filter' => ['type' => 'select', 'name' => 'status', 'options' => $statuses]],
                 'placement_test_at' => ['label' => 'Jadwal', 'sortable' => true],
             ],
-            'rowView' => 'admin.rasky.partials.placement-row',
+            'rowView' => 'pages.admin.placement-test.partials.placement-row',
             'empty' => 'Belum ada pendaftar yang masuk proses placement test.',
             'emptyDescription' => 'Pendaftar paid, placement test, atau enrolled akan tampil di sini.',
             'searchPlaceholder' => 'Cari kode, nama, atau email',
@@ -67,7 +67,7 @@ class PlacementTestController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('admin.rasky.detail', [
+        return view('pages.admin.placement-test.detail', [
             'title' => 'Detail Placement Test',
             'active' => 'placement',
             'heading' => $registration->registration_code,
@@ -81,8 +81,8 @@ class PlacementTestController extends Controller
             ],
             'placementRegistration' => $registration,
             'placementClasses' => $classes,
-            'placementScheduleAction' => route('admin.placement-tests.schedule', $registration),
-            'placementResultAction' => route('admin.placement-tests.result.store', $registration),
+            'placementScheduleAction' => route('admin.placement-test.schedule', $registration),
+            'placementResultAction' => route('admin.placement-test.result.store', $registration),
         ]);
     }
 }

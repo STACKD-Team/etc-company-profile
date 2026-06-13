@@ -14,7 +14,7 @@ class ContactMessageController extends Controller
 
     public function index(Request $request): View
     {
-        return view('admin.contact-messages.index', [
+        return view('pages.admin.contact-message.index', [
             'messages' => $this->messages->adminPaginate($this->filters($request), 15),
         ]);
     }
@@ -25,7 +25,7 @@ class ContactMessageController extends Controller
             $contactMessage = $this->messages->markAsRead($contactMessage);
         }
 
-        return view('admin.contact-messages.show', [
+        return view('pages.admin.contact-message.show', [
             'message' => $contactMessage,
         ]);
     }

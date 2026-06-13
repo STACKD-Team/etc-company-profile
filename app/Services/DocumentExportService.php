@@ -106,7 +106,7 @@ class DocumentExportService
         $student = $reportCard->enrollment?->user;
         $class = $reportCard->enrollment?->courseClass;
 
-        return view('admin.rasky.partials.report-card-document', [
+        return view('pages.admin.placement-test.partials.report-card-document', [
             'reportCard' => $reportCard,
             'studentName' => $student?->full_name ?? $student?->name ?? '-',
             'className' => $class?->name ?? '-',

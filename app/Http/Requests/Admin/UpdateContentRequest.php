@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Content;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -15,7 +16,7 @@ class UpdateContentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', Rule::in(['page', 'gallery', 'partner', 'room', 'team_member_extra', 'setting'])],
+            'type' => ['nullable', Rule::in(Content::TYPES)],
             'title' => ['required', 'string', 'max:200'],
             'slug' => ['nullable', 'string', 'max:220'],
             'body' => ['nullable', 'string'],

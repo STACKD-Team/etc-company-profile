@@ -9,6 +9,20 @@ class Content extends Model
 {
     use HasFactory;
 
+    public const TYPE_GALLERY = 'gallery';
+    public const TYPE_PARTNER = 'partner';
+    public const TYPE_PROFILE = 'profile';
+    public const TYPE_FAQ = 'faq';
+    public const TYPE_TESTIMONIAL = 'testimonial';
+
+    public const TYPES = [
+        self::TYPE_GALLERY,
+        self::TYPE_PARTNER,
+        self::TYPE_PROFILE,
+        self::TYPE_FAQ,
+        self::TYPE_TESTIMONIAL,
+    ];
+
     protected $fillable = [
         'type',
         'title',

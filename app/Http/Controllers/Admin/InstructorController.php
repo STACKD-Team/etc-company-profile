@@ -33,14 +33,14 @@ class InstructorController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        return view('admin.instructors.index', compact('instructors'));
+        return view('pages.admin.instructor.index', compact('instructors'));
     }
 
     public function show(User $instructor): View
     {
         abort_unless($instructor->role === 'instructor', 404);
 
-        return view('admin.instructors.show', [
+        return view('pages.admin.instructor.show', [
             'instructor' => $instructor->load(['classesTaught.program']),
         ]);
     }

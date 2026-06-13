@@ -17,7 +17,7 @@ class RegistrationController extends Controller
 
     public function index(Request $request): View
     {
-        return view('admin.registrations.index', [
+        return view('pages.admin.registration.index', [
             'registrations' => $this->registrationService->paginateAdminRegistrations($request->only([
                 'search',
                 'status',
@@ -34,14 +34,14 @@ class RegistrationController extends Controller
 
     public function show(Registration $registration): View
     {
-        return view('admin.registrations.show', [
+        return view('pages.admin.registration.show', [
             'registration' => $registration->load(['user', 'program', 'courseClass']),
         ]);
     }
 
     public function edit(Registration $registration): View
     {
-        return view('admin.registrations.edit', [
+        return view('pages.admin.registration.edit', [
             'registration' => $registration->load(['program']),
             'programs' => Program::query()->orderBy('name')->get(),
         ]);
@@ -51,6 +51,6 @@ class RegistrationController extends Controller
     {
         $this->registrationService->update($registration, $request->validated());
 
-        return to_route('admin.registrations.show', $registration)->with('status', 'Data pendaftaran berhasil diperbarui.');
+        return to_route('admin.registration.show', $registration)->with('status', 'Data pendaftaran berhasil diperbarui.');
     }
 }

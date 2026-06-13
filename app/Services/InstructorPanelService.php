@@ -11,6 +11,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class InstructorPanelService
 {
@@ -47,7 +48,7 @@ class InstructorPanelService
                 'incomplete_assessments' => $this->incompleteAssessmentsQuery($instructorId)->count(),
             ],
             'classes' => $this->classesQuery($instructorId)
-                ->with('program')
+                ->with(['program', 'room'])
                 ->withCount('enrollments')
                 ->orderByRaw("case status when 'ongoing' then 0 when 'upcoming' then 1 when 'completed' then 2 else 3 end")
                 ->orderByRaw('case when start_date is null then 1 else 0 end')
@@ -65,25 +66,35 @@ class InstructorPanelService
 
     public function paginateClasses(int $instructorId, array $filters): LengthAwarePaginator
     {
+        $hasLegacyRoomColumn = Schema::hasColumn('classes', 'room');
+
         $query = $this->classesQuery($instructorId)
-            ->with('program')
+            ->with(['program', 'room'])
             ->withCount('enrollments')
-            ->when($filters['search'] ?? null, function (Builder $query, string $search): void {
-                $query->where(function (Builder $query) use ($search): void {
+            ->when($filters['search'] ?? null, function (Builder $query, string $search) use ($hasLegacyRoomColumn): void {
+                $query->where(function (Builder $query) use ($search, $hasLegacyRoomColumn): void {
                     $query
                         ->where('name', 'like', '%'.$search.'%')
-                        ->orWhere('room', 'like', '%'.$search.'%')
+                        ->orWhereHas('room', fn (Builder $query) => $query->where('name', 'like', '%'.$search.'%'))
                         ->orWhereHas('program', fn (Builder $query) => $query->where('name', 'like', '%'.$search.'%'));
+
+                    if ($hasLegacyRoomColumn) {
+                        $query->orWhere('room', 'like', '%'.$search.'%');
+                    }
                 });
             })
             ->when($filters['name'] ?? null, fn (Builder $query, string $name) => $query->where('name', 'like', '%'.$name.'%'))
             ->when($filters['program_id'] ?? null, fn (Builder $query, int|string $programId) => $query->where('program_id', $programId))
-            ->when($filters['schedule'] ?? null, function (Builder $query, string $schedule): void {
-                $query->where(function (Builder $query) use ($schedule): void {
+            ->when($filters['schedule'] ?? null, function (Builder $query, string $schedule) use ($hasLegacyRoomColumn): void {
+                $query->where(function (Builder $query) use ($schedule, $hasLegacyRoomColumn): void {
                     $query
                         ->where('schedule_days', 'like', '%'.$schedule.'%')
                         ->orWhere('schedule_time', 'like', '%'.$schedule.'%')
-                        ->orWhere('room', 'like', '%'.$schedule.'%');
+                        ->orWhereHas('room', fn (Builder $query) => $query->where('name', 'like', '%'.$schedule.'%'));
+
+                    if ($hasLegacyRoomColumn) {
+                        $query->orWhere('room', 'like', '%'.$schedule.'%');
+                    }
                 });
             })
             ->when(
@@ -103,8 +114,7 @@ class InstructorPanelService
             ),
             'schedule' => fn (Builder $query, string $direction) => $query
                 ->orderBy('schedule_days', $direction)
-                ->orderBy('schedule_time', $direction)
-                ->orderBy('room', $direction),
+                ->orderBy('schedule_time', $direction),
             'students' => 'enrollments_count',
             'status' => 'status',
             'start_date' => 'start_date',

@@ -3,7 +3,11 @@
 use App\Http\Controllers\Admin\ClassController;
 use App\Http\Controllers\Admin\EnrollmentController;
 use App\Http\Controllers\Admin\InstructorController;
+use App\Http\Controllers\Admin\PlacementTestController;
+use App\Http\Controllers\Admin\PlacementTestResultController;
+use App\Http\Controllers\Admin\PlacementTestScheduleController;
 use App\Http\Controllers\Admin\ProgramController;
+use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\StudentController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,24 +15,55 @@ Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth', 'role:admin'])
     ->group(function (): void {
-        Route::get('/students', [StudentController::class, 'index'])->name('students.index');
-        Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
+        Route::redirect('/placement-tests', '/admin/placement-test')->name('legacy.placement-tests.index');
+        Route::redirect('/placement-tests/{registration}', '/admin/placement-test/{registration}')->name('legacy.placement-tests.show');
+        Route::redirect('/students', '/admin/student')->name('legacy.students.index');
+        Route::redirect('/students/{student}', '/admin/student/{student}')->name('legacy.students.show');
+        Route::redirect('/instructors', '/admin/instructor')->name('legacy.instructors.index');
+        Route::redirect('/instructors/{instructor}', '/admin/instructor/{instructor}')->name('legacy.instructors.show');
+        Route::redirect('/programs', '/admin/program')->name('legacy.programs.index');
+        Route::redirect('/programs/create', '/admin/program/create')->name('legacy.programs.create');
+        Route::redirect('/programs/{program}', '/admin/program/{program}')->name('legacy.programs.show');
+        Route::redirect('/programs/{program}/edit', '/admin/program/{program}/edit')->name('legacy.programs.edit');
+        Route::redirect('/classes', '/admin/class')->name('legacy.classes.index');
+        Route::redirect('/classes/create', '/admin/class/create')->name('legacy.classes.create');
+        Route::redirect('/classes/{class}', '/admin/class/{class}')->name('legacy.classes.show');
+        Route::redirect('/classes/{class}/edit', '/admin/class/{class}/edit')->name('legacy.classes.edit');
+        Route::redirect('/course-classes', '/admin/class')->name('legacy.course-classes.index');
+        Route::redirect('/course-classes/create', '/admin/class/create')->name('legacy.course-classes.create');
+        Route::redirect('/course-classes/{class}', '/admin/class/{class}')->name('legacy.course-classes.show');
+        Route::redirect('/course-classes/{class}/edit', '/admin/class/{class}/edit')->name('legacy.course-classes.edit');
+        Route::redirect('/enrollments', '/admin/enrollment')->name('legacy.enrollments.index');
+        Route::redirect('/enrollments/{enrollment}', '/admin/enrollment/{enrollment}')->name('legacy.enrollments.show');
 
-        Route::get('/instructors', [InstructorController::class, 'index'])->name('instructors.index');
-        Route::get('/instructors/{instructor}', [InstructorController::class, 'show'])->name('instructors.show');
+        Route::get('/placement-test', [PlacementTestController::class, 'index'])->name('placement-test.index');
+        Route::get('/placement-test/{registration}', [PlacementTestController::class, 'show'])->name('placement-test.show');
+        Route::post('/placement-test/{registration}/schedule', [PlacementTestScheduleController::class, 'store'])->name('placement-test.schedule');
+        Route::post('/placement-test/{registration}/result', [PlacementTestResultController::class, 'store'])->name('placement-test.result.store');
 
-        Route::get('/programs', [ProgramController::class, 'index'])->name('programs.index');
-        Route::get('/programs/create', [ProgramController::class, 'create'])->name('programs.create');
-        Route::post('/programs', [ProgramController::class, 'store'])->name('programs.store');
-        Route::get('/programs/{program}/edit', [ProgramController::class, 'edit'])->name('programs.edit');
-        Route::put('/programs/{program}', [ProgramController::class, 'update'])->name('programs.update');
+        Route::get('/student', [StudentController::class, 'index'])->name('student.index');
+        Route::get('/student/{student}', [StudentController::class, 'show'])->name('student.show');
 
-        Route::get('/classes', [ClassController::class, 'index'])->name('classes.index');
-        Route::get('/classes/create', [ClassController::class, 'create'])->name('classes.create');
-        Route::post('/classes', [ClassController::class, 'store'])->name('classes.store');
-        Route::get('/classes/{class}/edit', [ClassController::class, 'edit'])->name('classes.edit');
-        Route::put('/classes/{class}', [ClassController::class, 'update'])->name('classes.update');
+        Route::get('/instructor', [InstructorController::class, 'index'])->name('instructor.index');
+        Route::get('/instructor/{instructor}', [InstructorController::class, 'show'])->name('instructor.show');
 
-        Route::get('/enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
-        Route::post('/enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
+        Route::get('/program', [ProgramController::class, 'index'])->name('program.index');
+        Route::get('/program/create', [ProgramController::class, 'create'])->name('program.create');
+        Route::post('/program', [ProgramController::class, 'store'])->name('program.store');
+        Route::get('/program/{program}', [ProgramController::class, 'show'])->name('program.show');
+        Route::get('/program/{program}/edit', [ProgramController::class, 'edit'])->name('program.edit');
+        Route::put('/program/{program}', [ProgramController::class, 'update'])->name('program.update');
+
+        Route::get('/class', [ClassController::class, 'index'])->name('class.index');
+        Route::get('/class/create', [ClassController::class, 'create'])->name('class.create');
+        Route::post('/class', [ClassController::class, 'store'])->name('class.store');
+        Route::get('/class/{class}', [ClassController::class, 'show'])->name('class.show');
+        Route::get('/class/{class}/edit', [ClassController::class, 'edit'])->name('class.edit');
+        Route::put('/class/{class}', [ClassController::class, 'update'])->name('class.update');
+
+        Route::resource('room', RoomController::class)->except(['destroy']);
+
+        Route::get('/enrollment', [EnrollmentController::class, 'index'])->name('enrollment.index');
+        Route::post('/enrollment', [EnrollmentController::class, 'store'])->name('enrollment.store');
+        Route::get('/enrollment/{enrollment}', [EnrollmentController::class, 'show'])->name('enrollment.show');
     });

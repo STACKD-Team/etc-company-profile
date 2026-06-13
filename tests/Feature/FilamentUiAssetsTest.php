@@ -100,6 +100,9 @@ it('uses the shared three-color component tokens and automatic datatable control
     $javascript = file_get_contents(resource_path('js/app.js'));
 
     expect($css)
+        ->toContain("vendor/filament/filament/resources/css/theme.css")
+        ->toContain("@source '../../app/Filament/**/*.php'")
+        ->toContain("@source '../../vendor/filament/**/*.blade.php'")
         ->toContain('--color-etc-magenta: #e6007f')
         ->toContain('--color-etc-charcoal: #27171c')
         ->toContain('--color-etc-surface: #f5f5f5')
@@ -198,7 +201,7 @@ it('renders admin datatable column filters and applies safe filter sort query pa
     ]);
 
     $this->actingAs($admin)
-        ->get(route('admin.programs.index', [
+        ->get(route('admin.program.index', [
             'search' => 'Visible',
             'category' => 'english',
             'is_active' => '1',

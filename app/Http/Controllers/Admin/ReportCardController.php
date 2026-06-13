@@ -23,7 +23,7 @@ class ReportCardController extends Controller
             $filters['is_published'] = $request->boolean('is_published');
         }
 
-        return view('admin.rasky.index', [
+        return view('pages.admin.placement-test.index', [
             'title' => 'Rapor',
             'active' => 'reports',
             'items' => $reportCards->adminPaginate($filters, 10),
@@ -34,12 +34,12 @@ class ReportCardController extends Controller
                 'is_published' => ['label' => 'Status', 'sortable' => true, 'filter' => ['type' => 'select', 'name' => 'is_published', 'options' => ['1' => 'Published', '0' => 'Draft']]],
                 'issued_at' => ['label' => 'Terbit', 'sortable' => true, 'filter' => ['type' => 'date', 'name' => 'issued_from']],
             ],
-            'rowView' => 'admin.rasky.partials.report-card-row',
+            'rowView' => 'pages.admin.placement-test.partials.report-card-row',
             'empty' => 'Belum ada rapor.',
             'emptyDescription' => 'Rapor akan tampil setelah dibuat dari enrollment siswa.',
             'searchPlaceholder' => 'Cari siswa atau kelas',
             'actions' => [
-                ['label' => 'Buat Rapor', 'route' => 'admin.report-cards.create', 'icon' => 'add'],
+                ['label' => 'Buat Rapor', 'route' => 'admin.report-card.create', 'icon' => 'add'],
                 ['label' => 'Export Rapor', 'route' => 'admin.exports.report-cards', 'icon' => 'download'],
             ],
         ]);
@@ -47,13 +47,13 @@ class ReportCardController extends Controller
 
     public function create(): View
     {
-        return view('admin.rasky.report-card-form', [
+        return view('pages.admin.placement-test.report-card-form', [
             'title' => 'Buat Rapor',
             'reportCard' => new ReportCard,
             'enrollments' => Enrollment::query()->with('user', 'courseClass')->latest()->get(),
             'instructors' => User::query()->instructors()->orderBy('name')->get(),
             'directors' => User::query()->admins()->orderBy('name')->get(),
-            'action' => route('admin.report-cards.store'),
+            'action' => route('admin.report-card.store'),
             'method' => 'POST',
         ]);
     }
@@ -62,14 +62,14 @@ class ReportCardController extends Controller
     {
         $reportCard = $reportCards->create($request->validated());
 
-        return redirect()->route('admin.report-cards.show', $reportCard)->with('status', 'Rapor tersimpan.');
+        return redirect()->route('admin.report-card.show', $reportCard)->with('status', 'Rapor tersimpan.');
     }
 
     public function show(ReportCard $reportCard, DocumentExportService $documents): View
     {
         $reportCard->load('enrollment.user', 'enrollment.courseClass', 'instructor', 'academicDirector', 'managingDirector');
 
-        return view('admin.rasky.report-card-preview', [
+        return view('pages.admin.placement-test.report-card-preview', [
             'title' => 'Preview Rapor',
             'reportCard' => $reportCard,
             'documentHtml' => $documents->reportCardHtml($reportCard),
@@ -78,13 +78,13 @@ class ReportCardController extends Controller
 
     public function edit(ReportCard $reportCard): View
     {
-        return view('admin.rasky.report-card-form', [
+        return view('pages.admin.placement-test.report-card-form', [
             'title' => 'Edit Rapor',
             'reportCard' => $reportCard,
             'enrollments' => Enrollment::query()->with('user', 'courseClass')->latest()->get(),
             'instructors' => User::query()->instructors()->orderBy('name')->get(),
             'directors' => User::query()->admins()->orderBy('name')->get(),
-            'action' => route('admin.report-cards.update', $reportCard),
+            'action' => route('admin.report-card.update', $reportCard),
             'method' => 'PUT',
         ]);
     }
@@ -93,6 +93,6 @@ class ReportCardController extends Controller
     {
         $reportCards->update($reportCard, $request->validated());
 
-        return redirect()->route('admin.report-cards.show', $reportCard)->with('status', 'Rapor diperbarui.');
+        return redirect()->route('admin.report-card.show', $reportCard)->with('status', 'Rapor diperbarui.');
     }
 }

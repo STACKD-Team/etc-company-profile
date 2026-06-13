@@ -25,7 +25,7 @@
             <dl class="grid gap-x-6 gap-y-5 sm:grid-cols-2 xl:grid-cols-4">
                 @foreach ([
                     ['label' => 'Jadwal', 'value' => trim(($class->schedule_days ?? '-').' '.($class->schedule_time ?? ''))],
-                    ['label' => 'Ruangan', 'value' => $class->room ?? '-'],
+                    ['label' => 'Ruangan', 'value' => $class->room_label ?? '-'],
                     ['label' => 'Periode', 'value' => ($class->start_date?->format('d M Y') ?? '-').' - '.($class->end_date?->format('d M Y') ?? '-')],
                     ['label' => 'Jumlah Siswa', 'value' => $class->enrollments_count],
                 ] as $detail)

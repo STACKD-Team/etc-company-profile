@@ -77,80 +77,107 @@ php artisan route:list
 
 ## Admin Routes
 
-### Canonical Filament Admin Routes
+### Canonical Blade Admin Routes
 
-Route admin CRUD/RD Mia saat ini canonical di Filament Resource. Route target singular Sprint 3+ tetap roadmap; route aktual di bawah ini dipertahankan agar admin panel tidak berubah URL.
+Route admin Sprint 4 Mia canonical memakai Blade di `resources/views/pages/admin/...` dengan URI singular. Filament tetap terpasang untuk komponen internal, tetapi bukan surface route admin canonical.
 
 | Method | URI | Route Name | Controller/Action | Middleware | Layout/Notes |
 | --- | --- | --- | --- | --- | --- |
-| GET | `/admin` | `filament.admin.pages.dashboard` | `Filament\Pages\Dashboard` | Filament admin auth stack | Filament admin dashboard |
-| GET | `/admin/login` | `filament.admin.auth.login` | `Filament\Auth\Pages\Login` | Filament admin guest stack | Filament admin login |
-| POST | `/admin/logout` | `filament.admin.auth.logout` | `Filament\Auth\Http\Controllers\LogoutController` | Filament admin auth stack | Filament admin logout |
-| GET | `/admin/registrations` | `filament.admin.resources.registrations.index` | `App\Filament\Resources\Registrations\Pages\ListRegistrations` | Filament admin auth stack | Canonical pendaftaran admin |
-| GET | `/admin/registrations/create` | `filament.admin.resources.registrations.create` | `App\Filament\Resources\Registrations\Pages\CreateRegistration` | Filament admin auth stack | Create pendaftaran admin |
-| GET | `/admin/registrations/{record}` | `filament.admin.resources.registrations.view` | `App\Filament\Resources\Registrations\Pages\ViewRegistration` | Filament admin auth stack | Detail pendaftaran admin |
-| GET | `/admin/registrations/{record}/edit` | `filament.admin.resources.registrations.edit` | `App\Filament\Resources\Registrations\Pages\EditRegistration` | Filament admin auth stack | Edit pendaftaran admin |
-| GET | `/admin/payments` | `filament.admin.resources.payments.index` | `App\Filament\Resources\Payments\Pages\ListPayments` | Filament admin auth stack | Monitoring pembayaran |
-| GET | `/admin/payments/{record}` | `filament.admin.resources.payments.view` | `App\Filament\Resources\Payments\Pages\ViewPayment` | Filament admin auth stack | Detail pembayaran |
-| GET | `/admin/programs` | `filament.admin.resources.programs.index` | `App\Filament\Resources\Programs\Pages\ListPrograms` | Filament admin auth stack | Canonical program admin |
-| GET | `/admin/programs/create` | `filament.admin.resources.programs.create` | `App\Filament\Resources\Programs\Pages\CreateProgram` | Filament admin auth stack | Create program admin |
-| GET | `/admin/programs/{record}` | `filament.admin.resources.programs.view` | `App\Filament\Resources\Programs\Pages\ViewProgram` | Filament admin auth stack | Detail program admin |
-| GET | `/admin/programs/{record}/edit` | `filament.admin.resources.programs.edit` | `App\Filament\Resources\Programs\Pages\EditProgram` | Filament admin auth stack | Edit program admin |
-| GET | `/admin/program-promotions` | `filament.admin.resources.program-promotions.index` | `App\Filament\Resources\ProgramPromotions\Pages\ListProgramPromotions` | Filament admin auth stack | Promo program |
-| GET | `/admin/program-promotions/create` | `filament.admin.resources.program-promotions.create` | `App\Filament\Resources\ProgramPromotions\Pages\CreateProgramPromotion` | Filament admin auth stack | Create promo program |
-| GET | `/admin/program-promotions/{record}` | `filament.admin.resources.program-promotions.view` | `App\Filament\Resources\ProgramPromotions\Pages\ViewProgramPromotion` | Filament admin auth stack | Detail promo program |
-| GET | `/admin/program-promotions/{record}/edit` | `filament.admin.resources.program-promotions.edit` | `App\Filament\Resources\ProgramPromotions\Pages\EditProgramPromotion` | Filament admin auth stack | Edit promo program |
-| GET | `/admin/course-classes` | `filament.admin.resources.course-classes.index` | `App\Filament\Resources\CourseClasses\Pages\ListCourseClasses` | Filament admin auth stack | Canonical class admin |
-| GET | `/admin/students` | `filament.admin.resources.students.index` | `App\Filament\Resources\Students\Pages\ListStudents` | Filament admin auth stack | Canonical siswa admin |
-| GET | `/admin/instructors` | `filament.admin.resources.instructors.index` | `App\Filament\Resources\Instructors\Pages\ListInstructors` | Filament admin auth stack | Canonical instructor admin |
-| GET | `/admin/enrollments` | `filament.admin.resources.enrollments.index` | `App\Filament\Resources\Enrollments\Pages\ListEnrollments` | Filament admin auth stack | Canonical enrollment admin |
-| GET | `/admin/report-cards` | `filament.admin.resources.report-cards.index` | `App\Filament\Resources\ReportCards\Pages\ListReportCards` | Filament admin auth stack | Canonical rapor admin |
-| GET | `/admin/reels` | `filament.admin.resources.reels.index` | `App\Filament\Resources\Reels\Pages\ListReels` | Filament admin auth stack | Reels CMS |
-| GET | `/admin/contents` | `filament.admin.resources.contents.index` | `App\Filament\Resources\Contents\Pages\ListContents` | Filament admin auth stack | CMS content |
-| GET | `/admin/gallery-items` | `filament.admin.resources.gallery-items.index` | `App\Filament\Resources\GalleryItems\Pages\ListGalleryItems` | Filament admin auth stack | Gallery CMS |
-| GET | `/admin/partners` | `filament.admin.resources.partners.index` | `App\Filament\Resources\Partners\Pages\ListPartners` | Filament admin auth stack | Kerja Sama ETC/partner CMS |
-| GET | `/admin/contact-messages` | `filament.admin.resources.contact-messages.index` | `App\Filament\Resources\ContactMessages\Pages\ListContactMessages` | Filament admin auth stack | Pesan kontak |
-| GET | `/admin/chatbot-logs` | `filament.admin.resources.chatbot-logs.index` | `App\Filament\Resources\ChatbotLogs\Pages\ListChatbotLogs` | Filament admin auth stack | Chatbot logs |
-| GET | `/admin/settings` | `filament.admin.resources.settings.index` | `App\Filament\Resources\Settings\Pages\ListSettings` | Filament admin auth stack | Settings |
-| GET | `/admin/rag-knowledge-sources` | `filament.admin.resources.rag-knowledge-sources.index` | `App\Filament\Resources\RagKnowledgeSources\Pages\ListRagKnowledgeSources` | Filament admin auth stack | Knowledge sources RAG |
-| GET | `/admin/users` | `filament.admin.resources.users.index` | `App\Filament\Resources\Users\Pages\ListUsers` | Filament admin auth stack | User management |
+| GET | `/admin/dashboard` | `admin.dashboard` | `Admin\DashboardController@index` | `web`, `auth`, `role:admin` | Dashboard admin Blade |
+| GET | `/admin/registration` | `admin.registration.index` | `Admin\RegistrationController@index` | `web`, `auth`, `role:admin` | List pendaftaran |
+| GET | `/admin/registration/{registration}` | `admin.registration.show` | `Admin\RegistrationController@show` | `web`, `auth`, `role:admin` | Detail pendaftaran |
+| GET | `/admin/registration/{registration}/edit` | `admin.registration.edit` | `Admin\RegistrationController@edit` | `web`, `auth`, `role:admin` | Edit pendaftaran |
+| PUT | `/admin/registration/{registration}` | `admin.registration.update` | `Admin\RegistrationController@update` | `web`, `auth`, `role:admin` | Update pendaftaran |
+| GET | `/admin/payment` | `admin.payment.index` | `Admin\PaymentController@index` | `web`, `auth`, `role:admin` | Monitoring pembayaran RD |
+| GET | `/admin/payment/{payment}` | `admin.payment.show` | `Admin\PaymentController@show` | `web`, `auth`, `role:admin` | Detail pembayaran RD |
+| POST | `/admin/payment/{payment}/verify` | `admin.payment.verify` | `Admin\PaymentVerificationController@verify` | `web`, `auth`, `role:admin` | Verifikasi pembayaran |
+| POST | `/admin/payment/{payment}/reject` | `admin.payment.reject` | `Admin\PaymentVerificationController@reject` | `web`, `auth`, `role:admin` | Tolak pembayaran |
+| GET | `/admin/placement-test` | `admin.placement-test.index` | `Admin\PlacementTestController@index` | `web`, `auth`, `role:admin` | Placement test admin |
+| GET | `/admin/placement-test/{registration}` | `admin.placement-test.show` | `Admin\PlacementTestController@show` | `web`, `auth`, `role:admin` | Detail placement test |
+| POST | `/admin/placement-test/{registration}/schedule` | `admin.placement-test.schedule` | `Admin\PlacementTestScheduleController@store` | `web`, `auth`, `role:admin` | Jadwalkan placement test |
+| POST | `/admin/placement-test/{registration}/result` | `admin.placement-test.result.store` | `Admin\PlacementTestResultController@store` | `web`, `auth`, `role:admin` | Simpan hasil placement test |
+| GET | `/admin/student` | `admin.student.index` | `Admin\StudentController@index` | `web`, `auth`, `role:admin` | List siswa |
+| GET | `/admin/student/{student}` | `admin.student.show` | `Admin\StudentController@show` | `web`, `auth`, `role:admin` | Detail siswa |
+| GET | `/admin/instructor` | `admin.instructor.index` | `Admin\InstructorController@index` | `web`, `auth`, `role:admin` | List instructor |
+| GET | `/admin/instructor/{instructor}` | `admin.instructor.show` | `Admin\InstructorController@show` | `web`, `auth`, `role:admin` | Detail instructor |
+| GET | `/admin/program` | `admin.program.index` | `Admin\ProgramController@index` | `web`, `auth`, `role:admin` | List program |
+| GET | `/admin/program/create` | `admin.program.create` | `Admin\ProgramController@create` | `web`, `auth`, `role:admin` | Create program |
+| POST | `/admin/program` | `admin.program.store` | `Admin\ProgramController@store` | `web`, `auth`, `role:admin` | Store program |
+| GET | `/admin/program/{program}` | `admin.program.show` | `Admin\ProgramController@show` | `web`, `auth`, `role:admin` | Detail program dengan kelas, pendaftaran, dan promo terkait |
+| GET | `/admin/program/{program}/edit` | `admin.program.edit` | `Admin\ProgramController@edit` | `web`, `auth`, `role:admin` | Edit program |
+| PUT | `/admin/program/{program}` | `admin.program.update` | `Admin\ProgramController@update` | `web`, `auth`, `role:admin` | Update program |
+| GET | `/admin/class` | `admin.class.index` | `Admin\ClassController@index` | `web`, `auth`, `role:admin` | List kelas |
+| GET | `/admin/class/create` | `admin.class.create` | `Admin\ClassController@create` | `web`, `auth`, `role:admin` | Create kelas |
+| POST | `/admin/class` | `admin.class.store` | `Admin\ClassController@store` | `web`, `auth`, `role:admin` | Store kelas |
+| GET | `/admin/class/{class}` | `admin.class.show` | `Admin\ClassController@show` | `web`, `auth`, `role:admin` | Detail kelas dengan enrollment dan link rapor |
+| GET | `/admin/class/{class}/edit` | `admin.class.edit` | `Admin\ClassController@edit` | `web`, `auth`, `role:admin` | Edit kelas |
+| PUT | `/admin/class/{class}` | `admin.class.update` | `Admin\ClassController@update` | `web`, `auth`, `role:admin` | Update kelas |
+| GET | `/admin/room` | `admin.room.index` | `Admin\RoomController@index` | `web`, `auth`, `role:admin` | List room |
+| GET | `/admin/room/create` | `admin.room.create` | `Admin\RoomController@create` | `web`, `auth`, `role:admin` | Create room |
+| POST | `/admin/room` | `admin.room.store` | `Admin\RoomController@store` | `web`, `auth`, `role:admin` | Store room |
+| GET | `/admin/room/{room}` | `admin.room.show` | `Admin\RoomController@show` | `web`, `auth`, `role:admin` | Detail room |
+| GET | `/admin/room/{room}/edit` | `admin.room.edit` | `Admin\RoomController@edit` | `web`, `auth`, `role:admin` | Edit room |
+| PUT/PATCH | `/admin/room/{room}` | `admin.room.update` | `Admin\RoomController@update` | `web`, `auth`, `role:admin` | Update room |
+| GET | `/admin/enrollment` | `admin.enrollment.index` | `Admin\EnrollmentController@index` | `web`, `auth`, `role:admin` | List enrollment; create via form/modal context |
+| POST | `/admin/enrollment` | `admin.enrollment.store` | `Admin\EnrollmentController@store` | `web`, `auth`, `role:admin` | Store enrollment |
+| GET | `/admin/enrollment/{enrollment}` | `admin.enrollment.show` | `Admin\EnrollmentController@show` | `web`, `auth`, `role:admin` | Detail enrollment dengan student, class, dan rapor |
+| GET | `/admin/report-card` | `admin.report-card.index` | `Admin\ReportCardController@index` | `web`, `auth`, `role:admin` | List rapor |
+| GET | `/admin/report-card/create` | `admin.report-card.create` | `Admin\ReportCardController@create` | `web`, `auth`, `role:admin` | Create rapor |
+| POST | `/admin/report-card` | `admin.report-card.store` | `Admin\ReportCardController@store` | `web`, `auth`, `role:admin` | Store rapor |
+| GET | `/admin/report-card/{reportCard}` | `admin.report-card.show` | `Admin\ReportCardController@show` | `web`, `auth`, `role:admin` | Detail rapor |
+| GET | `/admin/report-card/{reportCard}/edit` | `admin.report-card.edit` | `Admin\ReportCardController@edit` | `web`, `auth`, `role:admin` | Edit rapor |
+| PUT | `/admin/report-card/{reportCard}` | `admin.report-card.update` | `Admin\ReportCardController@update` | `web`, `auth`, `role:admin` | Update rapor |
+| POST | `/admin/report-card/{reportCard}/publish` | `admin.report-card.publish` | `Admin\ReportCardPublishController@store` | `web`, `auth`, `role:admin` | Publish rapor |
+| GET | `/admin/reel` | `admin.reel.index` | `Admin\ReelController@index` | `web`, `auth`, `role:admin` | List reels |
+| GET | `/admin/reel/create` | `admin.reel.create` | `Admin\ReelController@create` | `web`, `auth`, `role:admin` | Create reel |
+| POST | `/admin/reel` | `admin.reel.store` | `Admin\ReelController@store` | `web`, `auth`, `role:admin` | Store reel |
+| GET | `/admin/reel/{reel}` | `admin.reel.show` | `Admin\ReelController@show` | `web`, `auth`, `role:admin` | Detail reel |
+| GET | `/admin/reel/{reel}/edit` | `admin.reel.edit` | `Admin\ReelController@edit` | `web`, `auth`, `role:admin` | Edit reel |
+| PUT | `/admin/reel/{reel}` | `admin.reel.update` | `Admin\ReelController@update` | `web`, `auth`, `role:admin` | Update reel |
+| GET | `/admin/gallery` | `admin.gallery.index` | `Admin\ContentController@index` | `web`, `auth`, `role:admin` | Gallery CMS |
+| GET | `/admin/gallery/{content}` | `admin.gallery.show` | `Admin\ContentController@show` | `web`, `auth`, `role:admin` | Detail gallery CMS |
+| GET | `/admin/partner` | `admin.partner.index` | `Admin\ContentController@index` | `web`, `auth`, `role:admin` | Partner CMS |
+| GET | `/admin/partner/{content}` | `admin.partner.show` | `Admin\ContentController@show` | `web`, `auth`, `role:admin` | Detail partner CMS |
+| GET | `/admin/testimonial` | `admin.testimonial.index` | `Admin\ContentController@index` | `web`, `auth`, `role:admin` | Testimonial CMS |
+| GET | `/admin/testimonial/{content}` | `admin.testimonial.show` | `Admin\ContentController@show` | `web`, `auth`, `role:admin` | Detail testimonial CMS |
+| GET | `/admin/faq` | `admin.faq.index` | `Admin\ContentController@index` | `web`, `auth`, `role:admin` | FAQ CMS |
+| GET | `/admin/faq/{content}` | `admin.faq.show` | `Admin\ContentController@show` | `web`, `auth`, `role:admin` | Detail FAQ CMS |
+| GET | `/admin/profile` | `admin.profile.index` | `Admin\SettingController@index` | `web`, `auth`, `role:admin` | Profile/settings CMS |
+| PUT | `/admin/profile` | `admin.profile.update` | `Admin\SettingController@update` | `web`, `auth`, `role:admin` | Update profile/settings |
+| GET | `/admin/contact-message` | `admin.contact-message.index` | `Admin\ContactMessageController@index` | `web`, `auth`, `role:admin` | Pesan kontak RD |
+| GET | `/admin/contact-message/{contactMessage}` | `admin.contact-message.show` | `Admin\ContactMessageController@show` | `web`, `auth`, `role:admin` | Detail pesan kontak RD |
+| GET | `/admin/chatbot-log` | `admin.chatbot-log.index` | `Admin\ChatbotLogController@index` | `web`, `auth`, `role:admin` | Chatbot logs RD |
+| GET | `/admin/chatbot-log/{chatbotLog}` | `admin.chatbot-log.show` | `Admin\ChatbotLogController@show` | `web`, `auth`, `role:admin` | Detail chatbot log RD |
 | GET | `/admin/exports/students` | `admin.exports.students` | `Admin\StudentExportController@index` | `web`, `auth`, `role:admin` | Form export siswa |
 | POST | `/admin/exports/students` | `admin.exports.students.download` | `Admin\StudentExportController@download` | `web`, `auth`, `role:admin` | Download export siswa |
 | GET | `/admin/exports/report-cards` | `admin.exports.report-cards` | `Admin\ReportCardExportController@index` | `web`, `auth`, `role:admin` | Form export rapor |
 | POST | `/admin/exports/report-cards` | `admin.exports.report-cards.download` | `Admin\ReportCardExportController@download` | `web`, `auth`, `role:admin` | Download export rapor |
 
-### Legacy Blade Admin Routes
+### Plural Admin Redirect Compatibility Routes
 
-Route Blade lama tetap tersedia untuk kompatibilitas link/test lama. Route name tetap `admin.*`, tetapi URI aktual berada di `/admin/legacy/...`.
+URL admin plural lama tetap ada sebagai redirect ke singular canonical. Route name memakai prefix `admin.legacy.*` agar tidak menjadi canonical internal link.
 
 | Method | URI | Route Name | Controller/Action | Middleware | Layout/Notes |
 | --- | --- | --- | --- | --- | --- |
-| GET | `/admin/legacy/dashboard` | `admin.dashboard` | `Admin\DashboardController@index` | `web`, `auth`, `role:admin` | Legacy dashboard Blade |
-| GET | `/admin/legacy/registrations` | `admin.registrations.index` | `Admin\RegistrationController@index` | `web`, `auth`, `role:admin` | Legacy list pendaftaran |
-| GET | `/admin/legacy/registrations/{registration}` | `admin.registrations.show` | `Admin\RegistrationController@show` | `web`, `auth`, `role:admin` | Legacy detail pendaftaran |
-| GET | `/admin/legacy/registrations/{registration}/edit` | `admin.registrations.edit` | `Admin\RegistrationController@edit` | `web`, `auth`, `role:admin` | Legacy edit pendaftaran |
-| PUT | `/admin/legacy/registrations/{registration}` | `admin.registrations.update` | `Admin\RegistrationController@update` | `web`, `auth`, `role:admin` | Legacy update pendaftaran |
-| GET | `/admin/legacy/payments` | `admin.payments.index` | `Admin\PaymentController@index` | `web`, `auth`, `role:admin` | Legacy list pembayaran |
-| GET | `/admin/legacy/payments/{payment}` | `admin.payments.show` | `Admin\PaymentController@show` | `web`, `auth`, `role:admin` | Legacy detail pembayaran |
-| POST | `/admin/legacy/payments/{payment}/verify` | `admin.payments.verify` | `Admin\PaymentVerificationController@verify` | `web`, `auth`, `role:admin` | Legacy verify manual |
-| POST | `/admin/legacy/payments/{payment}/reject` | `admin.payments.reject` | `Admin\PaymentVerificationController@reject` | `web`, `auth`, `role:admin` | Legacy reject manual |
-| GET | `/admin/legacy/placement-tests` | `admin.placement-tests.index` | `Admin\PlacementTestController@index` | `web`, `auth`, `role:admin` | Legacy placement test |
-| GET | `/admin/legacy/placement-tests/{registration}` | `admin.placement-tests.show` | `Admin\PlacementTestController@show` | `web`, `auth`, `role:admin` | Legacy detail placement test |
-| POST | `/admin/legacy/placement-tests/{registration}/schedule` | `admin.placement-tests.schedule` | `Admin\PlacementTestScheduleController@store` | `web`, `auth`, `role:admin` | Jadwalkan placement test |
-| POST | `/admin/legacy/placement-tests/{registration}/result` | `admin.placement-tests.result.store` | `Admin\PlacementTestResultController@store` | `web`, `auth`, `role:admin` | Simpan hasil placement test |
-| GET | `/admin/legacy/students` | `admin.students.index` | `Admin\StudentController@index` | `web`, `auth`, `role:admin` | Legacy list siswa |
-| GET | `/admin/legacy/students/{student}` | `admin.students.show` | `Admin\StudentController@show` | `web`, `auth`, `role:admin` | Legacy detail siswa |
-| GET | `/admin/legacy/instructors` | `admin.instructors.index` | `Admin\InstructorController@index` | `web`, `auth`, `role:admin` | Legacy list instructor |
-| GET | `/admin/legacy/instructors/{instructor}` | `admin.instructors.show` | `Admin\InstructorController@show` | `web`, `auth`, `role:admin` | Legacy detail instructor |
-| GET | `/admin/legacy/programs` | `admin.programs.index` | `Admin\ProgramController@index` | `web`, `auth`, `role:admin` | Legacy list program |
-| GET | `/admin/legacy/classes` | `admin.classes.index` | `Admin\ClassController@index` | `web`, `auth`, `role:admin` | Legacy list kelas |
-| GET | `/admin/legacy/enrollments` | `admin.enrollments.index` | `Admin\EnrollmentController@index` | `web`, `auth`, `role:admin` | Legacy list enrollment |
-| GET | `/admin/legacy/report-cards` | `admin.report-cards.index` | `Admin\ReportCardController@index` | `web`, `auth`, `role:admin` | Legacy list rapor |
-| GET | `/admin/legacy/reels` | `admin.reels.index` | `Admin\ReelController@index` | `web`, `auth`, `role:admin` | Legacy list reels |
-| GET | `/admin/legacy/contents` | `admin.contents.index` | `Admin\ContentController@index` | `web`, `auth`, `role:admin` | Legacy CMS content |
-| GET | `/admin/legacy/contact-messages` | `admin.contact-messages.index` | `Admin\ContactMessageController@index` | `web`, `auth`, `role:admin` | Legacy pesan kontak |
-| GET | `/admin/legacy/chatbot-logs` | `admin.chatbot-logs.index` | `Admin\ChatbotLogController@index` | `web`, `auth`, `role:admin` | Legacy chatbot logs |
-| GET | `/admin/legacy/settings` | `admin.settings.index` | `Admin\SettingController@index` | `web`, `auth`, `role:admin` | Legacy settings |
+| GET/HEAD | `/admin/registrations` | `admin.legacy.registrations.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/registration` |
+| GET/HEAD | `/admin/payments` | `admin.legacy.payments.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/payment` |
+| GET/HEAD | `/admin/placement-tests` | `admin.legacy.placement-tests.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/placement-test` |
+| GET/HEAD | `/admin/students` | `admin.legacy.students.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/student` |
+| GET/HEAD | `/admin/instructors` | `admin.legacy.instructors.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/instructor` |
+| GET/HEAD | `/admin/programs` | `admin.legacy.programs.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/program` |
+| GET/HEAD | `/admin/programs/{program}` | `admin.legacy.programs.show` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/program/{program}` |
+| GET/HEAD | `/admin/classes` | `admin.legacy.classes.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/class` |
+| GET/HEAD | `/admin/classes/{class}` | `admin.legacy.classes.show` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/class/{class}` |
+| GET/HEAD | `/admin/enrollments` | `admin.legacy.enrollments.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/enrollment` |
+| GET/HEAD | `/admin/enrollments/{enrollment}` | `admin.legacy.enrollments.show` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/enrollment/{enrollment}` |
+| GET/HEAD | `/admin/report-cards` | `admin.legacy.report-cards.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/report-card` |
+| GET/HEAD | `/admin/reels` | `admin.legacy.reels.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/reel` |
+| GET/HEAD | `/admin/reels/{reel}` | `admin.legacy.reels.show` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/reel/{reel}` |
+| GET/HEAD | `/admin/contents` | `admin.legacy.contents.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/gallery` |
+| GET/HEAD | `/admin/settings` | `admin.legacy.settings.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/profile` |
+| GET/HEAD | `/admin/contact-messages` | `admin.legacy.contact-messages.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/contact-message` |
+| GET/HEAD | `/admin/chatbot-logs` | `admin.legacy.chatbot-logs.index` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/chatbot-log` |
+| GET/HEAD | `/admin/chatbot-logs/{chatbotLog}` | `admin.legacy.chatbot-logs.show` | `Illuminate\Routing\RedirectController` | `web`, `auth`, `role:admin` | Redirect ke `/admin/chatbot-log/{chatbotLog}` |
 
 ## Student Routes
 

@@ -14,7 +14,7 @@ class ReportCardExportController extends Controller
 {
     public function index(): View
     {
-        return view('admin.rasky.export', [
+        return view('pages.admin.placement-test.export', [
             'title' => 'Export Rapor',
             'description' => 'Download rapor wajib memakai template DOC dari folder context.',
             'action' => route('admin.exports.report-cards.download'),

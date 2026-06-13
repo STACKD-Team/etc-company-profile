@@ -11,8 +11,12 @@ use Illuminate\View\View;
 class SettingController extends Controller
 {
     private const SETTINGS = [
+        'vision' => 'Visi',
+        'mission' => 'Misi',
+        'general_info' => 'Informasi Umum',
         'address' => 'Alamat',
         'phone' => 'Telepon',
+        'whatsapp' => 'WhatsApp',
         'email' => 'Email',
         'instagram' => 'Instagram',
         'hours' => 'Jam Operasional',
@@ -27,7 +31,7 @@ class SettingController extends Controller
 
     public function index(): View
     {
-        return view('admin.settings.index', [
+        return view('pages.admin.profile.index', [
             'settings' => $this->contents->settings(array_keys(self::SETTINGS)),
             'labels' => self::SETTINGS,
         ]);
@@ -40,6 +44,6 @@ class SettingController extends Controller
 
         $this->contents->updateSettings($data, self::SETTINGS, $request->file('qris'));
 
-        return to_route('admin.settings.index')->with('status', 'Settings berhasil diperbarui.');
+        return to_route('admin.profile.index')->with('status', 'Settings berhasil diperbarui.');
     }
 }

@@ -15,7 +15,7 @@ class PaymentController extends Controller
 
     public function index(Request $request): View
     {
-        return view('admin.payments.index', [
+        return view('pages.admin.payment.index', [
             'payments' => $this->registrationService->paginatePaymentVerifications($request->only([
                 'search',
                 'status',
@@ -32,7 +32,7 @@ class PaymentController extends Controller
 
     public function show(Registration $payment): View
     {
-        return view('admin.payments.show', [
+        return view('pages.admin.payment.show', [
             'payment' => $payment->load(['user', 'program', 'courseClass']),
         ]);
     }
