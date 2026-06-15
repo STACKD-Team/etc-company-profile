@@ -1306,6 +1306,84 @@ function initDataTables() {
     });
 }
 
+function initModalTriggers() {
+    const setFallbackModalOpen = (modal, isOpen) => {
+        const overlay = modal.querySelector('.fi-modal-close-overlay');
+        const windowElement = modal.querySelector('.fi-modal-window');
+
+        modal.removeAttribute('x-cloak');
+        modal.classList.toggle('fi-modal-open', isOpen);
+        modal.style.display = isOpen ? '' : 'none';
+        modal.dataset.fallbackModalOpen = isOpen ? 'true' : 'false';
+
+        if (overlay) {
+            overlay.style.display = isOpen ? '' : 'none';
+        }
+
+        if (windowElement) {
+            windowElement.style.display = isOpen ? '' : 'none';
+        }
+
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+
+        if (isOpen) {
+            windowElement?.querySelector('select, input, textarea, button')?.focus();
+        }
+    };
+
+    document.addEventListener('click', (event) => {
+        const trigger = event.target.closest('[data-open-modal]');
+
+        if (trigger) {
+            const id = trigger.dataset.openModal;
+
+            if (!id) {
+                return;
+            }
+
+            event.preventDefault();
+            document.dispatchEvent(new CustomEvent("open-modal", {
+                bubbles: true,
+                composed: true,
+                detail: { id },
+            }));
+
+            window.requestAnimationFrame(() => {
+                const modal = document.getElementById(id);
+
+                if (modal && !modal.classList.contains('fi-modal-open')) {
+                    setFallbackModalOpen(modal, true);
+                }
+            });
+
+            return;
+        }
+
+        const closeButton = event.target.closest('.fi-modal-close-btn');
+        const overlay = event.target.closest('.fi-modal-close-overlay');
+        const modal = (closeButton || overlay)?.closest('.fi-modal');
+
+        if (!modal || modal.dataset.fallbackModalOpen !== 'true') {
+            return;
+        }
+
+        event.preventDefault();
+        setFallbackModalOpen(modal, false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+        const modal = document.querySelector('.fi-modal[data-fallback-modal-open="true"]');
+
+        if (modal) {
+            setFallbackModalOpen(modal, false);
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initPublicRegistrationProgress();
     initStudentRevealCards();
@@ -1319,4 +1397,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initPublicFaq();
     initPublicReels();
     initDataTables();
+    initModalTriggers();
 });

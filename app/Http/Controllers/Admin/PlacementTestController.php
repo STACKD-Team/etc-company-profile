@@ -41,7 +41,7 @@ class PlacementTestController extends Controller
 
         return view('pages.admin.placement-test.index', [
             'title' => 'Placement Test',
-            'active' => 'placement',
+            'active' => 'placement-test',
             'items' => $items,
             'columns' => [
                 'registration_code' => ['label' => 'Kode', 'sortable' => true],
@@ -69,7 +69,7 @@ class PlacementTestController extends Controller
 
         return view('pages.admin.placement-test.detail', [
             'title' => 'Detail Placement Test',
-            'active' => 'placement',
+            'active' => 'placement-test',
             'heading' => $registration->registration_code,
             'description' => $registration->applicant_name,
             'details' => [

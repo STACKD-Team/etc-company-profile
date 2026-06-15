@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\ChatbotLog;
 use App\Models\Content;
 use App\Models\CourseClass;
-use App\Models\ChatbotLog;
 use App\Models\Enrollment;
 use App\Models\Program;
 use App\Models\Reel;
@@ -276,12 +276,21 @@ it('renders Sprint 4 enrollment modal and CMS sidebar grouping', function () {
     $this->actingAs($admin)->get(route('admin.enrollment.index'))
         ->assertOk()
         ->assertSee('create-enrollment-modal', false)
+        ->assertSee('data-open-modal="create-enrollment-modal"', false)
         ->assertSee('Assign Siswa ke Kelas');
 
     $this->actingAs($admin)->get(route('admin.dashboard'))
         ->assertOk()
         ->assertSee('data-sidebar-nav-group', false)
+        ->assertSee('data-sidebar-group="admissions"', false)
+        ->assertSee('data-sidebar-group="academic"', false)
+        ->assertSee('data-sidebar-group="users"', false)
+        ->assertSee('data-sidebar-group="communication"', false)
+        ->assertSee('Penerimaan')
+        ->assertSee('Akademik')
+        ->assertSee('Pengguna')
         ->assertSee('CMS')
+        ->assertSee('Komunikasi')
         ->assertDontSee('Export Siswa');
 });
 

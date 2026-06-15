@@ -46,20 +46,21 @@
                     />
                     <x-ui.action-bar align="start">
                         <x-ui.button type="submit" icon="heroicon-m-check">Simpan Hasil</x-ui.button>
-                        <x-ui.modal id="clear-placement-modal" heading="Clear placement test?" description="Jadwal, hasil, dan rekomendasi kelas akan dikosongkan. Status kembali ke paid." icon="heroicon-o-trash" icon-color="danger">
-                            <x-slot:trigger>
-                                <x-ui.button type="button" color="danger" outlined icon="heroicon-m-trash">Clear</x-ui.button>
-                            </x-slot:trigger>
-                            <form method="POST" action="{{ route('admin.placement-test.clear', $placementRegistration) }}">
-                                @csrf
-                                @method('DELETE')
-                                <input type="hidden" name="confirm" value="1">
-                                <x-ui.button type="submit" color="danger" icon="heroicon-m-trash">Clear Placement</x-ui.button>
-                            </form>
-                        </x-ui.modal>
+                        <x-ui.button type="button" color="danger" outlined icon="heroicon-m-trash" data-open-modal="clear-placement-modal">
+                            Clear
+                        </x-ui.button>
                     </x-ui.action-bar>
                 </form>
             </x-ui.detail-card>
         </div>
+
+        <x-ui.modal id="clear-placement-modal" heading="Clear placement test?" description="Jadwal, hasil, dan rekomendasi kelas akan dikosongkan. Status kembali ke paid." icon="heroicon-o-trash" icon-color="danger">
+            <form method="POST" action="{{ route('admin.placement-test.clear', $placementRegistration) }}">
+                @csrf
+                @method('DELETE')
+                <input type="hidden" name="confirm" value="1">
+                <x-ui.button type="submit" color="danger" icon="heroicon-m-trash">Clear Placement</x-ui.button>
+            </form>
+        </x-ui.modal>
     @endisset
 </x-layouts.dashboard>

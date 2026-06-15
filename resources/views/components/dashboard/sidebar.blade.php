@@ -16,16 +16,37 @@
     $defaultItems = [
         'admin' => [
             ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'url' => '/admin/dashboard', 'key' => 'dashboard', 'icon' => 'dashboard'],
-            ['label' => 'Pendaftaran', 'route' => 'admin.registration.index', 'url' => '#', 'key' => 'registrations', 'icon' => 'assignment'],
-            ['label' => 'Pembayaran', 'route' => 'admin.payment.index', 'url' => '#', 'key' => 'payments', 'icon' => 'payments'],
-            ['label' => 'Placement', 'route' => 'admin.placement-test.index', 'url' => '#', 'key' => 'placement-test', 'icon' => 'event_available'],
-            ['label' => 'Siswa', 'route' => 'admin.student.index', 'url' => '#', 'key' => 'students', 'icon' => 'groups'],
-            ['label' => 'Instructor', 'route' => 'admin.instructor.index', 'url' => '#', 'key' => 'instructors', 'icon' => 'co_present'],
-            ['label' => 'Program', 'route' => 'admin.program.index', 'url' => '#', 'key' => 'programs', 'icon' => 'school'],
-            ['label' => 'Kelas', 'route' => 'admin.class.index', 'url' => '#', 'key' => 'classes', 'icon' => 'meeting_room'],
-            ['label' => 'Room', 'route' => 'admin.room.index', 'url' => '#', 'key' => 'rooms', 'icon' => 'meeting_room'],
-            ['label' => 'Enrollment', 'route' => 'admin.enrollment.index', 'url' => '#', 'key' => 'enrollments', 'icon' => 'how_to_reg'],
-            ['label' => 'Rapor', 'route' => 'admin.report-card.index', 'url' => '#', 'key' => 'reports', 'icon' => 'description'],
+            [
+                'label' => 'Penerimaan',
+                'key' => 'admissions',
+                'icon' => 'assignment_ind',
+                'children' => [
+                    ['label' => 'Pendaftaran', 'route' => 'admin.registration.index', 'url' => '#', 'key' => 'registrations', 'icon' => 'assignment'],
+                    ['label' => 'Pembayaran', 'route' => 'admin.payment.index', 'url' => '#', 'key' => 'payments', 'icon' => 'payments'],
+                    ['label' => 'Placement', 'route' => 'admin.placement-test.index', 'url' => '#', 'key' => 'placement-test', 'icon' => 'event_available'],
+                ],
+            ],
+            [
+                'label' => 'Akademik',
+                'key' => 'academic',
+                'icon' => 'school',
+                'children' => [
+                    ['label' => 'Program', 'route' => 'admin.program.index', 'url' => '#', 'key' => 'programs', 'icon' => 'school'],
+                    ['label' => 'Kelas', 'route' => 'admin.class.index', 'url' => '#', 'key' => 'classes', 'icon' => 'meeting_room'],
+                    ['label' => 'Room', 'route' => 'admin.room.index', 'url' => '#', 'key' => 'rooms', 'icon' => 'door_open'],
+                    ['label' => 'Enrollment', 'route' => 'admin.enrollment.index', 'url' => '#', 'key' => 'enrollments', 'icon' => 'how_to_reg'],
+                    ['label' => 'Rapor', 'route' => 'admin.report-card.index', 'url' => '#', 'key' => 'reports', 'icon' => 'description'],
+                ],
+            ],
+            [
+                'label' => 'Pengguna',
+                'key' => 'users',
+                'icon' => 'group',
+                'children' => [
+                    ['label' => 'Siswa', 'route' => 'admin.student.index', 'url' => '#', 'key' => 'students', 'icon' => 'groups'],
+                    ['label' => 'Instructor', 'route' => 'admin.instructor.index', 'url' => '#', 'key' => 'instructors', 'icon' => 'co_present'],
+                ],
+            ],
             [
                 'label' => 'CMS',
                 'key' => 'cms',
@@ -39,8 +60,15 @@
                     ['label' => 'Profile', 'route' => 'admin.profile.index', 'url' => '#', 'key' => 'profile', 'icon' => 'settings'],
                 ],
             ],
-            ['label' => 'Pesan Kontak', 'route' => 'admin.contact-message.index', 'url' => '#', 'key' => 'contact_messages', 'icon' => 'inbox'],
-            ['label' => 'Chatbot Logs', 'route' => 'admin.chatbot-log.index', 'url' => '#', 'key' => 'chatbot_logs', 'icon' => 'forum'],
+            [
+                'label' => 'Komunikasi',
+                'key' => 'communication',
+                'icon' => 'forum',
+                'children' => [
+                    ['label' => 'Pesan Kontak', 'route' => 'admin.contact-message.index', 'url' => '#', 'key' => 'contact_messages', 'icon' => 'inbox'],
+                    ['label' => 'Chatbot Logs', 'route' => 'admin.chatbot-log.index', 'url' => '#', 'key' => 'chatbot_logs', 'icon' => 'smart_toy'],
+                ],
+            ],
         ],
         'student' => [
             ['label' => 'Dashboard', 'route' => 'student.dashboard', 'url' => '#', 'key' => 'dashboard', 'svg' => 'nav-dashboard'],
@@ -73,20 +101,16 @@
         return $item;
     });
 
-    $currentActive = $active ?: $items->first(function (array $item) {
-        $routeName = $item['route'] ?? null;
+    $routeActive = $items
+        ->flatMap(fn (array $item) => $item['children'] !== [] ? $item['children'] : [$item])
+        ->first(function (array $item): bool {
+            $routeName = $item['route'] ?? null;
 
-        return ($routeName
-            && \Illuminate\Support\Facades\Route::has($routeName)
-            && request()->routeIs($routeName))
-            || collect($item['children'] ?? [])->contains(function (array $child): bool {
-                $routeName = $child['route'] ?? null;
-
-                return $routeName
-                    && \Illuminate\Support\Facades\Route::has($routeName)
-                    && request()->routeIs($routeName);
-            });
-    })['key'] ?? 'dashboard';
+            return $routeName
+                && \Illuminate\Support\Facades\Route::has($routeName)
+                && request()->routeIs($routeName);
+        });
+    $currentActive = $active ?: ($routeActive['key'] ?? 'dashboard');
 @endphp
 
 <aside
@@ -137,13 +161,23 @@
             @endphp
 
             @if ($children->isNotEmpty())
-                <details class="group" @if ($isActive) open @endif data-sidebar-nav-group>
+                <details
+                    class="group"
+                    @if ($isActive) open @endif
+                    data-sidebar-nav-group
+                    data-sidebar-group="{{ $item['key'] }}"
+                >
                     <summary
+                        x-tooltip="{
+                            content: sidebarCollapsed && ! sidebarMobileOpen ? @js($item['label']) : '',
+                            theme: $store.theme,
+                        }"
                         @class([
                             'flex min-h-[var(--etc-field-size-sm)] cursor-pointer list-none items-center gap-3 rounded-field px-4 py-1.5 font-heading text-sm font-bold transition duration-200 [&::-webkit-details-marker]:hidden',
                             'bg-etc-surface-container text-etc-magenta shadow-soft ring-1 ring-etc-magenta/20' => $isActive,
                             'text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-on-surface' => ! $isActive,
                         ])
+                        aria-label="{{ $item['label'] }}"
                     >
                         <span class="material-symbols-outlined shrink-0 text-[20px]" @if ($isActive) style="font-variation-settings: 'FILL' 1;" @endif>{{ $item['icon'] }}</span>
                         <span class="truncate" data-sidebar-label>{{ $item['label'] }}</span>
@@ -160,6 +194,8 @@
                                     'text-etc-on-muted hover:bg-etc-surface-container hover:text-etc-on-surface' => ! $childActive,
                                 ])
                                 @if ($childActive) aria-current="page" @endif
+                                aria-label="{{ $child['label'] }}"
+                                data-sidebar-nav-link
                             >
                                 <span class="material-symbols-outlined shrink-0 text-[18px]">{{ $child['icon'] }}</span>
                                 <span class="truncate">{{ $child['label'] }}</span>

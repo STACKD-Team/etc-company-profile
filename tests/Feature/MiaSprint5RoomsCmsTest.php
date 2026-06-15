@@ -222,6 +222,8 @@ it('keeps CMS admin surfaces friendly by hiding slug, redundant type, and raw me
         ->assertSee('Kategori')
         ->assertSee('Website')
         ->assertSee('Tahun kerja sama')
+        ->assertSee('data-open-modal="delete-action-', false)
+        ->assertSee('role="dialog"', false)
         ->assertDontSee('polished-partner-sprint-5')
         ->assertDontSee('category');
 

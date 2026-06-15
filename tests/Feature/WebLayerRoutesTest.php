@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\Program;
 use App\Models\CourseClass;
 use App\Models\Enrollment;
-use App\Models\ReportCard;
+use App\Models\Program;
 use App\Models\Registration;
+use App\Models\ReportCard;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
@@ -181,6 +181,11 @@ it('allows admin users to open Rasky admin GET pages', function () {
     ] as $url) {
         $this->actingAs($admin)->get($url)->assertOk();
     }
+
+    $this->actingAs($admin)
+        ->get(route('admin.placement-test.index'))
+        ->assertSee('href="'.route('admin.placement-test.index').'"', false)
+        ->assertSee('aria-current="page"', false);
 });
 
 it('renders the Rasky placement detail workflow forms for admin users', function () {
@@ -195,6 +200,7 @@ it('renders the Rasky placement detail workflow forms for admin users', function
         ->assertSee('Jadwal Placement Test')
         ->assertSee('Hasil dan Rekomendasi Kelas')
         ->assertSee($courseClass->name)
+        ->assertSee('aria-current="page"', false)
         ->assertSee(route('admin.placement-test.schedule', $registration), false)
         ->assertSee(route('admin.placement-test.result.store', $registration), false);
 });
@@ -274,7 +280,7 @@ it('allows admin users to store placement result and assign a class without crea
     expect($registration->placement_test_result)->toBe('Student is ready for Teen 4.')
         ->and($registration->class_id)->toBe($courseClass->id)
         ->and($registration->status)->toBe('enrolled')
-        ->and(\App\Models\Enrollment::query()->where('user_id', $registration->user_id)->where('class_id', $courseClass->id)->exists())->toBeFalse();
+        ->and(Enrollment::query()->where('user_id', $registration->user_id)->where('class_id', $courseClass->id)->exists())->toBeFalse();
 });
 
 it('validates placement test result input', function () {

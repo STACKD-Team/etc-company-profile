@@ -21,16 +21,27 @@
         search-placeholder="Cari siswa, email, kelas, atau program"
     >
         <x-slot:actions>
-            <x-ui.modal id="create-enrollment-modal" heading="Assign Siswa ke Kelas" description="Buat enrollment dari daftar siswa dan kelas aktif." icon="heroicon-o-user-plus" width="2xl">
-                <x-slot:trigger>
-                    <x-ui.button type="button" icon="heroicon-m-plus">Assign Siswa</x-ui.button>
-                </x-slot:trigger>
-                <form method="POST" action="{{ route('admin.enrollment.store') }}" class="space-y-6">
-                    @php($enrollment = new \App\Models\Enrollment(['status' => 'active']))
-                    @include('pages.admin.enrollment._form')
-                    <x-ui.button type="submit" icon="heroicon-m-check">Simpan Enrollment</x-ui.button>
-                </form>
-            </x-ui.modal>
+            <x-ui.button
+                type="button"
+                icon="heroicon-m-plus"
+                data-open-modal="create-enrollment-modal"
+            >
+                Assign Siswa
+            </x-ui.button>
         </x-slot:actions>
     </x-ui.data-table>
+
+    <x-ui.modal
+        id="create-enrollment-modal"
+        heading="Assign Siswa ke Kelas"
+        description="Buat enrollment dari daftar siswa dan kelas aktif."
+        icon="heroicon-o-user-plus"
+        width="2xl"
+    >
+        <form method="POST" action="{{ route('admin.enrollment.store') }}" class="space-y-6">
+            @php($enrollment = new \App\Models\Enrollment(['status' => 'active']))
+            @include('pages.admin.enrollment._form')
+            <x-ui.button type="submit" icon="heroicon-m-check">Simpan Enrollment</x-ui.button>
+        </form>
+    </x-ui.modal>
 </x-layouts.dashboard>

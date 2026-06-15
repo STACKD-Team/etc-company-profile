@@ -8,6 +8,17 @@
     'slideOver' => false,
 ])
 
+@isset($trigger)
+    <div
+        {{ $trigger->attributes->class('fi-modal-trigger') }}
+        @if ($id && ! $trigger->attributes->get('disabled'))
+            data-open-modal="{{ $id }}"
+        @endif
+    >
+        {{ $trigger }}
+    </div>
+@endisset
+
 <x-filament::modal
     :id="$id"
     :heading="$heading"
@@ -18,10 +29,6 @@
     :slide-over="$slideOver"
     {{ $attributes }}
 >
-    @isset($trigger)
-        <x-slot name="trigger">{{ $trigger }}</x-slot>
-    @endisset
-
     {{ $slot }}
 
     @isset($footer)

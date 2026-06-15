@@ -5,6 +5,7 @@ use App\Models\Content;
 use App\Models\Program;
 use App\Models\Reel;
 use App\Models\Room;
+use App\Services\MediaStorageService;
 use App\Services\PublicDiscoveryService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
@@ -135,6 +136,13 @@ it('keeps remote, local, and fallback media URL behavior compatible', function (
 
     expect($media->mediaUrl('cloudinary://public/missing/photo', 'images/fallback.jpg'))
         ->toBe(asset('images/fallback.jpg'));
+});
+
+it('builds public storage media URLs from the active application origin', function () {
+    app('url')->forceRootUrl('http://127.0.0.1:8000');
+
+    expect(app(MediaStorageService::class)->url('contents/images/partner.png'))
+        ->toBe('http://127.0.0.1:8000/storage/contents/images/partner.png');
 });
 
 it('answers the public chatbot from Qdrant context and NVIDIA completion', function () {

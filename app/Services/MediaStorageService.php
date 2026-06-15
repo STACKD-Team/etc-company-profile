@@ -65,7 +65,7 @@ class MediaStorageService
             return asset(ltrim($path, '/'));
         }
 
-        return Storage::disk('public')->url($path);
+        return asset('storage/'.ltrim($path, '/'));
     }
 
     protected function buildPath(UploadedFile $file, string $directory): string
