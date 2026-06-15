@@ -40,14 +40,68 @@
         </div>
 
         <aside class="space-y-6">
-            <x-ui.panel heading="Chat Bantuan" description="Tampilan awal chatbot siswa. Integrasi RAG akan ditambahkan pada sprint integrasi.">
-                <div class="space-y-3">
-                    <div class="rounded-box bg-etc-charcoal p-4 text-etc-surface shadow-soft">
-                        <p class="font-heading text-sm font-bold">ETC Assistant</p>
-                        <p class="mt-2 text-sm leading-6 text-etc-surface/75">Halo, {{ $student->full_name ?? $student->name }}. Saya bisa membantu mengarahkan pertanyaan tentang kelas, pembayaran, dan rapor.</p>
-                    </div>
-                    <div class="ml-8 rounded-box bg-etc-surface-container p-4 shadow-soft">
-                        <p class="text-sm leading-6 text-etc-on-surface">Pilih kategori di halaman ini, lalu hubungi admin jika butuh tindak lanjut.</p>
+            <x-ui.panel heading="Chat Bantuan" description="Tanyakan kelas, pembayaran, riwayat belajar, dan rapor dari portal siswa.">
+                <div
+                    class="space-y-4"
+                    data-chatbot-widget
+                    data-chatbot-endpoint="{{ route('public.chatbot.messages.store') }}"
+                    aria-label="Chat bantuan siswa ETC Planet"
+                >
+                    <div class="overflow-hidden rounded-box border-2 border-etc-outline-variant bg-etc-surface shadow-soft" data-chatbot-panel>
+                        <div class="bg-etc-charcoal p-4 text-etc-surface">
+                            <p class="font-heading text-sm font-bold">ETC Assistant</p>
+                            <p class="mt-2 text-sm leading-6 text-etc-surface/75">Halo, {{ $student->full_name ?? $student->name }}. Saya bisa bantu menjawab pertanyaan tentang status belajar, pembayaran, dan rapor.</p>
+                        </div>
+
+                        <div class="max-h-96 space-y-3 overflow-y-auto bg-etc-surface-low p-4" data-chatbot-messages>
+                            <p class="max-w-[90%] rounded-card bg-etc-surface px-4 py-3 text-sm leading-6 text-etc-on-muted shadow-soft">
+                                Coba tanyakan: "Bagaimana cek rapor saya?" atau "Di mana lihat status pembayaran?"
+                            </p>
+                        </div>
+
+                        <div class="border-t-2 border-etc-outline-variant bg-etc-surface p-4">
+                            <div class="mb-3 flex flex-wrap gap-2" data-chatbot-suggestions>
+                                @foreach ([
+                                    'Bagaimana melihat kelas aktif saya?',
+                                    'Di mana cek status pembayaran?',
+                                    'Bagaimana download rapor?',
+                                    'Apa isi riwayat belajar?',
+                                ] as $suggestion)
+                                    <x-ui.button
+                                        type="button"
+                                        color="gray"
+                                        outlined
+                                        size="xs"
+                                        class="!rounded-pill"
+                                        data-chatbot-suggestion="{{ $suggestion }}"
+                                    >
+                                        {{ $suggestion }}
+                                    </x-ui.button>
+                                @endforeach
+                            </div>
+
+                            <form class="flex gap-2" data-chatbot-form>
+                                <x-ui.field
+                                    id="student-help-chatbot-message"
+                                    name="message"
+                                    label="Pesan chatbot"
+                                    label-class="sr-only"
+                                    wrapper-class="min-w-0 flex-1"
+                                    maxlength="1000"
+                                    required
+                                    autocomplete="off"
+                                    placeholder="Tulis pertanyaan..."
+                                />
+                                <x-ui.icon-button
+                                    type="submit"
+                                    icon="heroicon-m-paper-airplane"
+                                    label="Kirim pesan"
+                                    color="primary"
+                                    class="!rounded-pill"
+                                    data-chatbot-submit
+                                />
+                            </form>
+                        </div>
                     </div>
                 </div>
             </x-ui.panel>

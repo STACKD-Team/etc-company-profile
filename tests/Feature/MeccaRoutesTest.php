@@ -2,7 +2,9 @@
 
 use App\Models\CourseClass;
 use App\Models\Enrollment;
+use App\Models\ChatbotLog;
 use App\Models\Program;
+use App\Models\ProgramPromotion;
 use App\Models\Registration;
 use App\Models\ReportCard;
 use App\Models\Room;
@@ -275,6 +277,48 @@ test('student mecca pages render for authenticated student', function () {
     $this->actingAs($student)->get(route('student.report-cards.index', [], false))->assertOk()->assertViewIs('pages.student.report-card.index');
     $this->actingAs($student)->get(route('student.report-cards.show', $reportCard, false))->assertOk()->assertViewIs('pages.student.report-card.show')->assertSee('Detail Rapor');
     $this->actingAs($student)->get(route('student.help.index', [], false))->assertOk()->assertViewIs('pages.student.help.index');
+});
+
+test('student sprint seven help page renders active rag chatbot widget', function () {
+    $student = User::factory()->create([
+        'role' => 'student',
+        'full_name' => 'Mecca Chat Student',
+    ]);
+
+    $this->actingAs($student)
+        ->get(route('student.help.index', [], false))
+        ->assertOk()
+        ->assertSee('data-chatbot-widget', false)
+        ->assertSee('data-chatbot-messages', false)
+        ->assertSee('data-chatbot-form', false)
+        ->assertSee(route('public.chatbot.messages.store', [], false), false)
+        ->assertSee('Bagaimana melihat kelas aktif saya?')
+        ->assertDontSee('Integrasi RAG akan ditambahkan');
+});
+
+test('authenticated student chatbot message uses rag endpoint and stores user log', function () {
+    $student = User::factory()->create([
+        'role' => 'student',
+        'full_name' => 'Mecca Chat Student',
+    ]);
+
+    $this->actingAs($student)
+        ->postJson(route('public.chatbot.messages.store'), [
+            'message' => 'Bagaimana melihat status pembayaran saya?',
+            'session_id' => 'student-session-mecca',
+        ])
+        ->assertOk()
+        ->assertJson([
+            'status' => 'ok',
+            'session_id' => 'student-session-mecca',
+        ])
+        ->assertJsonPath('intent', 'pricing');
+
+    expect(ChatbotLog::query()
+        ->where('session_id', 'student-session-mecca')
+        ->where('user_id', $student->id)
+        ->where('user_message', 'Bagaimana melihat status pembayaran saya?')
+        ->exists())->toBeTrue();
 });
 
 test('student sprint six detail pages use shared detail components', function () {
@@ -891,6 +935,71 @@ test('student payment detail shows midtrans snapshot and continue payment link',
         ->assertSee('Lanjutkan Pembayaran')
         ->assertSee('https://pay.example.test/snap', false)
         ->assertDontSee('Bukti Pembayaran');
+});
+
+test('student payment pages use saved promo snapshot instead of current promotion relation', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $program = createMeccaSprint4Program(['name' => 'Strict Snapshot Program', 'slug' => 'strict-snapshot-program']);
+    $promotion = ProgramPromotion::query()->create([
+        'program_id' => $program->id,
+        'title' => 'Current Relation Promo',
+        'discount_type' => 'fixed',
+        'discount_value' => 500000,
+        'is_active' => true,
+    ]);
+
+    $withSnapshot = Registration::query()->create([
+        'registration_code' => 'REG-SNAPSHOT-STRICT',
+        'user_id' => $student->id,
+        'program_id' => $program->id,
+        'applicant_name' => 'Snapshot Strict Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_method' => 'qris',
+        'payment_status' => 'paid',
+        'payment_amount' => 2000000,
+        'original_amount' => 2000000,
+        'discount_amount' => 250000,
+        'final_amount' => 1750000,
+        'program_promotion_id' => $promotion->id,
+        'program_promotion_title' => 'Saved Snapshot Promo',
+        'status' => 'paid',
+    ]);
+
+    $withoutSnapshot = Registration::query()->create([
+        'registration_code' => 'REG-RELATION-IGNORED',
+        'user_id' => $student->id,
+        'program_id' => $program->id,
+        'applicant_name' => 'Relation Ignored Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_method' => 'qris',
+        'payment_status' => 'paid',
+        'payment_amount' => 2000000,
+        'original_amount' => 2000000,
+        'discount_amount' => 0,
+        'final_amount' => 2000000,
+        'program_promotion_id' => $promotion->id,
+        'program_promotion_title' => null,
+        'status' => 'paid',
+    ]);
+
+    $this->actingAs($student)
+        ->get(route('student.payments.index', ['search' => 'SNAPSHOT-STRICT'], false))
+        ->assertOk()
+        ->assertSee('Saved Snapshot Promo')
+        ->assertDontSee('Current Relation Promo');
+
+    $this->actingAs($student)
+        ->get(route('student.payments.show', $withSnapshot, false))
+        ->assertOk()
+        ->assertSee('Saved Snapshot Promo')
+        ->assertDontSee('Current Relation Promo');
+
+    $this->actingAs($student)
+        ->get(route('student.payments.show', $withoutSnapshot, false))
+        ->assertOk()
+        ->assertDontSee('Current Relation Promo');
 });
 
 test('admin academic mecca pages render for authenticated admin', function () {
