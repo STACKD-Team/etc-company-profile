@@ -501,13 +501,18 @@ class InstructorPanelService
         return $query->where(function (Builder $query): void {
             $query
                 ->doesntHave('reportCard')
-                ->orWhereHas('reportCard', fn (Builder $query) => $this->applyMissingAssessmentFieldConstraint($query));
+                ->orWhereHas('reportCard', function (Builder $query): void {
+                    $query->where('is_published', false);
+                    $this->applyMissingAssessmentFieldConstraint($query);
+                });
         });
     }
 
     private function applyCompleteAssessmentConstraint(Builder $query): Builder
     {
         return $query->whereHas('reportCard', function (Builder $query): void {
+            $query->where('is_published', false);
+
             foreach (self::ASSESSMENT_FIELDS as $field) {
                 $query->whereNotNull($field);
             }
@@ -520,7 +525,10 @@ class InstructorPanelService
             'not_started' => $query->doesntHave('reportCard'),
             'incomplete' => $query->whereHas(
                 'reportCard',
-                fn (Builder $query) => $this->applyMissingAssessmentFieldConstraint($query),
+                function (Builder $query): void {
+                    $query->where('is_published', false);
+                    $this->applyMissingAssessmentFieldConstraint($query);
+                },
             ),
             'draft' => $query->whereHas('reportCard', fn (Builder $query) => $query->where('is_published', false)),
             'published' => $query->whereHas('reportCard', fn (Builder $query) => $query->where('is_published', true)),

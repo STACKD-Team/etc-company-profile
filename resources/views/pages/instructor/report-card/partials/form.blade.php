@@ -1,4 +1,4 @@
-<form method="POST" action="{{ $action }}" class="space-y-6">
+<form method="POST" action="{{ $action }}" class="space-y-6" data-instructor-assessment-form>
         @csrf
         @if ($method !== 'POST')
             @method($method)
@@ -26,7 +26,7 @@
             icon="heroicon-o-pencil-square"
             class="motion-safe:transition motion-safe:duration-200 motion-safe:hover:shadow-panel"
         >
-            <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
+            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                 @foreach ([
                     'score_listening' => 'Listening',
                     'score_vocabulary' => 'Vocabulary',
@@ -40,7 +40,7 @@
                         :value="$reportCard->{$field}"
                         min="0"
                         max="20"
-                        helper="Maksimal 20"
+                        helper="Skor 0-20"
                     />
                 @endforeach
             </div>
@@ -52,10 +52,10 @@
             icon="heroicon-o-chart-bar-square"
             class="motion-safe:transition motion-safe:duration-200 motion-safe:hover:shadow-panel"
         >
-            <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
+            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                 @foreach ([
-                    'grade_pronunciation' => 'Pronunciation',
-                    'grade_sentence_arrangement' => 'Sentence Arrangement',
+                    'grade_pronunciation' => 'Pronunciation Fluency',
+                    'grade_sentence_arrangement' => 'Sentence and Word Arrangement',
                     'grade_class_participation' => 'Class Participation',
                     'grade_questioning_skill' => 'Questioning Skill',
                     'grade_analyzing_skill' => 'Analyzing Skill',
@@ -106,10 +106,10 @@
         </x-ui.panel>
 
         <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <x-ui.button :href="route('instructor.report-cards.index')" outlined>
+            <x-ui.button :href="route('instructor.report-cards.index')" outlined class="w-full justify-center sm:w-auto">
                 Batal
             </x-ui.button>
-            <x-ui.button type="submit" icon="heroicon-m-check">
+            <x-ui.button type="submit" icon="heroicon-m-check" class="w-full justify-center sm:w-auto">
                 Simpan Draft Assessment
             </x-ui.button>
         </div>

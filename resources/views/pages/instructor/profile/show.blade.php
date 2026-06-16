@@ -59,7 +59,7 @@
         </x-ui.panel>
 
         <div class="flex justify-end">
-            <x-ui.button type="submit" icon="heroicon-m-check">
+            <x-ui.button type="submit" icon="heroicon-m-check" class="w-full justify-center sm:w-auto">
                 Simpan Profil
             </x-ui.button>
         </div>

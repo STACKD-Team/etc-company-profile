@@ -45,7 +45,7 @@
             </div>
         </x-ui.panel>
 
-        <section class="grid gap-6 xl:grid-cols-2">
+        <section class="grid gap-6 lg:grid-cols-2">
             <x-ui.panel
                 heading="Written Test"
                 icon="heroicon-o-pencil-square"
@@ -61,14 +61,18 @@
                     ] as $label => $value)
                         <div class="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
                             <dt class="text-sm text-etc-on-muted">{{ $label }}</dt>
-                            <dd class="font-heading font-bold text-etc-on-surface">{{ $value ?? '-' }}</dd>
+                            <dd class="font-heading font-bold text-etc-on-surface">
+                                {{ $value !== null ? $value.'/20' : '-' }}
+                            </dd>
                         </div>
                     @endforeach
                 </dl>
                 <x-slot:footer>
                     <div class="flex items-center justify-between">
                         <span class="font-heading text-sm font-bold">Total Score</span>
-                        <span class="font-heading text-2xl font-bold text-etc-magenta">{{ $reportCard->total_score ?? '-' }}</span>
+                        <span class="font-heading text-2xl font-bold text-etc-magenta">
+                            {{ $reportCard->total_score !== null ? $reportCard->total_score.'/100' : '-' }}
+                        </span>
                     </div>
                 </x-slot:footer>
             </x-ui.panel>
@@ -80,8 +84,8 @@
             >
                 <dl class="divide-y divide-etc-outline-variant/50">
                     @foreach ([
-                        'Pronunciation' => $reportCard->grade_pronunciation,
-                        'Sentence Arrangement' => $reportCard->grade_sentence_arrangement,
+                        'Pronunciation Fluency' => $reportCard->grade_pronunciation,
+                        'Sentence and Word Arrangement' => $reportCard->grade_sentence_arrangement,
                         'Class Participation' => $reportCard->grade_class_participation,
                         'Questioning Skill' => $reportCard->grade_questioning_skill,
                         'Analyzing Skill' => $reportCard->grade_analyzing_skill,

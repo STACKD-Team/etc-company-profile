@@ -27,7 +27,7 @@
     </x-slot:headerActions>
 
     <div class="space-y-6" data-instructor-dashboard>
-        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5" aria-label="Ringkasan kelas instructor">
+        <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5" aria-label="Ringkasan kelas instructor">
             @foreach ($statCards as $card)
                 <x-ui.panel
                     compact
@@ -71,7 +71,7 @@
                         @foreach ($classes as $class)
                             <a
                                 href="{{ route('instructor.classes.show', $class) }}"
-                                class="group flex flex-col gap-3 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between motion-safe:transition motion-safe:duration-200"
+                                class="group flex flex-col gap-3 rounded-box py-4 outline-none first:pt-0 last:pb-0 focus-visible:ring-2 focus-visible:ring-etc-magenta focus-visible:ring-offset-2 sm:flex-row sm:items-center sm:justify-between motion-safe:transition motion-safe:duration-200"
                             >
                                 <div class="min-w-0">
                                     <div class="flex flex-wrap items-center gap-2">
@@ -133,6 +133,7 @@
                                     :href="$reportCard ? route('instructor.report-cards.edit', $reportCard) : route('instructor.report-cards.create', $enrollment)"
                                     size="sm"
                                     outlined
+                                    class="w-full justify-center sm:w-auto"
                                 >
                                     {{ $reportCard ? 'Lanjutkan' : 'Mulai' }}
                                 </x-ui.button>

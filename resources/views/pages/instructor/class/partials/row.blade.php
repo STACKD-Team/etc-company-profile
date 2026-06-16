@@ -1,6 +1,11 @@
 <tr class="group">
     <td class="py-4 pr-4 font-heading font-bold text-etc-on-surface">
-        <a href="{{ route('instructor.classes.show', $item) }}" class="text-etc-on-surface hover:text-etc-magenta">{{ $item->name }}</a>
+        <a
+            href="{{ route('instructor.classes.show', $item) }}"
+            class="rounded-selector text-etc-on-surface outline-none hover:text-etc-magenta focus-visible:ring-2 focus-visible:ring-etc-magenta focus-visible:ring-offset-2"
+        >
+            {{ $item->name }}
+        </a>
     </td>
     <td class="py-4 pr-4 text-etc-on-muted">{{ $item->program?->name ?? '-' }}</td>
     <td class="py-4 pr-4">

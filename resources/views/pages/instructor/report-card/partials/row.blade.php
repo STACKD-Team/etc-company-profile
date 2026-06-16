@@ -5,7 +5,9 @@
         <p class="mt-1 text-xs text-etc-on-muted">{{ $item->user?->email ?? '-' }}</p>
     </td>
     <td class="py-4 pr-4 text-etc-on-muted">{{ $item->courseClass?->name ?? '-' }}</td>
-    <td class="py-4 pr-4 font-heading font-bold">{{ $reportCard?->total_score ?? '-' }}</td>
+    <td class="py-4 pr-4 font-heading font-bold">
+        {{ $reportCard?->total_score !== null ? $reportCard->total_score.'/100' : '-' }}
+    </td>
     <td class="py-4 pr-4">
         <x-ui.badge :status="$item->assessment_state">
             {{ match ($item->assessment_state) {

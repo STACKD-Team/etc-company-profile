@@ -4,7 +4,10 @@
         <p class="mt-1 text-xs text-etc-on-muted">{{ $item->user?->email ?? '-' }}</p>
     </td>
     <td class="py-4 pr-4 text-etc-on-muted">
-        <a href="{{ route('instructor.classes.show', $item->courseClass) }}" class="font-semibold text-etc-magenta hover:text-etc-primary">
+        <a
+            href="{{ route('instructor.classes.show', $item->courseClass) }}"
+            class="rounded-selector font-semibold text-etc-magenta outline-none hover:text-etc-primary focus-visible:ring-2 focus-visible:ring-etc-magenta focus-visible:ring-offset-2"
+        >
             {{ $item->courseClass?->name ?? '-' }}
         </a>
     </td>
@@ -22,19 +25,21 @@
         </x-ui.badge>
     </td>
     <td class="py-4 pr-4">
-        @if ($item->reportCard)
+        @if ($item->reportCard && ! $item->can_edit_assessment)
             <x-ui.icon-button
-                :href="route($item->reportCard->is_published ? 'instructor.report-cards.show' : 'instructor.report-cards.edit', $item->reportCard)"
-                :icon="$item->reportCard->is_published ? 'heroicon-m-eye' : 'heroicon-m-pencil-square'"
-                :label="$item->reportCard->is_published ? 'Lihat assessment siswa' : 'Nilai siswa'"
+                :href="route('instructor.report-cards.show', $item->reportCard)"
+                icon="heroicon-m-eye"
+                label="Lihat assessment siswa"
                 size="sm"
                 outlined
             />
         @else
             <x-ui.icon-button
-                :href="route('instructor.report-cards.create', $item)"
+                :href="$item->reportCard
+                    ? route('instructor.report-cards.edit', $item->reportCard)
+                    : route('instructor.report-cards.create', $item)"
                 icon="heroicon-m-pencil-square"
-                label="Mulai assessment siswa"
+                :label="$item->reportCard ? 'Edit assessment siswa' : 'Mulai assessment siswa'"
                 size="sm"
                 outlined
             />
