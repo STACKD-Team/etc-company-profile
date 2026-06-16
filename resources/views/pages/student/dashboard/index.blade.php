@@ -28,10 +28,10 @@
     $latestReportClass = $latestReport?->enrollment?->courseClass;
 
     $statCards = [
-        ['label' => 'Kelas Aktif', 'value' => $stats['active_classes'], 'icon' => 'stat-class'],
-        ['label' => 'Total Pertemuan', 'value' => $stats['total_meetings'], 'icon' => 'stat-meeting'],
-        ['label' => 'Nilai Terakhir', 'value' => $stats['average_grade'], 'icon' => 'stat-grade'],
-        ['label' => 'Rapor Terbit', 'value' => $stats['certificates'], 'icon' => 'stat-certificate'],
+        ['label' => 'Kelas Aktif', 'value' => $stats['active_classes'], 'icon' => 'heroicon-m-academic-cap'],
+        ['label' => 'Total Pertemuan', 'value' => $stats['total_meetings'], 'icon' => 'heroicon-o-calendar-days'],
+        ['label' => 'Nilai Terakhir', 'value' => $stats['average_grade'], 'icon' => 'heroicon-o-star'],
+        ['label' => 'Rapor Terbit', 'value' => $stats['certificates'], 'icon' => 'heroicon-m-document-text'],
     ];
 @endphp
 
@@ -61,13 +61,14 @@
 
         <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Ringkasan progres belajar">
             @foreach ($statCards as $card)
-                <article class="student-reveal rounded-box border-2 border-etc-outline-variant bg-etc-surface p-5 shadow-soft" data-reveal-card>
-                    <span class="mb-5 flex h-12 w-12 items-center justify-center rounded-selector bg-etc-surface-container">
-                        <x-ui.icon :name="$card['icon']" class="h-6 w-6" />
-                    </span>
-                    <p class="text-sm text-etc-on-muted">{{ $card['label'] }}</p>
-                    <strong class="mt-2 block font-heading text-3xl font-bold text-etc-on-surface" data-stat-value>{{ $card['value'] }}</strong>
-                </article>
+                <x-ui.stat-card
+                    :label="$card['label']"
+                    :value="$card['value']"
+                    :icon="$card['icon']"
+                    :value-attributes="['data-stat-value' => 'true']"
+                    class="student-reveal"
+                    data-reveal-card
+                />
             @endforeach
         </section>
 
@@ -86,20 +87,23 @@
                                 <h3 class="font-heading text-2xl font-bold text-etc-on-surface">{{ $className }}</h3>
                                 <p class="mt-3 text-sm leading-6 text-etc-on-muted">{{ $activeProgram?->description ?? 'Detail kelas akan diperbarui oleh admin.' }}</p>
 
-                                <dl class="mt-5 grid gap-3 sm:grid-cols-3">
-                                    <div class="rounded-box bg-etc-surface-container p-4">
-                                        <dt class="text-xs font-bold uppercase text-etc-on-muted">Instruktur</dt>
-                                        <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $instructorName }}</dd>
-                                    </div>
-                                    <div class="rounded-box bg-etc-surface-container p-4">
-                                        <dt class="text-xs font-bold uppercase text-etc-on-muted">Jadwal</dt>
-                                        <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $schedule }}</dd>
-                                    </div>
-                                    <div class="rounded-box bg-etc-surface-container p-4">
-                                        <dt class="text-xs font-bold uppercase text-etc-on-muted">Ruangan</dt>
-                                        <dd class="mt-1 font-heading text-sm font-bold text-etc-on-surface">{{ $roomName }}</dd>
-                                    </div>
-                                </dl>
+                                <x-ui.description-list columns="3" class="mt-5 gap-3">
+                                    <x-ui.description-item
+                                        label="Instruktur"
+                                        :value="$instructorName"
+                                        class="rounded-box bg-etc-surface-container p-4"
+                                    />
+                                    <x-ui.description-item
+                                        label="Jadwal"
+                                        :value="$schedule"
+                                        class="rounded-box bg-etc-surface-container p-4"
+                                    />
+                                    <x-ui.description-item
+                                        label="Ruangan"
+                                        :value="$roomName"
+                                        class="rounded-box bg-etc-surface-container p-4"
+                                    />
+                                </x-ui.description-list>
 
                                 <div class="mt-6">
                                     <div class="mb-2 flex items-center justify-between gap-4 text-sm">
@@ -111,14 +115,14 @@
                                     </div>
                                 </div>
 
-                                <div class="mt-6 flex flex-wrap gap-3">
+                                <x-ui.action-bar align="start" class="mt-6">
                                     <x-ui.button :href="route('student.classes.show', $activeCourseClass)" icon="heroicon-m-eye">
                                         Detail Kelas
                                     </x-ui.button>
                                     <x-ui.button :href="route('student.learning-history.index')" outlined icon="heroicon-m-clock">
                                         Riwayat Belajar
                                     </x-ui.button>
-                                </div>
+                                </x-ui.action-bar>
                             </div>
                         </div>
                     @else
@@ -193,12 +197,12 @@
                                 <p class="mt-4 text-xs font-bold uppercase text-etc-on-muted">Nilai Akhir</p>
                                 <p class="mt-1 font-heading text-3xl font-bold text-etc-magenta">{{ $latestReport->final_grade ?? '-' }}</p>
                             </div>
-                            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                            <x-ui.action-bar align="start" class="gap-3">
                                 <x-ui.button :href="route('student.report-cards.show', $latestReport)" icon="heroicon-m-eye">Lihat Rapor</x-ui.button>
                                 @if ($latestReport->pdf_path)
                                     <x-ui.button :href="route('student.report-cards.download', $latestReport)" outlined icon="heroicon-m-arrow-down-tray">Unduh</x-ui.button>
                                 @endif
-                            </div>
+                            </x-ui.action-bar>
                         </div>
                     @else
                         <x-ui.empty-state heading="Belum ada rapor terbit" description="Rapor akan tampil setelah dipublikasikan admin." icon="heroicon-o-document-text" />
