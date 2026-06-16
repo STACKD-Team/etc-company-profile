@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('keeps reel analytics controlled without exposing like or view controls', function () {
+it('keeps reel analytics controlled with accessible like and view controls', function () {
     $reel = Reel::query()->create([
         'title' => 'Sprint 6 Interactive Reel',
         'description' => 'Reel dengan action yang mudah dijangkau.',
@@ -25,11 +25,12 @@ it('keeps reel analytics controlled without exposing like or view controls', fun
     $this->get(route('public.reels.index'))
         ->assertOk()
         ->assertSee('data-view-endpoint="'.route('public.reels.views.store', $reel).'"', false)
-        ->assertDontSee('public-reel-actions', false)
-        ->assertDontSee('data-reel-view-count', false)
-        ->assertDontSee('data-reel-like', false)
-        ->assertDontSee('data-like-endpoint', false)
-        ->assertDontSee('favorite_border');
+        ->assertSee('public-reel-actions', false)
+        ->assertSee('data-reel-view-count', false)
+        ->assertSee('data-reel-like', false)
+        ->assertSee('data-like-endpoint="'.route('public.reels.likes.store', $reel).'"', false)
+        ->assertSee('aria-pressed="false"', false)
+        ->assertSee('favorite_border');
 });
 
 it('exposes clear enrollment, program, and consultation actions in the first viewport', function () {

@@ -9,11 +9,13 @@
     @php
         $media = app(\App\Services\PublicDiscoveryService::class);
         $assetUrl = static fn (?string $path, string $fallback = 'videos/video1.mp4', string $resourceType = 'image'): string => $media->mediaUrl($path, $fallback, $resourceType);
+        $likedReelIds = collect(session('liked_reels', []))->map(static fn (mixed $id): int => (int) $id);
     @endphp
 
     @if ($reels->isNotEmpty())
         <section class="public-reels-feed" data-vertical-reels-feed aria-label="ETC Planet Reels">
             @foreach ($reels as $reel)
+                @php($isLiked = $likedReelIds->contains((int) $reel->getKey()))
                 <article class="public-reel-slide" data-reel-slide data-reel-id="{{ $reel->getKey() }}">
                     <x-ui.button
                         :href="route('public.home') . '#reels'"
@@ -77,6 +79,35 @@
                             </div>
                         </div>
 
+                        <div class="public-reel-actions" aria-label="Aksi reel {{ $reel->title }}">
+                            <div class="public-reel-action" aria-label="{{ number_format((int) $reel->views_count, 0, ',', '.') }} kali ditonton">
+                                <span class="public-reel-action__button" aria-hidden="true">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </span>
+                                <span class="public-reel-action__count" data-reel-view-count>{{ number_format((int) $reel->views_count, 0, ',', '.') }}</span>
+                                <span class="sr-only">tayangan</span>
+                            </div>
+
+                            <x-ui.button
+                                type="button"
+                                color="gray"
+                                size="sm"
+                                class="public-reel-action public-reel-action--interactive"
+                                data-reel-like
+                                data-like-endpoint="{{ route('public.reels.likes.store', $reel) }}"
+                                data-liked="{{ $isLiked ? 'true' : 'false' }}"
+                                aria-pressed="{{ $isLiked ? 'true' : 'false' }}"
+                                aria-label="{{ $isLiked ? 'Batalkan suka' : 'Sukai' }} reel {{ $reel->title }}"
+                            >
+                                <span class="public-reel-action__button">
+                                    <span class="material-symbols-outlined" data-reel-like-icon>{{ $isLiked ? 'favorite' : 'favorite_border' }}</span>
+                                </span>
+                                <span class="public-reel-action__count" data-reel-like-count>{{ number_format((int) $reel->likes_count, 0, ',', '.') }}</span>
+                                <span class="sr-only">suka</span>
+                            </x-ui.button>
+                        </div>
+
+                        <p class="sr-only" role="status" aria-live="polite" data-reel-action-status></p>
                     </div>
                 </article>
             @endforeach

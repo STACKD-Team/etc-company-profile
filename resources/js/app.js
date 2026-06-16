@@ -929,6 +929,7 @@ function initPublicFaq() {
 function initPublicReels() {
     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     const videos = [...document.querySelectorAll('[data-autoplay-reel="true"]')];
+    const numberFormatter = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 });
     let preferredMuted = window.localStorage.getItem('etc-reels-muted') === 'true';
     let soundUnlocked = false;
     let activeVideo = null;
@@ -990,8 +991,86 @@ function initPublicReels() {
                 'Accept': 'application/json',
             },
         })
-            .catch(() => {});
+            .then((response) => response.ok ? response.json() : null)
+            .then((data) => {
+                if (!data || !Number.isFinite(Number(data.views_count))) {
+                    return;
+                }
+
+                const slide = video.closest('[data-reel-slide]');
+                const count = slide?.querySelector('[data-reel-view-count]');
+
+                if (count) {
+                    count.textContent = numberFormatter.format(Number(data.views_count));
+                }
+            })
+            .catch(() => {
+                video.dataset.viewed = 'false';
+            });
     };
+
+    document.querySelectorAll('[data-reel-like]').forEach((button) => {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!token || !button.dataset.likeEndpoint || button.disabled) {
+                return;
+            }
+
+            const slide = button.closest('[data-reel-slide]');
+            const status = slide?.querySelector('[data-reel-action-status]');
+            const icon = button.querySelector('[data-reel-like-icon]');
+            const count = button.querySelector('[data-reel-like-count]');
+            const previousLiked = button.dataset.liked === 'true';
+
+            button.disabled = true;
+            button.setAttribute('aria-busy', 'true');
+
+            try {
+                const response = await fetch(button.dataset.likeEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Like request failed.');
+                }
+
+                const data = await response.json();
+                const liked = data.liked === true;
+
+                button.dataset.liked = liked ? 'true' : 'false';
+                button.setAttribute('aria-pressed', liked ? 'true' : 'false');
+                button.setAttribute('aria-label', liked ? 'Batalkan suka reel' : 'Sukai reel');
+                button.classList.toggle('is-liked', liked);
+
+                if (icon) {
+                    icon.textContent = liked ? 'favorite' : 'favorite_border';
+                }
+
+                if (count && Number.isFinite(Number(data.likes_count))) {
+                    count.textContent = numberFormatter.format(Number(data.likes_count));
+                }
+
+                if (status) {
+                    status.textContent = liked ? 'Reel disukai.' : 'Suka dibatalkan.';
+                }
+            } catch {
+                button.dataset.liked = previousLiked ? 'true' : 'false';
+
+                if (status) {
+                    status.textContent = 'Aksi suka belum berhasil. Silakan coba lagi.';
+                }
+            } finally {
+                button.disabled = false;
+                button.removeAttribute('aria-busy');
+            }
+        });
+    });
 
     const playWithSound = async (video) => {
         activeVideo = video;
@@ -1069,7 +1148,7 @@ function initPublicReels() {
         });
 
         player.addEventListener('click', (event) => {
-            if (!video || event.target.closest('[data-reel-sound-control]')) {
+            if (!video || event.target.closest('[data-reel-sound-control], [data-reel-like]')) {
                 return;
             }
 
@@ -1078,7 +1157,7 @@ function initPublicReels() {
         });
 
         player.addEventListener('keydown', (event) => {
-            if (!video || event.target.closest('[data-reel-sound-control]') || !['Enter', ' '].includes(event.key)) {
+            if (!video || event.target.closest('[data-reel-sound-control], [data-reel-like]') || !['Enter', ' '].includes(event.key)) {
                 return;
             }
 
