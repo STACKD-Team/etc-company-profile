@@ -36,6 +36,10 @@ class MediaStorageService
             return;
         }
 
+        if (Str::startsWith($path, 'cloudinary://')) {
+            return;
+        }
+
         $this->deleteFromFirebase($path);
     }
 

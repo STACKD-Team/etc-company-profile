@@ -52,6 +52,7 @@ class RoomForm
                         FileUpload::make('image')
                             ->label('Gambar room')
                             ->image()
+                            ->maxSize(4096)
                             ->visibility('public')
                             ->saveUploadedFileUsing(fn (TemporaryUploadedFile $file): string => app(MediaStorageService::class)->putUploadedFile($file, 'rooms'))
                             ->deleteUploadedFileUsing(fn (?string $file): null => tap(null, fn () => app(MediaStorageService::class)->delete($file))),

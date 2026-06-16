@@ -26,6 +26,7 @@ class ReelForm
                 FileUpload::make('video_path')
                     ->label('Video')
                     ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/webm'])
+                    ->maxSize(51200)
                     ->visibility('public')
                     ->saveUploadedFileUsing(fn (TemporaryUploadedFile $file): string => app(MediaStorageService::class)->putUploadedFile($file, 'reels/videos'))
                     ->deleteUploadedFileUsing(fn (?string $file): null => tap(null, fn () => app(MediaStorageService::class)->delete($file)))
@@ -33,6 +34,7 @@ class ReelForm
                 FileUpload::make('thumbnail_path')
                     ->label('Thumbnail')
                     ->image()
+                    ->maxSize(4096)
                     ->visibility('public')
                     ->saveUploadedFileUsing(fn (TemporaryUploadedFile $file): string => app(MediaStorageService::class)->putUploadedFile($file, 'reels/thumbnails'))
                     ->deleteUploadedFileUsing(fn (?string $file): null => tap(null, fn () => app(MediaStorageService::class)->delete($file))),

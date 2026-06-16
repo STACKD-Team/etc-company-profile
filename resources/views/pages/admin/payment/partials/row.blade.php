@@ -31,7 +31,9 @@
     <td class="py-4 pr-4 font-heading font-bold text-etc-on-surface">{{ $finalAmount > 0 ? 'Rp '.number_format($finalAmount, 0, ',', '.') : '-' }}</td>
     <td class="py-4 pr-4">
         <x-ui.badge :status="$paymentStatus">{{ str($paymentStatus)->replace('_', ' ')->headline() }}</x-ui.badge>
-        <p class="mt-1 text-xs text-etc-on-muted">{{ $statusLabels[$payment->status] ?? str($payment->status)->replace('_', ' ')->headline() }}</p>
+    </td>
+    <td class="py-4 pr-4">
+        <x-ui.badge :status="$payment->status">{{ $statusLabels[$payment->status] ?? str($payment->status)->replace('_', ' ')->headline() }}</x-ui.badge>
     </td>
     <td class="py-4 pr-4 text-etc-on-muted">{{ $payment->paid_at?->format('d M Y H:i') ?? '-' }}</td>
     <td class="py-4 pr-4">

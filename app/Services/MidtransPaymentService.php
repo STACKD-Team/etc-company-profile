@@ -72,10 +72,11 @@ class MidtransPaymentService
 
     /**
      * @param array<string, mixed> $payload
+     * @param array<string, mixed> $rawPayload
      */
-    public function handleNotification(array $payload): MidtransNotification
+    public function handleNotification(array $payload, array $rawPayload = []): MidtransNotification
     {
-        return DB::transaction(function () use ($payload): MidtransNotification {
+        return DB::transaction(function () use ($payload, $rawPayload): MidtransNotification {
             $orderId = (string) ($payload['order_id'] ?? '');
             $transactionStatus = (string) ($payload['transaction_status'] ?? 'unknown');
             $transactionId = (string) ($payload['transaction_id'] ?? $payload['order_id'] ?? '');
@@ -103,7 +104,7 @@ class MidtransPaymentService
                     'status_code' => $payload['status_code'] ?? null,
                     'gross_amount' => isset($payload['gross_amount']) ? (float) $payload['gross_amount'] : null,
                     'signature_key' => (string) ($payload['signature_key'] ?? ''),
-                    'raw_payload' => $payload,
+                    'raw_payload' => $rawPayload ?: $payload,
                     'processing_status' => 'received',
                     'received_at' => now(),
                 ],

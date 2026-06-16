@@ -1,12 +1,5 @@
 <?php
 
-use App\Http\Controllers\Payment\MidtransNotificationController;
-use Illuminate\Support\Facades\Route;
-
-Route::post('/payments/midtrans/notification', MidtransNotificationController::class)
-    ->middleware('throttle:payment')
-    ->name('payments.midtrans.notification');
-
 require __DIR__.'/web/public.php';
 require __DIR__.'/web/auth.php';
 require __DIR__.'/web/registration.php';
