@@ -150,10 +150,10 @@ it('keeps Miftah reels vertical, sound ready, and equipped with controlled socia
         ->assertSee('data-reel-player', false)
         ->assertSee('data-reel-playback-indicator', false)
         ->assertSee('public-reel-caption-panel', false)
-        ->assertDontSee('data-reel-view-count', false)
-        ->assertDontSee('data-like-endpoint', false)
-        ->assertDontSee('public-reel-actions', false)
-        ->assertDontSee('favorite_border')
+        ->assertSee('data-reel-view-count', false)
+        ->assertSee('data-like-endpoint', false)
+        ->assertSee('public-reel-actions', false)
+        ->assertSee('favorite_border')
         ->assertDontSee('Klik video untuk pause atau lanjutkan.')
         ->assertDontSee('muted', false);
 
@@ -177,6 +177,6 @@ it('keeps Miftah reels vertical, sound ready, and equipped with controlled socia
         ->toContain("feed.addEventListener('touchend'")
         ->toContain("feed.addEventListener('click'")
         ->toContain('feed.scrollTo({')
-        ->not->toContain("document.querySelectorAll('[data-reel-like]')")
+        ->toContain("document.querySelectorAll('[data-reel-like]')")
         ->toContain("player.addEventListener('keydown'");
 });
