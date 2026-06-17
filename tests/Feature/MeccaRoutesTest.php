@@ -337,6 +337,26 @@ test('student sprint six detail pages use shared detail components', function ()
     });
 });
 
+test('student sprint eight dashboard uses shared stat and detail components', function () {
+    $source = file_get_contents(resource_path('views/pages/student/dashboard/index.blade.php'));
+
+    expect($source)
+        ->toContain('<x-ui.stat-card')
+        ->toContain(':value-attributes')
+        ->toContain('<x-ui.description-list')
+        ->toContain('<x-ui.description-item')
+        ->toContain('<x-ui.action-bar')
+        ->toContain('heroicon-m-academic-cap')
+        ->toContain('heroicon-o-calendar-days')
+        ->toContain('heroicon-o-star')
+        ->toContain('heroicon-m-document-text')
+        ->not->toContain('student-reveal rounded-box border-2 border-etc-outline-variant bg-etc-surface p-5 shadow-soft')
+        ->not->toContain('stat-class')
+        ->not->toContain('stat-meeting')
+        ->not->toContain('stat-grade')
+        ->not->toContain('stat-certificate');
+});
+
 test('student sprint six policies scope class payment and report access', function () {
     $student = User::factory()->create(['role' => 'student']);
     $otherStudent = User::factory()->create(['role' => 'student']);
@@ -509,6 +529,7 @@ test('student dashboard shows owned learning data and working mecca links', func
         ->assertSee('Rp 1.400.000')
         ->assertSee('Rapor Terbaru')
         ->assertSee('Riwayat Belajar Ringkas')
+        ->assertSee('data-stat-value', false)
         ->assertDontSee('Other Student Class')
         ->assertSee(route('student.help.index', [], false), false)
         ->assertSee(route('student.classes.show', $activeClass, false), false)

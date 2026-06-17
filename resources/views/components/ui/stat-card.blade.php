@@ -4,7 +4,10 @@
     'description' => null,
     'icon' => null,
     'status' => null,
+    'valueAttributes' => [],
 ])
+
+@php($valueAttributeBag = new \Illuminate\View\ComponentAttributeBag($valueAttributes))
 
 <x-ui.panel compact {{ $attributes }}>
     <div class="flex items-start justify-between gap-4">
@@ -12,7 +15,7 @@
             <p class="font-heading text-xs font-bold uppercase tracking-normal text-etc-on-muted">
                 {{ $label }}
             </p>
-            <p class="break-words font-heading text-2xl font-bold tracking-normal text-etc-charcoal">
+            <p {{ $valueAttributeBag->class('break-words font-heading text-2xl font-bold tracking-normal text-etc-charcoal') }}>
                 {{ $value }}
             </p>
 
