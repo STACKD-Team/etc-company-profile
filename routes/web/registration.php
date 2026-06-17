@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Payment\MidtransNotificationController;
 use App\Http\Controllers\Public\RegistrationConfirmationController;
 use App\Http\Controllers\Public\RegistrationController;
 use App\Http\Controllers\Public\RegistrationPaymentController;
@@ -8,6 +9,10 @@ use App\Http\Controllers\Public\RegistrationProgramController;
 use App\Http\Controllers\Public\RegistrationReceiptController;
 use App\Http\Controllers\Public\RegistrationStartController;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/payments/midtrans/notification', MidtransNotificationController::class)
+    ->middleware('throttle:payment')
+    ->name('payments.midtrans.notification');
 
 Route::prefix('registration')
     ->name('registrations.')

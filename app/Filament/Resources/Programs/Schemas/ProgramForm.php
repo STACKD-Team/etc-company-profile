@@ -60,6 +60,7 @@ class ProgramForm
                         FileUpload::make('thumbnail')
                             ->label('Cover image')
                             ->image()
+                            ->maxSize(4096)
                             ->visibility('public')
                             ->saveUploadedFileUsing(fn (TemporaryUploadedFile $file): string => app(MediaStorageService::class)->putUploadedFile($file, 'programs/thumbnails'))
                             ->deleteUploadedFileUsing(fn (?string $file): null => tap(null, fn () => app(MediaStorageService::class)->delete($file)))

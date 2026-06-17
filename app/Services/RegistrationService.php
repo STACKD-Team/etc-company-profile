@@ -162,9 +162,11 @@ class RegistrationService extends BaseCrudService
             'created_at',
             'applicant_name',
             'status',
+            'payment_status',
             'program_id',
             'payment_method',
             'payment_amount',
+            'final_amount',
             'paid_at',
         ])
             ->paginate($perPage)

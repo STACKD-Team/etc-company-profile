@@ -76,6 +76,7 @@ class ReportCardForm
                         FileUpload::make('pdf_path')
                             ->label('PDF file')
                             ->acceptedFileTypes(['application/pdf'])
+                            ->maxSize(10240)
                             ->visibility('private')
                             ->saveUploadedFileUsing(fn (TemporaryUploadedFile $file): string => app(MediaStorageService::class)->putUploadedFile($file, 'report-cards/pdfs'))
                             ->deleteUploadedFileUsing(fn (?string $file): null => tap(null, fn () => app(MediaStorageService::class)->delete($file))),

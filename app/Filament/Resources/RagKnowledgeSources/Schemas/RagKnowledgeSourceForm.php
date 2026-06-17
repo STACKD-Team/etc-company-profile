@@ -39,6 +39,7 @@ class RagKnowledgeSourceForm
                         'application/vnd.ms-excel',
                         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                     ])
+                    ->maxSize(10240)
                     ->storeFiles(false)
                     ->visible(fn (?string $operation): bool => $operation === 'create')
                     ->required(fn (?string $operation): bool => $operation === 'create')
