@@ -226,10 +226,9 @@
 | `preferred_time` | VARCHAR(20) | YES | NULL | 09:00-10:30, 11:00-12:30, dst |
 | `placement_test_at` | DATETIME | YES | NULL | Jadwal placement test luring |
 | `placement_test_result` | TEXT | YES | NULL | Catatan hasil placement test |
-| `payment_method` | ENUM | YES | NULL | `qris`, `bank_transfer`, `virtual_account`, `ewallet`, `manual` |
+| `payment_method` | ENUM | YES | NULL | `qris`, `bank_transfer`, `virtual_account`, `ewallet` dari Midtrans |
 | `payment_amount` | DECIMAL(12,2) | YES | NULL | Jumlah dibayar |
 | `payment_gateway_id` | VARCHAR(100) | YES | NULL | ID transaksi Midtrans/Xendit |
-| `payment_proof` | VARCHAR(255) | YES | NULL | Bukti transfer (untuk metode manual) |
 | `paid_at` | TIMESTAMP | YES | NULL | Waktu pembayaran berhasil |
 | `status` | ENUM | NO | `pending_payment` | `pending_payment` → `paid` → `placement_test` → `enrolled` (atau `rejected`/`cancelled`) |
 | `notes` | TEXT | YES | NULL | Catatan tambahan |

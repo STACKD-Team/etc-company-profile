@@ -1,11 +1,7 @@
 <!-- NAVBAR -->
 <nav>
     <div class="nav-logo">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <circle cx="10" cy="10" r="9" stroke="#e91e8c" stroke-width="2"/>
-            <path d="M6 10l3 3 5-5" stroke="#e91e8c" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        ETC <span>Planet.</span>
+        <img src="{{ asset('images/logo.png') }}" alt="ETC Planet" width="40" height="40">
     </div>
     <div class="nav-links">
         <a href="#">Program</a>

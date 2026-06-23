@@ -1,6 +1,5 @@
 @php
-    $methods = ['qris' => 'QRIS', 'bank_transfer' => 'Transfer Bank', 'virtual_account' => 'Virtual Account', 'ewallet' => 'E-Wallet', 'manual' => 'Manual'];
-    $proofUrl = $payment->payment_proof ? app(\App\Services\MediaStorageService::class)->url($payment->payment_proof) : null;
+    $methods = ['qris' => 'QRIS', 'bank_transfer' => 'Transfer Bank', 'virtual_account' => 'Virtual Account', 'ewallet' => 'E-Wallet'];
     $paymentStatus = $payment->payment_status ?: match ($payment->status) {
         'paid', 'placement_test', 'enrolled' => 'paid',
         'cancelled' => 'expired',
@@ -99,37 +98,12 @@
                 </x-ui.description-list>
             </x-ui.detail-card>
 
-            <x-ui.detail-card heading="Fallback Legacy" description="Aksi ini hanya untuk arsip pembayaran manual lama atau kondisi darurat.">
-                @if ($proofUrl)
-                    <x-ui.button :href="$proofUrl" target="_blank" outlined icon="heroicon-m-photo">Buka Arsip Manual</x-ui.button>
+            <x-ui.detail-card heading="Aksi Midtrans" description="Pembayaran diproses otomatis melalui Midtrans. Gunakan retry hanya jika transaksi belum memiliki checkout aktif.">
+                @if ($payment->midtrans_redirect_url && $paymentStatus === 'waiting_payment')
+                    <x-ui.button :href="$payment->midtrans_redirect_url" target="_blank" icon="heroicon-m-arrow-top-right-on-square">Buka Checkout</x-ui.button>
                 @else
-                    <p class="text-sm text-etc-on-muted">Tidak ada arsip bukti manual.</p>
+                    <p class="text-sm leading-6 text-etc-on-muted">Tidak ada aksi manual untuk status ini.</p>
                 @endif
-
-                <div class="mt-5 space-y-3">
-                    <x-ui.modal id="verify-payment-modal" heading="Verifikasi Legacy" description="Gunakan hanya bila transaksi manual sudah dipastikan valid di luar Midtrans." icon="heroicon-o-check-circle">
-                        <x-slot:trigger>
-                            <x-ui.button type="button" outlined icon="heroicon-m-check">Verifikasi Legacy</x-ui.button>
-                        </x-slot:trigger>
-                        <form method="POST" action="{{ route('admin.payment.verify', ['payment' => $payment]) }}" class="space-y-4">
-                            @csrf
-                            <x-ui.field name="payment_amount" label="Nominal Koreksi" type="number" min="0" :value="$payment->final_amount ?: $payment->payment_amount" />
-                            <x-ui.select name="payment_method" label="Metode" :value="$payment->payment_method" placeholder="Tidak diubah" :options="$methods" />
-                            <x-ui.button type="submit" icon="heroicon-m-check">Tandai Paid Legacy</x-ui.button>
-                        </form>
-                    </x-ui.modal>
-
-                    <x-ui.modal id="reject-payment-modal" heading="Tolak Legacy" description="Gunakan hanya untuk pembayaran manual lama yang tidak valid." icon="heroicon-o-x-circle" icon-color="danger">
-                        <x-slot:trigger>
-                            <x-ui.button type="button" color="danger" outlined icon="heroicon-m-x-mark">Tolak Legacy</x-ui.button>
-                        </x-slot:trigger>
-                        <form method="POST" action="{{ route('admin.payment.reject', ['payment' => $payment]) }}" class="space-y-4">
-                            @csrf
-                            <x-ui.textarea name="notes" label="Alasan" rows="4" required />
-                            <x-ui.button type="submit" color="danger" icon="heroicon-m-x-mark">Tolak Pembayaran</x-ui.button>
-                        </form>
-                    </x-ui.modal>
-                </div>
             </x-ui.detail-card>
         </aside>
     </div>

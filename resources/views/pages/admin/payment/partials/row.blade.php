@@ -8,7 +8,7 @@
         'rejected' => 'Rejected',
         'cancelled' => 'Cancelled',
     ];
-    $methods = ['qris' => 'QRIS', 'bank_transfer' => 'Transfer Bank', 'virtual_account' => 'Virtual Account', 'ewallet' => 'E-Wallet', 'manual' => 'Manual'];
+    $methods = ['qris' => 'QRIS', 'bank_transfer' => 'Transfer Bank', 'virtual_account' => 'Virtual Account', 'ewallet' => 'E-Wallet'];
     $paymentStatus = $payment->payment_status ?: match ($payment->status) {
         'paid', 'placement_test', 'enrolled' => 'paid',
         'cancelled' => 'expired',

@@ -27,9 +27,10 @@
             <x-ui.button
                 :href="$routeUrl('public.home', '/')"
                 color="gray"
-                class="!min-h-0 !rounded-none !bg-transparent !p-0 !font-heading !text-2xl !font-black !text-white !shadow-none hover:!bg-transparent"
+                aria-label="ETC Planet"
+                class="!min-h-0 !rounded-none !bg-transparent !p-0 !shadow-none hover:!bg-transparent"
             >
-                ETC Planet
+                <img src="{{ asset('images/logo.png') }}" alt="ETC Planet" class="h-14 w-14 rounded-full object-cover shadow-soft">
             </x-ui.button>
             <p class="mt-4 max-w-sm text-sm leading-7 text-white/60">
                 Tempat belajar bahasa dengan suasana kelas yang aktif, hangat, dan terarah.

@@ -45,6 +45,24 @@
             <link rel="stylesheet" href="{{ asset('css/vite-fallback.css') }}">
         @endif
         @stack('styles')
+        <style>
+            @media (max-width: 767.98px) {
+                [data-dashboard-sidebar] {
+                    transform: translateX(-100%);
+                    transition: transform 200ms ease;
+                }
+
+                [data-dashboard-sidebar].translate-x-0 {
+                    transform: translateX(0);
+                }
+            }
+
+            @media (min-width: 768px) {
+                [data-dashboard-sidebar] {
+                    transform: translateX(0);
+                }
+            }
+        </style>
     </head>
     <body
         class="etc-filament-ui h-screen overflow-hidden bg-etc-surface font-body text-etc-on-surface antialiased"

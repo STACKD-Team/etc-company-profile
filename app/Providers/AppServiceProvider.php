@@ -88,6 +88,14 @@ class AppServiceProvider extends ServiceProvider
             $prefixes = [
                 'Midtrans\\' => [base_path('vendor/midtrans/midtrans-php/Midtrans')],
                 'SnapBi\\' => [base_path('vendor/midtrans/midtrans-php/SnapBi')],
+                'Composer\\Pcre\\' => [base_path('vendor/composer/pcre/src')],
+                'MarkBaker\\Complex\\' => [base_path('vendor/markbaker/complex/classes/src')],
+                'MarkBaker\\Matrix\\' => [base_path('vendor/markbaker/matrix/classes/src')],
+                'PhpOffice\\Math\\' => [base_path('vendor/phpoffice/math/src/Math')],
+                'PhpOffice\\PhpSpreadsheet\\' => [base_path('vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet')],
+                'PhpOffice\\PhpWord\\' => [base_path('vendor/phpoffice/phpword/src/PhpWord')],
+                'Psr\\SimpleCache\\' => [base_path('vendor/psr/simple-cache/src')],
+                'ZipStream\\' => [base_path('vendor/maennchen/zipstream-php/src')],
                 'Cloudinary\\' => [
                     base_path('vendor/cloudinary/cloudinary_php/src'),
                     base_path('vendor/cloudinary/transformation-builder-sdk/src'),

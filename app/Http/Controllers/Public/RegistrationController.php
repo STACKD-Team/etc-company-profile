@@ -18,7 +18,7 @@ class RegistrationController extends Controller
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
-        $selectedProgram = $this->resolveProgram($program) ?? $programs->first();
+        $selectedProgram = $this->resolveProgram($program);
 
         return view('public.registration.create', [
             'programs' => $programs,

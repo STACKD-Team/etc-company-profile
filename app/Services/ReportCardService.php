@@ -13,6 +13,7 @@ class ReportCardService extends BaseCrudService
 {
     public function __construct(
         protected MediaStorageService $mediaStorage,
+        protected DocumentExportService $documents,
     ) {}
 
     protected function modelClass(): string
@@ -39,6 +40,17 @@ class ReportCardService extends BaseCrudService
     {
         if (! $reportCard->enrollment_id || $reportCard->total_score === null) {
             throw new RuntimeException('A report card needs an enrollment and total score before it can be published.');
+        }
+
+        if (! $reportCard->pdf_path) {
+            $reportCard->loadMissing('enrollment.user', 'enrollment.courseClass', 'instructor', 'academicDirector', 'managingDirector');
+            $reportCard->pdf_path = $this->mediaStorage->putContent(
+                $this->documents->reportCardDocx($reportCard),
+                'report-cards/generated',
+                'report-card-'.$reportCard->id.'.docx',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            );
+            $reportCard->save();
         }
 
         /** @var ReportCard $reportCard */

@@ -13,7 +13,7 @@
         'expired' => 'Expired',
         'failed' => 'Failed',
     ];
-    $methods = ['qris' => 'QRIS', 'bank_transfer' => 'Transfer Bank', 'virtual_account' => 'Virtual Account', 'ewallet' => 'E-Wallet', 'manual' => 'Manual'];
+    $methods = ['qris' => 'QRIS', 'bank_transfer' => 'Transfer Bank', 'virtual_account' => 'Virtual Account', 'ewallet' => 'E-Wallet'];
 @endphp
 
 <x-layouts.dashboard title="Monitoring Pembayaran" area="admin" active="payments">
@@ -35,7 +35,7 @@
         ]"
         row-view="pages.admin.payment.partials.row"
         empty="Belum ada pembayaran"
-        empty-description="Transaksi Midtrans dan arsip pembayaran legacy akan tampil di sini."
+        empty-description="Transaksi Midtrans akan tampil setelah pendaftaran dibuat."
         search-placeholder="Cari nama, email, kode, atau order gateway"
     />
 </x-layouts.dashboard>

@@ -301,7 +301,11 @@ function initPublicChatbot() {
     const suggestions = widget.querySelector('[data-chatbot-suggestions]');
     const submit = widget.querySelector('[data-chatbot-submit]');
     const isPublicDiscoveryChatbot = widget.classList.contains('public-discovery-chatbot');
-    let sessionId = window.localStorage?.getItem('etc_public_chatbot_session') || null;
+    const sessionStorageKey = 'etc_public_chatbot_session';
+    const messagesStorageKey = 'etc_public_chatbot_messages';
+    const openStorageKey = 'etc_public_chatbot_open';
+    const maxStoredMessages = 30;
+    let sessionId = window.localStorage?.getItem(sessionStorageKey) || null;
     let lastFocusedElement = null;
 
     const setOpen = (isOpen) => {
@@ -309,6 +313,7 @@ function initPublicChatbot() {
         panel?.classList.toggle('is-open', isOpen);
         widget.classList.toggle('is-open', isOpen);
         toggle?.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        window.localStorage?.setItem(openStorageKey, isOpen ? '1' : '0');
 
         if (isOpen) {
             lastFocusedElement = document.activeElement;
@@ -318,18 +323,109 @@ function initPublicChatbot() {
         }
     };
 
-    const addMessage = (message, fromUser = false) => {
+    const appendLinks = (container, links = [], isPublic = false) => {
+        if (!Array.isArray(links) || links.length === 0) {
+            return;
+        }
+
+        const list = document.createElement('div');
+        list.className = isPublic
+            ? 'public-discovery-chatbot__links'
+            : 'mt-2 flex flex-wrap gap-2';
+
+        links.forEach((link) => {
+            if (!link?.label || !link?.url) {
+                return;
+            }
+
+            const anchor = document.createElement('a');
+            anchor.className = isPublic
+                ? 'public-discovery-chatbot__link'
+                : 'rounded-full border border-etc-magenta/25 bg-etc-magenta/10 px-3 py-1 text-xs font-semibold text-etc-magenta transition hover:bg-etc-magenta hover:text-white';
+            anchor.href = link.url;
+            anchor.textContent = link.label;
+            list.appendChild(anchor);
+        });
+
+        if (list.children.length > 0) {
+            container.appendChild(list);
+        }
+    };
+
+    const storedMessages = () => {
+        try {
+            const parsed = JSON.parse(window.localStorage?.getItem(messagesStorageKey) || '[]');
+
+            return Array.isArray(parsed) ? parsed : [];
+        } catch {
+            return [];
+        }
+    };
+
+    const normalizedLinks = (links = []) => Array.isArray(links)
+        ? links
+            .filter((link) => link?.label && link?.url)
+            .map((link) => ({
+                label: String(link.label).slice(0, 80),
+                url: String(link.url).slice(0, 500),
+            }))
+            .slice(0, 4)
+        : [];
+
+    const persistMessage = (message, fromUser = false, links = []) => {
+        if (!message) {
+            return;
+        }
+
+        const nextMessages = [
+            ...storedMessages(),
+            {
+                message: String(message).slice(0, 1000),
+                fromUser: Boolean(fromUser),
+                links: normalizedLinks(links),
+            },
+        ].slice(-maxStoredMessages);
+
+        window.localStorage?.setItem(messagesStorageKey, JSON.stringify(nextMessages));
+    };
+
+    const restoreMessages = () => {
+        const history = storedMessages();
+
+        if (history.length === 0 || !messages) {
+            return;
+        }
+
+        messages.replaceChildren();
+        history.forEach((item) => {
+            addMessage(item.message, Boolean(item.fromUser), normalizedLinks(item.links), false);
+        });
+        suggestions?.classList.add('hidden');
+    };
+
+    const addMessage = (message, fromUser = false, links = [], shouldPersist = true) => {
+        if (shouldPersist) {
+            persistMessage(message, fromUser, links);
+        }
+
         if (isPublicDiscoveryChatbot) {
             const row = document.createElement('div');
+            const bubbleWrap = document.createElement('div');
             const bubble = document.createElement('p');
 
             row.className = fromUser
                 ? 'public-discovery-chatbot__user-row'
                 : 'public-discovery-chatbot__bot-row';
+            bubbleWrap.className = 'public-discovery-chatbot__bubble-wrap';
             bubble.className = fromUser
                 ? 'public-discovery-chatbot__bubble public-discovery-chatbot__bubble--user'
                 : 'public-discovery-chatbot__bubble public-discovery-chatbot__bubble--bot';
             bubble.textContent = message;
+            bubbleWrap.appendChild(bubble);
+
+            if (!fromUser) {
+                appendLinks(bubbleWrap, links, true);
+            }
 
             if (!fromUser) {
                 const avatar = document.createElement('span');
@@ -342,7 +438,7 @@ function initPublicChatbot() {
                 row.appendChild(avatar);
             }
 
-            row.appendChild(bubble);
+            row.appendChild(bubbleWrap);
             messages?.appendChild(row);
             messages?.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
 
@@ -354,6 +450,9 @@ function initPublicChatbot() {
             ? 'ml-auto max-w-[85%] rounded-card bg-etc-magenta px-4 py-3 text-sm leading-6 text-white shadow-soft'
             : 'max-w-[85%] rounded-card bg-etc-surface px-4 py-3 text-sm leading-6 text-etc-on-muted shadow-soft';
         bubble.textContent = message;
+        if (!fromUser) {
+            appendLinks(bubble, links);
+        }
         messages?.appendChild(bubble);
         messages?.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
     };
@@ -436,10 +535,14 @@ function initPublicChatbot() {
 
             if (data?.session_id) {
                 sessionId = data.session_id;
-                window.localStorage?.setItem('etc_public_chatbot_session', sessionId);
+                window.localStorage?.setItem(sessionStorageKey, sessionId);
             }
 
-            addMessage(data?.reply || 'Maaf, jawaban belum tersedia. Silakan hubungi tim ETC melalui halaman kontak.');
+            addMessage(
+                data?.reply || 'Maaf, jawaban belum tersedia. Silakan hubungi tim ETC melalui halaman kontak.',
+                false,
+                data?.links || [],
+            );
         } catch {
             addMessage('Koneksi chatbot sedang bermasalah. Silakan coba lagi sebentar lagi.');
         } finally {
@@ -448,6 +551,12 @@ function initPublicChatbot() {
             input?.focus();
         }
     });
+
+    restoreMessages();
+
+    if (window.localStorage?.getItem(openStorageKey) === '1') {
+        setOpen(true);
+    }
 }
 
 function initPublicReveal() {

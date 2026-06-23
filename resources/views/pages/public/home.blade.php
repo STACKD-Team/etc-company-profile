@@ -228,34 +228,9 @@
                     <div class="public-home-carousel__viewport" data-carousel-viewport tabindex="0" aria-label="Daftar partner ETC Planet">
                         <div class="public-home-carousel__track" data-carousel-track>
                     @foreach ($partners as $partner)
-                        @php
-                            $website = $partner->meta['website'] ?? null;
-                        @endphp
-                        <article class="public-home-carousel__slide public-home-partner-card public-card p-5" data-carousel-slide>
-                            <div class="flex items-center gap-4">
-                                <img src="{{ $assetUrl($partner->image, 'images/hero-img.jpeg') }}" alt="Logo {{ $partner->title }}" class="h-14 w-14 rounded-card bg-etc-surface object-cover p-2 shadow-soft">
-                                <div>
-                                    <p class="font-heading text-xs font-bold uppercase text-etc-magenta">{{ $partner->meta['category'] ?? 'Partner' }}</p>
-                                    <h3 class="mt-1 font-heading text-lg font-bold">{{ $partner->title }}</h3>
-                                </div>
-                            </div>
-                            <p class="mt-4 text-sm leading-7 text-etc-on-muted">{{ $partner->body ?: 'Partner ETC Planet dalam pengembangan pembelajaran bahasa.' }}</p>
-                            <div class="mt-4 flex flex-wrap items-center gap-2 text-xs font-bold text-etc-on-muted">
-                                @if ($partner->meta['since'] ?? null)
-                                    <x-ui.badge color="gray">Sejak {{ $partner->meta['since'] }}</x-ui.badge>
-                                @endif
-                                @if ($website)
-                                    <x-ui.button
-                                        :href="$website"
-                                        target="_blank"
-                                        color="gray"
-                                        size="sm"
-                                        class="!min-h-0 !rounded-none !bg-transparent !p-0 !font-heading !text-[13px] !font-bold !text-etc-magenta !underline !decoration-etc-magenta/45 !underline-offset-4 !shadow-none hover:!bg-transparent hover:!text-etc-primary"
-                                    >
-                                        Kunjungi partner
-                                    </x-ui.button>
-                                @endif
-                            </div>
+                        <article class="public-home-carousel__slide public-home-partner-logo" data-carousel-slide>
+                            <img src="{{ $assetUrl($partner->image, 'images/logo.png') }}" alt="Logo {{ $partner->title }}" class="public-home-partner-logo__image">
+                            <h3 class="public-home-partner-logo__name">{{ $partner->title }}</h3>
                         </article>
                     @endforeach
                         </div>

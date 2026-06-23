@@ -44,7 +44,6 @@ class Registration extends Model
         'final_amount',
         'program_promotion_id',
         'program_promotion_title',
-        'payment_proof',
         'paid_at',
         'status',
         'notes',

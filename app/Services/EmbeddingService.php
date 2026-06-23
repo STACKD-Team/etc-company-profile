@@ -16,7 +16,7 @@ class EmbeddingService
     /**
      * @return array<int, float>
      */
-    public function embed(string $text): array
+    public function embed(string $text, string $inputType = 'passage'): array
     {
         if (! $this->isConfigured()) {
             return $this->localEmbedding($text);
@@ -27,7 +27,7 @@ class EmbeddingService
             ->post(rtrim((string) config('rag.nvidia.base_url'), '/').'/embeddings', [
                 'model' => config('rag.nvidia.embedding_model'),
                 'input' => $text,
-                'input_type' => 'passage',
+                'input_type' => $inputType,
             ])
             ->throw()
             ->json();

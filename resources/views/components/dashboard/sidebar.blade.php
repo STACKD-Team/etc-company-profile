@@ -128,9 +128,7 @@
             aria-label="ETC Padang"
             data-sidebar-brand-link
         >
-            <span class="flex h-[var(--etc-selector-size-xl)] w-[var(--etc-selector-size-xl)] shrink-0 items-center justify-center rounded-selector bg-etc-magenta text-etc-surface shadow-soft">
-                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">school</span>
-            </span>
+            <img src="{{ asset('images/logo.png') }}" alt="ETC Padang" class="h-[var(--etc-selector-size-xl)] w-[var(--etc-selector-size-xl)] shrink-0 rounded-full object-cover shadow-soft">
             <span
                 class="truncate font-heading text-sm font-bold text-etc-on-surface"
                 data-sidebar-label

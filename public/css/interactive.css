@@ -9,10 +9,6 @@
 .nav-brand,
 .btn-masuk,
 .btn-daftar,
-.btn-lanjut,
-.confirm-button,
-.btn-dashboard,
-.btn-unduh,
 .footer-logo,
 .footer-brand,
 .footer-col a {
@@ -28,10 +24,6 @@
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
     a,
-    button,
-    input,
-    select,
-    textarea,
     .nav-logo,
     .footer-logo,
     .step-circle,
@@ -66,11 +58,8 @@
         color: var(--interactive-pink);
     }
 
-    button:hover,
     .btn-daftar:hover,
-    .btn-lanjut:hover,
     .btn-confirm:hover,
-    .btn-dashboard:hover,
     .btn-upload:hover,
     .btn-download:hover {
         transform: translateY(-2px);
@@ -78,7 +67,6 @@
     }
 
     .btn-masuk:hover,
-    .btn-kembali:hover,
     .btn-cancel:hover {
         transform: translateY(-1px);
         color: var(--interactive-pink);
@@ -96,20 +84,8 @@
     }
 
     .method-card:hover,
-    .upload-zone:hover,
-    input:hover,
-    select:hover,
-    textarea:hover {
+    .upload-zone:hover {
         border-color: var(--interactive-pink);
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-        transform: translateY(-1px);
-        border-color: var(--interactive-pink);
-        box-shadow: 0 0 0 4px var(--interactive-pink-soft);
-        outline: none;
     }
 
     .step-circle:hover,

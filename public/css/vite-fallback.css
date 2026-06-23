@@ -663,8 +663,17 @@ footer[class*="bg-etc-charcoal"] a {
 }
 
 .etc-filament-ui .etc-data-table-scroll {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
     scrollbar-color: rgba(39, 23, 28, .28) transparent;
     scrollbar-width: thin;
+}
+
+.etc-filament-ui .etc-data-table-scroll > table {
+    width: 100%;
+    min-width: 45rem;
 }
 
 .etc-filament-ui .etc-data-table-scroll::-webkit-scrollbar {

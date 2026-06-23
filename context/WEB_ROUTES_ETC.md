@@ -64,8 +64,6 @@ php artisan route:list
 | GET | `/registration/form/{program?}` | `registrations.create` | `Public\RegistrationController@create` | `web` | Form pendaftaran |
 | POST | `/registration` | `registrations.store` | `Public\RegistrationController@store` | `web`, `throttle:registration` | Simpan pendaftaran |
 | GET | `/registration/payment/{registration}` | `registrations.payment.show` | `Public\RegistrationPaymentController@show` | `web`, `signed.optional` | Halaman pembayaran |
-| POST | `/registration/payment/{registration}/proof` | `registrations.payment.proof.store` | `Public\RegistrationPaymentProofController@store` | `web`, `throttle:upload` | Upload bukti bayar |
-| POST | `/registration/payment/{registration}/confirm` | `registrations.payment.confirm` | `Public\RegistrationPaymentController@confirm` | `web`, `throttle:payment` | Konfirmasi pembayaran |
 | GET | `/registration/confirmation/{registration}` | `registrations.confirmation.show` | `Public\RegistrationConfirmationController@show` | `web`, `signed.optional` | Konfirmasi pendaftaran |
 | GET | `/registration/{registration}/receipt` | `registrations.receipt.download` | `Public\RegistrationReceiptController@download` | `web`, `signed.optional` | Download bukti pendaftaran |
 
@@ -93,8 +91,6 @@ Route admin Sprint 4 Mia canonical memakai Blade di `resources/views/pages/admin
 | DELETE | `/admin/registration/{registration}` | `admin.registration.destroy` | `Admin\RegistrationController@destroy` | `web`, `auth`, `role:admin` | Soft delete pendaftaran |
 | GET | `/admin/payment` | `admin.payment.index` | `Admin\PaymentController@index` | `web`, `auth`, `role:admin` | Monitoring pembayaran RD |
 | GET | `/admin/payment/{payment}` | `admin.payment.show` | `Admin\PaymentController@show` | `web`, `auth`, `role:admin` | Detail pembayaran RD |
-| POST | `/admin/payment/{payment}/verify` | `admin.payment.verify` | `Admin\PaymentVerificationController@verify` | `web`, `auth`, `role:admin` | Verifikasi pembayaran |
-| POST | `/admin/payment/{payment}/reject` | `admin.payment.reject` | `Admin\PaymentVerificationController@reject` | `web`, `auth`, `role:admin` | Tolak pembayaran |
 | GET | `/admin/placement-test` | `admin.placement-test.index` | `Admin\PlacementTestController@index` | `web`, `auth`, `role:admin` | Placement test admin |
 | GET | `/admin/placement-test/{registration}` | `admin.placement-test.show` | `Admin\PlacementTestController@show` | `web`, `auth`, `role:admin` | Detail placement test |
 | POST | `/admin/placement-test/{registration}/schedule` | `admin.placement-test.schedule` | `Admin\PlacementTestScheduleController@store` | `web`, `auth`, `role:admin` | Jadwalkan placement test |

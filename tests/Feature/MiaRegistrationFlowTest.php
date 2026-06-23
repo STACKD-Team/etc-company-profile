@@ -3,12 +3,15 @@
 use App\Models\Program;
 use App\Models\Registration;
 use App\Models\User;
+use App\Services\MidtransPaymentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function (): void {
+    config(['midtrans.server_key' => null]);
+});
 
 test('documented mia sprint two route names are registered', function () {
     collect([
@@ -16,11 +19,12 @@ test('documented mia sprint two route names are registered', function () {
         'registrations.create',
         'registrations.store',
         'registrations.payment.show',
-        'registrations.payment.proof.store',
-        'registrations.payment.confirm',
         'registrations.confirmation.show',
         'registrations.receipt.download',
     ])->each(fn (string $routeName) => expect(Route::has($routeName))->toBeTrue($routeName));
+
+    expect(Route::has('registrations.payment.proof.store'))->toBeFalse()
+        ->and(Route::has('registrations.payment.confirm'))->toBeFalse();
 });
 
 test('mia registration form stores student profile and redirects to payment', function () {
@@ -53,9 +57,7 @@ test('mia registration form stores student profile and redirects to payment', fu
         ->and($student->address)->toBe('Jl. Padang No. 1');
 });
 
-test('mia payment proof upload confirmation and receipt work', function () {
-    Storage::fake('public');
-
+test('mia midtrans payment page and receipt work without legacy proof upload', function () {
     $program = Program::query()->create([
         'name' => 'General English',
         'slug' => 'general-english-payment-mia',
@@ -73,33 +75,96 @@ test('mia payment proof upload confirmation and receipt work', function () {
 
     $registration = Registration::query()->firstOrFail();
 
-    $this->post(route('registrations.payment.proof.store', $registration), [
-        'payment_method' => 'bank_transfer',
-        'payment_proof' => UploadedFile::fake()->image('proof.jpg'),
-    ])->assertSessionHasNoErrors();
-
-    $registration->refresh();
-
-    expect($registration->payment_method)->toBe('bank_transfer')
-        ->and($registration->payment_proof)->not->toBeNull();
-
-    Storage::disk('public')->assertExists($registration->payment_proof);
-
-    $this->post(route('registrations.payment.confirm', $registration), [
-        'payment_method' => 'bank_transfer',
-        'payment_confirmed' => '1',
-    ])->assertSessionHasNoErrors()
-        ->assertRedirect();
-
-    $registration->refresh();
-
-    expect($registration->status)->toBe('pending_payment')
-        ->and($registration->notes)->toContain('payment_confirmation');
+    $this->get(route('registrations.payment.show', $registration))
+        ->assertOk()
+        ->assertSee('Midtrans Checkout')
+        ->assertSee('Lanjutkan ke Midtrans')
+        ->assertDontSee('Upload Bukti')
+        ->assertDontSee('Konfirmasi Legacy');
 
     $this->get(route('registrations.receipt.download', $registration))
         ->assertOk()
         ->assertHeader('Content-Type', 'text/html; charset=UTF-8')
         ->assertSee($registration->registration_code);
+});
+
+test('mia midtrans snap payload redirects finished payments to confirmation page', function () {
+    config(['app.url' => 'https://etc.test']);
+
+    $program = Program::query()->create([
+        'name' => 'General English',
+        'slug' => 'general-english-midtrans-finish-mia',
+        'category' => 'english',
+        'type' => 'regular',
+        'target_age' => 'teen',
+        'duration_meetings' => 16,
+        'max_students' => 10,
+        'price' => 850000,
+        'registration_fee' => 200000,
+        'is_active' => true,
+    ]);
+
+    $registration = Registration::query()->create([
+        'registration_code' => 'REG-MIA-MIDTRANS-FINISH',
+        'program_id' => $program->id,
+        'applicant_name' => 'Mia Student',
+        'applicant_email' => 'mia.student@example.test',
+        'applicant_phone' => '081234567890',
+        'preferred_days' => 'mon_wed',
+        'preferred_time' => '09.00-10.30',
+        'payment_amount' => 1050000,
+        'final_amount' => 1050000,
+        'payment_status' => 'waiting_payment',
+        'status' => 'pending_payment',
+    ]);
+
+    $service = app(MidtransPaymentService::class);
+    $method = new \ReflectionMethod($service, 'buildSnapPayload');
+    $method->setAccessible(true);
+
+    $payload = $method->invoke($service, $registration->load('program'), 'ETC-REG-MIA-MIDTRANS-FINISH-1', 1050000);
+
+    expect($payload['callbacks']['finish'])
+        ->toBe(route('registrations.confirmation.show', ['registration' => $registration], true));
+});
+
+test('mia demo midtrans redirect uses confirmation page when credentials are missing', function () {
+    config([
+        'app.url' => 'https://etc.test',
+        'midtrans.server_key' => null,
+    ]);
+
+    $program = Program::query()->create([
+        'name' => 'General English',
+        'slug' => 'general-english-midtrans-demo-mia',
+        'category' => 'english',
+        'type' => 'regular',
+        'target_age' => 'teen',
+        'duration_meetings' => 16,
+        'max_students' => 10,
+        'price' => 850000,
+        'registration_fee' => 200000,
+        'is_active' => true,
+    ]);
+
+    $registration = Registration::query()->create([
+        'registration_code' => 'REG-MIA-MIDTRANS-DEMO',
+        'program_id' => $program->id,
+        'applicant_name' => 'Mia Student',
+        'applicant_email' => 'mia.student@example.test',
+        'applicant_phone' => '081234567890',
+        'preferred_days' => 'mon_wed',
+        'preferred_time' => '09.00-10.30',
+        'payment_amount' => 1050000,
+        'final_amount' => 1050000,
+        'payment_status' => 'waiting_payment',
+        'status' => 'pending_payment',
+    ]);
+
+    $updated = app(MidtransPaymentService::class)->createTransaction($registration);
+
+    expect($updated->midtrans_redirect_url)
+        ->toBe(route('registrations.confirmation.show', ['registration' => $updated], true));
 });
 
 function registrationPayload(Program $program): array

@@ -6,7 +6,8 @@
     @endpush
 
 @php
-    $selectedProgramId = (string) old('program_id', $selectedProgram?->id);
+    $selectedProgramId = (string) old('program_id', $selectedProgram?->id ?? '');
+    $selectedSummaryProgram = $programs->firstWhere('id', $selectedProgramId);
     $programPayload = $programs->mapWithKeys(fn ($program) => [
         $program->id => [
             'name' => $program->name,
@@ -19,7 +20,7 @@
     $transportations = ['Kendaraan Pribadi', 'Kendaraan Umum', 'Jalan Kaki', 'Ojek Online'];
     $toOptions = static fn (array $values): array => collect($values)->mapWithKeys(fn ($value) => [$value => $value])->all();
     $yesNoOptions = ['0' => 'Tidak', '1' => 'Ya'];
-    $programOptions = $programs->mapWithKeys(fn ($program) => [$program->id => $program->name])->all();
+    $sexOptions = ['M' => 'Laki-laki', 'F' => 'Perempuan'];
 @endphp
 
 <div class="page-shell">
@@ -58,6 +59,7 @@
 
     <form class="registration-layout" method="POST" action="{{ route('registrations.store') }}">
         @csrf
+        <input type="hidden" name="program_id" id="program_id" value="{{ $selectedProgramId }}">
 
         <section class="form-stack">
             <article class="form-card">
@@ -72,21 +74,15 @@
                     <x-ui.phone-field name="mobile_phone" label="No. Handphone / WA" placeholder="0812xxxxxx" required />
                     <x-ui.field name="place_of_birth" label="Tempat Lahir" placeholder="Kota kelahiran" required />
                     <x-ui.date-picker name="date_of_birth" label="Tanggal Lahir" required />
-                    <x-ui.radio-group
-                        name="sex"
-                        label="Jenis Kelamin"
-                        value="F"
-                        :options="['M' => 'Laki-laki', 'F' => 'Perempuan']"
-                        required
-                    />
-                    <x-ui.select name="religion" label="Agama" :options="$toOptions($religions)" required />
-                    <x-ui.field name="nationality" label="Kewarganegaraan" value="Indonesia" placeholder="Kewarganegaraan" required />
+                    <x-ui.select name="sex" label="Jenis Kelamin" :options="$sexOptions" placeholder="Pilih jenis kelamin" placeholder-disabled required />
+                    <x-ui.select name="religion" label="Agama" :options="$toOptions($religions)" placeholder="Pilih agama" placeholder-disabled required />
+                    <x-ui.field name="nationality" label="Kewarganegaraan" placeholder="Kewarganegaraan" required />
                     <x-ui.field name="occupation_school" label="Pekerjaan/Sekolah/Kampus" placeholder="Instansi/Pekerjaan saat ini" required />
                     <x-ui.field name="nisn" label="NISN" placeholder="Nomor Induk Siswa Nasional" />
                     <x-ui.field name="nik" label="NIK" placeholder="Nomor Induk Kependudukan" />
-                    <x-ui.radio-group name="kps_receiver" label="Penerima KPS" value="0" :options="$yesNoOptions" required />
+                    <x-ui.select name="kps_receiver" label="Penerima KPS" :options="$yesNoOptions" placeholder="Pilih status KPS" placeholder-disabled required />
                     <x-ui.field name="no_kps" label="No KPS" placeholder="Isi jika ya" />
-                    <x-ui.radio-group name="worthy_of_pip" label="Layak PIP" value="0" :options="$yesNoOptions" required />
+                    <x-ui.select name="worthy_of_pip" label="Layak PIP" :options="$yesNoOptions" placeholder="Pilih status PIP" placeholder-disabled required />
                     <x-ui.field name="pip_reason" label="Alasan Layak PIP" placeholder="Sebutkan alasannya" />
                     <x-ui.field name="no_kip" label="No KIP" placeholder="Nomor Kartu Indonesia Pintar" />
                 </div>
@@ -104,12 +100,12 @@
                     </div>
                     <x-ui.field name="rt_rw" label="RT/RW" placeholder="000/000" />
                     <x-ui.field name="postal_code" label="Kode Pos" placeholder="25xxx" />
-                    <x-ui.field name="province" label="Provinsi" value="Sumatera Barat" placeholder="Provinsi" />
-                    <x-ui.field name="district" label="Kab/Kota" value="Padang" placeholder="Kabupaten/Kota" />
+                    <x-ui.field name="province" label="Provinsi" placeholder="Provinsi" />
+                    <x-ui.field name="district" label="Kab/Kota" placeholder="Kabupaten/Kota" />
                     <x-ui.field name="sub_district" label="Kecamatan" placeholder="Kecamatan" />
                     <x-ui.field name="village" label="Desa / Kelurahan" placeholder="Kelurahan" />
-                    <x-ui.select name="living_with" label="Tinggal Bersama" :options="$toOptions($livingWith)" />
-                    <x-ui.select name="transportation" label="Alat Transportasi" :options="$toOptions($transportations)" />
+                    <x-ui.select name="living_with" label="Tinggal Bersama" :options="$toOptions($livingWith)" placeholder="Pilih tempat tinggal" placeholder-disabled />
+                    <x-ui.select name="transportation" label="Alat Transportasi" :options="$toOptions($transportations)" placeholder="Pilih transportasi" placeholder-disabled />
                 </div>
             </article>
 
@@ -122,29 +118,18 @@
                 <div class="form-grid">
                     <x-ui.field name="father_name" label="Nama Ayah" placeholder="Masukkan nama ayah" required />
                     <x-ui.field name="mother_name" label="Nama Ibu" placeholder="Masukkan nama ibu" required />
-                    <x-ui.select name="applying_for" label="Applying For" :options="$applyingForOptions" required />
-                    <x-ui.select
-                        name="program_id"
-                        id="program_id"
-                        label="Program Website"
-                        :value="$selectedProgramId"
-                        :options="$programOptions"
-                        placeholder="Belum ada program aktif"
-                        :disabled="$programs->isEmpty()"
-                        required
-                    />
-                    <x-ui.select name="preferred_days" id="preferred_days" label="Days Schedule" :options="$preferredDayOptions" required />
-                    <x-ui.select name="preferred_time" id="preferred_time" label="Time Schedule" :options="$preferredTimeOptions" required />
+                    <x-ui.select name="applying_for" label="Applying For" :options="$applyingForOptions" placeholder="Pilih kategori program" placeholder-disabled required />
+                    <x-ui.select name="preferred_days" id="preferred_days" label="Days Schedule" :options="$preferredDayOptions" placeholder="Pilih hari" placeholder-disabled required />
+                    <x-ui.select name="preferred_time" id="preferred_time" label="Time Schedule" :options="$preferredTimeOptions" placeholder="Pilih jam" placeholder-disabled required />
                 </div>
             </article>
 
             <div class="action-row">
-                <x-ui.button :href="route('public.programs.index')" color="gray" outlined size="xl" class="btn-kembali">
+                <x-ui.button :href="route('public.programs.index')" color="gray" outlined size="xl" icon="heroicon-m-arrow-left" class="max-[760px]:w-full">
                     Kembali
                 </x-ui.button>
-                <x-ui.button type="submit" size="xl" class="btn-lanjut" :disabled="$programs->isEmpty()">
+                <x-ui.button type="submit" size="xl" :disabled="$programs->isEmpty() || blank($selectedProgramId)" icon="heroicon-m-arrow-right" icon-position="after" class="max-[760px]:w-full">
                     Lanjut ke Pembayaran
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </x-ui.button>
             </div>
         </section>
@@ -156,7 +141,7 @@
                 <span>Program Dipilih</span>
                 <strong class="program-name">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg>
-                    <span id="summary-program">{{ $selectedProgram?->name ?? 'Belum ada program aktif' }}</span>
+                    <span id="summary-program">{{ $selectedSummaryProgram?->name ?? 'Pilih program terlebih dahulu' }}</span>
                 </strong>
             </div>
 
@@ -164,7 +149,7 @@
                 <span>Jadwal</span>
                 <strong class="schedule">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    <span id="summary-schedule">Mon-Wed, 09.00-10.30</span>
+                    <span id="summary-schedule">Pilih jadwal terlebih dahulu</span>
                 </strong>
             </div>
 
@@ -203,9 +188,12 @@ function updateRegistrationSummary() {
     }
 
     const program = registrationPrograms[programSelect.value] || null;
+    const hasSchedule = daySelect.value && timeSelect.value;
 
-    document.getElementById('summary-program').textContent = program ? program.name : 'Belum ada program aktif';
-    document.getElementById('summary-schedule').textContent = `${daySelect.options[daySelect.selectedIndex]?.text || '-'}, ${timeSelect.value || '-'}`;
+    document.getElementById('summary-program').textContent = program ? program.name : 'Pilih program terlebih dahulu';
+    document.getElementById('summary-schedule').textContent = hasSchedule
+        ? `${daySelect.options[daySelect.selectedIndex]?.text || '-'}, ${timeSelect.value}`
+        : 'Pilih jadwal terlebih dahulu';
     document.getElementById('summary-registration').textContent = rupiah(program?.registration_fee || 0);
     document.getElementById('summary-program-fee').textContent = rupiah(program?.price || 0);
     document.getElementById('summary-total').textContent = rupiah((program?.registration_fee || 0) + (program?.price || 0));

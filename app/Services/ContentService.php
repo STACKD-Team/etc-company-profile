@@ -52,9 +52,9 @@ class ContentService extends BaseCrudService
      * @param array<string, string|null> $values
      * @param array<string, string> $labels
      */
-    public function updateSettings(array $values, array $labels, ?UploadedFile $qrisImage = null): void
+    public function updateSettings(array $values, array $labels): void
     {
-        DB::transaction(function () use ($values, $labels, $qrisImage): void {
+        DB::transaction(function () use ($values, $labels): void {
             foreach ($labels as $slug => $title) {
                 $content = Content::query()->firstOrNew([
                     'type' => Content::TYPE_PROFILE,
@@ -66,17 +66,7 @@ class ContentService extends BaseCrudService
                 $content->display_order = array_search($slug, array_keys($labels), true) ?: 0;
                 $content->is_published = true;
 
-                if ($slug === 'qris') {
-                    $content->meta = ['value' => $values[$slug] ?? 'QRIS ETC Planet'];
-
-                    if ($qrisImage !== null) {
-                        $content->image = $content->exists
-                            ? $this->mediaStorage->replace($content->image, $qrisImage, 'settings')
-                            : $this->mediaStorage->putUploadedFile($qrisImage, 'settings');
-                    }
-                } else {
-                    $content->meta = ['value' => $values[$slug] ?? null];
-                }
+                $content->meta = ['value' => $values[$slug] ?? null];
 
                 $content->save();
             }

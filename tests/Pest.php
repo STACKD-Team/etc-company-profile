@@ -18,6 +18,14 @@ pest()->extend(TestCase::class)
  // ->use(RefreshDatabase::class)
     ->in('Feature');
 
+pest()->beforeEach(function (): void {
+    config([
+        'cloudinary.allow_test_uploads' => false,
+        'midtrans.server_key' => null,
+        'midtrans.client_key' => null,
+    ]);
+})->in('Feature');
+
 /*
 |--------------------------------------------------------------------------
 | Expectations

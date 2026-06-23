@@ -35,8 +35,8 @@ test('mia old plural admin URLs redirect to singular blade routes', function () 
         expect(route($routeName, absolute: false))->toBe('/'.$uri);
     });
 
-    expect(route('admin.payment.verify', ['payment' => 1], false))->toBe('/admin/payment/1/verify')
-        ->and(route('admin.payment.reject', ['payment' => 1], false))->toBe('/admin/payment/1/reject');
+    expect(Route::has('admin.payment.verify'))->toBeFalse()
+        ->and(Route::has('admin.payment.reject'))->toBeFalse();
 });
 
 test('mia sprint three midtrans webhook route is registered', function () {

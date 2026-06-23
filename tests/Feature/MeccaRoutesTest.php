@@ -297,6 +297,11 @@ test('student sprint seven help page renders active rag chatbot widget', functio
 });
 
 test('authenticated student chatbot message uses rag endpoint and stores user log', function () {
+    config([
+        'rag.nvidia.api_key' => null,
+        'rag.qdrant.url' => null,
+    ]);
+
     $student = User::factory()->create([
         'role' => 'student',
         'full_name' => 'Mecca Chat Student',
@@ -312,7 +317,7 @@ test('authenticated student chatbot message uses rag endpoint and stores user lo
             'status' => 'ok',
             'session_id' => 'student-session-mecca',
         ])
-        ->assertJsonPath('intent', 'pricing');
+        ->assertJsonPath('intent', 'rag_no_context');
 
     expect(ChatbotLog::query()
         ->where('session_id', 'student-session-mecca')
@@ -861,7 +866,7 @@ test('student sprint two list tables support search filters sorting and paginati
         'applicant_name' => 'Filter Student',
         'applicant_email' => $student->email,
         'applicant_phone' => '081234567890',
-        'payment_method' => 'manual',
+        'payment_method' => 'virtual_account',
         'payment_status' => 'waiting_payment',
         'payment_amount' => 1000000,
         'status' => 'pending_payment',

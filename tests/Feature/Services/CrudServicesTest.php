@@ -171,7 +171,7 @@ it('performs CRUD operations through all model services', function () {
     $users->update($student, ['full_name' => 'Budi Updated']);
     $programs->update($program, ['name' => 'General English Updated']);
     $classes->update($courseClass, ['status' => 'ongoing']);
-    $registrations->uploadPaymentProof($registration, UploadedFile::fake()->create('proof.jpg', 1, 'image/jpeg'));
+    $registrations->update($registration, ['payment_gateway_id' => 'MID-CRUD-001']);
     $registrations->markAsPaid($registration, 550000, 'qris');
     $enrollments->complete($enrollment, '2026-08-15');
     $reportCards->publish($reportCard);
@@ -317,9 +317,6 @@ it('handles media lifecycle for file-aware services', function () {
         'applicant_email' => 'media.student@example.test',
         'applicant_phone' => '0812222222',
     ]);
-    $registration = $registrations->uploadPaymentProof($registration, UploadedFile::fake()->create('proof.jpg', 1, 'image/jpeg'));
-    $oldProof = $registration->payment_proof;
-    $registration = $registrations->uploadPaymentProof($registration, UploadedFile::fake()->create('proof-new.jpg', 1, 'image/jpeg'));
     $registrations->assignClass($registration, $courseClass);
     $enrollment = $registrations->createEnrollmentFromRegistration($registration);
 
@@ -355,8 +352,6 @@ it('handles media lifecycle for file-aware services', function () {
 
     expect($student->avatar)->toStartWith('users/avatars/')
         ->and($program->thumbnail)->toStartWith('programs/thumbnails/')
-        ->and($registration->payment_proof)->toStartWith('registrations/payment-proofs/')
-        ->and($oldProof)->toBeIn($this->mediaStorage->deleted)
         ->and($enrollment)->toBeInstanceOf(Enrollment::class)
         ->and($reportCard->pdf_path)->toStartWith('report-cards/pdfs/')
         ->and($reel->video_path)->toStartWith('reels/videos/')
@@ -381,7 +376,6 @@ it('handles media lifecycle for file-aware services', function () {
         $reel->thumbnail_path,
         $content->image,
         $reportCard->pdf_path,
-        $registration->payment_proof,
         $program->thumbnail,
         $student->avatar,
     );

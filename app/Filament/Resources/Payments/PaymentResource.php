@@ -40,8 +40,7 @@ class PaymentResource extends Resource
             ->where(function (Builder $query): void {
                 $query->whereNotNull('payment_amount')
                     ->orWhereNotNull('midtrans_order_id')
-                    ->orWhereNotNull('payment_gateway_id')
-                    ->orWhereNotNull('payment_proof');
+                    ->orWhereNotNull('payment_gateway_id');
             });
     }
 
@@ -80,6 +79,7 @@ class PaymentResource extends Resource
                         'waiting_payment' => 'Waiting payment',
                         'paid' => 'Paid',
                         'expired' => 'Expired',
+                        'cancelled' => 'Cancelled',
                         'failed' => 'Failed',
                     ]),
                 SelectFilter::make('status')

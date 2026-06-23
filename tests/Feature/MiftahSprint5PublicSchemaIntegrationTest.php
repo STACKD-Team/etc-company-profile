@@ -271,6 +271,11 @@ it('renders published testimonials with bounded ratings and optional photos', fu
 });
 
 it('uses published FAQ and profile settings in the chatbot', function () {
+    config([
+        'rag.nvidia.api_key' => null,
+        'rag.qdrant.url' => null,
+    ]);
+
     Content::query()->create([
         'type' => Content::TYPE_PROFILE,
         'title' => 'Chatbot Profile',
@@ -295,7 +300,7 @@ it('uses published FAQ and profile settings in the chatbot', function () {
         'message' => 'Saya mencari kelas akhir pekan.',
     ])
         ->assertOk()
-        ->assertJsonPath('intent', 'faq')
+        ->assertJsonPath('intent', 'rag')
         ->assertJsonPath('reply', 'Kelas akhir pekan tersedia sesuai kuota.');
 
     $this->postJson(route('public.chatbot.messages.store'), [
@@ -303,7 +308,7 @@ it('uses published FAQ and profile settings in the chatbot', function () {
         'message' => 'Di mana alamat dan WhatsApp ETC?',
     ])
         ->assertOk()
-        ->assertJsonPath('intent', 'contact')
+        ->assertJsonPath('intent', 'rag')
         ->assertJsonPath(
             'reply',
             'ETC Planet berlokasi di Jl. Chatbot Sprint 5. Kamu dapat menghubungi 081299998888 untuk konsultasi. Instagram ETC Planet: https://instagram.example.test/chatbot.',
@@ -311,6 +316,11 @@ it('uses published FAQ and profile settings in the chatbot', function () {
 });
 
 it('shows honest empty states without hardcoded CMS or organization data', function () {
+    config([
+        'rag.nvidia.api_key' => null,
+        'rag.qdrant.url' => null,
+    ]);
+
     expect(app(PublicDiscoveryService::class)->faqItems())->toBe([])
         ->and(app(PublicDiscoveryService::class)->settings())->toBe([]);
 
@@ -341,9 +351,9 @@ it('shows honest empty states without hardcoded CMS or organization data', funct
         'message' => 'Di mana alamat ETC?',
     ])
         ->assertOk()
-        ->assertJsonPath('intent', 'contact')
+        ->assertJsonPath('intent', 'rag_no_context')
         ->assertJsonPath(
             'reply',
-            'Informasi kontak ETC Planet belum dipublikasikan. Silakan gunakan form kontak agar tim ETC dapat menghubungi kamu.',
+            'Aku tidak tahu berdasarkan knowledge base ETC Planet saat ini.',
         );
 });

@@ -70,7 +70,6 @@ test('student can view own payment detail and cannot view another student paymen
         'applicant_name' => 'Mia Student',
         'payment_amount' => 1500000,
         'payment_method' => 'bank_transfer',
-        'payment_proof' => 'registrations/payment-proofs/mia-proof.jpg',
         'status' => 'paid',
         'paid_at' => now(),
     ]);
@@ -89,7 +88,7 @@ test('student can view own payment detail and cannot view another student paymen
         ->assertSee('Potongan promo')
         ->assertSee('Nominal akhir')
         ->assertSee('Rp 1.500.000')
-        ->assertSee('Informasi Legacy')
+        ->assertDontSee('Informasi Legacy')
         ->assertDontSee('Bukti Pembayaran');
 
     $this->actingAs($student)

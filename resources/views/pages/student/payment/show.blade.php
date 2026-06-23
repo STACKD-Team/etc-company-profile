@@ -1,7 +1,6 @@
 @php
     $statusLabel = $statusLabels[$payment->status] ?? str($payment->status)->replace('_', ' ')->headline();
     $formatMoney = fn (float|int|null $amount): string => 'Rp '.number_format((float) $amount, 0, ',', '.');
-    $proofUrl = $payment->payment_proof ? app(\App\Services\MediaStorageService::class)->url($payment->payment_proof) : null;
     $isWaiting = in_array($summary['status'], ['pending_payment', 'waiting_payment'], true);
 @endphp
 
@@ -48,17 +47,6 @@
                     <x-ui.description-item label="Status Pendaftaran" :value="$statusLabel" />
                     <x-ui.description-item label="Catatan" :value="$payment->notes" class="md:col-span-2" />
                 </x-ui.description-list>
-            </x-ui.detail-card>
-
-            <x-ui.detail-card heading="Informasi Legacy" description="Arsip upload lama hanya ditampilkan sebagai referensi, bukan alur pembayaran utama.">
-                @if ($proofUrl)
-                    <p class="text-sm text-etc-on-muted">File arsip pembayaran manual lama masih tersedia.</p>
-                    <x-ui.button :href="$proofUrl" target="_blank" outlined class="mt-4" icon="heroicon-m-arrow-top-right-on-square">
-                        Buka Arsip
-                    </x-ui.button>
-                @else
-                    <p class="text-sm text-etc-on-muted">Tidak ada arsip pembayaran manual.</p>
-                @endif
             </x-ui.detail-card>
         </div>
 

@@ -4,7 +4,6 @@ use App\Http\Controllers\Payment\MidtransNotificationController;
 use App\Http\Controllers\Public\RegistrationConfirmationController;
 use App\Http\Controllers\Public\RegistrationController;
 use App\Http\Controllers\Public\RegistrationPaymentController;
-use App\Http\Controllers\Public\RegistrationPaymentProofController;
 use App\Http\Controllers\Public\RegistrationProgramController;
 use App\Http\Controllers\Public\RegistrationReceiptController;
 use App\Http\Controllers\Public\RegistrationStartController;
@@ -29,12 +28,6 @@ Route::prefix('registration')
         Route::get('/payment/{registration}', [RegistrationPaymentController::class, 'show'])
             ->middleware('signed.optional')
             ->name('payment.show');
-        Route::post('/payment/{registration}/proof', [RegistrationPaymentProofController::class, 'store'])
-            ->middleware('throttle:upload')
-            ->name('payment.proof.store');
-        Route::post('/payment/{registration}/confirm', [RegistrationPaymentController::class, 'confirm'])
-            ->middleware('throttle:payment')
-            ->name('payment.confirm');
         Route::get('/confirmation/{registration}', [RegistrationConfirmationController::class, 'show'])
             ->middleware('signed.optional')
             ->name('confirmation.show');

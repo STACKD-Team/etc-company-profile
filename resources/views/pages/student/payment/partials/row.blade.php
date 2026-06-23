@@ -20,7 +20,7 @@
     </td>
     <td class="py-4 pr-4 text-etc-on-muted">{{ $item->program?->name ?? 'Program ETC Planet' }}</td>
     <td class="py-4 pr-4">
-        <x-ui.badge status="info">{{ $methods[$item->payment_method] ?? ($item->payment_method ?? 'Belum dipilih') }}</x-ui.badge>
+        <x-ui.badge status="info">{{ $methods[$item->payment_method] ?? ($item->payment_method ?? 'Midtrans') }}</x-ui.badge>
     </td>
     <td class="py-4 pr-4">
         <p class="text-xs font-bold uppercase text-etc-on-muted">Nominal akhir</p>

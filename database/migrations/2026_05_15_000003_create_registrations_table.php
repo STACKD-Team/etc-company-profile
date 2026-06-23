@@ -24,10 +24,9 @@ return new class extends Migration
             $table->string('preferred_time', 20)->nullable();
             $table->dateTime('placement_test_at')->nullable();
             $table->text('placement_test_result')->nullable();
-            $table->enum('payment_method', ['qris', 'bank_transfer', 'virtual_account', 'ewallet', 'manual'])->nullable();
+            $table->enum('payment_method', ['qris', 'bank_transfer', 'virtual_account', 'ewallet'])->nullable();
             $table->decimal('payment_amount', 12, 2)->nullable();
             $table->string('payment_gateway_id', 100)->nullable();
-            $table->string('payment_proof')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->enum('status', ['pending_payment', 'paid', 'placement_test', 'enrolled', 'rejected', 'cancelled'])->default('pending_payment');
             $table->text('notes')->nullable();

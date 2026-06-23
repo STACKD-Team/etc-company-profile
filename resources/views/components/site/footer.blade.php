@@ -48,7 +48,7 @@
 <footer {{ $attributes->class('relative bg-etc-charcoal pb-24 pt-16 text-white md:pb-16') }}>
     <div class="mx-auto grid max-w-[1120px] grid-cols-1 gap-12 px-5 md:grid-cols-[260px_1fr] lg:px-0">
         <div class="space-y-5">
-            <div class="font-heading text-[18px] font-black">{{ $brand }}</div>
+            <img src="{{ asset('images/logo.png') }}" alt="{{ $brand }}" class="h-14 w-14 rounded-full object-cover shadow-soft">
             <p class="text-[14px] leading-[var(--etc-leading-normal)] text-white/60">
                 &copy; {{ now()->year }} ETC Planet.<br>
                 {{ $address }}

@@ -1,5 +1,5 @@
 <x-layouts.dashboard title="Edit Pendaftaran" area="admin" active="registrations">
-    <x-ui.panel heading="Data Pendaftaran" description="Perbarui koreksi data intake tanpa mengubah workflow pembayaran manual Sprint 1.">
+    <x-ui.panel heading="Data Pendaftaran" description="Perbarui koreksi data intake tanpa mengubah status gateway Midtrans secara manual.">
         <form method="POST" action="{{ route('admin.registration.update', $registration) }}" class="grid gap-5 md:grid-cols-2">
             @include('pages.admin.registration._form-fields')
 

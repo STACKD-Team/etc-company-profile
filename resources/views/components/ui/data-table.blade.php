@@ -53,9 +53,10 @@
     id="{{ $tableId }}"
     method="{{ $method }}"
     action="{{ $action }}"
+    class="w-full"
     data-data-table-form
 >
-    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center" data-data-table-toolbar>
+    <div class="mb-4 flex w-full flex-col gap-3 sm:flex-row sm:items-center" data-data-table-toolbar>
         @if ($showSearch)
             <div class="min-w-0 flex-1">
                 <x-ui.search-field
@@ -101,8 +102,8 @@
     <input type="hidden" name="direction" value="{{ $direction }}">
     <input type="hidden" name="page" value="{{ request('page', 1) }}">
 
-    <x-filament::section {{ $attributes->class('etc-data-table') }}>
-        <div class="etc-data-table-scroll overflow-x-auto">
+    <x-filament::section {{ $attributes->class('etc-data-table w-full') }}>
+        <div class="etc-data-table-scroll block w-full max-w-full overflow-x-auto">
             <table class="w-full min-w-[720px] text-left text-sm">
                 <thead>
                     <tr class="text-xs uppercase text-etc-on-muted">

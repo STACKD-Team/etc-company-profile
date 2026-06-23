@@ -1,11 +1,16 @@
 <x-layouts.public title="Pembayaran" :show-navbar="false" :show-footer="false" :show-chatbot="false">
 <x-public-discovery.navbar active="program" />
 <link rel="stylesheet" href="{{ asset('css/pembayaran.css') }}">
-<link rel="stylesheet" href="{{ asset('css/interactive.css') }}">
+
+@php
+    $isWaiting = in_array($paymentSummary['status'], ['waiting_payment', 'pending_payment'], true);
+    $canPay = $paymentSummary['redirectUrl'] && $isWaiting && (! $paymentSummary['expiresAt'] || $paymentSummary['expiresAt']->isFuture());
+@endphp
 
 <header class="page-header">
+    <p class="page-kicker">Pembayaran Midtrans</p>
     <h1>Pendaftaran ETC Planet</h1>
-    <p>Selesaikan pembayaran otomatis melalui Midtrans. Status akan diperbarui dari notifikasi gateway setelah transaksi berhasil.</p>
+    <p>Selesaikan transaksi melalui Midtrans. Status pembayaran akan berubah otomatis setelah gateway mengirim notifikasi.</p>
 
     <div class="stepper" aria-label="Progress pendaftaran">
         <div class="step done">
@@ -31,10 +36,12 @@
 </header>
 
 @if (session('status'))
-    <div class="payment-alert">{{ session('status') }}</div>
+    <div class="payment-alert">
+        <x-ui.alert status="success">{{ session('status') }}</x-ui.alert>
+    </div>
 @endif
 
-<main class="payment-layout">
+<main class="payment-layout payment-layout--midtrans">
     <aside class="summary-card">
         <h2>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2h8v4H8z"/><path d="M6 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1"/><path d="M8 11h8M8 15h5"/></svg>
@@ -65,132 +72,48 @@
 
         <div class="summary-note">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-            <p>Status saat ini: {{ str($paymentSummary['status'])->replace('_', ' ')->headline() }}. Admin tidak perlu verifikasi manual untuk transaksi Midtrans sukses.</p>
+            <p>Status saat ini: {{ str($paymentSummary['status'])->replace('_', ' ')->headline() }}.</p>
         </div>
     </aside>
 
     <section class="payment-content">
-        <h2 class="section-title">Pembayaran Otomatis Midtrans</h2>
-
-        <div class="method-grid">
-            <article class="method-card is-active">
-                <div class="method-head">
-                    <div class="method-icon qris-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z"/></svg>
-                    </div>
-                    <div class="method-copy">
-                        <h3>Midtrans Checkout</h3>
-                        <p>QRIS, virtual account, e-wallet, dan metode lain dari gateway</p>
-                    </div>
-                    <span class="radio-dot"></span>
+        <article class="midtrans-card">
+            <div class="method-head">
+                <div class="method-icon qris-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z"/></svg>
                 </div>
-                <div class="qris-box">
-                    <div class="qr-panel">
-                        <svg viewBox="0 0 78 78" aria-hidden="true">
-                            <rect width="78" height="78" fill="white" rx="4"/>
-                            <path fill="#e6007e" d="M8 8h18v18H8zM12 12v10h10V12H12Zm42-4h16v18H54zM58 12v10h8V12h-8ZM8 54h18v16H8zM12 58v8h10v-8H12Zm26-48h5v5h-5zm8 0h5v5h-5zM30 20h5v5h-5zm10 0h10v5H40zM30 31h5v5h-5zm10 0h5v5h-5zm10 0h20v5H50zM8 38h5v5H8zm10 0h8v5h-8zm18 0h8v5h-8zm13 0h5v5h-5zm9 0h12v5H58zM31 49h12v5H31zm18 0h5v5h-5zm9 0h12v5H58zM31 59h5v5h-5zm10 0h9v5h-9zm17 0h12v5H58zM31 68h16v5H31zm22 0h5v5h-5zm10 0h7v5h-7z"/>
-                        </svg>
-                    </div>
-                    <span class="timer">
-                        <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>
-                        {{ $paymentSummary['expiresAt'] ? 'Batas: '.$paymentSummary['expiresAt']->format('d M Y H:i') : 'Menunggu pembayaran' }}
-                    </span>
+                <div class="method-copy">
+                    <p class="section-kicker">Gateway otomatis</p>
+                    <h2 class="section-title">Midtrans Checkout</h2>
+                    <p>Bayar dengan QRIS, virtual account, e-wallet, atau metode lain yang tersedia di Midtrans.</p>
                 </div>
-            </article>
-        </div>
-
-        <div class="payment-actions">
-            @if ($paymentSummary['redirectUrl'])
-                <a class="confirm-button" href="{{ $paymentSummary['redirectUrl'] }}" target="_blank" rel="noopener">
-                    Lanjutkan ke Midtrans
-                    <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-                </a>
-            @else
-                <div class="payment-alert">Transaksi Midtrans belum memiliki URL pembayaran. Hubungi admin ETC atau coba refresh halaman ini.</div>
-            @endif
-            <a class="cancel-button" href="{{ route('registrations.confirmation.show', ['registration' => $registration]) }}">Lihat Status Pendaftaran</a>
-        </div>
-
-        <form class="upload-card" method="POST" action="{{ route('registrations.payment.proof.store', ['registration' => $registration]) }}" enctype="multipart/form-data">
-            @csrf
-            <input type="hidden" name="payment_method" class="payment-method-input" value="{{ old('payment_method', $registration->payment_method ?? 'qris') }}">
-
-            <h2 class="section-title">Fallback Legacy: Upload Bukti Manual</h2>
-            <p class="summary-note">Gunakan hanya jika admin ETC meminta arsip pembayaran manual. Alur utama tetap melalui Midtrans.</p>
-            <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-                <div class="upload-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 0 1 1.2-9.86A6 6 0 0 1 19 11.5 3.75 3.75 0 0 1 18.25 19H17"/><path d="M12 12v8"/><path d="M8.5 15.5 12 12l3.5 3.5"/></svg>
-                </div>
-                <p>Klik atau tarik file ke sini</p>
-                <span>Mendukung JPG, PNG, atau PDF (Maks. 5MB)</span>
-                <button type="button" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">Pilih File</button>
             </div>
-            <input type="file" name="payment_proof" id="fileInput" accept=".jpg,.jpeg,.png,.pdf" onchange="showFileName(this)" required>
-            <div id="file-name" class="file-name"></div>
-            @error('payment_proof') <small class="field-error">{{ $message }}</small> @enderror
-            @error('payment_method') <small class="field-error">{{ $message }}</small> @enderror
 
-            @if ($registration->payment_proof)
-                <div class="proof-status">Bukti pembayaran sudah tersimpan. Upload ulang jika file sebelumnya salah.</div>
-            @endif
-
-            <button class="upload-submit" type="submit">Upload Arsip Legacy</button>
-        </form>
-
-        <form class="payment-actions" method="POST" action="{{ route('registrations.payment.confirm', ['registration' => $registration]) }}">
-            @csrf
-            <input type="hidden" name="payment_method" class="payment-method-input" value="{{ old('payment_method', $registration->payment_method ?? 'qris') }}">
-            <label class="confirm-box" for="agree">
-                <input type="checkbox" name="payment_confirmed" id="agree" value="1" required>
-                <span>
-                    <strong>Saya sudah membayar</strong>
-                    Konfirmasi legacy ini hanya dipakai jika pembayaran manual diminta oleh admin.
+            <div class="midtrans-status">
+                <span class="timer">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>
+                    {{ $paymentSummary['expiresAt'] ? 'Batas: '.$paymentSummary['expiresAt']->format('d M Y H:i') : 'Menunggu pembayaran' }}
                 </span>
-            </label>
-            @error('payment_confirmed') <small class="field-error">{{ $message }}</small> @enderror
+                <span class="gateway-code">{{ $registration->midtrans_order_id ?: 'Order sedang disiapkan' }}</span>
+            </div>
 
-            <button class="confirm-button" type="submit">
-                Konfirmasi Legacy
-                <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-            </button>
-            <a class="cancel-button" href="{{ route('registrations.create', ['program' => $registration->program?->slug]) }}">Kembali ke Form</a>
-        </form>
+            <div class="payment-actions">
+                @if ($canPay)
+                    <x-ui.button :href="$paymentSummary['redirectUrl']" target="_blank" rel="noopener" size="xl" class="w-full max-w-[432px]" icon="heroicon-m-arrow-right" icon-position="after">
+                        Lanjutkan ke Midtrans
+                    </x-ui.button>
+                @elseif ($paymentSummary['redirectUrl'] && $paymentSummary['status'] === 'paid')
+                    <x-ui.alert status="success" class="payment-alert--inline">Pembayaran sudah diterima. Kamu bisa melihat status pendaftaran di halaman konfirmasi.</x-ui.alert>
+                @else
+                    <x-ui.alert status="warning" class="payment-alert--inline">Transaksi Midtrans belum tersedia atau sudah tidak aktif. Hubungi admin ETC Planet untuk bantuan.</x-ui.alert>
+                @endif
+                <x-ui.button :href="route('registrations.confirmation.show', ['registration' => $registration])" color="gray" outlined size="xl" class="w-full max-w-[432px]">
+                    Lihat Status Pendaftaran
+                </x-ui.button>
+            </div>
+        </article>
     </section>
 </main>
 
-@push('scripts')
-<script>
-function selectMethod(card) {
-    document.querySelectorAll('.method-card').forEach(item => item.classList.remove('is-active'));
-    card.classList.add('is-active');
-
-    document.querySelectorAll('.payment-method-input').forEach((input) => {
-        input.value = card.dataset.method;
-    });
-}
-
-function copyText(text) {
-    navigator.clipboard.writeText(text).then(() => alert('Nomor rekening disalin: ' + text));
-}
-
-function showFileName(input) {
-    const fileName = document.getElementById('file-name');
-
-    if (input.files.length > 0) {
-        fileName.textContent = 'File dipilih: ' + input.files[0].name;
-        fileName.style.display = 'block';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const currentMethod = document.querySelector('.payment-method-input')?.value || 'qris';
-    const currentCard = document.querySelector(`.method-card[data-method="${currentMethod}"]`);
-
-    if (currentCard) {
-        selectMethod(currentCard);
-    }
-});
-</script>
-@endpush
 <x-public-discovery.page-end />
 </x-layouts.public>

@@ -298,7 +298,6 @@ class StudentPanelService
             'bank_transfer' => 'Transfer Bank',
             'virtual_account' => 'Virtual Account',
             'ewallet' => 'E-Wallet',
-            'manual' => 'Manual',
         ];
     }
 
@@ -330,7 +329,6 @@ class StudentPanelService
                     ->orWhereNotNull('payment_gateway_id')
                     ->orWhereNotNull('midtrans_order_id')
                     ->orWhereNotNull('midtrans_redirect_url')
-                    ->orWhereNotNull('payment_proof')
                     ->orWhereNotNull('paid_at')
                     ->orWhereIn('status', ['pending_payment', 'paid', 'placement_test', 'enrolled', 'rejected', 'cancelled']);
             });

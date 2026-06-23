@@ -3,6 +3,8 @@
 use App\Models\ChatbotLog;
 use App\Models\Content;
 use App\Models\Program;
+use App\Models\RagKnowledgeChunk;
+use App\Models\RagKnowledgeSource;
 use App\Models\Reel;
 use App\Models\Room;
 use App\Services\MediaStorageService;
@@ -159,11 +161,21 @@ it('answers the public chatbot from Qdrant context and NVIDIA completion', funct
                 ],
             ]],
         ]),
-        'https://nvidia.example.test/v1/chat/completions' => Http::response([
-            'choices' => [[
-                'message' => ['content' => 'Placement test ETC dilaksanakan secara offline.'],
-            ]],
-        ]),
+        'https://nvidia.example.test/v1/chat/completions' => Http::sequence()
+            ->push([
+                'choices' => [[
+                    'message' => ['content' => json_encode([
+                        'scope' => 'etc',
+                        'retrieval_query' => 'placement test ETC Planet',
+                        'public_data_needed' => [],
+                    ])],
+                ]],
+            ])
+            ->push([
+                'choices' => [[
+                    'message' => ['content' => 'Placement test ETC dilaksanakan secara offline.'],
+                ]],
+            ]),
     ]);
 
     $this->postJson(route('public.chatbot.messages.store'), [
@@ -183,13 +195,15 @@ it('answers the public chatbot from Qdrant context and NVIDIA completion', funct
         ->where('bot_response', 'Placement test ETC dilaksanakan secara offline.')
         ->exists())->toBeTrue();
 
-    Http::assertSentCount(3);
+    Http::assertSentCount(4);
     Http::assertSent(fn (Request $request): bool => $request->url() === 'https://qdrant.example.test/collections/etc-test-knowledge/points/search'
         && $request->hasHeader('api-key', 'qdrant-test-key')
         && $request['limit'] === 5);
+    Http::assertSent(fn (Request $request): bool => $request->url() === 'https://nvidia.example.test/v1/embeddings'
+        && $request['input_type'] === 'query');
 });
 
-it('falls back to current public data when retrieved knowledge is not relevant', function () {
+it('uses allowlisted public program data and links when retrieved knowledge is not relevant', function () {
     $program = Program::query()->create([
         'name' => 'Sprint 7 Pricing Program',
         'slug' => 'sprint-7-pricing-program',
@@ -212,6 +226,21 @@ it('falls back to current public data when retrieved knowledge is not relevant',
                 ],
             ]],
         ]),
+        'https://nvidia.example.test/v1/chat/completions' => Http::sequence()
+            ->push([
+                'choices' => [[
+                    'message' => ['content' => json_encode([
+                        'scope' => 'etc',
+                        'retrieval_query' => 'biaya program ETC Planet',
+                        'public_data_needed' => ['programs'],
+                    ])],
+                ]],
+            ])
+            ->push([
+                'choices' => [[
+                    'message' => ['content' => 'Biaya program Sprint 7 Pricing Program adalah Rp 1.500.000 dan biaya pendaftarannya Rp 100.000.'],
+                ]],
+            ]),
     ]);
 
     $this->postJson(route('public.chatbot.messages.store'), [
@@ -219,20 +248,178 @@ it('falls back to current public data when retrieved knowledge is not relevant',
         'message' => 'Berapa biaya program?',
     ])
         ->assertOk()
-        ->assertJsonPath('intent', 'pricing')
-        ->assertJsonPath(
-            'reply',
-            'Biaya pendaftaran mulai dari Rp 100.000. Biaya program saat ini Rp 1.500.000. Buka halaman Program untuk melihat harga dan promo aktif setiap kelas.',
-        );
+        ->assertJsonPath('intent', 'rag')
+        ->assertJsonPath('reply', 'Biaya program Sprint 7 Pricing Program adalah Rp 1.500.000 dan biaya pendaftarannya Rp 100.000.')
+        ->assertJsonPath('links.0.label', 'Sprint 7 Pricing Program')
+        ->assertJsonPath('links.0.url', route('public.programs.show', $program, false));
 
     expect(ChatbotLog::query()->where('session_id', 'miftah-sprint-7-low-score')
-        ->where('intent', 'pricing')
+        ->where('intent', 'rag')
         ->exists())->toBeTrue();
-    Http::assertSentCount(2);
+    Http::assertSentCount(4);
+});
+
+it('does not expose inactive public program data in chatbot links', function () {
+    Program::query()->create([
+        'name' => 'Inactive Secret Program',
+        'slug' => 'inactive-secret-program',
+        'category' => 'english',
+        'price' => 999999,
+        'registration_fee' => 100000,
+        'is_active' => false,
+    ]);
+    $active = Program::query()->create([
+        'name' => 'Active English Program',
+        'slug' => 'active-english-program',
+        'category' => 'english',
+        'price' => 1500000,
+        'registration_fee' => 100000,
+        'is_active' => true,
+    ]);
+
+    Http::fake([
+        'https://nvidia.example.test/v1/embeddings' => Http::response([
+            'data' => [['embedding' => [0.1, 0.2, 0.3]]],
+        ]),
+        'https://qdrant.example.test/collections/etc-test-knowledge/points/search' => Http::response(['result' => []]),
+        'https://nvidia.example.test/v1/chat/completions' => Http::sequence()
+            ->push([
+                'choices' => [[
+                    'message' => ['content' => json_encode([
+                        'scope' => 'etc',
+                        'retrieval_query' => 'program bahasa Inggris ETC Planet',
+                        'public_data_needed' => ['programs'],
+                    ])],
+                ]],
+            ])
+            ->push([
+                'choices' => [[
+                    'message' => ['content' => 'Untuk latihan bahasa Inggris, kamu bisa melihat Active English Program.'],
+                ]],
+            ]),
+    ]);
+
+    $this->postJson(route('public.chatbot.messages.store'), [
+        'session_id' => 'miftah-sprint-7-active-only',
+        'message' => 'Program yang bagus untuk melatih bahasa Inggris?',
+    ])
+        ->assertOk()
+        ->assertJsonPath('intent', 'rag')
+        ->assertJsonPath('links.0.label', 'Active English Program')
+        ->assertJsonMissing(['label' => 'Inactive Secret Program'])
+        ->assertJsonPath('links.0.url', route('public.programs.show', $active, false));
+});
+
+it('refuses chatbot questions outside ETC Planet Padang context', function () {
+    Http::fake([
+        'https://nvidia.example.test/v1/chat/completions' => Http::response([
+            'choices' => [[
+                'message' => ['content' => json_encode([
+                    'scope' => 'out_of_scope',
+                    'retrieval_query' => 'presiden Amerika',
+                    'public_data_needed' => [],
+                ])],
+            ]],
+        ]),
+    ]);
+
+    $this->postJson(route('public.chatbot.messages.store'), [
+        'session_id' => 'miftah-sprint-7-out-of-scope',
+        'message' => 'Siapa presiden Amerika?',
+    ])
+        ->assertOk()
+        ->assertJsonPath('intent', 'rag_out_of_scope')
+        ->assertJsonPath('reply', 'Aku hanya bisa membantu menjawab informasi seputar ETC Planet Padang.')
+        ->assertJsonMissingPath('links');
+
+    Http::assertSentCount(1);
+});
+
+it('falls back to allowlisted public data when the AI router is unavailable', function () {
+    $program = Program::query()->create([
+        'name' => 'English Conversation Fallback',
+        'slug' => 'english-conversation-fallback',
+        'category' => 'english',
+        'description' => 'Program untuk melatih percakapan bahasa Inggris.',
+        'price' => 1500000,
+        'registration_fee' => 100000,
+        'is_active' => true,
+    ]);
+
+    Http::fake([
+        'https://nvidia.example.test/v1/chat/completions' => Http::response([
+            'message' => 'Router unavailable.',
+        ], 503),
+    ]);
+
+    $this->postJson(route('public.chatbot.messages.store'), [
+        'session_id' => 'miftah-sprint-7-public-fallback',
+        'message' => 'Program disini apa saja?',
+    ])
+        ->assertOk()
+        ->assertJsonPath('intent', 'rag')
+        ->assertJsonPath('links.0.label', 'English Conversation Fallback')
+        ->assertJsonPath('links.0.url', route('public.programs.show', $program, false));
+});
+
+it('falls back to local indexed knowledge chunks when vector retrieval is unavailable', function () {
+    $source = RagKnowledgeSource::query()->create([
+        'title' => 'Company Profile',
+        'source_type' => 'upload',
+        'status' => 'ready',
+        'is_active' => true,
+        'extracted_text' => 'Company profile ETC.',
+    ]);
+    RagKnowledgeChunk::query()->create([
+        'knowledge_source_id' => $source->id,
+        'qdrant_point_id' => 'local-founder-point',
+        'chunk_index' => 0,
+        'content' => 'Saya, Debby Susiyanti, S.Pd, sebagai pemilik Lembaga Pendidikan dan Pelatihan Kerja ETC. Debby Susiyanti, S.Pd adalah Managing Director.',
+        'metadata' => ['title' => 'Company Profile'],
+        'embedding_model' => 'test',
+    ]);
+
+    Http::fake([
+        'https://nvidia.example.test/v1/chat/completions' => Http::response([
+            'message' => 'Router unavailable.',
+        ], 503),
+    ]);
+
+    $this->postJson(route('public.chatbot.messages.store'), [
+        'session_id' => 'miftah-sprint-7-local-founder',
+        'message' => 'siapa pendiri ETC Padang',
+    ])
+        ->assertOk()
+        ->assertJsonPath('intent', 'rag')
+        ->assertJsonPath('reply', 'Debby Susiyanti, S.Pd adalah pemilik Lembaga Pendidikan dan Pelatihan Kerja ETC sekaligus Managing Director.');
+});
+
+it('renders chatbot links safely from structured response data', function () {
+    $javascript = file_get_contents(resource_path('js/app.js'));
+
+    expect($javascript)
+        ->toContain('const appendLinks = (container, links = [], isPublic = false) => {')
+        ->toContain("const anchor = document.createElement('a');")
+        ->toContain('anchor.textContent = link.label')
+        ->toContain('data?.links || []')
+        ->toContain('bubble.textContent = message')
+        ->toContain("const messagesStorageKey = 'etc_public_chatbot_messages'")
+        ->toContain('const restoreMessages = () => {')
+        ->toContain('window.localStorage?.setItem(messagesStorageKey')
+        ->not->toContain('bubble.innerHTML = message');
 });
 
 it('returns a safe fallback instead of HTTP 500 when an external RAG service fails', function () {
     Http::fake([
+        'https://nvidia.example.test/v1/chat/completions' => Http::response([
+            'choices' => [[
+                'message' => ['content' => json_encode([
+                    'scope' => 'etc',
+                    'retrieval_query' => 'informasi database publik ETC Planet',
+                    'public_data_needed' => [],
+                ])],
+            ]],
+        ]),
         'https://nvidia.example.test/v1/embeddings' => Http::failedConnection('Connection timed out.'),
     ]);
 
@@ -243,16 +430,25 @@ it('returns a safe fallback instead of HTTP 500 when an external RAG service fai
         ->assertOk()
         ->assertJsonPath('status', 'ok')
         ->assertJsonPath('session_id', 'miftah-sprint-7-timeout')
-        ->assertJsonPath('intent', 'general')
-        ->assertJsonPath('reply', 'Halo! Aku bisa bantu jawab tentang program, biaya, jadwal, pendaftaran, placement test, dan kontak ETC Planet.');
+        ->assertJsonPath('intent', 'rag_no_context')
+        ->assertJsonPath('reply', 'Aku tidak tahu berdasarkan knowledge base ETC Planet saat ini.');
 
     expect(ChatbotLog::query()->where('session_id', 'miftah-sprint-7-timeout')
-        ->where('intent', 'general')
+        ->where('intent', 'rag_no_context')
         ->exists())->toBeTrue();
 });
 
 it('returns a safe fallback when an external RAG service responds with an HTTP error', function () {
     Http::fake([
+        'https://nvidia.example.test/v1/chat/completions' => Http::response([
+            'choices' => [[
+                'message' => ['content' => json_encode([
+                    'scope' => 'etc',
+                    'retrieval_query' => 'informasi umum ETC',
+                    'public_data_needed' => [],
+                ])],
+            ]],
+        ]),
         'https://nvidia.example.test/v1/embeddings' => Http::response([
             'message' => 'Upstream service unavailable.',
         ], 503),
@@ -264,10 +460,10 @@ it('returns a safe fallback when an external RAG service responds with an HTTP e
     ])
         ->assertOk()
         ->assertJsonPath('status', 'ok')
-        ->assertJsonPath('intent', 'general');
+        ->assertJsonPath('intent', 'rag_no_context');
 
     expect(ChatbotLog::query()->where('session_id', 'miftah-sprint-7-http-error')
-        ->where('intent', 'general')
+        ->where('intent', 'rag_no_context')
         ->exists())->toBeTrue();
 });
 

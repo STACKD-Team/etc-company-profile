@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\StoreChatbotMessageRequest;
 use App\Services\ChatbotLogService;
-use App\Services\PublicDiscoveryService;
 use App\Services\RagChatService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +15,6 @@ class ChatbotController extends Controller
 {
     public function store(
         StoreChatbotMessageRequest $request,
-        PublicDiscoveryService $discovery,
         ChatbotLogService $logs,
         RagChatService $rag,
     ): JsonResponse {
@@ -30,20 +28,26 @@ class ChatbotController extends Controller
             Log::warning('Public chatbot could not start the RAG flow.', [
                 'exception' => $exception::class,
             ]);
-            $answer = ['intent' => 'rag_fallback'];
-        }
-
-        if ($answer['intent'] === 'rag_fallback') {
-            $answer = $discovery->answerChatbot($data['message']);
+            $answer = [
+                'intent' => 'rag_error',
+                'reply' => 'Aku belum bisa memeriksa knowledge base ETC Planet saat ini. Silakan coba lagi sebentar lagi.',
+                'links' => [],
+            ];
         }
 
         $logs->logInteraction($sessionId, $data['message'], $answer['reply'], $answer['intent'], $request->user());
 
-        return response()->json([
+        $payload = [
             'status' => 'ok',
             'session_id' => $sessionId,
             'intent' => $answer['intent'],
             'reply' => $answer['reply'],
-        ]);
+        ];
+
+        if (! empty($answer['links'])) {
+            $payload['links'] = $answer['links'];
+        }
+
+        return response()->json($payload);
     }
 }

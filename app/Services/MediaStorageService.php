@@ -24,6 +24,26 @@ class MediaStorageService
         return $path;
     }
 
+    public function putContent(string $content, string $directory, string $filename, string $mimeType = 'application/octet-stream'): string
+    {
+        $extension = pathinfo($filename, PATHINFO_EXTENSION) ?: 'bin';
+        $path = trim($directory, '/').'/'.Str::uuid().'.'.$extension;
+
+        $tmp = tempnam(sys_get_temp_dir(), 'etc-generated-');
+
+        if ($tmp === false || file_put_contents($tmp, $content) === false) {
+            throw new RuntimeException('Unable to create generated file for storage upload.');
+        }
+
+        try {
+            $file = new UploadedFile($tmp, $filename, $mimeType, null, true);
+
+            return $this->putUploadedFile($file, $directory);
+        } finally {
+            @unlink($tmp);
+        }
+    }
+
     public function delete(?string $path): void
     {
         if ($path === null || $path === '') {
@@ -222,7 +242,7 @@ class MediaStorageService
 
     protected function hasCloudinary(): bool
     {
-        if (app()->runningUnitTests()) {
+        if (app()->runningUnitTests() && ! (bool) config('cloudinary.allow_test_uploads')) {
             return false;
         }
 

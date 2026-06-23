@@ -16,9 +16,10 @@ test('documented mia sprint three route names are registered', function () {
         'admin.registration.update',
         'admin.payment.index',
         'admin.payment.show',
-        'admin.payment.verify',
-        'admin.payment.reject',
     ])->each(fn (string $routeName) => expect(Route::has($routeName))->toBeTrue($routeName));
+
+    expect(Route::has('admin.payment.verify'))->toBeFalse()
+        ->and(Route::has('admin.payment.reject'))->toBeFalse();
 });
 
 test('mia admin intake pages require admin role', function () {
@@ -78,15 +79,16 @@ test('admin can list show edit and update mia registration data', function () {
         ->and((float) $registration->payment_amount)->toBe(1400000.0);
 });
 
-test('admin can view verify and reject mia registration payments', function () {
+test('admin can view mia midtrans registration payments', function () {
     $this->withoutVite();
 
     $admin = User::factory()->create(['role' => 'admin']);
     $program = createMiaProgram('Payment English', 'payment-english-admin-mia');
     $registration = createMiaRegistration($program, [
         'payment_method' => 'bank_transfer',
-        'payment_proof' => 'registrations/payment-proofs/proof.jpg',
-        'notes' => '{"payment_confirmation":true}',
+        'midtrans_order_id' => 'ETC-REG-20260604-MIA-1',
+        'payment_gateway_id' => 'ETC-REG-20260604-MIA-1',
+        'payment_status' => 'waiting_payment',
     ]);
 
     $this->actingAs($admin)
@@ -99,35 +101,10 @@ test('admin can view verify and reject mia registration payments', function () {
         ->get(route('admin.payment.show', ['payment' => $registration]))
         ->assertOk()
         ->assertSee('Detail Pembayaran')
-        ->assertSee($registration->registration_code);
-
-    $this->actingAs($admin)
-        ->post(route('admin.payment.verify', ['payment' => $registration]), [
-            'payment_amount' => 1500000,
-            'payment_method' => 'bank_transfer',
-        ])
-        ->assertSessionHasNoErrors()
-        ->assertRedirect(route('admin.payment.show', ['payment' => $registration]));
-
-    $registration->refresh();
-
-    expect($registration->status)->toBe('paid')
-        ->and($registration->paid_at)->not->toBeNull()
-        ->and($registration->payment_proof)->toBe('registrations/payment-proofs/proof.jpg')
-        ->and((float) $registration->payment_amount)->toBe(1500000.0);
-
-    $this->actingAs($admin)
-        ->post(route('admin.payment.reject', ['payment' => $registration]), [
-            'notes' => 'Bukti pembayaran tidak valid.',
-        ])
-        ->assertSessionHasNoErrors()
-        ->assertRedirect(route('admin.payment.show', ['payment' => $registration]));
-
-    $registration->refresh();
-
-    expect($registration->status)->toBe('rejected')
-        ->and($registration->notes)->toBe('Bukti pembayaran tidak valid.')
-        ->and($registration->payment_proof)->toBe('registrations/payment-proofs/proof.jpg');
+        ->assertSee($registration->registration_code)
+        ->assertSee('Gateway Midtrans')
+        ->assertDontSee('Fallback Legacy')
+        ->assertDontSee('Verifikasi Legacy');
 });
 
 function createMiaProgram(string $name, string $slug): Program

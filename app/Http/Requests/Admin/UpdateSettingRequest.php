@@ -27,7 +27,6 @@ class UpdateSettingRequest extends FormRequest
             'bank_account_name' => ['nullable', 'string', 'max:150'],
             'bank_account_number' => ['nullable', 'string', 'max:80'],
             'payment_notes' => ['nullable', 'string', 'max:1000'],
-            'qris' => ['nullable', 'image', 'max:4096'],
         ];
     }
 }

@@ -277,15 +277,14 @@ it('updates per-slug profile settings and exposes their overrides publicly', fun
             'bank_name' => 'BCA',
             'bank_account_name' => 'ETC Planet',
             'bank_account_number' => '1234567890',
-            'payment_notes' => 'Konfirmasi pembayaran ke admin.',
-            'qris' => UploadedFile::fake()->image('qris.png'),
+            'payment_notes' => 'Pembayaran diproses otomatis melalui Midtrans.',
         ])
         ->assertRedirect(route('admin.profile.index'))
         ->assertSessionHasNoErrors();
 
     expect(Content::query()->where('type', 'profile')->where('slug', 'address')->first()?->meta['value'])->toBe('Jl. Sprint 6 No. 1, Padang')
         ->and(Content::query()->where('type', 'profile')->where('slug', 'bank_name')->first()?->meta['value'])->toBe('BCA')
-        ->and(Content::query()->where('type', 'profile')->where('slug', 'qris')->first()?->image)->toStartWith('settings/');
+        ->and(Content::query()->where('type', 'profile')->where('slug', 'qris')->exists())->toBeFalse();
 
     $this->get(route('public.contact.index'))
         ->assertOk()

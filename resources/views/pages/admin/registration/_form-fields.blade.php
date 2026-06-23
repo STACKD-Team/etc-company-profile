@@ -6,7 +6,7 @@
         ->mapWithKeys(fn ($status) => [$status => str($status)->replace('_', ' ')->headline()->toString()])
         ->all();
     $days = ['mon_wed' => 'Mon-Wed', 'tue_thu' => 'Tues-Thurs', 'wed_fri' => 'Wed-Fri', 'sat_sun' => 'Sat-Sun', 'request' => 'Request Schedule'];
-    $methods = ['qris' => 'QRIS', 'bank_transfer' => 'Transfer Bank', 'virtual_account' => 'Virtual Account', 'ewallet' => 'E-Wallet', 'manual' => 'Manual'];
+    $methods = ['qris' => 'QRIS', 'bank_transfer' => 'Transfer Bank', 'virtual_account' => 'Virtual Account', 'ewallet' => 'E-Wallet'];
 @endphp
 
 <x-ui.field name="applicant_name" label="Nama Pendaftar" :value="$registration->applicant_name" required />

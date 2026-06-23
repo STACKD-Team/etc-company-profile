@@ -10,7 +10,6 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -18,7 +17,6 @@ use RuntimeException;
 class RegistrationService extends BaseCrudService
 {
     public function __construct(
-        protected MediaStorageService $mediaStorage,
         protected MidtransPaymentService $midtransPayment,
     ) {}
 
@@ -75,44 +73,6 @@ class RegistrationService extends BaseCrudService
         });
     }
 
-    public function uploadPaymentProof(Registration $registration, UploadedFile $proof): Registration
-    {
-        /** @var Registration $registration */
-        $registration = $this->update($registration, [
-            'payment_proof' => $this->mediaStorage->replace($registration->payment_proof, $proof, 'registrations/payment-proofs'),
-        ]);
-
-        return $registration;
-    }
-
-    public function submitPaymentProof(Registration $registration, UploadedFile $proof, string $paymentMethod): Registration
-    {
-        /** @var Registration $registration */
-        $registration = $this->update($registration, [
-            'payment_method' => $paymentMethod,
-            'payment_proof' => $this->mediaStorage->replace($registration->payment_proof, $proof, 'registrations/payment-proofs'),
-        ]);
-
-        return $registration;
-    }
-
-    public function confirmPaymentSubmission(Registration $registration, string $paymentMethod): Registration
-    {
-        $notes = $this->decodeNotes($registration->notes);
-        $notes['payment_confirmation'] = [
-            'method' => $paymentMethod,
-            'confirmed_by_applicant_at' => now()->toIso8601String(),
-        ];
-
-        /** @var Registration $registration */
-        $registration = $this->update($registration, [
-            'payment_method' => $paymentMethod,
-            'notes' => json_encode($notes, JSON_THROW_ON_ERROR),
-        ]);
-
-        return $registration;
-    }
-
     public function receiptData(Registration $registration): array
     {
         $registration->loadMissing(['user', 'program']);
@@ -153,9 +113,8 @@ class RegistrationService extends BaseCrudService
         $query = $this->baseQuery()
             ->where(function (Builder $query): void {
                 $query->whereNotNull('payment_method')
-                    ->orWhereNotNull('payment_proof')
                     ->orWhereNotNull('payment_gateway_id')
-                    ->orWhere('notes', 'like', '%payment_confirmation%');
+                    ->orWhereNotNull('midtrans_order_id');
             });
 
         return $this->applySorting($this->applyFilters($query, $filters), $filters, [
@@ -175,8 +134,8 @@ class RegistrationService extends BaseCrudService
 
     public function markAsPaid(Registration $registration, ?float $amount = null, ?string $paymentMethod = null, bool $adminOverride = false): Registration
     {
-        if (! $adminOverride && ! $registration->payment_proof && ! $registration->payment_gateway_id) {
-            throw new RuntimeException('A registration needs payment proof or a gateway transaction before it can be marked as paid.');
+        if (! $adminOverride && ! $registration->payment_gateway_id && ! $registration->midtrans_order_id) {
+            throw new RuntimeException('A registration needs a Midtrans gateway transaction before it can be marked as paid.');
         }
 
         $data = [
@@ -218,15 +177,7 @@ class RegistrationService extends BaseCrudService
 
     public function forceDelete(Model $model): bool
     {
-        /** @var Registration $model */
-        $paymentProof = $model->payment_proof;
-        $deleted = parent::forceDelete($model);
-
-        if ($deleted) {
-            $this->mediaStorage->delete($paymentProof);
-        }
-
-        return $deleted;
+        return parent::forceDelete($model);
     }
 
     public function schedulePlacementTest(Registration $registration, string $scheduledAt): Registration
@@ -357,6 +308,6 @@ class RegistrationService extends BaseCrudService
 
         $decoded = json_decode($notes, true);
 
-        return is_array($decoded) ? $decoded : ['legacy_notes' => $notes];
+        return is_array($decoded) ? $decoded : ['notes' => $notes];
     }
 }

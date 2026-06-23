@@ -43,8 +43,6 @@ class RegistrationInfolist
                     ->placeholder('-'),
                 TextEntry::make('payment_gateway_id')
                     ->placeholder('-'),
-                TextEntry::make('payment_proof')
-                    ->placeholder('-'),
                 TextEntry::make('paid_at')
                     ->dateTime()
                     ->placeholder('-'),

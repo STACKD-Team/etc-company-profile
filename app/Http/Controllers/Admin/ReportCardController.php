@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\DestroyAdminResourceRequest;
 use App\Http\Requests\Admin\SaveReportCardRequest;
+use App\Models\CourseClass;
 use App\Models\Enrollment;
 use App\Models\ReportCard;
 use App\Models\User;
@@ -42,8 +43,9 @@ class ReportCardController extends Controller
             'searchPlaceholder' => 'Cari siswa atau kelas',
             'actions' => [
                 ['label' => 'Buat Rapor', 'route' => 'admin.report-card.create', 'icon' => 'add'],
-                ['label' => 'Export Rapor', 'route' => 'admin.exports.report-cards', 'icon' => 'download'],
             ],
+            'classes' => CourseClass::query()->orderBy('name')->get(),
+            'reportCards' => ReportCard::query()->with('enrollment.user')->latest()->get(),
         ]);
     }
 

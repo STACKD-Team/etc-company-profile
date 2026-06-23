@@ -104,6 +104,11 @@ it('stores valid contact messages and rejects invalid contact messages', functio
 });
 
 it('logs chatbot messages and returns the public chatbot JSON shape', function () {
+    config([
+        'rag.nvidia.api_key' => null,
+        'rag.qdrant.url' => null,
+    ]);
+
     $response = $this->postJson('/chatbot/messages', [
         'message' => 'Berapa biaya pendaftaran dan program?',
     ]);
@@ -112,7 +117,7 @@ it('logs chatbot messages and returns the public chatbot JSON shape', function (
         ->assertOk()
         ->assertJsonStructure(['status', 'session_id', 'intent', 'reply'])
         ->assertJsonPath('status', 'ok')
-        ->assertJsonPath('intent', 'pricing');
+        ->assertJsonPath('intent', 'rag_no_context');
 
     expect(ChatbotLog::query()->count())->toBe(1);
 });

@@ -24,7 +24,6 @@ class SettingController extends Controller
         'bank_account_name' => 'Nama Pemilik Rekening',
         'bank_account_number' => 'Nomor Rekening',
         'payment_notes' => 'Catatan Pembayaran',
-        'qris' => 'QRIS',
     ];
 
     public function __construct(private ContentService $contents) {}
@@ -40,9 +39,8 @@ class SettingController extends Controller
     public function update(UpdateSettingRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        unset($data['qris']);
 
-        $this->contents->updateSettings($data, self::SETTINGS, $request->file('qris'));
+        $this->contents->updateSettings($data, self::SETTINGS);
 
         return to_route('admin.profile.index')->with('status', 'Settings berhasil diperbarui.');
     }

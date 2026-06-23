@@ -203,9 +203,12 @@ it('shows only published partners on the public home page', function () {
         ->assertSee('data-partner-section', false)
         ->assertSee('Kerja Sama ETC')
         ->assertSee('Published School Partner')
-        ->assertSee('Sekolah')
-        ->assertSee('Sejak 2025')
         ->assertSee('partner-school.jpg')
+        ->assertSee('public-home-partner-logo')
+        ->assertDontSee('Sekolah')
+        ->assertDontSee('Sejak 2025')
+        ->assertDontSee('Kolaborasi kelas speaking untuk siswa sekolah.')
+        ->assertDontSee('Kunjungi partner')
         ->assertDontSee('Hidden Partner');
 });
 
@@ -555,7 +558,7 @@ it('renders the refined home discovery sections from the Stitch reference', func
         ->toContain('.public-home-carousel__arrow[data-carousel-prev]')
         ->toContain('.public-home-carousel__arrow[data-carousel-next]')
         ->toContain('.public-testimonial-card:hover')
-        ->toContain('.public-home-partner-card:hover')
+        ->toContain('.public-home-partner-logo__image')
         ->toContain('.public-home-reel-card:hover')
         ->toContain('.public-home-instructor-card')
         ->toContain('.public-home-instructor-card img')

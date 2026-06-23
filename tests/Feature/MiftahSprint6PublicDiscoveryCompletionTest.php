@@ -119,6 +119,11 @@ it('uses published CMS media and testimonial ratings on the public home page', f
 });
 
 it('answers pricing and schedule questions from current database records', function () {
+    config([
+        'rag.nvidia.api_key' => null,
+        'rag.qdrant.url' => null,
+    ]);
+
     $program = Program::query()->create([
         'name' => 'Sprint 6 Dynamic English',
         'slug' => 'sprint-6-dynamic-english',
@@ -136,21 +141,27 @@ it('answers pricing and schedule questions from current database records', funct
         'status' => 'upcoming',
     ]);
 
-    $this->postJson(route('public.chatbot.messages.store'), [
+    $pricingResponse = $this->postJson(route('public.chatbot.messages.store'), [
         'session_id' => 'sprint-6-pricing',
         'message' => 'Berapa biaya program sekarang?',
-    ])
-        ->assertOk()
-        ->assertJsonPath('intent', 'pricing')
-        ->assertJsonPath('reply', 'Biaya pendaftaran mulai dari Rp 125.000. Biaya program saat ini Rp 1.750.000. Buka halaman Program untuk melihat harga dan promo aktif setiap kelas.');
+    ]);
 
-    $this->postJson(route('public.chatbot.messages.store'), [
+    $pricingResponse
+        ->assertOk()
+        ->assertJsonPath('intent', 'rag')
+        ->assertJsonPath('links.0.label', 'Sprint 6 Dynamic English');
+    expect($pricingResponse->json('reply'))->toContain('Sprint 6 Dynamic English');
+
+    $scheduleResponse = $this->postJson(route('public.chatbot.messages.store'), [
         'session_id' => 'sprint-6-schedule',
         'message' => 'Apa jadwal kelas yang tersedia?',
-    ])
+    ]);
+
+    $scheduleResponse
         ->assertOk()
-        ->assertJsonPath('intent', 'schedule')
-        ->assertJsonPath('reply', 'Jadwal kelas yang tersedia: Sprint 6 Dynamic English: Selasa-Kamis, 18.30-20.00. Jadwal dapat berubah mengikuti kuota kelas.');
+        ->assertJsonPath('intent', 'rag')
+        ->assertJsonPath('links.0.label', 'Sprint 6 Dynamic English');
+    expect($scheduleResponse->json('reply'))->toContain('Sprint 6 Evening Class');
 });
 
 it('keeps the public chatbot and reels operable with a keyboard', function () {

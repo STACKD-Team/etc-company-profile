@@ -1,7 +1,13 @@
 <x-layouts.public title="Konfirmasi Pendaftaran" :show-navbar="false" :show-footer="false" :show-chatbot="false">
     <x-public-discovery.navbar active="program" />
     <link rel="stylesheet" href="{{ asset('css/konfirmasi.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/interactive.css') }}">
+
+    @php
+        $paymentStatus = $registrationDetail['paymentStatus'];
+        $canContinue = $registrationDetail['redirectUrl']
+            && in_array($paymentStatus, ['waiting_payment', 'pending_payment'], true)
+            && (! $registrationDetail['expiresAt'] || $registrationDetail['expiresAt']->isFuture());
+    @endphp
 
     <div class="page-shell">
         <main class="confirmation-main">
@@ -30,53 +36,75 @@
                 </div>
             </div>
 
-            <section class="success-hero">
+            <section class="success-hero success-hero--{{ $confirmationCopy['tone'] }}">
                 <div class="success-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span class="material-symbols-outlined">{{ $confirmationCopy['icon'] }}</span>
                 </div>
-                <h1>Pendaftaran Diterima!</h1>
-                <p>Terima kasih telah mendaftar di ETC Planet. Pembayaran kamu akan dicek admin sebelum masuk tahap placement test offline.</p>
+                <x-ui.badge :status="$paymentStatus" size="lg" class="status-pill">{{ str($paymentStatus)->replace('_', ' ')->headline() }}</x-ui.badge>
+                <h1>{{ $confirmationCopy['title'] }}</h1>
+                <p>{{ $confirmationCopy['body'] }}</p>
             </section>
 
             <section class="detail-card">
-                <h2>Detail Pendaftaran</h2>
-                <div class="detail-row">
-                    <span>Nama Siswa</span>
-                    <strong>{{ $registrationDetail['studentName'] }}</strong>
+                <div class="detail-card__head">
+                    <div>
+                        <p>Detail transaksi</p>
+                        <h2>Ringkasan Pendaftaran</h2>
+                    </div>
+                    <strong>{{ $registrationDetail['amount'] }}</strong>
                 </div>
-                <div class="detail-row">
-                    <span>Program Terpilih</span>
-                    <strong><em>{{ $registrationDetail['programName'] }}</em></strong>
-                </div>
-                <div class="detail-row">
-                    <span>ID Pendaftaran</span>
-                    <strong><code>{{ $registrationDetail['registrationCode'] }}</code></strong>
-                </div>
-                <div class="detail-row">
-                    <span>Status</span>
-                    <strong>{{ str($registrationDetail['status'])->replace('_', ' ')->title() }}</strong>
+
+                <div class="detail-grid">
+                    <div class="detail-row">
+                        <span>Nama Siswa</span>
+                        <strong>{{ $registrationDetail['studentName'] }}</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Program Terpilih</span>
+                        <strong>{{ $registrationDetail['programName'] }}</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>ID Pendaftaran</span>
+                        <strong><code>{{ $registrationDetail['registrationCode'] }}</code></strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Status Pendaftaran</span>
+                        <strong>{{ str($registrationDetail['status'])->replace('_', ' ')->title() }}</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Status Gateway</span>
+                        <strong>{{ str($paymentStatus)->replace('_', ' ')->title() }}</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Dibayar Pada</span>
+                        <strong>{{ $registrationDetail['paidAt']?->format('d M Y H:i') ?? '-' }}</strong>
+                    </div>
                 </div>
             </section>
 
-            <section class="info-box">
+            <section class="info-box info-box--{{ $confirmationCopy['tone'] }}">
                 <div class="info-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                    <span class="material-symbols-outlined">info</span>
                 </div>
                 <div>
-                    <h3>Informasi Penting:</h3>
-                    <p>Placement Test akan dijadwalkan oleh admin ETC Planet. Pantau email kamu secara berkala untuk instruksi selanjutnya.</p>
+                    <h3>Langkah berikutnya</h3>
+                    <p>{{ $confirmationCopy['next'] }}</p>
                 </div>
             </section>
 
             <div class="action-row">
-                <a class="btn-unduh" href="{{ $receiptUrl }}">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>
+                <x-ui.button :href="$receiptUrl" color="gray" outlined size="xl" class="w-full" icon="heroicon-m-arrow-down-tray">
                     Unduh Bukti Pendaftaran
-                </a>
-                <a class="btn-dashboard" href="{{ route('public.home') }}">
-                    Kembali ke Beranda
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-                </a>
+                </x-ui.button>
+                @if ($canContinue)
+                    <x-ui.button :href="$registrationDetail['redirectUrl']" target="_blank" rel="noopener" size="xl" class="w-full" icon="heroicon-m-arrow-right" icon-position="after">
+                        Lanjutkan Pembayaran
+                    </x-ui.button>
+                @else
+                    <x-ui.button :href="route('public.home')" size="xl" class="w-full" icon="heroicon-m-arrow-right" icon-position="after">
+                        Kembali ke Beranda
+                    </x-ui.button>
+                @endif
             </div>
         </main>
     </div>

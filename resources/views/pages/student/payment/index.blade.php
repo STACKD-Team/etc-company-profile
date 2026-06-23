@@ -34,7 +34,7 @@
         ]"
         row-view="pages.student.payment.partials.row"
         empty="Belum ada riwayat pembayaran"
-        empty-description="Pembayaran akan tampil setelah pendaftaran dibuat atau dikonfirmasi."
+        empty-description="Pembayaran akan tampil setelah pendaftaran dibuat."
         search-placeholder="Cari kode, program, pendaftar, gateway, atau promo"
         data-student-payments-table
     />

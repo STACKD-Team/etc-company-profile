@@ -27,9 +27,10 @@
         <x-ui.button
             :href="$routeUrl('public.home', '/')"
             color="gray"
-            class="!min-h-0 !rounded-none !bg-transparent !p-0 !font-heading !text-2xl !font-black !tracking-normal !text-white !shadow-none hover:!bg-transparent"
+            aria-label="ETC Planet"
+            class="!min-h-0 !rounded-none !bg-transparent !p-0 !shadow-none hover:!bg-transparent"
         >
-            ETC Planet
+            <img src="{{ asset('images/logo.png') }}" alt="ETC Planet" class="h-12 w-12 rounded-full object-cover shadow-soft">
         </x-ui.button>
 
         <div class="hidden items-center gap-10 md:flex">

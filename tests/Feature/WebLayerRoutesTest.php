@@ -8,6 +8,8 @@ use App\Models\ReportCard;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory as SpreadsheetFactory;
 
 uses(RefreshDatabase::class);
 
@@ -347,7 +349,17 @@ it('allows admin users to create preview and publish a complete report card', fu
         ->post(route('admin.report-card.publish', $reportCard))
         ->assertRedirect(route('admin.report-card.show', $reportCard));
 
-    expect($reportCard->refresh()->is_published)->toBeTrue();
+    $reportCard->refresh();
+
+    expect($reportCard->is_published)->toBeTrue()
+        ->and($reportCard->pdf_path)->toEndWith('.docx');
+
+    Storage::disk('public')->assertExists($reportCard->pdf_path);
+    expect(docxText(Storage::disk('public')->get($reportCard->pdf_path)))
+        ->toContain('Budi Report')
+        ->toContain('Teen 4 Report')
+        ->toContain('Good progress.')
+        ->not->toContain('${');
 });
 
 it('validates complete report card input', function () {
@@ -379,9 +391,17 @@ it('downloads Rasky student recap export as xlsx content', function () {
         ->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
     expect($response->getContent())->toStartWith('PK');
+
+    $spreadsheet = spreadsheetFromContent($response->getContent());
+    $sheet = $spreadsheet->getActiveSheet();
+
+    expect(collect($sheet->toArray())->flatten()->filter()->values()->all())
+        ->toContain('ETC-RPT-001')
+        ->toContain('Budi Report')
+        ->toContain('Teen 4 Report');
 });
 
-it('downloads Rasky report card export as doc content', function () {
+it('downloads Rasky report card export as docx content', function () {
     $admin = User::factory()->create([
         'role' => 'admin',
     ]);
@@ -394,10 +414,31 @@ it('downloads Rasky report card export as doc content', function () {
 
     $response
         ->assertOk()
-        ->assertHeader('Content-Type', 'application/msword; charset=UTF-8');
+        ->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
 
-    expect($response->getContent())->toContain('STUDENT EVALUATION')
-        ->and($response->getContent())->toContain('Budi Report');
+    expect($response->getContent())->toStartWith('PK');
+    expect(docxText($response->getContent()))
+        ->toContain('STUDENT EVALUATION')
+        ->toContain('Budi Report')
+        ->toContain('Good progress.')
+        ->not->toContain('${');
+});
+
+it('renders report card export as an admin modal action', function () {
+    $admin = User::factory()->create([
+        'role' => 'admin',
+    ]);
+    [, $reportCard] = createRaskyReportCardFixture(persistReportCard: true);
+
+    $this->actingAs($admin)
+        ->get(route('admin.report-card.index'))
+        ->assertOk()
+        ->assertSee('report-card-export-modal', false)
+        ->assertSee('data-open-modal="report-card-export-modal"', false)
+        ->assertSee(route('admin.exports.report-cards.download'), false)
+        ->assertSee('Download DOCX')
+        ->assertSee('Budi Report')
+        ->assertSee((string) $reportCard->id, false);
 });
 
 it('shows report cards connected to classes taught by the instructor', function () {
@@ -535,4 +576,36 @@ function createRaskyReportCardFixture(bool $persistReportCard = false): array
     $reportCard = $persistReportCard ? ReportCard::query()->create($data) : null;
 
     return [$data, $reportCard, $instructor, $student, $courseClass, $director];
+}
+
+function docxText(string $content): string
+{
+    $tmp = tempnam(sys_get_temp_dir(), 'docx-test-');
+    file_put_contents($tmp, $content);
+
+    $zip = new ZipArchive;
+    $opened = $zip->open($tmp);
+
+    if ($opened !== true) {
+        @unlink($tmp);
+        throw new RuntimeException('Generated DOCX could not be opened.');
+    }
+
+    $xml = (string) $zip->getFromName('word/document.xml');
+    $zip->close();
+    @unlink($tmp);
+
+    return html_entity_decode(strip_tags($xml));
+}
+
+function spreadsheetFromContent(string $content): \PhpOffice\PhpSpreadsheet\Spreadsheet
+{
+    $tmp = tempnam(sys_get_temp_dir(), 'xlsx-test-');
+    file_put_contents($tmp, $content);
+
+    try {
+        return SpreadsheetFactory::load($tmp);
+    } finally {
+        @unlink($tmp);
+    }
 }

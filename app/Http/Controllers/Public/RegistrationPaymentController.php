@@ -3,12 +3,8 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Public\ConfirmRegistrationPaymentRequest;
 use App\Models\Registration;
-use App\Services\RegistrationService;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\URL;
 
 class RegistrationPaymentController extends Controller
 {
@@ -31,27 +27,7 @@ class RegistrationPaymentController extends Controller
                 'redirectUrl' => $registration->midtrans_redirect_url,
                 'snapToken' => $registration->midtrans_snap_token,
             ],
-            'bankAccount' => [
-                'bank' => 'BCA',
-                'number' => '123-456-7890',
-                'holder' => 'ETC Planet',
-            ],
         ]);
-    }
-
-    public function confirm(
-        ConfirmRegistrationPaymentRequest $request,
-        Registration $registration,
-        RegistrationService $registrations,
-    ): RedirectResponse {
-        $registration = $registrations->confirmPaymentSubmission(
-            $registration,
-            $request->validated('payment_method'),
-        );
-
-        return redirect()
-            ->to(URL::signedRoute('registrations.confirmation.show', ['registration' => $registration]))
-            ->with('status', 'Konfirmasi pembayaran legacy diterima. Admin ETC akan memeriksa arsip pembayaran manual jika diperlukan.');
     }
 
     protected function rupiah(float $amount): string

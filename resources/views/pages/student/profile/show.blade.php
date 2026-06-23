@@ -13,7 +13,7 @@
             <div class="grid gap-5 md:grid-cols-2">
                 <x-ui.field name="full_name" label="Nama Lengkap" :value="$student->full_name" />
                 <x-ui.field name="place_of_birth" label="Tempat Lahir" :value="$student->place_of_birth" />
-                <x-ui.field name="date_of_birth" label="Tanggal Lahir" type="date" :value="$student->date_of_birth?->format('Y-m-d')" />
+                <x-ui.date-picker name="date_of_birth" label="Tanggal Lahir" :value="$student->date_of_birth?->format('Y-m-d')" />
                 <x-ui.select
                     name="sex"
                     label="Jenis Kelamin"

@@ -82,6 +82,52 @@ test('sprint 7 duplicate midtrans webhook is idempotent', function () {
         ->and($registration->refresh()->paid_at?->toISOString())->toBe($paidAt);
 });
 
+test('sprint 7 midtrans webhook maps non paid statuses consistently', function (string $midtransStatus, string $fraudStatus, string $paymentStatus, string $registrationStatus) {
+    Config::set('midtrans.server_key', 'sprint7-secret');
+
+    $registration = miaSprint7PaymentRegistration([
+        'registration_code' => 'REG-SPRINT7-'.Str::upper(Str::random(8)),
+        'midtrans_order_id' => 'ETC-REG-SPRINT7-'.Str::upper(Str::random(8)),
+        'final_amount' => 1250000,
+    ]);
+    $payload = miaSprint7MidtransPayload($registration, $midtransStatus, 1250000);
+    $payload['fraud_status'] = $fraudStatus;
+    $payload['signature_key'] = hash('sha512', $payload['order_id'].$payload['status_code'].$payload['gross_amount'].config('midtrans.server_key'));
+
+    $this->postJson(route('payments.midtrans.notification'), $payload)
+        ->assertOk()
+        ->assertJson(['status' => 'processed']);
+
+    $registration->refresh();
+
+    expect($registration->payment_status)->toBe($paymentStatus)
+        ->and($registration->status)->toBe($registrationStatus);
+})->with([
+    'pending' => ['pending', 'accept', 'waiting_payment', 'pending_payment'],
+    'capture challenge' => ['capture', 'challenge', 'waiting_payment', 'pending_payment'],
+    'expire' => ['expire', 'accept', 'expired', 'cancelled'],
+    'cancel' => ['cancel', 'accept', 'cancelled', 'cancelled'],
+    'deny' => ['deny', 'deny', 'failed', 'rejected'],
+    'failure' => ['failure', 'accept', 'failed', 'rejected'],
+]);
+
+test('sprint 7 late non paid webhook does not downgrade a paid registration', function () {
+    Config::set('midtrans.server_key', 'sprint7-secret');
+
+    $registration = miaSprint7PaymentRegistration([
+        'final_amount' => 1250000,
+        'payment_status' => 'paid',
+        'status' => 'paid',
+        'paid_at' => now(),
+    ]);
+    $payload = miaSprint7MidtransPayload($registration, 'expire', 1250000);
+
+    $this->postJson(route('payments.midtrans.notification'), $payload)->assertOk();
+
+    expect($registration->refresh()->payment_status)->toBe('paid')
+        ->and($registration->status)->toBe('paid');
+});
+
 test('sprint 7 invalid signature and mismatched amount do not mark registration paid', function () {
     Config::set('midtrans.server_key', 'sprint7-secret');
 
@@ -176,7 +222,7 @@ test('sprint 7 rag chatbot uses qdrant context and falls back safely', function 
 
     $rag = new RagChatService(
         new class extends EmbeddingService {
-            public function embed(string $text): array
+            public function embed(string $text, string $inputType = 'passage'): array
             {
                 return [0.1, 0.2, 0.3];
             }
@@ -208,7 +254,7 @@ test('sprint 7 rag chatbot uses qdrant context and falls back safely', function 
 
     expect($answer['intent'])->toBe('rag')
         ->and($answer['reply'])->toContain('ETC Planet')
-        ->and($fallback['intent'])->toBe('rag_fallback');
+        ->and($fallback['intent'])->toBe('rag_out_of_scope');
 });
 
 test('sprint 7 qdrant service bootstraps missing collection before upsert', function () {
@@ -219,12 +265,13 @@ test('sprint 7 qdrant service bootstraps missing collection before upsert', func
         'qdrant.test/collections/etc_planet_knowledge' => Http::sequence()
             ->push([], 404)
             ->push(['result' => true], 200),
+        'qdrant.test/collections/etc_planet_knowledge/index?wait=true' => Http::response(['result' => true], 200),
         'qdrant.test/collections/etc_planet_knowledge/points?wait=true' => Http::response(['result' => true], 200),
     ]);
 
     app(QdrantVectorService::class)->upsert('point-1', [0.1, 0.2], ['content' => 'Knowledge']);
 
-    Http::assertSentCount(3);
+    Http::assertSentCount(5);
 });
 
 function miaSprint7Program(): Program

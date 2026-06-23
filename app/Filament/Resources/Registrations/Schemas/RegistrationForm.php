@@ -55,7 +55,6 @@ class RegistrationForm
             'bank_transfer' => 'Bank transfer',
             'virtual_account' => 'Virtual account',
             'ewallet' => 'Ewallet',
-            'manual' => 'Manual',
         ])
                     ->default(null),
                 TextInput::make('payment_amount')
@@ -72,11 +71,10 @@ class RegistrationForm
                         'waiting_payment' => 'Waiting payment',
                         'paid' => 'Paid',
                         'expired' => 'Expired',
+                        'cancelled' => 'Cancelled',
                         'failed' => 'Failed',
                     ]),
                 TextInput::make('payment_gateway_id')
-                    ->default(null),
-                TextInput::make('payment_proof')
                     ->default(null),
                 DateTimePicker::make('paid_at'),
                 Select::make('status')

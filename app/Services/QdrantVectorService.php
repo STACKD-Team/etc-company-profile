@@ -122,6 +122,25 @@ class QdrantVectorService
             $exists->throw();
         }
 
+        $this->ensurePayloadIndex('is_active', 'bool');
+        $this->ensurePayloadIndex('status', 'keyword');
+
         $this->collectionEnsured = true;
+    }
+
+    protected function ensurePayloadIndex(string $fieldName, string $schema): void
+    {
+        $response = Http::withHeaders($this->headers())
+            ->timeout(30)
+            ->put($this->baseUrl().'/collections/'.config('rag.qdrant.collection').'/index?wait=true', [
+                'field_name' => $fieldName,
+                'field_schema' => $schema,
+            ]);
+
+        if ($response->successful() || in_array($response->status(), [400, 409], true)) {
+            return;
+        }
+
+        $response->throw();
     }
 }

@@ -21,7 +21,7 @@ class TableQueryRequest extends FormRequest
             'class_id' => ['nullable', 'integer', 'min:1'],
             'instructor_id' => ['nullable', 'integer', 'min:1'],
             'payment_status' => ['nullable', Rule::in(['waiting_payment', 'pending_payment', 'paid', 'expired', 'failed', 'cancelled', 'placement_test', 'enrolled', 'rejected'])],
-            'payment_method' => ['nullable', Rule::in(['qris', 'bank_transfer', 'virtual_account', 'ewallet', 'manual'])],
+            'payment_method' => ['nullable', Rule::in(['qris', 'bank_transfer', 'virtual_account', 'ewallet'])],
             'report_status' => ['nullable', Rule::in(['published', 'with_file', 'without_file'])],
             'final_grade' => ['nullable', Rule::in(['A', 'B', 'C', 'D'])],
             'issued_at' => ['nullable', 'date_format:Y-m-d'],
