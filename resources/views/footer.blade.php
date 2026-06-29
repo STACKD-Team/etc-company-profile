@@ -3,8 +3,7 @@
     <div class="footer-grid">
         <div>
             <div class="footer-logo">
-                <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="#e91e8c" stroke-width="2"/><path d="M6 10l3 3 5-5" stroke="#e91e8c" stroke-width="2" stroke-linecap="round"/></svg>
-                ETC Planet.
+                <img src="{{ asset('images/logo.png') }}" alt="ETC Planet" width="40" height="40">
             </div>
             <p class="footer-description">Platform e-learning terdepan untuk mengembangkan kemampuan bahasa Inggris Anda dengan kurikulum modern dan interaktif.</p>
         </div>

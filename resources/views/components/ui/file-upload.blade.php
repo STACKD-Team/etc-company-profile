@@ -7,6 +7,7 @@
     'error' => null,
     'id' => null,
     'accept' => null,
+    'size' => 'md',
 ])
 
 @php
@@ -18,7 +19,7 @@
     @if ($label)
         <span class="font-heading text-sm font-bold text-etc-on-surface">{{ $label }} @if ($required)<span class="text-etc-magenta">*</span>@endif</span>
     @endif
-    <x-filament::input.wrapper :valid="blank($error)" :disabled="$disabled">
+    <x-filament::input.wrapper :valid="blank($error)" :disabled="$disabled" class="etc-field-size-{{ $size }}">
         <x-filament::input :id="$id" :name="$name" type="file" :accept="$accept" :required="$required" :disabled="$disabled" {{ $attributes }} />
     </x-filament::input.wrapper>
     @if ($error)<p class="text-xs font-medium text-red-600">{{ $error }}</p>@elseif ($helper)<p class="text-xs text-etc-on-muted">{{ $helper }}</p>@endif

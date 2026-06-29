@@ -1,69 +1,25 @@
 ---
 name: Playful Professional Identity
 colors:
-  surface: '#fff8f8'
-  surface-dim: '#f0d3da'
-  surface-bright: '#fff8f8'
-  surface-container-lowest: '#ffffff'
-  surface-container-low: '#fff0f2'
-  surface-container: '#ffe8ed'
-  surface-container-high: '#ffe1e8'
-  surface-container-highest: '#f9dbe2'
-  on-surface: '#27171c'
-  on-surface-variant: '#5a3f47'
-  inverse-surface: '#3e2b31'
-  inverse-on-surface: '#ffecf0'
-  outline: '#8e6f78'
-  outline-variant: '#e2bdc7'
-  surface-tint: '#b90065'
-  primary: '#b90065'
-  on-primary: '#ffffff'
-  primary-container: '#e6007f'
-  on-primary-container: '#130006'
-  inverse-primary: '#ffb0c9'
-  secondary: '#5f5e5e'
-  on-secondary: '#ffffff'
-  secondary-container: '#e4e2e1'
-  on-secondary-container: '#656464'
-  tertiary: '#006e11'
-  on-tertiary: '#ffffff'
-  tertiary-container: '#008a18'
-  on-tertiary-container: '#ffffff'
-  error: '#ba1a1a'
-  on-error: '#ffffff'
-  error-container: '#ffdad6'
-  on-error-container: '#93000a'
-  primary-fixed: '#ffd9e3'
-  primary-fixed-dim: '#ffb0c9'
-  on-primary-fixed: '#3e001e'
-  on-primary-fixed-variant: '#8e004c'
-  secondary-fixed: '#e4e2e1'
-  secondary-fixed-dim: '#c8c6c6'
-  on-secondary-fixed: '#1b1c1c'
-  on-secondary-fixed-variant: '#474747'
-  tertiary-fixed: '#88fc7d'
-  tertiary-fixed-dim: '#6cdf64'
-  on-tertiary-fixed: '#002202'
-  on-tertiary-fixed-variant: '#00530a'
-  background: '#fff8f8'
-  on-background: '#27171c'
-  surface-variant: '#f9dbe2'
+  base: '#F5F5F5'
+  neutral: '#27171C'
+  accent: '#E6007F'
 typography:
   h1:
     fontFamily: Plus Jakarta Sans
-    fontSize: 56px
+    fontSize: 32-36px
     fontWeight: '700'
-    lineHeight: '1.1'
+    lineHeight: '1.4'
   h2:
     fontFamily: Plus Jakarta Sans
-    fontSize: 36px
+    fontSize: 24-30px
     fontWeight: '700'
-    lineHeight: '1.2'
+    lineHeight: '1.4'
   h3:
     fontFamily: Plus Jakarta Sans
-    fontSize: 24px
+    fontSize: 20-24px
     fontWeight: '700'
-    lineHeight: '1.3'
+    lineHeight: '1.4'
   body:
     fontFamily: Work Sans
     fontSize: 16px
@@ -71,21 +27,31 @@ typography:
     lineHeight: '1.5'
   button:
     fontFamily: Plus Jakarta Sans
-    fontSize: 15px
+    fontSize: 14-16px
     fontWeight: '700'
-    lineHeight: '1'
+    lineHeight: '1.4'
   small:
     fontFamily: Work Sans
-    fontSize: 13px
+    fontSize: 12-14px
     fontWeight: '400'
-    lineHeight: '1.4'
+    lineHeight: '1.4-1.6'
 rounded:
-  sm: 0.25rem
-  DEFAULT: 0.5rem
-  md: 0.75rem
-  lg: 1rem
-  xl: 1.5rem
-  full: 9999px
+  box: 1rem
+  field: 2rem
+  selector: 1rem
+sizes:
+  field:
+    xs: 24px
+    sm: 32px
+    md: 40px
+    lg: 48px
+    xl: 56px
+  selector:
+    xs: 16px
+    sm: 20px
+    md: 24px
+    lg: 28px
+    xl: 32px
 spacing:
   base-unit: 4px
   gutter: 24px
@@ -106,7 +72,9 @@ This design system employs a strict 60-30-10 distribution to ensure visual balan
 - **Neutral (30%):** Warm Plum Charcoal (#27171C) is used for primary text and structural elements, providing high contrast with a softer, warmer tone that pairs naturally with the Magenta-pink accent.
 - **Primary/Accent (10%):** Hot Magenta-pink (#e6007f) is the energetic heart of the brand, reserved for high-priority calls to action, brand highlights, and interactive states.
 
-Supporting tints like Light Pink (#FFE6F3) are utilized for background containers and decorative "blobs" to soften the interface without distracting from the content. Status colors (Success, Warning, Error) follow standard conventions to ensure immediate recognition and accessibility.
+No additional brand colors are allowed. Tonal layers, muted text, hover backgrounds, decorative shapes, and borders must be produced with opacity from these three colors rather than separate hex values. Pure white is not a dashboard surface token.
+
+Semantic Success, Warning, and Error colors are allowed only for status badges, alerts, validation feedback, and destructive confirmations. They must not be used as decorative page or card colors.
 
 ## Typography
 The typography strategy leverages two distinct families to represent the "Playful Professional" dichotomy. 
@@ -114,6 +82,8 @@ The typography strategy leverages two distinct families to represent the "Playfu
 For **Headings and Accent text**, the design system utilizes a rounded, friendly sans-serif (mapping to **Plus Jakarta Sans**). This typeface provides a soft, approachable geometry that feels modern and welcoming. For **Body text**, a highly legible and grounded sans-serif (mapping to **Work Sans**) is used to ensure clarity during long-form reading, such as course descriptions or tutorial notes.
 
 Weight is strictly limited to Regular (400) and Bold (700) to maintain a clean hierarchy without unnecessary complexity. Headlines should always use the Bold weight to anchor the page, while the Body uses Regular for maximum readability.
+
+Shared typography uses a 16px body base and never drops below 12px. Font sizes must use even pixel values only. H1 ranges from 32-36px, H2 from 24-30px, and H3 from 20-24px. Buttons and action controls use only the even endpoints in the 14-16px range. Captions, hints, metadata, helper text, and compact labels use only the even endpoints in the 12-14px range. Line-height must stay between 1.4 and 1.6 for readable text; icon font rendering may use tighter line-height only when the glyph itself is the control.
 
 ## Layout & Spacing
 The layout follows a **Fixed Grid** philosophy, centering content within a 1200px maximum width container on desktop. A 12-column grid is used for desktop layouts, transitioning to a 4-column grid for mobile devices. 
@@ -123,23 +93,48 @@ Spacing is governed by a 4px base unit, with standard increments (8, 16, 24, 32,
 ## Elevation & Depth
 To maintain a modern and clean aesthetic, this design system avoids heavy shadows in favor of **Ambient Depth**. 
 
-Hierarchy is primarily established through **Tonal Layers**, using the Light Pink tint (#FFE6F3) to lift secondary content blocks off the warm white base. When elevation is required (such as on cards or floating buttons), a soft, multi-layered shadow is applied: `0 2px 8px rgba(0,0,0,0.06)`. This creates a subtle lift that feels tactile without appearing dated. Interactive elements may slightly intensify this shadow on hover to provide immediate feedback.
+Hierarchy is primarily established through **Tonal Layers**, using low-opacity Magenta over the Off-white base to lift secondary content blocks. When elevation is required (such as on cards or floating buttons), a soft shadow derived from low-opacity Charcoal is applied. This creates a subtle lift that feels tactile without introducing another palette color. Interactive elements may slightly intensify this shadow on hover to provide immediate feedback.
 
 ## Shapes
 The shape language is consistently rounded to reinforce the "Playful" brand pillar. 
 
-- **Cards:** 16px radius, creating a soft but structured container for course details and testimonials.
-- **Input Fields:** 8px radius, providing enough roundedness to feel modern while maintaining a functional look.
-- **Pills/Buttons:** 24px radius (full pill), used for all buttons and category tags to maximize the "friendly" aesthetic and provide clear tap targets.
+- **Boxes:** Cards, panels, modals, drawers, alerts, and empty states use a `1rem` radius.
+- **Fields:** Buttons, icon buttons, inputs, selects, textareas, date fields, search fields, tabs, and pagination controls use a `2rem` radius.
+- **Selectors:** Checkboxes, radio controls, toggles, badges, and chips use a `1rem` radius.
+- **Borders:** Every visible component border and focus border uses a `2px` width.
 
 Decorative blobs should be asymmetrical and organic, avoiding perfect circles to maintain a hand-drawn, inclusive feel.
 
 ## Components
 Consistent component behavior is vital for the trustworthy aspect of the "Playful Professional" style.
 
-- **Buttons:** All buttons must be pill-shaped with a minimum height of 48px to ensure accessibility. Primary buttons use the Magenta-pink (#e6007f) with white text. Secondary buttons use the Warm Plum Charcoal (#27171C) or an outline style.
-- **Input Fields:** Use 8px rounded corners with a 1px border (#BDBDBD). On focus, the border should transition to Magenta-pink with a soft glow.
-- **Cards:** Use a 16px radius and the ambient shadow. Content within cards should have a minimum of 24px internal padding.
-- **Chips/Pills:** Used for course categories (e.g., "English," "TOEFL"). These use the 24px radius and the Light Pink background (#FFE6F3).
-- **Checkboxes & Radios:** Should be oversized with 24x24px hit areas, using the primary brand color for the active state to ensure they are easy to interact with on mobile.
+- **Buttons:** Buttons use the shared field radius (`2rem`), 16px horizontal padding for text-bearing variants, and one of the fixed field heights: `xs` 24px, `sm` 32px, `md` 40px, `lg` 48px, or `xl` 56px. Primary buttons use Magenta with off-white text. Secondary buttons use Charcoal or an outline style.
+- **Input Fields:** Use `2rem` radius, 16px horizontal padding, a 2px Charcoal-opacity border, off-white background, Magenta focus border, the same fixed field height scale as buttons, and a 16px body text default.
+- **Cards:** Use `1rem` radius, a 2px Charcoal-opacity border, and subtle ambient shadow. Content within cards should have a minimum of 24px internal padding.
+- **Chips/Badges:** Use `1rem` radius, the fixed selector size scale (`xs` 16px through `xl` 32px), and tonal backgrounds derived from the three brand colors, except semantic status variants.
+- **Checkboxes & Radios:** Use `1rem` selector radius, the fixed selector size scale, and the primary brand color for the active state.
 - **Decorative Blobs:** Use these as background elements for "Hero" images or behind "Teacher Profiles" to create a sense of depth and personality.
+
+All component dimensions, padding, gaps, and icon sizes use the 4px base unit. Text-bearing field controls use 16px left and right padding. Field heights follow `xs` 24px, `sm` 32px, `md` 40px, `lg` 48px, and `xl` 56px. Selector dimensions follow `xs` 16px, `sm` 20px, `md` 24px, `lg` 28px, and `xl` 32px.
+
+## Dashboard Shell
+
+- The shared dashboard header contains only a sidebar toggle on the far left and the authenticated user's avatar, name, role, and dropdown trigger on the far right.
+- Page title, eyebrow, and page-specific actions belong at the beginning of the content area, never inside the global header.
+- The profile dropdown contains Logout. User identity, Help, and Logout controls do not appear in the sidebar.
+- The desktop sidebar starts expanded and can collapse to an icon-only rail. The preference is stored in browser local storage and restored across dashboard pages.
+- Collapsed menu icons provide accessible labels and hover/focus tooltips. Branding uses a logo icon without the “ETC Planet” wordmark.
+- On mobile, the hamburger opens the full labeled sidebar as a left overlay with backdrop, Escape support, and a visible close action. Do not duplicate navigation in a bottom bar.
+
+## Data Tables
+
+- Dashboard list pages use the shared `x-ui.data-table` wrapper or a Filament Table with equivalent behavior.
+- Global search and its Reset action remain visible in a plain toolbar above the table panel. The toolbar has no card, border, background, or container padding.
+- Column headings occupy the first table-header row. Column filters occupy a second header row directly below their matching headings; action-only columns have an empty filter cell.
+- Every data column that can be queried safely provides an appropriate filter: text, number, date, select, or database-backed autocomplete. Action-only columns have no filter.
+- Text, number, and search inputs apply automatically after a 400ms debounce. Select, date, and autocomplete filters apply immediately after a valid change.
+- Filter forms do not use an Apply button. Reset removes search, column filters, and pagination while retaining the active sort column and direction.
+- Search, column filters, sort column, sort direction, and pagination are stored in query parameters so refreshes and shared URLs restore the same table state.
+- Header filters stay visible on small screens and move together with their columns through horizontal table scrolling.
+- Horizontal table scrollbars use a thin transparent track and a low-opacity Charcoal thumb; pure black scrollbar colors are not allowed.
+- Sortable and filterable columns must be whitelisted server-side. Entity options and results must respect the authenticated user's authorization scope.

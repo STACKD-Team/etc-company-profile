@@ -5,29 +5,30 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\Registration;
 use App\Models\ReportCard;
+use App\Services\StudentPanelService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, StudentPanelService $panel): View
     {
         $student = $request->user();
 
         $activeEnrollments = $student->enrollments()
-            ->with(['courseClass.program', 'courseClass.instructor'])
+            ->with(['courseClass.program', 'courseClass.instructor', 'courseClass.room'])
             ->where('status', 'active')
             ->latest('enrolled_at')
             ->get();
 
         $currentEnrollment = $activeEnrollments->first()
             ?? $student->enrollments()
-                ->with(['courseClass.program', 'courseClass.instructor'])
+                ->with(['courseClass.program', 'courseClass.instructor', 'courseClass.room'])
                 ->latest('enrolled_at')
                 ->first();
 
         $publishedReports = ReportCard::query()
-            ->with(['enrollment.courseClass.program'])
+            ->with(['enrollment.courseClass.program', 'enrollment.courseClass.room'])
             ->where('is_published', true)
             ->whereHas('enrollment', fn ($query) => $query->where('user_id', $student->id))
             ->latest('issued_at')
@@ -38,6 +39,14 @@ class DashboardController extends Controller
             ->where('user_id', $student->id)
             ->whereNotNull('payment_amount')
             ->latest('paid_at')
+            ->latest('created_at')
+            ->get();
+        $latestPayment = $payments->first();
+
+        $recentLearningHistory = $student->enrollments()
+            ->with(['courseClass.program', 'courseClass.instructor', 'courseClass.room', 'reportCard'])
+            ->latest('enrolled_at')
+            ->take(3)
             ->get();
 
         $activeCourseClass = $currentEnrollment?->courseClass;
@@ -46,7 +55,7 @@ class DashboardController extends Controller
         $completedMeetings = $currentEnrollment ? min(12, $durationMeetings) : 0;
         $progressPercent = $currentEnrollment ? (int) round(($completedMeetings / $durationMeetings) * 100) : 0;
 
-        return view('student.dashboard', [
+        return view('pages.student.dashboard.index', [
             'student' => $student,
             'activeEnrollments' => $activeEnrollments,
             'currentEnrollment' => $currentEnrollment,
@@ -54,6 +63,10 @@ class DashboardController extends Controller
             'activeProgram' => $activeProgram,
             'publishedReports' => $publishedReports,
             'payments' => $payments,
+            'latestPayment' => $latestPayment,
+            'latestPaymentSummary' => $latestPayment ? $panel->paymentSummary($latestPayment) : null,
+            'latestReport' => $publishedReports->first(),
+            'recentLearningHistory' => $recentLearningHistory,
             'stats' => [
                 'active_classes' => $activeEnrollments->count(),
                 'total_meetings' => $activeEnrollments->sum(fn ($enrollment) => (int) ($enrollment->courseClass?->program?->duration_meetings ?? 0)),

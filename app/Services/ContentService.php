@@ -23,10 +23,14 @@ class ContentService extends BaseCrudService
 
     public function adminPaginate(array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
-        return $this->query($filters)
-            ->orderBy('type')
-            ->orderBy('display_order')
-            ->latest('created_at')
+        return $this->applySorting($this->query($filters), $filters, [
+            'title',
+            'type',
+            'display_order',
+            'is_published',
+            'created_at',
+            'updated_at',
+        ], 'updated_at', 'desc')
             ->paginate($perPage)
             ->withQueryString();
     }
@@ -38,7 +42,7 @@ class ContentService extends BaseCrudService
     public function settings(array $slugs = []): Collection
     {
         return Content::query()
-            ->where('type', 'setting')
+            ->where('type', Content::TYPE_PROFILE)
             ->when($slugs !== [], fn (Builder $query) => $query->whereIn('slug', $slugs))
             ->get()
             ->keyBy('slug');
@@ -48,12 +52,12 @@ class ContentService extends BaseCrudService
      * @param array<string, string|null> $values
      * @param array<string, string> $labels
      */
-    public function updateSettings(array $values, array $labels, ?UploadedFile $qrisImage = null): void
+    public function updateSettings(array $values, array $labels): void
     {
-        DB::transaction(function () use ($values, $labels, $qrisImage): void {
+        DB::transaction(function () use ($values, $labels): void {
             foreach ($labels as $slug => $title) {
                 $content = Content::query()->firstOrNew([
-                    'type' => 'setting',
+                    'type' => Content::TYPE_PROFILE,
                     'slug' => $slug,
                 ]);
 
@@ -62,17 +66,7 @@ class ContentService extends BaseCrudService
                 $content->display_order = array_search($slug, array_keys($labels), true) ?: 0;
                 $content->is_published = true;
 
-                if ($slug === 'qris') {
-                    $content->meta = ['value' => $values[$slug] ?? 'QRIS ETC Planet'];
-
-                    if ($qrisImage !== null) {
-                        $content->image = $content->exists
-                            ? $this->mediaStorage->replace($content->image, $qrisImage, 'settings')
-                            : $this->mediaStorage->putUploadedFile($qrisImage, 'settings');
-                    }
-                } else {
-                    $content->meta = ['value' => $values[$slug] ?? null];
-                }
+                $content->meta = ['value' => $values[$slug] ?? null];
 
                 $content->save();
             }

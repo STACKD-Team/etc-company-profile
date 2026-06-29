@@ -14,7 +14,7 @@ class ReportCardExportController extends Controller
 {
     public function index(): View
     {
-        return view('admin.rasky.export', [
+        return view('pages.admin.placement-test.export', [
             'title' => 'Export Rapor',
             'description' => 'Download rapor wajib memakai template DOC dari folder context.',
             'action' => route('admin.exports.report-cards.download'),
@@ -26,11 +26,11 @@ class ReportCardExportController extends Controller
 
     public function download(Request $request, DocumentExportService $documents): Response
     {
-        $content = $documents->reportCardsDoc($request->only(['report_card_id', 'class_id', 'is_published', 'issued_from', 'issued_to']));
+        $content = $documents->reportCardsDocx($request->only(['report_card_id', 'class_id', 'is_published', 'issued_from', 'issued_to']));
 
         return response($content, 200, [
-            'Content-Type' => 'application/msword; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="rapor-etc.doc"',
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'Content-Disposition' => 'attachment; filename="rapor-etc.docx"',
         ]);
     }
 }

@@ -29,11 +29,14 @@ it('registers merged sprint route names from all teammates', function () {
 });
 
 it('keeps admin content routes protected for admins', function () {
-    $route = Route::getRoutes()->getByName('admin.reels.index');
+    $route = Route::getRoutes()->getByName('admin.reel.index');
 
     expect($route)->not->toBeNull()
         ->and($route->gatherMiddleware())->toContain('auth')
         ->and($route->gatherMiddleware())->toContain('role:admin');
+
+    $this->get(route('admin.reel.index', absolute: false))
+        ->assertRedirect('/login');
 
     $this->get('/admin/reels')
         ->assertRedirect('/login');
@@ -43,7 +46,7 @@ it('rejects authenticated users with the wrong role', function () {
     $student = User::factory()->create(['role' => 'student']);
 
     $this->actingAs($student)
-        ->get('/admin/reels')
+        ->get(route('admin.reel.index', absolute: false))
         ->assertForbidden();
 });
 

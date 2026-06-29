@@ -5,6 +5,7 @@ use App\Models\ContactMessage;
 use App\Models\Content;
 use App\Models\Program;
 use App\Models\Reel;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
@@ -98,30 +99,28 @@ it('renders all Miftah pages through the shared public layout', function () {
     $reel = miftahSprint0Reel();
 
     Content::query()->create([
-        'type' => 'page',
+        'type' => 'profile',
         'title' => 'Tentang ETC Planet',
-        'slug' => 'about',
+        'slug' => 'etc-profile',
         'body' => 'Profil ETC Planet.',
         'meta' => ['vision' => 'Belajar bahasa yang menyenangkan.', 'mission' => ['Kelas aktif'], 'values' => ['Friendly']],
         'is_published' => true,
     ]);
 
     Content::query()->create([
-        'type' => 'page',
-        'title' => 'FAQ ETC Planet',
-        'slug' => 'faq',
-        'body' => 'Pertanyaan umum.',
-        'meta' => ['items' => [['question' => 'Bagaimana cara daftar?', 'answer' => 'Pilih program lalu isi form.']]],
+        'type' => 'faq',
+        'title' => 'Bagaimana cara daftar?',
+        'slug' => 'faq-daftar',
+        'body' => 'Pilih program lalu isi form.',
+        'meta' => [],
         'is_published' => true,
     ]);
 
-    Content::query()->create([
-        'type' => 'room',
-        'title' => 'Ruang Belajar',
-        'slug' => 'ruang-belajar',
-        'body' => 'Ruang belajar nyaman.',
-        'meta' => ['facilities' => ['AC', 'Projector']],
-        'is_published' => true,
+    Room::query()->create([
+        'name' => 'Ruang Belajar',
+        'description' => 'Ruang belajar nyaman.',
+        'facilities' => ['AC', 'Projector'],
+        'is_active' => true,
     ]);
 
     Content::query()->create([
@@ -150,8 +149,6 @@ it('renders all Miftah pages through the shared public layout', function () {
         route('public.faq.index'),
         route('public.programs.index'),
         route('public.programs.show', $program),
-        route('public.reels.index'),
-        route('public.reels.show', $reel),
     ] as $url) {
         $this->get($url)
             ->assertOk()
@@ -160,6 +157,15 @@ it('renders all Miftah pages through the shared public layout', function () {
             ->assertDontSee('Fondasi halaman')
             ->assertDontSee('Implementasi penuh');
     }
+
+    $this->get(route('public.reels.index'))
+        ->assertOk()
+        ->assertDontSee('data-chatbot-widget', false)
+        ->assertDontSee('Fondasi halaman')
+        ->assertDontSee('Implementasi penuh');
+
+    $this->get(route('public.reels.show', $reel))
+        ->assertRedirect(route('public.reels.index', ['reel' => $reel->getKey()]));
 });
 
 it('keeps program discovery using active database data and registration CTAs', function () {
@@ -182,7 +188,7 @@ it('keeps program discovery using active database data and registration CTAs', f
         ->assertSee('Rp 1.500.000')
         ->assertSee('Rp 200.000')
         ->assertSee(route('public.programs.show', $active), false)
-        ->assertSee(route('registrations.programs.index'), false)
+        ->assertSee(route('registrations.create', ['program' => $active->id]), false)
         ->assertDontSee($inactive->name);
 
     $this->get(route('public.programs.index', ['category' => 'mandarin']))
@@ -193,7 +199,7 @@ it('keeps program discovery using active database data and registration CTAs', f
     $this->get(route('public.programs.show', $active))
         ->assertOk()
         ->assertSee($active->name)
-        ->assertSee(route('registrations.programs.index', ['program' => $active->id]), false);
+        ->assertSee(route('registrations.create', ['program' => $active->id]), false);
 
     $this->get(route('public.programs.show', $inactive))
         ->assertNotFound();
@@ -227,7 +233,7 @@ it('returns public chatbot JSON and logs the interaction', function () {
     expect(ChatbotLog::query()->where('session_id', 'miftah-session')->exists())->toBeTrue();
 });
 
-it('shows only published reels and keeps view and like endpoints controlled', function () {
+it('shows only published reels, hides social controls, and keeps endpoints controlled', function () {
     $published = miftahSprint0Reel([
         'title' => 'Published Sprint 0 Reel',
         'views_count' => 7,
@@ -247,9 +253,7 @@ it('shows only published reels and keeps view and like endpoints controlled', fu
         ->assertDontSee($draft->title);
 
     $this->get(route('public.reels.show', $published))
-        ->assertOk()
-        ->assertSee('data-view-endpoint', false)
-        ->assertSee('data-like-endpoint', false);
+        ->assertRedirect(route('public.reels.index', ['reel' => $published->getKey()]));
 
     $this->get(route('public.reels.show', $draft))->assertNotFound();
 
@@ -283,9 +287,8 @@ it('keeps Miftah public views on one shared layout and public controllers away f
         'programs/index.blade.php',
         'programs/show.blade.php',
         'reels/index.blade.php',
-        'reels/show.blade.php',
     ] as $view) {
-        expect(file_get_contents(resource_path("views/public/{$view}")))->toContain('<x-layouts.public');
+        expect(file_get_contents(resource_path("views/pages/public/{$view}")))->toContain('<x-layouts.public');
     }
 
     foreach (glob(app_path('Http/Controllers/Public/*Controller.php')) as $controller) {

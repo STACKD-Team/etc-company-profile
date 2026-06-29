@@ -1,35 +1,21 @@
 *, *::before, *::after {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
 
 :root {
     --pink: #e6007e;
     --pink-soft: #ffe5f0;
-    --pink-panel: #fff7fb;
+    --pink-panel: #f5f5f5;
     --dark: #2b2b2b;
     --text: #303033;
     --muted: #77777d;
     --line: #e7e7e7;
     --soft: #f7f7f7;
-    --white: #ffffff;
+    --white: #f5f5f5;
     --shadow: 0 2px 9px rgba(0, 0, 0, .08);
 }
 
-body {
-    min-height: 100vh;
-    background: #f6f6f6;
-    color: var(--text);
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
-button,
-input {
-    font-family: inherit;
-}
-
-a {
+.payment-layout a {
     text-decoration: none;
 }
 
@@ -100,13 +86,6 @@ a {
 .payment-alert {
     width: min(1110px, calc(100% - 48px));
     margin: -28px auto 30px;
-    border: 1px solid #ffb7d8;
-    border-radius: 12px;
-    background: #ffe5f2;
-    color: var(--text);
-    padding: 14px 18px;
-    font-size: 13px;
-    font-weight: 800;
 }
 
 .page-header h1 {
@@ -115,6 +94,16 @@ a {
     font-weight: 800;
     letter-spacing: 0;
     margin-bottom: 16px;
+}
+
+.page-kicker,
+.section-kicker {
+    margin: 0 0 10px;
+    color: var(--pink);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
 }
 
 .page-header p {
@@ -200,6 +189,10 @@ a {
     grid-template-columns: 350px minmax(0, 1fr);
     gap: 31px;
     align-items: start;
+}
+
+.payment-layout--midtrans {
+    grid-template-columns: 360px minmax(0, 1fr);
 }
 
 .summary-card {
@@ -320,6 +313,52 @@ a {
 
 .payment-content {
     min-width: 0;
+}
+
+.midtrans-card {
+    min-height: 420px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    box-shadow: var(--shadow);
+    padding: 34px;
+}
+
+.midtrans-card .section-title {
+    margin-bottom: 8px;
+}
+
+.midtrans-status {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    background: var(--soft);
+    padding: 18px;
+    margin-top: 28px;
+}
+
+.gateway-code {
+    min-height: 36px;
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.payment-alert--inline {
+    width: min(432px, 100%);
+    margin: 0;
+    text-align: center;
 }
 
 .section-title {
@@ -607,16 +646,6 @@ input[type="file"] {
     line-height: 1.4;
 }
 
-.proof-status {
-    margin-top: 18px;
-    border-radius: 10px;
-    background: var(--pink-soft);
-    color: var(--text);
-    padding: 13px 15px;
-    font-size: 13px;
-    font-weight: 700;
-}
-
 .upload-submit {
     width: min(320px, 100%);
     min-height: 48px;
@@ -681,40 +710,6 @@ input[type="file"] {
     flex-direction: column;
     align-items: center;
     gap: 24px;
-}
-
-.confirm-button {
-    width: min(432px, 100%);
-    border: 0;
-    border-radius: 999px;
-    background: var(--pink);
-    color: var(--white);
-    box-shadow: 0 6px 12px rgba(230, 0, 126, .22);
-    padding: 16px 28px;
-    font-size: 16px;
-    font-weight: 800;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-}
-
-.confirm-button svg {
-    width: 18px;
-    height: 18px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2.6;
-}
-
-.cancel-button {
-    border: 0;
-    background: transparent;
-    color: #666;
-    font-size: 14px;
-    font-weight: 800;
-    cursor: pointer;
 }
 
 .legacy-page-footer {
@@ -804,7 +799,8 @@ input[type="file"] {
         display: none;
     }
 
-    .payment-layout {
+    .payment-layout,
+    .payment-layout--midtrans {
         grid-template-columns: 1fr;
         max-width: 740px;
     }
@@ -881,6 +877,14 @@ input[type="file"] {
         width: calc(100% - 32px);
         padding-bottom: 64px;
         gap: 22px;
+    }
+
+    .midtrans-card {
+        padding: 24px 18px;
+    }
+
+    .midtrans-status {
+        grid-template-columns: 1fr;
     }
 
     .upload-card {

@@ -10,8 +10,7 @@ class FaqController extends Controller
 {
     public function index(PublicDiscoveryService $discovery): View
     {
-        return view('public.faq.index', [
-            'page' => $discovery->page('faq'),
+        return view('pages.public.faq.index', [
             'faqs' => $discovery->faqItems(),
         ]);
     }

@@ -12,6 +12,9 @@
     'id' => null,
     'prefix' => null,
     'suffix' => null,
+    'size' => 'md',
+    'wrapperClass' => '',
+    'labelClass' => '',
 ])
 
 @php
@@ -20,14 +23,14 @@
     $fieldValue = old($name, $value);
 @endphp
 
-<label for="{{ $id }}" class="block space-y-2">
+<label for="{{ $id }}" @class(['block space-y-2', $wrapperClass])>
     @if ($label)
-        <span class="font-heading text-sm font-bold text-etc-on-surface">
+        <span @class(['font-heading text-sm font-bold text-etc-on-surface', $labelClass])>
             {{ $label }} @if ($required)<span class="text-etc-magenta">*</span>@endif
         </span>
     @endif
 
-    <x-filament::input.wrapper :valid="blank($error)" :disabled="$disabled" :prefix="$prefix" :suffix="$suffix">
+    <x-filament::input.wrapper :valid="blank($error)" :disabled="$disabled" :prefix="$prefix" :suffix="$suffix" class="etc-field-size-{{ $size }}">
         <x-filament::input
             :id="$id"
             :name="$name"

@@ -17,10 +17,10 @@ class StoreCourseClassRequest extends FormRequest
         return [
             'program_id' => ['required', 'exists:programs,id'],
             'instructor_id' => ['nullable', Rule::exists('users', 'id')->where('role', 'instructor')],
+            'room_id' => ['nullable', 'exists:rooms,id'],
             'name' => ['required', 'string', 'max:100'],
             'schedule_days' => ['nullable', 'string', 'max:50'],
             'schedule_time' => ['nullable', 'string', 'max:50'],
-            'room' => ['nullable', 'string', 'max:50'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'status' => ['nullable', Rule::in(['upcoming', 'ongoing', 'completed', 'cancelled'])],

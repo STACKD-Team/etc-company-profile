@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\DestroyAdminResourceRequest;
 use App\Http\Requests\Admin\StoreProgramRequest;
 use App\Http\Requests\Admin\UpdateProgramRequest;
 use App\Models\Program;
@@ -17,14 +18,20 @@ class ProgramController extends Controller
 
     public function index(Request $request): View
     {
-        return view('admin.programs.index', [
-            'programs' => $this->programService->paginate($request->only(['search', 'category', 'type']), 12),
+        $filters = $request->only(['search', 'category', 'type', 'target_age', 'sort', 'direction']);
+
+        if ($request->filled('is_active')) {
+            $filters['is_active'] = $request->boolean('is_active');
+        }
+
+        return view('pages.admin.program.index', [
+            'programs' => $this->programService->paginate($filters, 12),
         ]);
     }
 
     public function create(): View
     {
-        return view('admin.programs.create', ['program' => new Program()]);
+        return view('pages.admin.program.create', ['program' => new Program()]);
     }
 
     public function store(StoreProgramRequest $request): RedirectResponse
@@ -32,14 +39,26 @@ class ProgramController extends Controller
         $data = $request->validated();
         $data['is_active'] = $request->boolean('is_active');
 
-        $this->programService->create($data);
+        $program = $this->programService->create($data);
 
-        return to_route('admin.programs.index')->with('status', 'Program berhasil dibuat.');
+        return to_route('admin.program.show', $program)->with('status', 'Program berhasil dibuat.');
+    }
+
+    public function show(Program $program): View
+    {
+        $program->load([
+            'classes.instructor',
+            'classes.room',
+            'registrations',
+            'promotions',
+        ]);
+
+        return view('pages.admin.program.show', compact('program'));
     }
 
     public function edit(Program $program): View
     {
-        return view('admin.programs.edit', compact('program'));
+        return view('pages.admin.program.edit', compact('program'));
     }
 
     public function update(UpdateProgramRequest $request, Program $program): RedirectResponse
@@ -49,6 +68,14 @@ class ProgramController extends Controller
 
         $this->programService->update($program, $data);
 
-        return to_route('admin.programs.index')->with('status', 'Program berhasil diperbarui.');
+        return to_route('admin.program.show', $program)->with('status', 'Program berhasil diperbarui.');
+    }
+
+    public function destroy(DestroyAdminResourceRequest $request, Program $program): RedirectResponse
+    {
+        $request->validated();
+        $this->programService->delete($program);
+
+        return to_route('admin.program.index')->with('status', 'Program berhasil dihapus.');
     }
 }

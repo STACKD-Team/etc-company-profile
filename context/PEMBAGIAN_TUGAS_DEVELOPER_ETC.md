@@ -29,6 +29,7 @@ Target utama:
 Developer wajib membaca dan mengikuti file berikut sebelum mengerjakan task:
 
 - `PROJECT_BLUEPRINT_ETC.md`
+- `context/WEB_ROUTES_ETC.md`
 - `context/SKEMA_DATABASE_LENGKAP.md`
 - `context/FORMULIR PENDAFTARAN.jpeg`
 - `context/(RAPOR AKHIR PEMBELAJARAN) SE TEEN 4.doc`
@@ -36,16 +37,18 @@ Developer wajib membaca dan mengikuti file berikut sebelum mengerjakan task:
 - `context/stitch_etc_planet_digital_hub/playful_professional_identity/DESIGN.md`
 - Referensi HTML dan screenshot di `context/stitch_etc_planet_digital_hub/`
 
-Catatan legacy:
+Catatan pembagian sumber:
 
-- `context/WEB_ROUTES_ETC.md` adalah dokumen deprecated dan tidak dipakai lagi sebagai sumber ownership/task terbaru.
-- Jika ada perbedaan ownership antara dokumen ini dan dokumen route lama, ikuti dokumen pembagian tugas ini.
+- `context/WEB_ROUTES_ETC.md` tetap aktif sebagai inventaris route project.
+- Ownership, sprint, prioritas, dan pembagian kerja developer mengikuti dokumen pembagian tugas ini.
+- Jika ada perubahan route saat mengerjakan sprint, update inventaris route di `context/WEB_ROUTES_ETC.md` dan catat dampaknya pada task/sprint terkait.
 
 Aturan penting:
 
 - Jangan menghapus atau mengganti file context/template contoh.
 - Ownership route/modul untuk sprint penyempurnaan mengikuti dokumen ini.
 - URI dan route name yang sudah ada tetap dipertahankan kecuali ada task eksplisit untuk mengubahnya.
+- Roadmap route baru memakai singular English URL dengan prefix role, misalnya `/admin/student`, `/admin/report-card`, `/student/class`, dan `/instructor/report-card`. Setelah route aktual diubah, update inventaris di `context/WEB_ROUTES_ETC.md`.
 - Bahasa URI dan route name tetap Bahasa Inggris.
 - Teks UI boleh Bahasa Indonesia.
 - Jangan membuat logic bisnis di Blade.
@@ -119,6 +122,12 @@ Contoh mapping wrapper project ke Filament:
 | `x-ui.badge` | `<x-filament::badge>` |
 | `x-ui.modal` | `<x-filament::modal>` |
 | `x-ui.panel` | `<x-filament::section>` atau `<x-filament::card>` |
+| `x-ui.detail-card` | `x-ui.panel` |
+| `x-ui.resource-header` | `x-ui.button`, `x-ui.badge`, dan Tailwind layout |
+| `x-ui.description-list` | Tailwind description list |
+| `x-ui.description-item` | Tailwind description item |
+| `x-ui.stat-card` | `x-ui.panel`, `x-ui.badge`, dan Filament icon |
+| `x-ui.action-bar` | Tailwind action layout |
 | `x-ui.empty-state` | `<x-filament::empty-state>` |
 | `x-ui.data-table` | `<x-filament::section>`, `<x-filament::input.wrapper>`, `<x-filament::input>`, `<x-filament::button>`, `<x-filament::empty-state>`, pagination Filament/Laravel |
 | `x-ui.field` | `<x-filament::input.wrapper>` dan `<x-filament::input>` |
@@ -171,6 +180,11 @@ General UI components yang wajib dipakai:
 - `x-ui.badge`.
 - `x-ui.modal`.
 - `x-ui.panel`.
+- `x-ui.detail-card` untuk semua halaman detail dashboard.
+- `x-ui.description-list` dan `x-ui.description-item` untuk data identitas/detail entity.
+- `x-ui.resource-header` untuk header list/detail/create/edit dashboard.
+- `x-ui.stat-card` untuk ringkasan angka/status di dashboard dan detail page.
+- `x-ui.action-bar` untuk grouping tombol aksi.
 - `x-ui.empty-state`.
 - `x-ui.data-table` untuk semua table/list page dashboard.
 - `x-ui.pagination` hanya untuk pagination di luar konteks table.
@@ -239,7 +253,7 @@ Query contract untuk table server-side:
 - Jangan langsung memakai nilai `sort` dari request tanpa whitelist.
 - Action column, computed-only column, dan relasi kompleks boleh tidak sortable jika didokumentasikan.
 
-### 5.6 Modal, Badge, Panel, dan Empty State Contract
+### 5.6 Modal, Badge, Panel, Detail, dan Empty State Contract
 
 Modal:
 
@@ -258,6 +272,21 @@ Panel:
 - `x-ui.panel` wajib memakai `<x-filament::section>` atau `<x-filament::card>`.
 - Hindari panel di dalam panel kecuali ada alasan interaksi yang jelas.
 
+Detail page:
+
+- Semua detail page admin, student, dan instructor wajib memakai `x-ui.resource-header` di bagian atas.
+- Semua detail entity wajib memakai `x-ui.detail-card`.
+- Data identitas, data akademik, data pembayaran, data kontak, dan data metadata ditampilkan dengan `x-ui.description-list` dan `x-ui.description-item`.
+- Related records seperti histori enrollments, daftar siswa kelas, transaksi terkait, atau rapor terkait tetap memakai `x-ui.data-table`.
+- Status di resource header, detail card, table, dan stat wajib memakai `x-ui.badge`.
+- Tombol edit, delete, publish, export, download, dan action tambahan dikelompokkan memakai `x-ui.action-bar` berisi `x-ui.button` atau `x-ui.icon-button`.
+- Destructive action wajib memakai `x-ui.modal`.
+
+Stat card:
+
+- Ringkasan angka/status di dashboard dan detail page memakai `x-ui.stat-card`.
+- `x-ui.stat-card` tidak boleh dipakai sebagai pengganti table atau detail card.
+
 Empty state:
 
 - Semua halaman kosong memakai `x-ui.empty-state`.
@@ -273,6 +302,11 @@ Saat memigrasi halaman lama, developer wajib:
 - Ganti raw button menjadi `x-ui.button` atau `x-ui.icon-button`.
 - Ganti status span custom menjadi `x-ui.badge`.
 - Ganti card/panel manual menjadi `x-ui.panel` jika konteksnya dashboard.
+- Ganti header halaman manual menjadi `x-ui.resource-header`.
+- Ganti detail card manual menjadi `x-ui.detail-card`.
+- Ganti label-value detail manual menjadi `x-ui.description-list` dan `x-ui.description-item`.
+- Ganti grouping tombol manual menjadi `x-ui.action-bar`.
+- Ganti summary card angka/status manual menjadi `x-ui.stat-card`.
 - Ganti empty state manual menjadi `x-ui.empty-state`.
 - Pastikan search/filter/sort/pagination tetap bekerja.
 - Pastikan `old()` value dan validation error tetap tampil.
@@ -413,11 +447,139 @@ Deliverable:
 - Table entity lebih mudah dicari, difilter, dan diproses.
 - Update tampilan component cukup dilakukan di file wrapper component project.
 
-### Sprint 3 - Integrasi Fitur Besar
+### Sprint 3 - Source Alignment dan Route/Page Convention
 
 Tujuan:
 
-- Melengkapi integrasi Midtrans, Cloudinary, RAG chatbot, dan admin knowledge uploader.
+- Mengunci flow sistem baru sebelum integrasi besar dikerjakan.
+- Menyelaraskan dokumen aktif agar tidak ada konflik route, schema, ownership, dan struktur view.
+- Menyiapkan kontrak implementasi halaman yang dipakai admin, instructor, dan student.
+
+Keputusan utama:
+
+- `context/WEB_ROUTES_ETC.md` tetap menjadi inventaris route aktual project.
+- Roadmap route baru memakai singular English URL dengan prefix role:
+  - Admin: `/admin/dashboard`, `/admin/student`, `/admin/instructor`, `/admin/registration`, `/admin/payment`, `/admin/placement-test`, `/admin/program`, `/admin/class`, `/admin/room`, `/admin/enrollment`, `/admin/report-card`, `/admin/reel`, `/admin/contact-message`, `/admin/chatbot-log`, `/admin/gallery`, `/admin/partner`, `/admin/testimonial`, `/admin/faq`, `/admin/profile`.
+  - Instructor: `/instructor/dashboard`, `/instructor/profile`, `/instructor/class`, `/instructor/student`, `/instructor/report-card`.
+  - Student: `/student/dashboard`, `/student/profile`, `/student/class`, `/student/report-card`, `/student/payment`.
+- Route aktual baru boleh diubah bertahap. Setiap perubahan route harus langsung dicatat ulang di `context/WEB_ROUTES_ETC.md`.
+- Untuk Sprint 3 Mia, admin CRUD/RD yang sudah berjalan di Filament tetap canonical di route aktual `/admin/...` dengan route name `filament.admin.resources.*`; route Blade lama dipertahankan di `/admin/legacy/...` sebagai compatibility layer sampai ada sprint migrasi URL khusus.
+- Struktur view target:
+  - Admin pages: `resources/views/pages/admin/{resource}/index.blade.php`, `show.blade.php`, `create.blade.php`, `edit.blade.php`.
+  - Instructor pages: `resources/views/pages/instructor/{resource}/index.blade.php`, `show.blade.php`, `create.blade.php`, `edit.blade.php`.
+  - Student pages: `resources/views/pages/student/{resource}/index.blade.php`, `show.blade.php`, `create.blade.php`, `edit.blade.php`.
+  - Public pages: `resources/views/pages/public/...`.
+- Halaman role-specific tidak boleh memakai satu file view utama bersama walaupun resource dan URL mirip.
+- Shared component boleh dipakai bersama, tetapi file page utama tetap dipisah per role agar ownership dan konflik kerja lebih aman.
+- Untuk admin Mia yang memakai Filament Resource, class/resource di `app/Filament/Resources` menjadi page utama saat ini; migrasi Blade lama ke `resources/views/pages/admin/...` dicatat sebagai backlog bila halaman Blade kembali dipakai sebagai canonical surface.
+- Contoh struktur view role-specific:
+  - `/admin/student` -> `resources/views/pages/admin/student/index.blade.php`.
+  - `/admin/report-card/{reportCard}` -> `resources/views/pages/admin/report-card/show.blade.php`.
+  - `/instructor/report-card/{reportCard}` -> `resources/views/pages/instructor/report-card/show.blade.php`.
+  - `/student/report-card/{reportCard}` -> `resources/views/pages/student/report-card/show.blade.php`.
+
+Deliverable:
+
+- Dokumen roadmap, schema, dan blueprint sinkron dengan flow sistem baru.
+- Route inventory tetap merepresentasikan route aktual.
+- Backlog migrasi view ke folder `pages/` terdokumentasi jelas.
+- Batas kerja tiap developer tetap mengikuti ownership di dokumen ini.
+
+### Sprint 4 - Admin Operational CRUD/RD Flow
+
+Tujuan:
+
+- Menjadikan admin panel pusat operasional untuk semua entity utama dengan pola list, detail, create, edit, delete, dan action yang konsisten.
+
+Scope admin:
+
+- Dashboard: `/admin/dashboard`.
+- CRUD: instructor, student, registration, placement test, program, class, room, enrollment, report card, reel, gallery, partner, testimonial, faq.
+- RD: payment, contact message, chatbot log.
+- Profile/settings: admin mengelola visi, misi, alamat, telepon, dan informasi umum ETC Padang.
+
+Kontrak UX:
+
+- Semua list page memakai datatable konsisten: global search, filter relevan, sortable safe columns, pagination, empty state, action column, dan tombol create bila resource mendukung create.
+- Tombol extra memakai modal, bukan halaman terpisah, bila action bersifat pendukung. Contoh: export rekapan siswa di `/admin/student` membuka modal filter export.
+- Semua detail page memiliki `x-ui.resource-header` berisi tombol edit, delete, dan tombol extra bila ada.
+- Semua detail page memakai `x-ui.detail-card`.
+- Semua data identitas/detail entity memakai `x-ui.description-list` dan `x-ui.description-item`.
+- Jika entity punya relasi one-to-many, tampilkan related datatable di bawah detail card. Contoh: detail student menampilkan histori kelas/enrollments.
+- Enrollment create tidak memakai halaman terpisah; gunakan modal dari list/detail context.
+- Sidebar admin hanya menampilkan menu flow utama. CMS seperti reel, gallery, partner, testimonial, faq, dan profile dikelompokkan dalam dropdown `CMS`.
+
+Deliverable:
+
+- Admin punya kontrak CRUD/RD yang seragam dan bisa dikerjakan paralel.
+- Shared list/detail pattern terdokumentasi sebelum implementasi page migration.
+- Semua action sensitif tetap wajib policy/authorization dan FormRequest.
+
+### Sprint 5 - Rooms, CMS Simplification, dan Schema Cleanup
+
+Tujuan:
+
+- Memisahkan room menjadi entity mandiri dan menyederhanakan CMS agar bisa dipakai admin awam tanpa field teknis yang membingungkan.
+
+Database/schema target:
+
+- Tambahkan tabel `rooms` dengan kolom `id`, `name`, `description`, `capacity`, `image`, `created_at`, `updated_at`.
+- Ubah `classes.room` menjadi `classes.room_id` FK ke `rooms.id`.
+- Batasi `contents.type` menjadi `gallery`, `partner`, `profile`, `faq`, `testimonial`.
+- Testimonial memiliki field/form rating dengan rentang 1-5.
+- Room bukan lagi `contents.type`; room dikelola melalui resource/table sendiri.
+
+Kontrak CMS:
+
+- FAQ form hanya menampilkan field mudah dipahami seperti `question` dan `answer`.
+- Gallery form hanya menampilkan `title`, `description`, dan `image` untuk kebutuhan dasar.
+- Partner form menampilkan nama partner, logo/gambar, deskripsi, dan link bila ada.
+- Testimonial form menampilkan nama, role/asal, pesan, rating, dan foto bila ada.
+- Profile form menampilkan visi, misi, alamat, telepon, dan informasi umum ETC Padang.
+- `meta`, `slug`, dan field teknis lain tidak ditampilkan sebagai field utama ke admin awam kecuali benar-benar diperlukan dan diberi label mudah dipahami.
+
+Deliverable:
+
+- Kontrak schema baru terdokumentasi.
+- CMS tidak lagi memaksa admin memahami struktur polymorphic teknis.
+- Public facilities/room mengambil data dari `rooms`, bukan `contents.type = room`.
+
+### Sprint 6 - Role-Specific Workflow Completion
+
+Tujuan:
+
+- Menyelesaikan behavior halaman admin, instructor, dan student dengan file page utama terpisah per role.
+- Mencegah konflik kerja pada halaman yang resource-nya mirip seperti report-card, class, student, dan payment.
+
+Kontrak behavior:
+
+- Report card:
+  - Admin melihat semua rapor dan bisa CRUD/publish sesuai policy.
+  - Instructor melihat rapor dari kelas yang diajar dan rapor yang dia buat; bisa CRUD draft sesuai policy.
+  - Student hanya melihat rapor miliknya yang sudah publish.
+- Class:
+  - Admin mengelola semua class.
+  - Instructor hanya melihat class yang diajar.
+  - Student hanya melihat class yang diikuti.
+- Student:
+  - Admin mengelola semua student.
+  - Instructor hanya membaca student dari kelas yang diajar.
+- Payment:
+  - Admin membaca semua payment/registration payment.
+  - Student hanya membaca payment miliknya sendiri.
+
+Deliverable:
+
+- Page utama dipisah per role di `resources/views/pages/admin`, `resources/views/pages/instructor`, dan `resources/views/pages/student`.
+- Shared component `x-ui.*` dipakai untuk menjaga konsistensi antar role tanpa menyatukan file page utama.
+- Query scope dan policy membedakan data/action per role.
+- Tidak ada data student/payment/report-card yang bocor ke role yang salah.
+
+### Sprint 7 - Integrasi Besar Setelah Flow Stabil
+
+Tujuan:
+
+- Melengkapi integrasi besar setelah route, schema, CMS, dan role workflow inti stabil.
 
 Fitur besar:
 
@@ -426,50 +588,17 @@ Fitur besar:
 - NVIDIA RAG chatbot.
 - Qdrant vector database.
 - Admin knowledge source upload dan indexing.
-- Foto gallery CMS tersimpan ke Cloudinary lewat `MediaStorageService`.
-- Program cover image dan logo `Kerja Sama ETC` tersimpan ke Cloudinary.
-- Promo program memengaruhi nominal pembayaran Midtrans.
-- Snapshot promo dan harga disimpan saat registrasi dibuat agar audit pembayaran tetap stabil walaupun promo berubah.
+- Program cover image, gallery image, room image, partner logo, testimonial photo, reels media, dan dokumen memakai media service yang konsisten.
+- Promo program memengaruhi nominal pembayaran dan snapshot harga disimpan saat registration dibuat.
 
 Deliverable:
 
 - Pembayaran tidak lagi memakai bukti manual sebagai flow utama.
-- Media disimpan ke Cloudinary.
-- Upload, replace, delete, dan preview foto gallery mengikuti aturan Cloudinary yang sama dengan media lain.
-- Midtrans memakai nominal akhir setelah promo aktif dihitung.
-- Chatbot dapat menjawab berdasarkan knowledge source.
-- Admin dapat upload file knowledge dan melakukan re-index.
+- Media tersimpan lewat service storage yang sama.
+- Chatbot mengambil konteks dari knowledge source.
+- Integrasi besar tidak mengganggu flow CRUD/RD yang sudah stabil.
 
-### Sprint 4 - Role Workflow Completion
-
-Tujuan:
-
-- Menyempurnakan alur kerja dari pengunjung sampai siswa download rapor.
-
-Flow yang harus matang:
-
-```text
-visitor sees program with cover image and active promo
--> visitor registers with selected program and promo snapshot
--> Midtrans payment uses final amount after promo
--> automatic paid status
--> admin schedules placement test
--> admin assigns class
--> student enrollment
--> class learning flow
--> instructor/admin assessment
--> report card published
--> student downloads report card
-```
-
-Deliverable:
-
-- Workflow berjalan tanpa data manual yang membingungkan.
-- Admin, student, dan instructor punya batas akses jelas.
-- Status setiap tahap mudah dipahami.
-- Student learning history dan detail siswa admin konsisten memakai data `enrollments`.
-
-### Sprint 5 - Testing, QA, dan Final Polish
+### Sprint 8 - Testing, QA, dan Final Polish
 
 Tujuan:
 
@@ -482,17 +611,15 @@ Task bersama:
 - Jalankan `npm run build`.
 - Test mobile, tablet, dan desktop.
 - Test role access admin/student/instructor.
-- Test upload Cloudinary.
-- Test Midtrans sandbox.
-- Test RAG upload, indexing, retrieval, dan chatbot response.
-- Test report card visibility dan download.
-- Test edge cases seperti empty data, expired payment, failed upload, indexing failed, dan unauthorized access.
+- Test semua list/detail/create/edit/action utama.
+- Test rooms, CMS simplified forms, report-card visibility, payment visibility, export modal, dan related datatable.
+- Test integration flow jika Sprint 7 sudah diimplementasikan: Cloudinary upload, Midtrans sandbox, RAG upload/indexing/retrieval.
 
 Deliverable:
 
 - Semua sprint acceptance checklist terpenuhi.
 - Tidak ada flow utama yang broken.
-- UI nyaman dan konsisten.
+- UI nyaman, konsisten, dan mudah dipakai admin awam.
 
 ## 7. Detail Tugas Miftah - Public Discovery
 
@@ -679,7 +806,7 @@ Task Midtrans:
   - `expire` -> payment expired/cancelled sesuai kebutuhan field/status
   - `cancel`, `deny`, `failure` -> failed/rejected sesuai aturan project
 - Admin payment page berubah menjadi monitoring, bukan tempat verify manual.
-- Route upload bukti dan tombol verify/reject admin ditandai deprecated sebagai workflow utama.
+- Route upload bukti dan tombol verify/reject admin ditandai sebagai workflow lama, bukan workflow utama.
 
 Tabel audit yang direncanakan:
 
@@ -916,6 +1043,7 @@ Acceptance criteria Mecca:
 Area milik Rasky:
 
 - Instructor dashboard
+- Instructor profile
 - Instructor classes
 - Instructor class detail
 - Instructor students
@@ -924,10 +1052,35 @@ Area milik Rasky:
 Route terkait:
 
 - `instructor.dashboard`
+- `instructor.profile.show`
+- `instructor.profile.update`
 - `instructor.classes.index`
 - `instructor.classes.show`
 - `instructor.students.index`
 - `instructor.report-cards.index`
+- `instructor.report-cards.create`
+- `instructor.report-cards.store`
+- `instructor.report-cards.show`
+- `instructor.report-cards.edit`
+- `instructor.report-cards.update`
+
+Route profile dan assessment instructor:
+
+- `GET /instructor/profile`
+- `PUT /instructor/profile`
+- `GET /instructor/enrollment/{enrollment}/report-card/create`
+- `POST /instructor/enrollment/{enrollment}/report-card`
+- `GET /instructor/report-card/{reportCard}`
+- `GET /instructor/report-card/{reportCard}/edit`
+- `PUT /instructor/report-card/{reportCard}`
+
+Page utama instructor menggunakan struktur role-specific di
+`resources/views/pages/instructor/` dengan resource singular `dashboard`,
+`profile`, `class`, `student`, dan `report-card`.
+
+Instructor hanya dapat membuat dan mengubah draft assessment untuk enrollment
+dari kelas yang diajar. Rapor yang sudah dipublish bersifat read-only dan
+publish/unpublish tetap menjadi kewenangan admin.
 
 Backlog UI/UX:
 
@@ -1005,6 +1158,9 @@ CLOUDINARY_SECURE=true
 
 Migration baru yang direncanakan:
 
+- `create_rooms_table`
+- `update_classes_replace_room_with_room_id`
+- `update_contents_type_for_simplified_cms`
 - `create_midtrans_notifications_table`
 - `create_program_promotions_table`
 - `create_rag_knowledge_sources_table`
@@ -1036,15 +1192,37 @@ Perubahan/pemanfaatan yang diperlukan pada `programs`:
 - Gunakan field gambar program yang tersedia, seperti `thumbnail`, sebagai cover image program.
 - Jika implementasi saat ini belum punya field gambar, tambahkan field cover image/thumbnail yang menyimpan path atau Cloudinary public id.
 
+Tabel room yang direncanakan:
+
+```text
+rooms
+```
+
+Kolom minimum:
+
+- `id`
+- `name`
+- `description` nullable
+- `capacity` nullable
+- `image` nullable
+- timestamps
+
+Perubahan yang diperlukan pada `classes`:
+
+- Ganti `room` text lama menjadi `room_id` nullable FK ke `rooms.id`.
+- Form class memakai select room dari tabel `rooms`.
+- Detail class menampilkan nama, kapasitas, dan gambar room bila ada.
+
 Perubahan/pemanfaatan yang diperlukan pada `contents`:
 
-- Gunakan `type = gallery` untuk CMS foto gallery.
-- Gunakan `image` untuk gambar utama gallery.
-- Gunakan `images` JSON untuk multiple gallery images.
-- Gunakan `meta` untuk caption, alt text, kategori, sort order, atau atribut tambahan gallery.
-- Gunakan `type = partner` untuk CMS `Kerja Sama ETC`.
-- Simpan logo pada field image/media yang tersedia.
-- Simpan atribut tambahan seperti website, since/tahun mulai, kategori kerja sama, dan sort order pada kolom/meta yang tersedia.
+- Batasi `type` menjadi `gallery`, `partner`, `profile`, `faq`, dan `testimonial`.
+- Jangan pakai `contents.type = room`; room memakai tabel `rooms`.
+- Gallery memakai field admin sederhana: title, description/body, image, dan publish/sort bila perlu.
+- Partner memakai field admin sederhana: name/title, logo/image, description/body, website/link bila ada, dan publish/sort bila perlu.
+- Profile memakai field admin sederhana: visi, misi, alamat, telepon, dan informasi umum ETC Padang.
+- FAQ memakai field admin sederhana: question dan answer.
+- Testimonial memakai field admin sederhana: nama, role/asal, pesan, rating 1-5, dan foto bila ada.
+- Field teknis seperti `meta`, raw JSON, dan `slug` tidak menjadi field utama untuk admin awam.
 
 Perubahan yang mungkin diperlukan pada `registrations`:
 
@@ -1068,7 +1246,7 @@ Catatan:
 
 - Jika perlu status payment lebih detail, gunakan kolom khusus payment status, bukan memaksakan semua variasi Midtrans ke `registrations.status`.
 - Jangan menghitung ulang promo lama dari data promo aktif saat ini; gunakan snapshot pada registration/payment untuk audit.
-- Jangan menghapus field payment proof sebelum semua flow lama dipastikan tidak dipakai. Tandai deprecated dulu.
+- Jangan menghapus field payment proof sebelum semua flow lama dipastikan tidak dipakai. Tandai sebagai legacy dulu.
 
 ## 13. API, Route, dan Webhook Backlog
 

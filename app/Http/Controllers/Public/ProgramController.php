@@ -12,14 +12,15 @@ class ProgramController extends Controller
     public function index(Request $request): View
     {
         $programs = Program::query()
+            ->with('activePromotions')
             ->where('is_active', true)
-            ->when($request->string('category')->toString(), fn($query, string $category) => $query->where('category', $category))
+            ->when($request->string('category')->toString(), fn ($query, string $category) => $query->where('category', $category))
             ->orderBy('name')
             ->get();
 
-        return view('public.programs.index', [
+        return view('pages.public.programs.index', [
             'programs' => $programs,
-            'categories' => Program::query()->where('is_active', true)->distinct()->pluck('category')->filter()->values(),
+            'categories' => Program::query()->where('is_active', true)->distinct()->orderBy('category')->pluck('category')->filter()->values(),
             'selectedCategory' => $request->string('category')->toString(),
         ]);
     }
@@ -28,6 +29,8 @@ class ProgramController extends Controller
     {
         abort_unless($program->is_active, 404);
 
+        $program->load('activePromotions');
+
         $featuredClass = $program->classes()
             ->with('instructor')
             ->whereIn('status', ['ongoing', 'upcoming'])
@@ -35,7 +38,7 @@ class ProgramController extends Controller
             ->orderBy('start_date')
             ->first();
 
-        return view('public.programs.show', [
+        return view('pages.public.programs.show', [
             'program' => $program,
             'detailContent' => config('program_details.programs.' . $program->slug, config('program_details.default')),
             'featuredClass' => $featuredClass,

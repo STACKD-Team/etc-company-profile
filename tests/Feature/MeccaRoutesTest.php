@@ -2,8 +2,12 @@
 
 use App\Models\CourseClass;
 use App\Models\Enrollment;
+use App\Models\ChatbotLog;
 use App\Models\Program;
+use App\Models\ProgramPromotion;
+use App\Models\Registration;
 use App\Models\ReportCard;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -75,78 +79,14 @@ function createMeccaSprint4ReportCard(Enrollment $enrollment, array $attributes 
     ], $attributes));
 }
 
-test('registration programs page renders active programs and links the selected program to registration form', function () {
-    $activeProgram = Program::query()->create([
-        'name' => 'General English',
-        'slug' => 'general-english',
-        'category' => 'english',
-        'type' => 'regular',
-        'target_age' => 'teen',
-        'description' => 'Program komunikasi bahasa Inggris.',
-        'duration_meetings' => 20,
-        'max_students' => 12,
-        'price' => 1500000,
-        'registration_fee' => 200000,
-        'is_active' => true,
-    ]);
-
-    Program::query()->create([
-        'name' => 'Inactive Program',
-        'slug' => 'inactive-program',
-        'category' => 'english',
-        'type' => 'regular',
-        'target_age' => 'teen',
-        'duration_meetings' => 12,
-        'max_students' => 12,
-        'price' => 1000000,
-        'registration_fee' => 100000,
-        'is_active' => false,
-    ]);
-
+test('legacy registration programs route redirects to the public programs page', function () {
     $this->get('/registration/programs')
-        ->assertOk()
-        ->assertSee('General English')
-        ->assertSee('value="'.$activeProgram->id.'"', false)
-        ->assertSee('checked', false)
-        ->assertSee('/registration/form/'.$activeProgram->id, false)
-        ->assertDontSee(route('public.contact.index', ['program' => $activeProgram->id]), false)
-        ->assertDontSee('Inactive Program');
+        ->assertRedirect(route('public.programs.index'));
 });
 
-test('registration programs page can preselect a program from query string', function () {
-    $english = Program::query()->create([
-        'name' => 'English Teen',
-        'slug' => 'english-teen-picker',
-        'category' => 'english',
-        'type' => 'regular',
-        'target_age' => 'teen',
-        'duration_meetings' => 16,
-        'max_students' => 10,
-        'price' => 1200000,
-        'registration_fee' => 200000,
-        'is_active' => true,
-    ]);
-
-    $mandarin = Program::query()->create([
-        'name' => 'Mandarin Starter',
-        'slug' => 'mandarin-starter-picker',
-        'category' => 'mandarin',
-        'type' => 'private',
-        'target_age' => 'adult',
-        'duration_meetings' => 12,
-        'max_students' => 6,
-        'price' => 1800000,
-        'registration_fee' => 200000,
-        'is_active' => true,
-    ]);
-
-    $this->get('/registration/programs?program='.$mandarin->id)
-        ->assertOk()
-        ->assertSee('value="'.$english->id.'"', false)
-        ->assertSee('value="'.$mandarin->id.'"', false)
-        ->assertSee('<strong id="summary-name" class="font-heading text-lg">Mandarin Starter</strong>', false)
-        ->assertSee('/registration/form/'.$mandarin->id, false)
-        ->assertDontSee(route('public.contact.index', ['program' => $mandarin->id]), false);
+test('legacy registration programs query also redirects to the public programs page', function () {
+    $this->get('/registration/programs?program=2')
+        ->assertRedirect(route('public.programs.index'));
 });
 
 test('public programs page renders active programs with discovery details', function () {
@@ -270,26 +210,28 @@ test('documented mecca route names are registered', function () {
         'student.classes.index',
         'student.classes.show',
         'student.learning-history.index',
+        'student.payments.index',
+        'student.payments.show',
         'student.report-cards.index',
         'student.report-cards.show',
         'student.report-cards.download',
         'student.help.index',
-        'admin.students.index',
-        'admin.students.show',
-        'admin.instructors.index',
-        'admin.instructors.show',
-        'admin.programs.index',
-        'admin.programs.create',
-        'admin.programs.store',
-        'admin.programs.edit',
-        'admin.programs.update',
-        'admin.classes.index',
-        'admin.classes.create',
-        'admin.classes.store',
-        'admin.classes.edit',
-        'admin.classes.update',
-        'admin.enrollments.index',
-        'admin.enrollments.store',
+        'admin.student.index',
+        'admin.student.show',
+        'admin.instructor.index',
+        'admin.instructor.show',
+        'admin.program.index',
+        'admin.program.create',
+        'admin.program.store',
+        'admin.program.edit',
+        'admin.program.update',
+        'admin.class.index',
+        'admin.class.create',
+        'admin.class.store',
+        'admin.class.edit',
+        'admin.class.update',
+        'admin.enrollment.index',
+        'admin.enrollment.store',
     ])->each(fn (string $routeName) => expect(\Illuminate\Support\Facades\Route::has($routeName))->toBeTrue());
 });
 
@@ -328,13 +270,170 @@ test('student mecca pages render for authenticated student', function () {
         'issued_at' => now()->toDateString(),
     ]);
 
-    $this->actingAs($student)->get('/student/profile')->assertOk();
-    $this->actingAs($student)->get('/student/classes')->assertOk()->assertSee('Intermediate B1');
-    $this->actingAs($student)->get("/student/classes/{$class->id}")->assertOk()->assertSee('Intermediate B1');
-    $this->actingAs($student)->get('/student/learning-history')->assertOk();
+    $this->actingAs($student)->get(route('student.profile.show', [], false))->assertOk()->assertViewIs('pages.student.profile.show');
+    $this->actingAs($student)->get(route('student.classes.index', [], false))->assertOk()->assertViewIs('pages.student.class.index')->assertSee('Intermediate B1');
+    $this->actingAs($student)->get(route('student.classes.show', $class, false))->assertOk()->assertViewIs('pages.student.class.show')->assertSee('Intermediate B1');
+    $this->actingAs($student)->get(route('student.learning-history.index', [], false))->assertOk()->assertViewIs('pages.student.learning-history.index');
+    $this->actingAs($student)->get(route('student.report-cards.index', [], false))->assertOk()->assertViewIs('pages.student.report-card.index');
+    $this->actingAs($student)->get(route('student.report-cards.show', $reportCard, false))->assertOk()->assertViewIs('pages.student.report-card.show')->assertSee('Detail Rapor');
+    $this->actingAs($student)->get(route('student.help.index', [], false))->assertOk()->assertViewIs('pages.student.help.index');
+});
+
+test('student sprint seven help page renders active rag chatbot widget', function () {
+    $student = User::factory()->create([
+        'role' => 'student',
+        'full_name' => 'Mecca Chat Student',
+    ]);
+
+    $this->actingAs($student)
+        ->get(route('student.help.index', [], false))
+        ->assertOk()
+        ->assertSee('data-chatbot-widget', false)
+        ->assertSee('data-chatbot-messages', false)
+        ->assertSee('data-chatbot-form', false)
+        ->assertSee(route('public.chatbot.messages.store', [], false), false)
+        ->assertSee('Bagaimana melihat kelas aktif saya?')
+        ->assertDontSee('Integrasi RAG akan ditambahkan');
+});
+
+test('authenticated student chatbot message uses rag endpoint and stores user log', function () {
+    config([
+        'rag.nvidia.api_key' => null,
+        'rag.qdrant.url' => null,
+    ]);
+
+    $student = User::factory()->create([
+        'role' => 'student',
+        'full_name' => 'Mecca Chat Student',
+    ]);
+
+    $this->actingAs($student)
+        ->postJson(route('public.chatbot.messages.store'), [
+            'message' => 'Bagaimana melihat status pembayaran saya?',
+            'session_id' => 'student-session-mecca',
+        ])
+        ->assertOk()
+        ->assertJson([
+            'status' => 'ok',
+            'session_id' => 'student-session-mecca',
+        ])
+        ->assertJsonPath('intent', 'rag_no_context');
+
+    expect(ChatbotLog::query()
+        ->where('session_id', 'student-session-mecca')
+        ->where('user_id', $student->id)
+        ->where('user_message', 'Bagaimana melihat status pembayaran saya?')
+        ->exists())->toBeTrue();
+});
+
+test('student sprint six detail pages use shared detail components', function () {
+    collect([
+        resource_path('views/pages/student/class/show.blade.php'),
+        resource_path('views/pages/student/payment/show.blade.php'),
+        resource_path('views/pages/student/report-card/show.blade.php'),
+    ])->each(function (string $path): void {
+        $source = file_get_contents($path);
+
+        expect($source)
+            ->toContain('<x-ui.resource-header')
+            ->toContain('<x-ui.detail-card')
+            ->toContain('<x-ui.description-list')
+            ->toContain('<x-ui.description-item');
+    });
+});
+
+test('student sprint eight dashboard uses shared stat and detail components', function () {
+    $source = file_get_contents(resource_path('views/pages/student/dashboard/index.blade.php'));
+
+    expect($source)
+        ->toContain('<x-ui.stat-card')
+        ->toContain(':value-attributes')
+        ->toContain('<x-ui.description-list')
+        ->toContain('<x-ui.description-item')
+        ->toContain('<x-ui.action-bar')
+        ->toContain('heroicon-m-academic-cap')
+        ->toContain('heroicon-o-calendar-days')
+        ->toContain('heroicon-o-star')
+        ->toContain('heroicon-m-document-text')
+        ->not->toContain('student-reveal rounded-box border-2 border-etc-outline-variant bg-etc-surface p-5 shadow-soft')
+        ->not->toContain('stat-class')
+        ->not->toContain('stat-meeting')
+        ->not->toContain('stat-grade')
+        ->not->toContain('stat-certificate');
+});
+
+test('student sprint six policies scope class payment and report access', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $otherStudent = User::factory()->create(['role' => 'student']);
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $ownedClass = createMeccaSprint4Class(['name' => 'Policy Owned Class']);
+    $otherClass = createMeccaSprint4Class(['name' => 'Policy Other Class']);
+    $ownedEnrollment = createMeccaSprint4Enrollment($student, $ownedClass);
+    $otherEnrollment = createMeccaSprint4Enrollment($otherStudent, $otherClass);
+    $ownedReport = createMeccaSprint4ReportCard($ownedEnrollment, ['is_published' => true]);
+    $ownedDraftReport = createMeccaSprint4ReportCard(
+        createMeccaSprint4Enrollment($student, createMeccaSprint4Class(['name' => 'Policy Draft Class'])),
+        ['is_published' => false]
+    );
+    $otherReport = createMeccaSprint4ReportCard($otherEnrollment, ['is_published' => true]);
+    $ownedPayment = Registration::query()->create([
+        'registration_code' => 'REG-POLICY-OWNED',
+        'user_id' => $student->id,
+        'program_id' => $ownedClass->program_id,
+        'class_id' => $ownedClass->id,
+        'applicant_name' => 'Policy Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_amount' => 1400000,
+        'status' => 'pending_payment',
+    ]);
+    $otherPayment = Registration::query()->create([
+        'registration_code' => 'REG-POLICY-OTHER',
+        'user_id' => $otherStudent->id,
+        'program_id' => $otherClass->program_id,
+        'class_id' => $otherClass->id,
+        'applicant_name' => 'Other Policy Student',
+        'applicant_email' => $otherStudent->email,
+        'applicant_phone' => '081234567890',
+        'payment_amount' => 1400000,
+        'status' => 'pending_payment',
+    ]);
+
+    expect(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $ownedClass))->toBeTrue()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $otherClass))->toBeFalse()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $ownedPayment))->toBeTrue()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $otherPayment))->toBeFalse()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $ownedReport))->toBeTrue()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('download', $ownedReport))->toBeTrue()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $ownedDraftReport))->toBeFalse()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($student)->allows('view', $otherReport))->toBeFalse()
+        ->and(\Illuminate\Support\Facades\Gate::forUser($admin)->allows('view', $ownedClass))->toBeFalse();
+});
+
+test('student sprint three plural urls remain available as legacy aliases', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $class = createMeccaSprint4Class(['name' => 'Legacy Alias Class']);
+    $enrollment = createMeccaSprint4Enrollment($student, $class);
+    $reportCard = createMeccaSprint4ReportCard($enrollment);
+    $payment = Registration::query()->create([
+        'registration_code' => 'REG-LEGACY-ALIAS',
+        'user_id' => $student->id,
+        'program_id' => $class->program_id,
+        'class_id' => $class->id,
+        'applicant_name' => 'Legacy Alias Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_amount' => 1400000,
+        'status' => 'pending_payment',
+    ]);
+
+    $this->actingAs($student)->get('/student/classes')->assertOk()->assertSee('Legacy Alias Class');
+    $this->actingAs($student)->get("/student/classes/{$class->id}")->assertOk()->assertSee('Legacy Alias Class');
+    $this->actingAs($student)->get('/student/payments')->assertOk()->assertSee('REG-LEGACY-ALIAS');
+    $this->actingAs($student)->get("/student/payments/{$payment->id}")->assertOk()->assertSee('REG-LEGACY-ALIAS');
     $this->actingAs($student)->get('/student/report-cards')->assertOk();
     $this->actingAs($student)->get("/student/report-cards/{$reportCard->id}")->assertOk()->assertSee('Detail Rapor');
-    $this->actingAs($student)->get('/student/help')->assertOk();
 });
 
 test('student sprint four routes require student access', function () {
@@ -351,6 +450,18 @@ test('student sprint four routes require student access', function () {
         ['get', route('student.classes.index', [], false), []],
         ['get', route('student.classes.show', $class, false), []],
         ['get', route('student.learning-history.index', [], false), []],
+        ['get', route('student.payments.index', [], false), []],
+        ['get', route('student.payments.show', Registration::query()->create([
+            'registration_code' => 'REG-STUDENT-ACCESS',
+            'user_id' => $student->id,
+            'program_id' => $class->program_id,
+            'class_id' => $class->id,
+            'applicant_name' => 'Student Access',
+            'applicant_email' => $student->email,
+            'applicant_phone' => '081234567890',
+            'payment_amount' => 1400000,
+            'status' => 'pending_payment',
+        ]), false), []],
         ['get', route('student.report-cards.index', [], false), []],
         ['get', route('student.report-cards.show', $reportCard, false), []],
         ['get', route('student.report-cards.download', $reportCard, false), []],
@@ -398,17 +509,37 @@ test('student dashboard shows owned learning data and working mecca links', func
     ]);
     createMeccaSprint4Enrollment($otherStudent, $otherClass);
 
+    Registration::query()->create([
+        'registration_code' => 'REG-DASHBOARD-PAID',
+        'user_id' => $student->id,
+        'program_id' => $activeClass->program_id,
+        'class_id' => $activeClass->id,
+        'applicant_name' => 'Mecca Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_amount' => 1400000,
+        'payment_method' => 'qris',
+        'paid_at' => '2026-06-10 10:00:00',
+        'status' => 'paid',
+    ]);
+
     $this->actingAs($student)
         ->get(route('student.dashboard', [], false))
         ->assertOk()
         ->assertSee('Mecca Student')
         ->assertSee('Owned Active Class')
+        ->assertSee('Pembayaran Terakhir')
+        ->assertSee('REG-DASHBOARD-PAID')
+        ->assertSee('Lunas')
+        ->assertSee('Rp 1.400.000')
+        ->assertSee('Rapor Terbaru')
+        ->assertSee('Riwayat Belajar Ringkas')
+        ->assertSee('data-stat-value', false)
         ->assertDontSee('Other Student Class')
         ->assertSee(route('student.help.index', [], false), false)
         ->assertSee(route('student.classes.show', $activeClass, false), false)
-        ->assertSee(route('student.report-cards.index', [], false), false)
         ->assertSee(route('student.report-cards.download', $downloadableReport, false), false)
-        ->assertSee(route('student.report-cards.show', $viewOnlyReport, false), false);
+        ->assertSee(route('student.learning-history.index', [], false), false);
 });
 
 test('student profile update uses validated allowed fields', function () {
@@ -458,6 +589,7 @@ test('student classes only expose enrollments owned by the authenticated student
     $this->actingAs($student)
         ->get(route('student.classes.index', [], false))
         ->assertOk()
+        ->assertSee('data-student-classes-table', false)
         ->assertSee('Owned Student Class')
         ->assertDontSee('Other Student Private Class');
 
@@ -471,14 +603,16 @@ test('student classes only expose enrollments owned by the authenticated student
         ->assertNotFound();
 });
 
-test('student learning history only shows completed and dropped enrollments', function () {
+test('student learning history shows all owned enrollments and published report links', function () {
     $student = User::factory()->create(['role' => 'student']);
+    $otherStudent = User::factory()->create(['role' => 'student']);
     $activeClass = createMeccaSprint4Class(['name' => 'Still Active Class']);
     $completedClass = createMeccaSprint4Class(['name' => 'Completed History Class']);
     $droppedClass = createMeccaSprint4Class(['name' => 'Dropped History Class']);
+    $otherClass = createMeccaSprint4Class(['name' => 'Other Student History Class']);
 
     createMeccaSprint4Enrollment($student, $activeClass, ['status' => 'active']);
-    createMeccaSprint4Enrollment($student, $completedClass, [
+    $completedEnrollment = createMeccaSprint4Enrollment($student, $completedClass, [
         'status' => 'completed',
         'completed_at' => '2026-07-12',
     ]);
@@ -486,13 +620,115 @@ test('student learning history only shows completed and dropped enrollments', fu
         'status' => 'dropped',
         'completed_at' => '2026-07-13',
     ]);
+    createMeccaSprint4Enrollment($otherStudent, $otherClass, ['status' => 'completed']);
+    $publishedReport = createMeccaSprint4ReportCard($completedEnrollment);
 
     $this->actingAs($student)
         ->get(route('student.learning-history.index', [], false))
         ->assertOk()
+        ->assertSee('data-student-learning-history-table', false)
+        ->assertSee('Still Active Class')
         ->assertSee('Completed History Class')
         ->assertSee('Dropped History Class')
-        ->assertDontSee('Still Active Class');
+        ->assertSee('Sedang Berjalan')
+        ->assertSee('Rapor Published')
+        ->assertSee(route('student.report-cards.show', $publishedReport, false), false)
+        ->assertDontSee('Other Student History Class');
+});
+
+test('student sprint five rooms render from room relation and remain scoped in search', function () {
+    $student = User::factory()->create(['role' => 'student', 'full_name' => 'Room Relation Student']);
+    $otherStudent = User::factory()->create(['role' => 'student', 'full_name' => 'Other Room Student']);
+    $instructor = User::factory()->create(['role' => 'instructor', 'full_name' => 'Room Instructor']);
+    $program = createMeccaSprint4Program(['name' => 'Room Relation Program', 'slug' => 'room-relation-program']);
+    $room = Room::query()->create([
+        'name' => 'Mecca Sprint 5 Room',
+        'description' => 'Room from rooms table.',
+        'capacity' => 12,
+        'is_active' => true,
+        'display_order' => 1,
+    ]);
+    $hiddenRoom = Room::query()->create([
+        'name' => 'Hidden Sprint 5 Room',
+        'capacity' => 8,
+        'is_active' => true,
+        'display_order' => 2,
+    ]);
+
+    $ownedClass = CourseClass::query()->create([
+        'program_id' => $program->id,
+        'instructor_id' => $instructor->id,
+        'room_id' => $room->id,
+        'name' => 'Room Relation Class',
+        'schedule_days' => 'Tue-Thu',
+        'schedule_time' => '16.00-17.30',
+        'status' => 'ongoing',
+    ]);
+    $otherOwnedClass = CourseClass::query()->create([
+        'program_id' => $program->id,
+        'instructor_id' => $instructor->id,
+        'room_id' => $hiddenRoom->id,
+        'name' => 'Different Room Class',
+        'schedule_days' => 'Fri',
+        'schedule_time' => '13.00-14.30',
+        'status' => 'ongoing',
+    ]);
+    $otherStudentClass = CourseClass::query()->create([
+        'program_id' => $program->id,
+        'instructor_id' => $instructor->id,
+        'room_id' => $room->id,
+        'name' => 'Other Student Same Room Class',
+        'schedule_days' => 'Sat',
+        'schedule_time' => '09.00-10.30',
+        'status' => 'ongoing',
+    ]);
+
+    $enrollment = createMeccaSprint4Enrollment($student, $ownedClass, ['status' => 'active']);
+    createMeccaSprint4Enrollment($student, $otherOwnedClass, ['status' => 'completed']);
+    createMeccaSprint4Enrollment($otherStudent, $otherStudentClass, ['status' => 'active']);
+    $reportCard = createMeccaSprint4ReportCard($enrollment, ['pdf_path' => 'report-cards/room-relation.pdf']);
+
+    $this->actingAs($student)
+        ->get(route('student.dashboard', [], false))
+        ->assertOk()
+        ->assertSee('Room Relation Class')
+        ->assertSee('Mecca Sprint 5 Room')
+        ->assertDontSee('Other Student Same Room Class');
+
+    $this->actingAs($student)
+        ->get(route('student.classes.index', ['search' => 'Mecca Sprint 5 Room'], false))
+        ->assertOk()
+        ->assertViewHas('enrollments', fn ($enrollments) => collect($enrollments->items())->pluck('id')->all() === [$enrollment->id])
+        ->assertSee('data-student-classes-table', false)
+        ->assertSee('Room Relation Class')
+        ->assertSee('Mecca Sprint 5 Room')
+        ->assertDontSee('Other Student Same Room Class');
+
+    $this->actingAs($student)
+        ->get(route('student.classes.show', $ownedClass, false))
+        ->assertOk()
+        ->assertSee('Room Relation Class')
+        ->assertSee('Mecca Sprint 5 Room');
+
+    $this->actingAs($student)
+        ->get(route('student.learning-history.index', ['search' => 'Mecca Sprint 5 Room'], false))
+        ->assertOk()
+        ->assertViewHas('enrollments', fn ($enrollments) => collect($enrollments->items())->pluck('id')->all() === [$enrollment->id])
+        ->assertSee('Room Relation Class')
+        ->assertSee('Mecca Sprint 5 Room')
+        ->assertDontSee('Other Student Same Room Class');
+
+    $this->actingAs($student)
+        ->get(route('student.report-cards.index', [], false))
+        ->assertOk()
+        ->assertSee('Room Relation Program')
+        ->assertSee('Mecca Sprint 5 Room');
+
+    $this->actingAs($student)
+        ->get(route('student.report-cards.show', $reportCard, false))
+        ->assertOk()
+        ->assertSee('Room Relation Class')
+        ->assertSee('Mecca Sprint 5 Room');
 });
 
 test('student report cards only expose published reports owned by the authenticated student', function () {
@@ -520,6 +756,7 @@ test('student report cards only expose published reports owned by the authentica
     $this->actingAs($student)
         ->get(route('student.report-cards.index', [], false))
         ->assertOk()
+        ->assertSee('data-student-report-cards-table', false)
         ->assertSee('Owned Published Program')
         ->assertDontSee('Owned Draft Program')
         ->assertDontSee('Other Published Program');
@@ -527,6 +764,10 @@ test('student report cards only expose published reports owned by the authentica
     $this->actingAs($student)
         ->get(route('student.report-cards.show', $ownedPublishedReport, false))
         ->assertOk()
+        ->assertSee('Written Test')
+        ->assertSee('Overall Class Assessment')
+        ->assertSee('Next Class')
+        ->assertSee('Comments and Suggestions')
         ->assertSee('Owned published comment.');
 
     $this->actingAs($student)
@@ -579,16 +820,229 @@ test('student report card download requires a published owned file', function ()
         ->assertNotFound();
 });
 
-test('admin academic mecca pages render for authenticated admin', function () {
-    $admin = User::factory()->create(['role' => 'admin']);
+test('student sprint two list tables support search filters sorting and pagination', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $instructor = User::factory()->create(['role' => 'instructor', 'full_name' => 'Filter Instructor']);
+    $program = createMeccaSprint4Program(['name' => 'Filter Program', 'slug' => 'filter-program']);
+    $targetClass = createMeccaSprint4Class([
+        'program_id' => $program->id,
+        'instructor_id' => $instructor->id,
+        'name' => 'Filter Target Class',
+    ]);
+    $hiddenClass = createMeccaSprint4Class(['name' => 'Hidden Filter Class']);
 
-    $this->actingAs($admin)->get('/admin/students')->assertOk();
-    $this->actingAs($admin)->get('/admin/instructors')->assertOk();
-    $this->actingAs($admin)->get('/admin/programs')->assertOk();
-    $this->actingAs($admin)->get('/admin/programs/create')->assertOk();
-    $this->actingAs($admin)->get('/admin/classes')->assertOk();
-    $this->actingAs($admin)->get('/admin/classes/create')->assertOk();
-    $this->actingAs($admin)->get('/admin/enrollments')->assertOk();
+    $targetEnrollment = createMeccaSprint4Enrollment($student, $targetClass, ['status' => 'completed']);
+    createMeccaSprint4Enrollment($student, $hiddenClass, ['status' => 'active']);
+    $report = createMeccaSprint4ReportCard($targetEnrollment, [
+        'final_grade' => 'B',
+        'total_score' => 82,
+        'pdf_path' => 'report-cards/filter-target.pdf',
+    ]);
+
+    Registration::query()->create([
+        'registration_code' => 'REG-FILTER-TARGET',
+        'user_id' => $student->id,
+        'program_id' => $program->id,
+        'class_id' => $targetClass->id,
+        'applicant_name' => 'Filter Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_method' => 'qris',
+        'payment_status' => 'paid',
+        'payment_amount' => 1500000,
+        'original_amount' => 1500000,
+        'discount_amount' => 250000,
+        'final_amount' => 1250000,
+        'program_promotion_title' => 'Promo Mecca',
+        'paid_at' => '2026-06-10 10:00:00',
+        'status' => 'paid',
+    ]);
+
+    Registration::query()->create([
+        'registration_code' => 'REG-FILTER-HIDDEN',
+        'user_id' => $student->id,
+        'program_id' => $hiddenClass->program_id,
+        'class_id' => $hiddenClass->id,
+        'applicant_name' => 'Filter Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_method' => 'virtual_account',
+        'payment_status' => 'waiting_payment',
+        'payment_amount' => 1000000,
+        'status' => 'pending_payment',
+    ]);
+
+    $this->actingAs($student)
+        ->get(route('student.classes.index', [
+            'search' => 'Target',
+            'status' => 'completed',
+            'sort' => 'status',
+            'direction' => 'asc',
+            'per_page' => 10,
+        ], false))
+        ->assertOk()
+        ->assertViewHas('enrollments', fn ($enrollments) => collect($enrollments->items())->pluck('id')->all() === [$targetEnrollment->id])
+        ->assertSee('data-student-classes-table', false)
+        ->assertSee('Filter Target Class');
+
+    $this->actingAs($student)
+        ->get(route('student.learning-history.index', [
+            'program_id' => $program->id,
+            'instructor_id' => $instructor->id,
+            'sort' => 'completed_at',
+        ], false))
+        ->assertOk()
+        ->assertViewHas('enrollments', fn ($enrollments) => collect($enrollments->items())->pluck('id')->all() === [$targetEnrollment->id])
+        ->assertSee('Filter Target Class')
+        ->assertSee(route('student.report-cards.show', $report, false), false);
+
+    $this->actingAs($student)
+        ->get(route('student.payments.index', [
+            'payment_status' => 'paid',
+            'payment_method' => 'qris',
+            'sort' => 'payment_amount',
+            'direction' => 'desc',
+        ], false))
+        ->assertOk()
+        ->assertSee('data-student-payments-table', false)
+        ->assertSee('REG-FILTER-TARGET')
+        ->assertSee('Promo Mecca')
+        ->assertSee('Rp 1.250.000')
+        ->assertDontSee('REG-FILTER-HIDDEN');
+
+    $this->actingAs($student)
+        ->get(route('student.report-cards.index', [
+            'final_grade' => 'B',
+            'report_status' => 'with_file',
+            'sort' => 'total_score',
+        ], false))
+        ->assertOk()
+        ->assertSee('data-student-report-cards-table', false)
+        ->assertSee('Filter Program')
+        ->assertSee('Nilai B');
+});
+
+test('student payment detail shows midtrans snapshot and continue payment link', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $program = createMeccaSprint4Program(['name' => 'Snapshot Payment Program', 'slug' => 'snapshot-payment-program']);
+
+    $payment = Registration::query()->create([
+        'registration_code' => 'REG-SNAPSHOT-PAY',
+        'user_id' => $student->id,
+        'program_id' => $program->id,
+        'applicant_name' => 'Snapshot Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_method' => 'virtual_account',
+        'payment_status' => 'waiting_payment',
+        'payment_amount' => 1800000,
+        'original_amount' => 1800000,
+        'discount_amount' => 300000,
+        'final_amount' => 1500000,
+        'program_promotion_title' => 'Promo Snapshot',
+        'payment_gateway_id' => 'MIDTRANS-123',
+        'midtrans_redirect_url' => 'https://pay.example.test/snap',
+        'midtrans_snap_token' => 'SNAP-TOKEN-123',
+        'payment_expires_at' => now()->addHour(),
+        'status' => 'pending_payment',
+    ]);
+
+    $this->actingAs($student)
+        ->get(route('student.payments.show', $payment, false))
+        ->assertOk()
+        ->assertSee('REG-SNAPSHOT-PAY')
+        ->assertSee('Virtual Account')
+        ->assertSee('MIDTRANS-123')
+        ->assertSee('SNAP-TOKEN-123')
+        ->assertSee('Promo Snapshot')
+        ->assertSee('Rp 1.800.000')
+        ->assertSee('Rp 300.000')
+        ->assertSee('Rp 1.500.000')
+        ->assertSee('Lanjutkan Pembayaran')
+        ->assertSee('https://pay.example.test/snap', false)
+        ->assertDontSee('Bukti Pembayaran');
+});
+
+test('student payment pages use saved promo snapshot instead of current promotion relation', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $program = createMeccaSprint4Program(['name' => 'Strict Snapshot Program', 'slug' => 'strict-snapshot-program']);
+    $promotion = ProgramPromotion::query()->create([
+        'program_id' => $program->id,
+        'title' => 'Current Relation Promo',
+        'discount_type' => 'fixed',
+        'discount_value' => 500000,
+        'is_active' => true,
+    ]);
+
+    $withSnapshot = Registration::query()->create([
+        'registration_code' => 'REG-SNAPSHOT-STRICT',
+        'user_id' => $student->id,
+        'program_id' => $program->id,
+        'applicant_name' => 'Snapshot Strict Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_method' => 'qris',
+        'payment_status' => 'paid',
+        'payment_amount' => 2000000,
+        'original_amount' => 2000000,
+        'discount_amount' => 250000,
+        'final_amount' => 1750000,
+        'program_promotion_id' => $promotion->id,
+        'program_promotion_title' => 'Saved Snapshot Promo',
+        'status' => 'paid',
+    ]);
+
+    $withoutSnapshot = Registration::query()->create([
+        'registration_code' => 'REG-RELATION-IGNORED',
+        'user_id' => $student->id,
+        'program_id' => $program->id,
+        'applicant_name' => 'Relation Ignored Student',
+        'applicant_email' => $student->email,
+        'applicant_phone' => '081234567890',
+        'payment_method' => 'qris',
+        'payment_status' => 'paid',
+        'payment_amount' => 2000000,
+        'original_amount' => 2000000,
+        'discount_amount' => 0,
+        'final_amount' => 2000000,
+        'program_promotion_id' => $promotion->id,
+        'program_promotion_title' => null,
+        'status' => 'paid',
+    ]);
+
+    $this->actingAs($student)
+        ->get(route('student.payments.index', ['search' => 'SNAPSHOT-STRICT'], false))
+        ->assertOk()
+        ->assertSee('Saved Snapshot Promo')
+        ->assertDontSee('Current Relation Promo');
+
+    $this->actingAs($student)
+        ->get(route('student.payments.show', $withSnapshot, false))
+        ->assertOk()
+        ->assertSee('Saved Snapshot Promo')
+        ->assertDontSee('Current Relation Promo');
+
+    $this->actingAs($student)
+        ->get(route('student.payments.show', $withoutSnapshot, false))
+        ->assertOk()
+        ->assertDontSee('Current Relation Promo');
+});
+
+test('admin academic mecca pages render for authenticated admin', function () {
+    $admin = User::factory()->create(['role' => 'admin', 'is_active' => true]);
+
+    $this->actingAs($admin)->get('/admin/student')->assertOk();
+    $this->actingAs($admin)->get('/admin/instructor')->assertOk();
+    $this->actingAs($admin)->get('/admin/program')->assertOk();
+    $this->actingAs($admin)->get('/admin/program/create')->assertOk();
+    $this->actingAs($admin)->get('/admin/class')->assertOk();
+    $this->actingAs($admin)->get('/admin/class/create')->assertOk();
+    $this->actingAs($admin)->get('/admin/enrollment')->assertOk();
+
+    $this->actingAs($admin)->get('/admin/students')->assertRedirect('/admin/student');
+    $this->actingAs($admin)->get('/admin/programs/create')->assertRedirect('/admin/program/create');
+    $this->actingAs($admin)->get('/admin/course-classes')->assertRedirect('/admin/class');
+    $this->actingAs($admin)->get('/admin/classes/create')->assertRedirect('/admin/class/create');
 });
 
 test('admin academic routes require admin access', function () {
@@ -597,12 +1051,12 @@ test('admin academic routes require admin access', function () {
     $this->get('/admin/programs')->assertRedirect('/login');
 
     $this->actingAs($student)
-        ->get('/admin/programs')
+        ->get(route('admin.program.index', [], false))
         ->assertForbidden();
 });
 
 test('admin student and instructor pages only expose matching roles', function () {
-    $admin = User::factory()->create(['role' => 'admin']);
+    $admin = User::factory()->create(['role' => 'admin', 'is_active' => true]);
     $student = User::factory()->create([
         'role' => 'student',
         'name' => 'Student Account',
@@ -615,33 +1069,33 @@ test('admin student and instructor pages only expose matching roles', function (
     ]);
 
     $this->actingAs($admin)
-        ->get('/admin/students')
+        ->get(route('admin.student.index', [], false))
         ->assertOk()
         ->assertSee('Mecca Student')
         ->assertDontSee('ETC Instructor');
 
     $this->actingAs($admin)
-        ->get("/admin/students/{$student->id}")
+        ->get(route('admin.student.show', $student, false))
         ->assertOk()
         ->assertSee('Mecca Student');
 
     $this->actingAs($admin)
-        ->get("/admin/students/{$instructor->id}")
+        ->get(route('admin.student.show', $instructor, false))
         ->assertNotFound();
 
     $this->actingAs($admin)
-        ->get('/admin/instructors')
+        ->get(route('admin.instructor.index', [], false))
         ->assertOk()
         ->assertSee('ETC Instructor')
         ->assertDontSee('Mecca Student');
 
     $this->actingAs($admin)
-        ->get("/admin/instructors/{$instructor->id}")
+        ->get(route('admin.instructor.show', $instructor, false))
         ->assertOk()
         ->assertSee('ETC Instructor');
 
     $this->actingAs($admin)
-        ->get("/admin/instructors/{$student->id}")
+        ->get(route('admin.instructor.show', $student, false))
         ->assertNotFound();
 });
 
@@ -649,7 +1103,7 @@ test('admin can create and update programs', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
     $this->actingAs($admin)
-        ->post(route('admin.programs.store'), [
+        ->post(route('admin.program.store'), [
             'name' => 'Academic English',
             'slug' => 'academic-english',
             'category' => 'english',
@@ -662,14 +1116,14 @@ test('admin can create and update programs', function () {
             'registration_fee' => 200000,
             'is_active' => '1',
         ])
-        ->assertRedirect(route('admin.programs.index'));
+        ->assertRedirect(route('admin.program.show', 'academic-english'));
 
     $program = Program::query()->where('slug', 'academic-english')->firstOrFail();
 
     expect($program->is_active)->toBeTrue();
 
     $this->actingAs($admin)
-        ->put(route('admin.programs.update', $program), [
+        ->put(route('admin.program.update', $program), [
             'name' => 'Academic English Updated',
             'slug' => 'academic-english',
             'category' => 'test_prep',
@@ -681,7 +1135,7 @@ test('admin can create and update programs', function () {
             'price' => 1750000,
             'registration_fee' => 250000,
         ])
-        ->assertRedirect(route('admin.programs.index'));
+        ->assertRedirect(route('admin.program.show', $program));
 
     $program->refresh();
 
@@ -721,8 +1175,8 @@ test('admin can create and update classes with instructor role validation', func
     ];
 
     $this->actingAs($admin)
-        ->post(route('admin.classes.store'), $classPayload)
-        ->assertRedirect(route('admin.classes.index'));
+        ->post(route('admin.class.store'), $classPayload)
+        ->assertRedirect(route('admin.class.show', 1));
 
     $class = CourseClass::query()->where('name', 'Teen B1')->firstOrFail();
 
@@ -731,17 +1185,17 @@ test('admin can create and update classes with instructor role validation', func
         ->and($class->status)->toBe('upcoming');
 
     $this->actingAs($admin)
-        ->put(route('admin.classes.update', $class), array_merge($classPayload, [
+        ->put(route('admin.class.update', $class), array_merge($classPayload, [
             'name' => 'Teen B2',
             'status' => 'ongoing',
         ]))
-        ->assertRedirect(route('admin.classes.index'));
+        ->assertRedirect(route('admin.class.show', $class));
 
     expect($class->refresh()->name)->toBe('Teen B2')
         ->and($class->status)->toBe('ongoing');
 
     $this->actingAs($admin)
-        ->post(route('admin.classes.store'), array_merge($classPayload, [
+        ->post(route('admin.class.store'), array_merge($classPayload, [
             'name' => 'Invalid Instructor Class',
             'instructor_id' => $student->id,
         ]))
@@ -779,8 +1233,8 @@ test('admin can assign student enrollments and duplicate assignments are rejecte
     ];
 
     $this->actingAs($admin)
-        ->post(route('admin.enrollments.store'), $payload)
-        ->assertRedirect(route('admin.enrollments.index'));
+        ->post(route('admin.enrollment.store'), $payload)
+        ->assertRedirect(route('admin.enrollment.show', 1));
 
     $enrollment = Enrollment::query()
         ->where('user_id', $student->id)
@@ -791,7 +1245,7 @@ test('admin can assign student enrollments and duplicate assignments are rejecte
         ->and($enrollment->status)->toBe('active');
 
     $this->actingAs($admin)
-        ->post(route('admin.enrollments.store'), $payload)
+        ->post(route('admin.enrollment.store'), $payload)
         ->assertSessionHasErrors('class_id');
 });
 
@@ -818,7 +1272,7 @@ test('admin enrollment rejects non student users', function () {
     ]);
 
     $this->actingAs($admin)
-        ->post(route('admin.enrollments.store'), [
+        ->post(route('admin.enrollment.store'), [
             'user_id' => $instructor->id,
             'class_id' => $class->id,
             'enrolled_at' => '2026-06-12',

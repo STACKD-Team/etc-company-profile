@@ -14,7 +14,7 @@ class StudentExportController extends Controller
 {
     public function index(): View
     {
-        return view('admin.rasky.export', [
+        return view('pages.admin.placement-test.export', [
             'title' => 'Export Rekap Siswa',
             'description' => 'Export wajib memakai template XLSX dari folder context.',
             'action' => route('admin.exports.students.download'),

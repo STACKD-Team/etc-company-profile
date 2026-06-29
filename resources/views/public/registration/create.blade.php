@@ -1,11 +1,13 @@
-<x-layouts.public title="Pendaftaran Online" navbar-active="program">
+<x-layouts.public title="Pendaftaran Online" :show-navbar="false" :show-footer="false" :show-chatbot="false">
+    <x-public-discovery.navbar active="program" />
     @push('styles')
         <link rel="stylesheet" href="{{ asset('css/pendaftaran.css') }}">
         <link rel="stylesheet" href="{{ asset('css/interactive.css') }}">
     @endpush
 
 @php
-    $selectedProgramId = (string) old('program_id', $selectedProgram?->id);
+    $selectedProgramId = (string) old('program_id', $selectedProgram?->id ?? '');
+    $selectedSummaryProgram = $programs->firstWhere('id', $selectedProgramId);
     $programPayload = $programs->mapWithKeys(fn ($program) => [
         $program->id => [
             'name' => $program->name,
@@ -13,6 +15,12 @@
             'price' => (float) $program->price,
         ],
     ]);
+    $religions = ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu', 'Lainnya'];
+    $livingWith = ['Orang Tua', 'Wali', 'Kos/Kontrakan', 'Rumah Kerabat', 'Sendiri'];
+    $transportations = ['Kendaraan Pribadi', 'Kendaraan Umum', 'Jalan Kaki', 'Ojek Online'];
+    $toOptions = static fn (array $values): array => collect($values)->mapWithKeys(fn ($value) => [$value => $value])->all();
+    $yesNoOptions = ['0' => 'Tidak', '1' => 'Ya'];
+    $sexOptions = ['M' => 'Laki-laki', 'F' => 'Perempuan'];
 @endphp
 
 <div class="page-shell">
@@ -44,11 +52,14 @@
     </header>
 
     @if (session('status'))
-        <div class="registration-alert">{{ session('status') }}</div>
+        <x-ui.alert status="success" title="Pendaftaran tersimpan" class="registration-alert">
+            {{ session('status') }}
+        </x-ui.alert>
     @endif
 
     <form class="registration-layout" method="POST" action="{{ route('registrations.store') }}">
         @csrf
+        <input type="hidden" name="program_id" id="program_id" value="{{ $selectedProgramId }}">
 
         <section class="form-stack">
             <article class="form-card">
@@ -58,99 +69,22 @@
                 </h2>
 
                 <div class="form-grid">
-                    <label class="field">
-                        <span>Nama Lengkap</span>
-                        <input name="full_name" type="text" value="{{ old('full_name') }}" placeholder="Masukkan nama lengkap" required>
-                        @error('full_name') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Email</span>
-                        <input name="email" type="email" value="{{ old('email') }}" placeholder="contoh@email.com" required>
-                        @error('email') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>No. Handphone / WA</span>
-                        <input name="mobile_phone" type="tel" value="{{ old('mobile_phone') }}" placeholder="0812xxxxxx" required>
-                        @error('mobile_phone') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Tempat Lahir</span>
-                        <input name="place_of_birth" type="text" value="{{ old('place_of_birth') }}" placeholder="Kota kelahiran" required>
-                        @error('place_of_birth') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Tanggal Lahir</span>
-                        <input name="date_of_birth" type="date" value="{{ old('date_of_birth') }}" required>
-                        @error('date_of_birth') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <div class="field">
-                        <span>Jenis Kelamin</span>
-                        <div class="radio-group">
-                            <label><input type="radio" name="sex" value="M" @checked(old('sex') === 'M') required> Laki-laki</label>
-                            <label><input type="radio" name="sex" value="F" @checked(old('sex', 'F') === 'F') required> Perempuan</label>
-                        </div>
-                        @error('sex') <small class="field-error">{{ $message }}</small> @enderror
-                    </div>
-                    <label class="field">
-                        <span>Agama</span>
-                        <select name="religion" required>
-                            @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu', 'Lainnya'] as $religion)
-                                <option value="{{ $religion }}" @selected(old('religion') === $religion)>{{ $religion }}</option>
-                            @endforeach
-                        </select>
-                        @error('religion') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Kewarganegaraan</span>
-                        <input name="nationality" type="text" value="{{ old('nationality', 'Indonesia') }}" placeholder="Kewarganegaraan" required>
-                        @error('nationality') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Pekerjaan/Sekolah/Kampus</span>
-                        <input name="occupation_school" type="text" value="{{ old('occupation_school') }}" placeholder="Instansi/Pekerjaan saat ini" required>
-                        @error('occupation_school') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>NISN</span>
-                        <input name="nisn" type="text" value="{{ old('nisn') }}" placeholder="Nomor Induk Siswa Nasional">
-                        @error('nisn') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>NIK</span>
-                        <input name="nik" type="text" value="{{ old('nik') }}" placeholder="Nomor Induk Kependudukan">
-                        @error('nik') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Penerima KPS</span>
-                        <select name="kps_receiver" required>
-                            <option value="0" @selected(old('kps_receiver', '0') === '0')>Tidak</option>
-                            <option value="1" @selected(old('kps_receiver') === '1')>Ya</option>
-                        </select>
-                        @error('kps_receiver') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>No KPS</span>
-                        <input name="no_kps" type="text" value="{{ old('no_kps') }}" placeholder="Isi jika ya">
-                        @error('no_kps') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Layak PIP</span>
-                        <select name="worthy_of_pip" required>
-                            <option value="0" @selected(old('worthy_of_pip', '0') === '0')>Tidak</option>
-                            <option value="1" @selected(old('worthy_of_pip') === '1')>Ya</option>
-                        </select>
-                        @error('worthy_of_pip') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Alasan Layak PIP</span>
-                        <input name="pip_reason" type="text" value="{{ old('pip_reason') }}" placeholder="Sebutkan alasannya">
-                        @error('pip_reason') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>No KIP</span>
-                        <input name="no_kip" type="text" value="{{ old('no_kip') }}" placeholder="Nomor Kartu Indonesia Pintar">
-                        @error('no_kip') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
+                    <x-ui.field name="full_name" label="Nama Lengkap" placeholder="Masukkan nama lengkap" required />
+                    <x-ui.email-field name="email" label="Email" placeholder="contoh@email.com" required />
+                    <x-ui.phone-field name="mobile_phone" label="No. Handphone / WA" placeholder="0812xxxxxx" required />
+                    <x-ui.field name="place_of_birth" label="Tempat Lahir" placeholder="Kota kelahiran" required />
+                    <x-ui.date-picker name="date_of_birth" label="Tanggal Lahir" required />
+                    <x-ui.select name="sex" label="Jenis Kelamin" :options="$sexOptions" placeholder="Pilih jenis kelamin" placeholder-disabled required />
+                    <x-ui.select name="religion" label="Agama" :options="$toOptions($religions)" placeholder="Pilih agama" placeholder-disabled required />
+                    <x-ui.field name="nationality" label="Kewarganegaraan" placeholder="Kewarganegaraan" required />
+                    <x-ui.field name="occupation_school" label="Pekerjaan/Sekolah/Kampus" placeholder="Instansi/Pekerjaan saat ini" required />
+                    <x-ui.field name="nisn" label="NISN" placeholder="Nomor Induk Siswa Nasional" />
+                    <x-ui.field name="nik" label="NIK" placeholder="Nomor Induk Kependudukan" />
+                    <x-ui.select name="kps_receiver" label="Penerima KPS" :options="$yesNoOptions" placeholder="Pilih status KPS" placeholder-disabled required />
+                    <x-ui.field name="no_kps" label="No KPS" placeholder="Isi jika ya" />
+                    <x-ui.select name="worthy_of_pip" label="Layak PIP" :options="$yesNoOptions" placeholder="Pilih status PIP" placeholder-disabled required />
+                    <x-ui.field name="pip_reason" label="Alasan Layak PIP" placeholder="Sebutkan alasannya" />
+                    <x-ui.field name="no_kip" label="No KIP" placeholder="Nomor Kartu Indonesia Pintar" />
                 </div>
             </article>
 
@@ -161,59 +95,17 @@
                 </h2>
 
                 <div class="form-grid">
-                    <label class="field field-full">
-                        <span>Alamat Lengkap</span>
-                        <textarea name="address" rows="4" placeholder="Nama jalan, nomor rumah, RT/RW..." required>{{ old('address') }}</textarea>
-                        @error('address') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>RT/RW</span>
-                        <input name="rt_rw" type="text" value="{{ old('rt_rw') }}" placeholder="000/000">
-                        @error('rt_rw') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Kode Pos</span>
-                        <input name="postal_code" type="text" value="{{ old('postal_code') }}" placeholder="25xxx">
-                        @error('postal_code') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Provinsi</span>
-                        <input name="province" type="text" value="{{ old('province', 'Sumatera Barat') }}" placeholder="Provinsi">
-                        @error('province') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Kab/Kota</span>
-                        <input name="district" type="text" value="{{ old('district', 'Padang') }}" placeholder="Kabupaten/Kota">
-                        @error('district') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Kecamatan</span>
-                        <input name="sub_district" type="text" value="{{ old('sub_district') }}" placeholder="Kecamatan">
-                        @error('sub_district') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Desa / Kelurahan</span>
-                        <input name="village" type="text" value="{{ old('village') }}" placeholder="Kelurahan">
-                        @error('village') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Tinggal Bersama</span>
-                        <select name="living_with">
-                            @foreach (['Orang Tua', 'Wali', 'Kos/Kontrakan', 'Rumah Kerabat', 'Sendiri'] as $option)
-                                <option value="{{ $option }}" @selected(old('living_with') === $option)>{{ $option }}</option>
-                            @endforeach
-                        </select>
-                        @error('living_with') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Alat Transportasi</span>
-                        <select name="transportation">
-                            @foreach (['Kendaraan Pribadi', 'Kendaraan Umum', 'Jalan Kaki', 'Ojek Online'] as $option)
-                                <option value="{{ $option }}" @selected(old('transportation') === $option)>{{ $option }}</option>
-                            @endforeach
-                        </select>
-                        @error('transportation') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
+                    <div class="field-full">
+                        <x-ui.textarea name="address" label="Alamat Lengkap" placeholder="Nama jalan, nomor rumah, RT/RW..." rows="4" required />
+                    </div>
+                    <x-ui.field name="rt_rw" label="RT/RW" placeholder="000/000" />
+                    <x-ui.field name="postal_code" label="Kode Pos" placeholder="25xxx" />
+                    <x-ui.field name="province" label="Provinsi" placeholder="Provinsi" />
+                    <x-ui.field name="district" label="Kab/Kota" placeholder="Kabupaten/Kota" />
+                    <x-ui.field name="sub_district" label="Kecamatan" placeholder="Kecamatan" />
+                    <x-ui.field name="village" label="Desa / Kelurahan" placeholder="Kelurahan" />
+                    <x-ui.select name="living_with" label="Tinggal Bersama" :options="$toOptions($livingWith)" placeholder="Pilih tempat tinggal" placeholder-disabled />
+                    <x-ui.select name="transportation" label="Alat Transportasi" :options="$toOptions($transportations)" placeholder="Pilih transportasi" placeholder-disabled />
                 </div>
             </article>
 
@@ -224,63 +116,21 @@
                 </h2>
 
                 <div class="form-grid">
-                    <label class="field">
-                        <span>Nama Ayah</span>
-                        <input name="father_name" type="text" value="{{ old('father_name') }}" placeholder="Masukkan nama ayah" required>
-                        @error('father_name') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Nama Ibu</span>
-                        <input name="mother_name" type="text" value="{{ old('mother_name') }}" placeholder="Masukkan nama ibu" required>
-                        @error('mother_name') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Applying For</span>
-                        <select name="applying_for" required>
-                            @foreach ($applyingForOptions as $value => $label)
-                                <option value="{{ $value }}" @selected(old('applying_for') === $value)>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        @error('applying_for') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Program Website</span>
-                        <select name="program_id" id="program_id" required>
-                            @forelse ($programs as $program)
-                                <option value="{{ $program->id }}" @selected($selectedProgramId === (string) $program->id)>{{ $program->name }}</option>
-                            @empty
-                                <option value="">Belum ada program aktif</option>
-                            @endforelse
-                        </select>
-                        @error('program_id') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Days Schedule</span>
-                        <select name="preferred_days" id="preferred_days" required>
-                            @foreach ($preferredDayOptions as $value => $label)
-                                <option value="{{ $value }}" @selected(old('preferred_days') === $value)>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        @error('preferred_days') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
-                    <label class="field">
-                        <span>Time Schedule</span>
-                        <select name="preferred_time" id="preferred_time" required>
-                            @foreach ($preferredTimeOptions as $value => $label)
-                                <option value="{{ $value }}" @selected(old('preferred_time') === $value)>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        @error('preferred_time') <small class="field-error">{{ $message }}</small> @enderror
-                    </label>
+                    <x-ui.field name="father_name" label="Nama Ayah" placeholder="Masukkan nama ayah" required />
+                    <x-ui.field name="mother_name" label="Nama Ibu" placeholder="Masukkan nama ibu" required />
+                    <x-ui.select name="applying_for" label="Applying For" :options="$applyingForOptions" placeholder="Pilih kategori program" placeholder-disabled required />
+                    <x-ui.select name="preferred_days" id="preferred_days" label="Days Schedule" :options="$preferredDayOptions" placeholder="Pilih hari" placeholder-disabled required />
+                    <x-ui.select name="preferred_time" id="preferred_time" label="Time Schedule" :options="$preferredTimeOptions" placeholder="Pilih jam" placeholder-disabled required />
                 </div>
             </article>
 
             <div class="action-row">
-                <a class="btn-kembali" href="{{ route('registrations.programs.index') }}">Kembali</a>
-                <button class="btn-lanjut" type="submit" @disabled($programs->isEmpty())>
+                <x-ui.button :href="route('public.programs.index')" color="gray" outlined size="xl" icon="heroicon-m-arrow-left" class="max-[760px]:w-full">
+                    Kembali
+                </x-ui.button>
+                <x-ui.button type="submit" size="xl" :disabled="$programs->isEmpty() || blank($selectedProgramId)" icon="heroicon-m-arrow-right" icon-position="after" class="max-[760px]:w-full">
                     Lanjut ke Pembayaran
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-                </button>
+                </x-ui.button>
             </div>
         </section>
 
@@ -291,7 +141,7 @@
                 <span>Program Dipilih</span>
                 <strong class="program-name">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg>
-                    <span id="summary-program">{{ $selectedProgram?->name ?? 'Belum ada program aktif' }}</span>
+                    <span id="summary-program">{{ $selectedSummaryProgram?->name ?? 'Pilih program terlebih dahulu' }}</span>
                 </strong>
             </div>
 
@@ -299,7 +149,7 @@
                 <span>Jadwal</span>
                 <strong class="schedule">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    <span id="summary-schedule">Mon-Wed, 09.00-10.30</span>
+                    <span id="summary-schedule">Pilih jadwal terlebih dahulu</span>
                 </strong>
             </div>
 
@@ -332,10 +182,18 @@ function updateRegistrationSummary() {
     const programSelect = document.getElementById('program_id');
     const daySelect = document.getElementById('preferred_days');
     const timeSelect = document.getElementById('preferred_time');
-    const program = registrationPrograms[programSelect.value] || null;
 
-    document.getElementById('summary-program').textContent = program ? program.name : 'Belum ada program aktif';
-    document.getElementById('summary-schedule').textContent = `${daySelect.options[daySelect.selectedIndex]?.text || '-'}, ${timeSelect.value || '-'}`;
+    if (!programSelect || !daySelect || !timeSelect) {
+        return;
+    }
+
+    const program = registrationPrograms[programSelect.value] || null;
+    const hasSchedule = daySelect.value && timeSelect.value;
+
+    document.getElementById('summary-program').textContent = program ? program.name : 'Pilih program terlebih dahulu';
+    document.getElementById('summary-schedule').textContent = hasSchedule
+        ? `${daySelect.options[daySelect.selectedIndex]?.text || '-'}, ${timeSelect.value}`
+        : 'Pilih jadwal terlebih dahulu';
     document.getElementById('summary-registration').textContent = rupiah(program?.registration_fee || 0);
     document.getElementById('summary-program-fee').textContent = rupiah(program?.price || 0);
     document.getElementById('summary-total').textContent = rupiah((program?.registration_fee || 0) + (program?.price || 0));
@@ -350,4 +208,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 @endpush
+<x-public-discovery.page-end />
 </x-layouts.public>

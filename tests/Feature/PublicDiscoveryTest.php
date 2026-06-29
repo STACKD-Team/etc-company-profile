@@ -5,7 +5,9 @@ use App\Models\ContactMessage;
 use App\Models\Content;
 use App\Models\Program;
 use App\Models\Reel;
+use App\Models\Room;
 use App\Models\User;
+use Database\Seeders\PublicDiscoverySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -27,8 +29,6 @@ it('renders all Miftah public discovery pages without foundation placeholders', 
         '/gallery',
         '/contact',
         '/faq',
-        '/reels',
-        "/reels/{$reel->id}",
     ] as $uri) {
         $this->get($uri)
             ->assertOk()
@@ -36,6 +36,15 @@ it('renders all Miftah public discovery pages without foundation placeholders', 
             ->assertDontSee('Implementasi penuh')
             ->assertSee('data-chatbot-widget', false);
     }
+
+    $this->get('/reels')
+        ->assertOk()
+        ->assertDontSee('Fondasi halaman')
+        ->assertDontSee('Implementasi penuh')
+        ->assertDontSee('data-chatbot-widget', false);
+
+    $this->get("/reels/{$reel->id}")
+        ->assertRedirect(route('public.reels.index', ['reel' => $reel->id]));
 });
 
 it('connects public program CTAs into detail and the registration picker', function () {
@@ -50,23 +59,31 @@ it('connects public program CTAs into detail and the registration picker', funct
         'max_students' => 12,
         'price' => 1500000,
         'registration_fee' => 200000,
+        'thumbnail' => 'images/pu2-img.jpg',
         'is_active' => true,
     ]);
 
     $this->get('/')
         ->assertOk()
-        ->assertSee(route('registrations.programs.index'), false)
+        ->assertSee(route('public.programs.index'), false)
         ->assertSee(route('public.programs.show', $program), false);
 
     $this->get(route('public.programs.show', $program))
         ->assertOk()
-        ->assertSee(route('registrations.programs.index', ['program' => $program->id]), false);
+        ->assertSee(route('registrations.create', ['program' => $program->id]), false);
+
+    $this->get(route('public.programs.index'))
+        ->assertOk()
+        ->assertSee(route('registrations.create', ['program' => $program->id]), false)
+        ->assertDontSee(route('registrations.programs.index', ['program' => $program->id]), false);
+
+    $this->get(route('registrations.create', ['program' => $program->id]))
+        ->assertOk()
+        ->assertSee('value="'.$program->id.'" selected', false)
+        ->assertSee($program->name);
 
     $this->get(route('registrations.programs.index', ['program' => $program->id]))
-        ->assertOk()
-        ->assertSee('checked', false)
-        ->assertSee('/registration/form/'.$program->id, false)
-        ->assertDontSee(route('public.contact.index', ['program' => $program->id]), false);
+        ->assertRedirect(route('public.programs.index'));
 });
 
 it('stores valid contact messages and rejects invalid contact messages', function () {
@@ -87,6 +104,11 @@ it('stores valid contact messages and rejects invalid contact messages', functio
 });
 
 it('logs chatbot messages and returns the public chatbot JSON shape', function () {
+    config([
+        'rag.nvidia.api_key' => null,
+        'rag.qdrant.url' => null,
+    ]);
+
     $response = $this->postJson('/chatbot/messages', [
         'message' => 'Berapa biaya pendaftaran dan program?',
     ]);
@@ -95,7 +117,7 @@ it('logs chatbot messages and returns the public chatbot JSON shape', function (
         ->assertOk()
         ->assertJsonStructure(['status', 'session_id', 'intent', 'reply'])
         ->assertJsonPath('status', 'ok')
-        ->assertJsonPath('intent', 'pricing');
+        ->assertJsonPath('intent', 'rag_no_context');
 
     expect(ChatbotLog::query()->count())->toBe(1);
 });
@@ -118,7 +140,8 @@ it('only shows published reels publicly and hides unpublished reel detail', func
         ->assertSee($published->title)
         ->assertDontSee($draft->title);
 
-    $this->get("/reels/{$published->id}")->assertOk();
+    $this->get("/reels/{$published->id}")
+        ->assertRedirect(route('public.reels.index', ['reel' => $published->id]));
     $this->get("/reels/{$draft->id}")->assertNotFound();
 });
 
@@ -162,10 +185,13 @@ it('toggles reel likes in the session without going negative', function () {
 });
 
 it('loads public discovery seed data idempotently', function () {
-    $this->seed(\Database\Seeders\PublicDiscoverySeeder::class);
-    $this->seed(\Database\Seeders\PublicDiscoverySeeder::class);
+    $this->seed(PublicDiscoverySeeder::class);
+    $this->seed(PublicDiscoverySeeder::class);
 
-    expect(Content::query()->where('type', 'page')->where('slug', 'about')->count())->toBe(1)
+    expect(Content::query()->where('type', Content::TYPE_PROFILE)->where('slug', 'etc-profile')->count())->toBe(1)
+        ->and(Content::query()->where('type', Content::TYPE_FAQ)->count())->toBe(4)
+        ->and(Content::query()->where('type', Content::TYPE_TESTIMONIAL)->count())->toBe(3)
+        ->and(Room::query()->count())->toBe(3)
         ->and(Reel::query()->where('is_published', true)->count())->toBeGreaterThan(0)
         ->and(User::query()->instructors()->where('show_on_team_page', true)->count())->toBeGreaterThan(0);
 });

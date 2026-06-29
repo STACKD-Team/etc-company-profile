@@ -10,7 +10,7 @@ class FacilityController extends Controller
 {
     public function index(PublicDiscoveryService $discovery): View
     {
-        return view('public.facilities.index', [
+        return view('pages.public.facilities.index', [
             'rooms' => $discovery->rooms(),
         ]);
     }

@@ -9,6 +9,7 @@
     'readonly' => false,
     'error' => null,
     'id' => null,
+    'size' => 'md',
 ])
 
 @php
@@ -21,7 +22,7 @@
     @if ($label)
         <span class="font-heading text-sm font-bold text-etc-on-surface">{{ $label }} @if ($required)<span class="text-etc-magenta">*</span>@endif</span>
     @endif
-    <x-filament::input.wrapper :valid="blank($error)" :disabled="$disabled" prefix="Rp">
+    <x-filament::input.wrapper :valid="blank($error)" :disabled="$disabled" prefix="Rp" class="etc-field-size-{{ $size }}">
         <x-filament::input :id="$id" :name="$name" type="number" :value="$fieldValue" :placeholder="$placeholder" :required="$required" :disabled="$disabled" :readonly="$readonly" min="0" step="1000" {{ $attributes }} />
     </x-filament::input.wrapper>
     @if ($error)<p class="text-xs font-medium text-red-600">{{ $error }}</p>@elseif ($helper)<p class="text-xs text-etc-on-muted">{{ $helper }}</p>@endif

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('contents', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['page', 'gallery', 'partner', 'room', 'team_member_extra', 'setting']);
+            $table->enum('type', ['gallery', 'partner', 'profile', 'faq', 'testimonial']);
             $table->string('title', 200);
             $table->string('slug', 220)->nullable();
             $table->longText('body')->nullable();
@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('display_order')->nullable()->default(0);
             $table->boolean('is_published')->nullable()->default(true);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index('type', 'idx_contents_type');
             $table->index('slug', 'idx_contents_slug');

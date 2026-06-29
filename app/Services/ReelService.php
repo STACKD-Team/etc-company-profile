@@ -23,8 +23,16 @@ class ReelService extends BaseCrudService
 
     public function adminPaginate(array $filters = [], int $perPage = 12): LengthAwarePaginator
     {
-        return $this->query($filters)
-            ->latest('created_at')
+        return $this->applySorting($this->query($filters), $filters, [
+            'title',
+            'category',
+            'is_published',
+            'views_count',
+            'likes_count',
+            'duration_seconds',
+            'published_at',
+            'created_at',
+        ])
             ->paginate($perPage)
             ->withQueryString();
     }
@@ -85,7 +93,9 @@ class ReelService extends BaseCrudService
     public function incrementViews(Reel $reel): Reel
     {
         return DB::transaction(function () use ($reel) {
-            $reel->increment('views_count');
+            Reel::query()
+                ->whereKey($reel->getKey())
+                ->update(['views_count' => DB::raw('COALESCE(views_count, 0) + 1')]);
 
             return $reel->refresh();
         });
@@ -94,7 +104,9 @@ class ReelService extends BaseCrudService
     public function incrementLikes(Reel $reel): Reel
     {
         return DB::transaction(function () use ($reel) {
-            $reel->increment('likes_count');
+            Reel::query()
+                ->whereKey($reel->getKey())
+                ->update(['likes_count' => DB::raw('COALESCE(likes_count, 0) + 1')]);
 
             return $reel->refresh();
         });
@@ -103,11 +115,10 @@ class ReelService extends BaseCrudService
     public function decrementLikes(Reel $reel): Reel
     {
         return DB::transaction(function () use ($reel) {
-            $reel->refresh();
-
-            if ((int) $reel->likes_count > 0) {
-                $reel->decrement('likes_count');
-            }
+            Reel::query()
+                ->whereKey($reel->getKey())
+                ->where('likes_count', '>', 0)
+                ->decrement('likes_count');
 
             return $reel->refresh();
         });

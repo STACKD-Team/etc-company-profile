@@ -49,4 +49,28 @@ class Program extends Model
     {
         return $this->hasMany(Registration::class);
     }
+
+    public function promotions(): HasMany
+    {
+        return $this->hasMany(ProgramPromotion::class);
+    }
+
+    public function activePromotions(): HasMany
+    {
+        return $this->promotions()
+            ->activeNow()
+            ->orderByDesc('starts_at')
+            ->orderByDesc('discount_value');
+    }
+
+    public function currentPromotion(): ?ProgramPromotion
+    {
+        $promotions = $this->relationLoaded('activePromotions')
+            ? $this->activePromotions
+            : $this->activePromotions()->get();
+
+        return $promotions
+            ->sortByDesc(fn (ProgramPromotion $promotion): float => $promotion->discountAmount($this->price))
+            ->first();
+    }
 }

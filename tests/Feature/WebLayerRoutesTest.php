@@ -1,13 +1,15 @@
 <?php
 
-use App\Models\Program;
 use App\Models\CourseClass;
 use App\Models\Enrollment;
-use App\Models\ReportCard;
+use App\Models\Program;
 use App\Models\Registration;
+use App\Models\ReportCard;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory as SpreadsheetFactory;
 
 uses(RefreshDatabase::class);
 
@@ -22,17 +24,17 @@ it('registers the implemented Rasky web route names after sprint merge', functio
         'auth.password.reset',
         'auth.password.update',
         'admin.dashboard',
-        'admin.placement-tests.index',
-        'admin.placement-tests.show',
-        'admin.placement-tests.schedule',
-        'admin.placement-tests.result.store',
-        'admin.report-cards.index',
-        'admin.report-cards.create',
-        'admin.report-cards.store',
-        'admin.report-cards.show',
-        'admin.report-cards.edit',
-        'admin.report-cards.update',
-        'admin.report-cards.publish',
+        'admin.placement-test.index',
+        'admin.placement-test.show',
+        'admin.placement-test.schedule',
+        'admin.placement-test.result.store',
+        'admin.report-card.index',
+        'admin.report-card.create',
+        'admin.report-card.store',
+        'admin.report-card.show',
+        'admin.report-card.edit',
+        'admin.report-card.update',
+        'admin.report-card.publish',
         'admin.exports.students',
         'admin.exports.students.download',
         'admin.exports.report-cards',
@@ -117,7 +119,7 @@ it('allows an admin to login and reach the admin dashboard', function () {
         'email' => 'admin@etcplanet.test',
         'password' => 'password',
     ])
-        ->assertRedirect(route('admin.dashboard'));
+        ->assertRedirect('/admin/dashboard');
 
     $this->assertAuthenticated();
 
@@ -173,14 +175,19 @@ it('allows admin users to open Rasky admin GET pages', function () {
 
     foreach ([
         route('admin.dashboard'),
-        route('admin.placement-tests.index'),
-        route('admin.report-cards.index'),
-        route('admin.report-cards.create'),
+        route('admin.placement-test.index'),
+        route('admin.report-card.index'),
+        route('admin.report-card.create'),
         route('admin.exports.students'),
         route('admin.exports.report-cards'),
     ] as $url) {
         $this->actingAs($admin)->get($url)->assertOk();
     }
+
+    $this->actingAs($admin)
+        ->get(route('admin.placement-test.index'))
+        ->assertSee('href="'.route('admin.placement-test.index').'"', false)
+        ->assertSee('aria-current="page"', false);
 });
 
 it('renders the Rasky placement detail workflow forms for admin users', function () {
@@ -190,13 +197,14 @@ it('renders the Rasky placement detail workflow forms for admin users', function
     [$registration, $courseClass] = createRaskyPlacementFixture();
 
     $this->actingAs($admin)
-        ->get(route('admin.placement-tests.show', $registration))
+        ->get(route('admin.placement-test.show', $registration))
         ->assertOk()
         ->assertSee('Jadwal Placement Test')
         ->assertSee('Hasil dan Rekomendasi Kelas')
         ->assertSee($courseClass->name)
-        ->assertSee(route('admin.placement-tests.schedule', $registration), false)
-        ->assertSee(route('admin.placement-tests.result.store', $registration), false);
+        ->assertSee('aria-current="page"', false)
+        ->assertSee(route('admin.placement-test.schedule', $registration), false)
+        ->assertSee(route('admin.placement-test.result.store', $registration), false);
 });
 
 it('protects the Rasky placement workflow from guests and non admin users', function () {
@@ -205,19 +213,19 @@ it('protects the Rasky placement workflow from guests and non admin users', func
         'role' => 'student',
     ]);
 
-    $this->get(route('admin.placement-tests.show', $registration))
+    $this->get(route('admin.placement-test.show', $registration))
         ->assertRedirect(route('auth.login'));
 
-    $this->post(route('admin.placement-tests.schedule', $registration), [
+    $this->post(route('admin.placement-test.schedule', $registration), [
         'placement_test_at' => '2026-05-20 10:00:00',
     ])->assertRedirect(route('auth.login'));
 
     $this->actingAs($student)
-        ->get(route('admin.placement-tests.show', $registration))
+        ->get(route('admin.placement-test.show', $registration))
         ->assertForbidden();
 
     $this->actingAs($student)
-        ->post(route('admin.placement-tests.result.store', $registration), [
+        ->post(route('admin.placement-test.result.store', $registration), [
             'placement_test_result' => 'Ready for Teen 4.',
         ])
         ->assertForbidden();
@@ -230,10 +238,10 @@ it('allows admin users to schedule a placement test', function () {
     [$registration] = createRaskyPlacementFixture();
 
     $this->actingAs($admin)
-        ->post(route('admin.placement-tests.schedule', $registration), [
+        ->post(route('admin.placement-test.schedule', $registration), [
             'placement_test_at' => '2026-05-20 10:00:00',
         ])
-        ->assertRedirect(route('admin.placement-tests.show', $registration))
+        ->assertRedirect(route('admin.placement-test.show', $registration))
         ->assertSessionHasNoErrors();
 
     $registration->refresh();
@@ -249,9 +257,9 @@ it('validates placement test schedule input', function () {
     [$registration] = createRaskyPlacementFixture();
 
     $this->actingAs($admin)
-        ->from(route('admin.placement-tests.show', $registration))
-        ->post(route('admin.placement-tests.schedule', $registration), [])
-        ->assertRedirect(route('admin.placement-tests.show', $registration))
+        ->from(route('admin.placement-test.show', $registration))
+        ->post(route('admin.placement-test.schedule', $registration), [])
+        ->assertRedirect(route('admin.placement-test.show', $registration))
         ->assertSessionHasErrors(['placement_test_at']);
 });
 
@@ -262,11 +270,11 @@ it('allows admin users to store placement result and assign a class without crea
     [$registration, $courseClass] = createRaskyPlacementFixture();
 
     $this->actingAs($admin)
-        ->post(route('admin.placement-tests.result.store', $registration), [
+        ->post(route('admin.placement-test.result.store', $registration), [
             'placement_test_result' => 'Student is ready for Teen 4.',
             'class_id' => $courseClass->id,
         ])
-        ->assertRedirect(route('admin.placement-tests.show', $registration))
+        ->assertRedirect(route('admin.placement-test.show', $registration))
         ->assertSessionHasNoErrors();
 
     $registration->refresh();
@@ -274,7 +282,7 @@ it('allows admin users to store placement result and assign a class without crea
     expect($registration->placement_test_result)->toBe('Student is ready for Teen 4.')
         ->and($registration->class_id)->toBe($courseClass->id)
         ->and($registration->status)->toBe('enrolled')
-        ->and(\App\Models\Enrollment::query()->where('user_id', $registration->user_id)->where('class_id', $courseClass->id)->exists())->toBeFalse();
+        ->and(Enrollment::query()->where('user_id', $registration->user_id)->where('class_id', $courseClass->id)->exists())->toBeFalse();
 });
 
 it('validates placement test result input', function () {
@@ -284,12 +292,12 @@ it('validates placement test result input', function () {
     [$registration] = createRaskyPlacementFixture();
 
     $this->actingAs($admin)
-        ->from(route('admin.placement-tests.show', $registration))
-        ->post(route('admin.placement-tests.result.store', $registration), [
+        ->from(route('admin.placement-test.show', $registration))
+        ->post(route('admin.placement-test.result.store', $registration), [
             'placement_test_result' => '',
             'class_id' => 999999,
         ])
-        ->assertRedirect(route('admin.placement-tests.show', $registration))
+        ->assertRedirect(route('admin.placement-test.show', $registration))
         ->assertSessionHasErrors(['placement_test_result', 'class_id']);
 });
 
@@ -315,22 +323,22 @@ it('allows admin users to create preview and publish a complete report card', fu
     [$reportCardData] = createRaskyReportCardFixture();
 
     $this->actingAs($admin)
-        ->get(route('admin.report-cards.create'))
+        ->get(route('admin.report-card.create'))
         ->assertOk()
         ->assertSee('Written Test')
         ->assertSee('Overall Class Assessment')
         ->assertSee('Managing Director');
 
     $response = $this->actingAs($admin)
-        ->post(route('admin.report-cards.store'), $reportCardData)
+        ->post(route('admin.report-card.store'), $reportCardData)
         ->assertSessionHasNoErrors();
 
     $reportCard = ReportCard::query()->firstOrFail();
 
-    $response->assertRedirect(route('admin.report-cards.show', $reportCard));
+    $response->assertRedirect(route('admin.report-card.show', $reportCard));
 
     $this->actingAs($admin)
-        ->get(route('admin.report-cards.show', $reportCard))
+        ->get(route('admin.report-card.show', $reportCard))
         ->assertOk()
         ->assertSee('STUDENT EVALUATION')
         ->assertSee('WRITTEN TEST')
@@ -338,10 +346,20 @@ it('allows admin users to create preview and publish a complete report card', fu
         ->assertSee('Publish');
 
     $this->actingAs($admin)
-        ->post(route('admin.report-cards.publish', $reportCard))
-        ->assertRedirect(route('admin.report-cards.show', $reportCard));
+        ->post(route('admin.report-card.publish', $reportCard))
+        ->assertRedirect(route('admin.report-card.show', $reportCard));
 
-    expect($reportCard->refresh()->is_published)->toBeTrue();
+    $reportCard->refresh();
+
+    expect($reportCard->is_published)->toBeTrue()
+        ->and($reportCard->pdf_path)->toEndWith('.docx');
+
+    Storage::disk('public')->assertExists($reportCard->pdf_path);
+    expect(docxText(Storage::disk('public')->get($reportCard->pdf_path)))
+        ->toContain('Budi Report')
+        ->toContain('Teen 4 Report')
+        ->toContain('Good progress.')
+        ->not->toContain('${');
 });
 
 it('validates complete report card input', function () {
@@ -350,12 +368,12 @@ it('validates complete report card input', function () {
     ]);
 
     $this->actingAs($admin)
-        ->from(route('admin.report-cards.create'))
-        ->post(route('admin.report-cards.store'), [
+        ->from(route('admin.report-card.create'))
+        ->post(route('admin.report-card.store'), [
             'score_listening' => 99,
             'grade_pronunciation' => 'Z',
         ])
-        ->assertRedirect(route('admin.report-cards.create'))
+        ->assertRedirect(route('admin.report-card.create'))
         ->assertSessionHasErrors(['enrollment_id', 'score_listening', 'grade_pronunciation']);
 });
 
@@ -373,9 +391,17 @@ it('downloads Rasky student recap export as xlsx content', function () {
         ->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
     expect($response->getContent())->toStartWith('PK');
+
+    $spreadsheet = spreadsheetFromContent($response->getContent());
+    $sheet = $spreadsheet->getActiveSheet();
+
+    expect(collect($sheet->toArray())->flatten()->filter()->values()->all())
+        ->toContain('ETC-RPT-001')
+        ->toContain('Budi Report')
+        ->toContain('Teen 4 Report');
 });
 
-it('downloads Rasky report card export as doc content', function () {
+it('downloads Rasky report card export as docx content', function () {
     $admin = User::factory()->create([
         'role' => 'admin',
     ]);
@@ -388,10 +414,31 @@ it('downloads Rasky report card export as doc content', function () {
 
     $response
         ->assertOk()
-        ->assertHeader('Content-Type', 'application/msword; charset=UTF-8');
+        ->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
 
-    expect($response->getContent())->toContain('STUDENT EVALUATION')
-        ->and($response->getContent())->toContain('Budi Report');
+    expect($response->getContent())->toStartWith('PK');
+    expect(docxText($response->getContent()))
+        ->toContain('STUDENT EVALUATION')
+        ->toContain('Budi Report')
+        ->toContain('Good progress.')
+        ->not->toContain('${');
+});
+
+it('renders report card export as an admin modal action', function () {
+    $admin = User::factory()->create([
+        'role' => 'admin',
+    ]);
+    [, $reportCard] = createRaskyReportCardFixture(persistReportCard: true);
+
+    $this->actingAs($admin)
+        ->get(route('admin.report-card.index'))
+        ->assertOk()
+        ->assertSee('report-card-export-modal', false)
+        ->assertSee('data-open-modal="report-card-export-modal"', false)
+        ->assertSee(route('admin.exports.report-cards.download'), false)
+        ->assertSee('Download DOCX')
+        ->assertSee('Budi Report')
+        ->assertSee((string) $reportCard->id, false);
 });
 
 it('shows report cards connected to classes taught by the instructor', function () {
@@ -529,4 +576,36 @@ function createRaskyReportCardFixture(bool $persistReportCard = false): array
     $reportCard = $persistReportCard ? ReportCard::query()->create($data) : null;
 
     return [$data, $reportCard, $instructor, $student, $courseClass, $director];
+}
+
+function docxText(string $content): string
+{
+    $tmp = tempnam(sys_get_temp_dir(), 'docx-test-');
+    file_put_contents($tmp, $content);
+
+    $zip = new ZipArchive;
+    $opened = $zip->open($tmp);
+
+    if ($opened !== true) {
+        @unlink($tmp);
+        throw new RuntimeException('Generated DOCX could not be opened.');
+    }
+
+    $xml = (string) $zip->getFromName('word/document.xml');
+    $zip->close();
+    @unlink($tmp);
+
+    return html_entity_decode(strip_tags($xml));
+}
+
+function spreadsheetFromContent(string $content): \PhpOffice\PhpSpreadsheet\Spreadsheet
+{
+    $tmp = tempnam(sys_get_temp_dir(), 'xlsx-test-');
+    file_put_contents($tmp, $content);
+
+    try {
+        return SpreadsheetFactory::load($tmp);
+    } finally {
+        @unlink($tmp);
+    }
 }

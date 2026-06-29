@@ -7,6 +7,7 @@ Panduan ringkas untuk agen/developer yang bekerja di project ETC Planet.
 Sebelum mengubah kode, baca sumber yang relevan:
 
 - `PROJECT_BLUEPRINT_ETC.md`
+- `context/PEMBAGIAN_TUGAS_DEVELOPER_ETC.md`
 - `context/WEB_ROUTES_ETC.md`
 - `context/SKEMA_DATABASE_LENGKAP.md`
 - `context/FORMULIR PENDAFTARAN.jpeg`
@@ -34,9 +35,10 @@ Folder `context/` adalah sumber kebenaran project.
 
 ## Route Web
 
-- Semua route mengikuti `context/WEB_ROUTES_ETC.md`: owner, method, URI, route name, controller action, middleware, layout, dan notes.
+- `context/WEB_ROUTES_ETC.md` adalah inventaris route project: method, URI, route name, controller action, middleware, layout, dan notes.
+- Ownership, sprint, prioritas, dan pembagian kerja developer mengikuti `context/PEMBAGIAN_TUGAS_DEVELOPER_ETC.md`.
 - URI/path dan route name wajib Bahasa Inggris, contoh: `/programs`, `/registration/payment/{registration}`, `public.programs.show`, `admin.registrations.index`.
-- Jangan membuat URI/route name baru jika sudah ada di `WEB_ROUTES_ETC.md`. Jika perlu tambahan, update dokumen itu dulu dengan owner yang jelas.
+- Jangan membuat URI/route name baru jika sudah ada di `WEB_ROUTES_ETC.md`. Jika perlu tambahan atau perubahan route, update dokumen route itu tanpa menambah kolom owner.
 - Gunakan controller action, bukan closure, kecuali route sementara yang sangat kecil.
 - Gunakan HTTP method sesuai fungsi: `GET` read/page, `POST` create/action, `PUT/PATCH` update, `DELETE` delete/cancel.
 - Route statis harus ditulis sebelum route dinamis, misalnya `/programs` sebelum `/programs/{program}`.
@@ -75,7 +77,7 @@ Aturan:
   - Student: `/student` + `student.`
   - Instructor: `/instructor` + `instructor.`
 - Dashboard wajib middleware `auth` + role sesuai area.
-- Pembagian owner mengikuti `WEB_ROUTES_ETC.md`: Miftah public/content, Mia registration/payment, Mecca student/academic, Rasky auth/admin dashboard/reports/instructor.
+- Pembagian owner mengikuti `context/PEMBAGIAN_TUGAS_DEVELOPER_ETC.md`.
 
 ## Blade Dan UI
 
@@ -90,7 +92,7 @@ Aturan:
 - Jangan duplikasi markup navbar, sidebar, bottom navigation, atau footer.
 - Gunakan route name dari `WEB_ROUTES_ETC.md` untuk link. Fallback URL hanya untuk komponen navigasi reusable yang harus aman saat route belum tersedia.
 - Gunakan `@csrf`, `@method`, `@error`, `old()`, flash message, dan escape output dengan `{{ }}`.
-- Pisahkan view public/admin/student, misalnya `resources/views/public`, `resources/views/admin`, `resources/views/student`.
+- Page utama mengikuti struktur target `resources/views/pages/public`, `resources/views/pages/admin`, `resources/views/pages/student`, dan `resources/views/pages/instructor`. View flow lama yang belum dimigrasikan tetap dipisah per area.
 
 ## Desain
 

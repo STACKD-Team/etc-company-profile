@@ -10,7 +10,6 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -18,7 +17,7 @@ use RuntimeException;
 class RegistrationService extends BaseCrudService
 {
     public function __construct(
-        protected MediaStorageService $mediaStorage,
+        protected MidtransPaymentService $midtransPayment,
     ) {}
 
     protected function modelClass(): string
@@ -44,8 +43,9 @@ class RegistrationService extends BaseCrudService
         }
 
         return DB::transaction(function () use ($applicantData): Registration {
-            $program = Program::query()->findOrFail($applicantData['program_id']);
+            $program = Program::query()->with('activePromotions')->findOrFail($applicantData['program_id']);
             $user = $this->storeStudentProfile($applicantData);
+            $paymentSnapshot = $this->midtransPayment->snapshotAmount($program);
 
             /** @var Registration $registration */
             $registration = Registration::query()->create([
@@ -57,7 +57,8 @@ class RegistrationService extends BaseCrudService
                 'applicant_phone' => $applicantData['mobile_phone'],
                 'preferred_days' => $applicantData['preferred_days'],
                 'preferred_time' => $applicantData['preferred_time'],
-                'payment_amount' => (float) $program->registration_fee + (float) $program->price,
+                ...$paymentSnapshot,
+                'payment_status' => 'waiting_payment',
                 'status' => 'pending_payment',
                 'notes' => json_encode([
                     'applying_for' => $applicantData['applying_for'],
@@ -66,46 +67,10 @@ class RegistrationService extends BaseCrudService
                 ], JSON_THROW_ON_ERROR),
             ]);
 
-            return $registration->load($this->defaultWith());
+            return $this->midtransPayment
+                ->createTransaction($registration)
+                ->load($this->defaultWith());
         });
-    }
-
-    public function uploadPaymentProof(Registration $registration, UploadedFile $proof): Registration
-    {
-        /** @var Registration $registration */
-        $registration = $this->update($registration, [
-            'payment_proof' => $this->mediaStorage->replace($registration->payment_proof, $proof, 'registrations/payment-proofs'),
-        ]);
-
-        return $registration;
-    }
-
-    public function submitPaymentProof(Registration $registration, UploadedFile $proof, string $paymentMethod): Registration
-    {
-        /** @var Registration $registration */
-        $registration = $this->update($registration, [
-            'payment_method' => $paymentMethod,
-            'payment_proof' => $this->mediaStorage->replace($registration->payment_proof, $proof, 'registrations/payment-proofs'),
-        ]);
-
-        return $registration;
-    }
-
-    public function confirmPaymentSubmission(Registration $registration, string $paymentMethod): Registration
-    {
-        $notes = $this->decodeNotes($registration->notes);
-        $notes['payment_confirmation'] = [
-            'method' => $paymentMethod,
-            'confirmed_by_applicant_at' => now()->toIso8601String(),
-        ];
-
-        /** @var Registration $registration */
-        $registration = $this->update($registration, [
-            'payment_method' => $paymentMethod,
-            'notes' => json_encode($notes, JSON_THROW_ON_ERROR),
-        ]);
-
-        return $registration;
     }
 
     public function receiptData(Registration $registration): array
@@ -129,7 +94,16 @@ class RegistrationService extends BaseCrudService
 
     public function paginateAdminRegistrations(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return $this->applyFilters($this->baseQuery()->latest(), $filters)
+        return $this->applySorting($this->applyFilters($this->baseQuery(), $filters), $filters, [
+            'created_at',
+            'registration_code',
+            'applicant_name',
+            'applicant_email',
+            'status',
+            'program_id',
+            'payment_amount',
+            'paid_at',
+        ])
             ->paginate($perPage)
             ->withQueryString();
     }
@@ -139,21 +113,29 @@ class RegistrationService extends BaseCrudService
         $query = $this->baseQuery()
             ->where(function (Builder $query): void {
                 $query->whereNotNull('payment_method')
-                    ->orWhereNotNull('payment_proof')
                     ->orWhereNotNull('payment_gateway_id')
-                    ->orWhere('notes', 'like', '%payment_confirmation%');
-            })
-            ->latest();
+                    ->orWhereNotNull('midtrans_order_id');
+            });
 
-        return $this->applyFilters($query, $filters)
+        return $this->applySorting($this->applyFilters($query, $filters), $filters, [
+            'created_at',
+            'applicant_name',
+            'status',
+            'payment_status',
+            'program_id',
+            'payment_method',
+            'payment_amount',
+            'final_amount',
+            'paid_at',
+        ])
             ->paginate($perPage)
             ->withQueryString();
     }
 
     public function markAsPaid(Registration $registration, ?float $amount = null, ?string $paymentMethod = null, bool $adminOverride = false): Registration
     {
-        if (! $adminOverride && ! $registration->payment_proof && ! $registration->payment_gateway_id) {
-            throw new RuntimeException('A registration needs payment proof or a gateway transaction before it can be marked as paid.');
+        if (! $adminOverride && ! $registration->payment_gateway_id && ! $registration->midtrans_order_id) {
+            throw new RuntimeException('A registration needs a Midtrans gateway transaction before it can be marked as paid.');
         }
 
         $data = [
@@ -195,15 +177,7 @@ class RegistrationService extends BaseCrudService
 
     public function forceDelete(Model $model): bool
     {
-        /** @var Registration $model */
-        $paymentProof = $model->payment_proof;
-        $deleted = parent::forceDelete($model);
-
-        if ($deleted) {
-            $this->mediaStorage->delete($paymentProof);
-        }
-
-        return $deleted;
+        return parent::forceDelete($model);
     }
 
     public function schedulePlacementTest(Registration $registration, string $scheduledAt): Registration
@@ -254,8 +228,9 @@ class RegistrationService extends BaseCrudService
 
     protected function applyFilters(Builder $query, array $filters): Builder
     {
-        $query = $this->whereLike($query, ['applicant_name', 'applicant_email'], $filters['search'] ?? null)
+        $query = $this->whereLike($query, ['registration_code', 'applicant_name', 'applicant_email', 'midtrans_order_id', 'payment_gateway_id', 'program_promotion_title'], $filters['search'] ?? null)
             ->when($filters['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $status))
+            ->when($filters['payment_status'] ?? null, fn (Builder $query, string $status) => $query->where('payment_status', $status))
             ->when($filters['payment_method'] ?? null, fn (Builder $query, string $method) => $query->where('payment_method', $method))
             ->when($filters['program_id'] ?? null, fn (Builder $query, int|string $programId) => $query->where('program_id', $programId))
             ->when($filters['class_id'] ?? null, fn (Builder $query, int|string $classId) => $query->where('class_id', $classId));
@@ -333,6 +308,6 @@ class RegistrationService extends BaseCrudService
 
         $decoded = json_decode($notes, true);
 
-        return is_array($decoded) ? $decoded : ['legacy_notes' => $notes];
+        return is_array($decoded) ? $decoded : ['notes' => $notes];
     }
 }

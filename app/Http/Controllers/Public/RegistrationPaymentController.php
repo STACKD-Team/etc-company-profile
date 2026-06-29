@@ -3,12 +3,8 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Public\ConfirmRegistrationPaymentRequest;
 use App\Models\Registration;
-use App\Services\RegistrationService;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\URL;
 
 class RegistrationPaymentController extends Controller
 {
@@ -22,29 +18,16 @@ class RegistrationPaymentController extends Controller
                 'program' => $registration->program?->name ?? '-',
                 'registrationFee' => $this->rupiah((float) ($registration->program?->registration_fee ?? 0)),
                 'programFee' => $this->rupiah((float) ($registration->program?->price ?? 0)),
-                'total' => $this->rupiah((float) $registration->payment_amount),
-            ],
-            'bankAccount' => [
-                'bank' => 'BCA',
-                'number' => '123-456-7890',
-                'holder' => 'ETC Planet',
+                'originalAmount' => $this->rupiah((float) ($registration->original_amount ?: $registration->payment_amount)),
+                'discountAmount' => $this->rupiah((float) ($registration->discount_amount ?: 0)),
+                'finalAmount' => $this->rupiah((float) ($registration->final_amount ?: $registration->payment_amount)),
+                'promotionTitle' => $registration->program_promotion_title,
+                'status' => $registration->payment_status ?: $registration->status,
+                'expiresAt' => $registration->payment_expires_at,
+                'redirectUrl' => $registration->midtrans_redirect_url,
+                'snapToken' => $registration->midtrans_snap_token,
             ],
         ]);
-    }
-
-    public function confirm(
-        ConfirmRegistrationPaymentRequest $request,
-        Registration $registration,
-        RegistrationService $registrations,
-    ): RedirectResponse {
-        $registration = $registrations->confirmPaymentSubmission(
-            $registration,
-            $request->validated('payment_method'),
-        );
-
-        return redirect()
-            ->to(URL::signedRoute('registrations.confirmation.show', ['registration' => $registration]))
-            ->with('status', 'Konfirmasi pembayaran diterima. Admin ETC akan memverifikasi bukti pembayaran.');
     }
 
     protected function rupiah(float $amount): string

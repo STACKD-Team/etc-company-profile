@@ -16,6 +16,6 @@ class PlacementTestScheduleController extends Controller
 
         $registrations->schedulePlacementTest($registration, $validated['placement_test_at']);
 
-        return redirect()->route('admin.placement-tests.show', $registration)->with('status', 'Jadwal placement test tersimpan.');
+        return redirect()->route('admin.placement-test.show', $registration)->with('status', 'Jadwal placement test tersimpan.');
     }
 }

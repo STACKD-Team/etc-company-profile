@@ -61,7 +61,7 @@ th{width:34%;color:#5a3f47}
 <h1>Bukti Pendaftaran ETC Planet</h1>
 <p>Dokumen digital ini menjadi bukti bahwa formulir pendaftaran online sudah diterima.</p>
 <table>'.$body.'</table>
-<div class="note">Pembayaran akan diproses setelah admin ETC Planet memverifikasi bukti pembayaran.</div>
+<div class="note">Status pembayaran diproses otomatis melalui Midtrans. Simpan kode pendaftaran untuk komunikasi dengan admin ETC Planet.</div>
 </main>
 </body>
 </html>';

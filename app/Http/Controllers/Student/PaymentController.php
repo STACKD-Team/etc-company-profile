@@ -3,46 +3,44 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Student\TableQueryRequest;
 use App\Models\Registration;
-use Illuminate\Database\Eloquent\Builder;
+use App\Services\StudentPanelService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class PaymentController extends Controller
 {
-    public function index(Request $request): View
+    public function index(TableQueryRequest $request, StudentPanelService $panel): View
     {
-        $student = $request->user();
+        $studentId = (int) $request->user()->id;
 
-        return view('student.payments.index', [
-            'student' => $student,
-            'payments' => Registration::query()
-                ->with(['program', 'courseClass'])
-                ->where('user_id', $student->id)
-                ->where($this->paymentRelevantFilter())
-                ->latest('created_at')
-                ->paginate(10),
-        ]);
-    }
-
-    public function show(Request $request, Registration $payment): View
-    {
-        abort_unless($payment->user_id === $request->user()->id, 403);
-
-        return view('student.payments.show', [
+        return view('pages.student.payment.index', [
             'student' => $request->user(),
-            'payment' => $payment->load(['program', 'courseClass']),
+            'payments' => $panel->paginatePayments($studentId, $request->validated()),
+            'programOptions' => $panel->programOptions($studentId),
+            'classOptions' => $panel->classOptions($studentId),
+            'statusLabels' => $panel->statusLabels(),
+            'statusColors' => $panel->statusColors(),
+            'paymentStatusOptions' => $panel->paymentStatusOptions(),
+            'methods' => $panel->methods(),
         ]);
     }
 
-    protected function paymentRelevantFilter(): callable
+    public function show(Request $request, Registration $payment, StudentPanelService $panel): View
     {
-        return function (Builder $query): void {
-            $query->whereNotNull('payment_amount')
-                ->orWhereNotNull('payment_method')
-                ->orWhereNotNull('payment_proof')
-                ->orWhereNotNull('paid_at')
-                ->orWhereIn('status', ['pending_payment', 'paid', 'placement_test', 'enrolled', 'rejected']);
-        };
+        Gate::forUser($request->user())->authorize('view', $payment);
+
+        $payment = $panel->ownedPayment((int) $request->user()->id, $payment);
+
+        return view('pages.student.payment.show', [
+            'student' => $request->user(),
+            'payment' => $payment,
+            'summary' => $panel->paymentSummary($payment),
+            'statusLabels' => $panel->statusLabels(),
+            'statusColors' => $panel->statusColors(),
+            'methods' => $panel->methods(),
+        ]);
     }
 }

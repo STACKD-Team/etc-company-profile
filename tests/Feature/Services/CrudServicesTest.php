@@ -1,9 +1,12 @@
 <?php
 
 use App\Models\CourseClass;
+use App\Models\Content;
 use App\Models\Enrollment;
 use App\Models\Program;
 use App\Models\Registration;
+use App\Models\Reel;
+use App\Models\ReportCard;
 use App\Models\User;
 use App\Services\ChatbotLogService;
 use App\Services\ContactMessageService;
@@ -133,7 +136,7 @@ it('performs CRUD operations through all model services', function () {
     ]);
 
     $content = $contents->create([
-        'type' => 'page',
+        'type' => 'profile',
         'title' => 'Tentang ETC',
         'slug' => 'tentang-etc',
         'body' => 'Profil ETC Planet.',
@@ -168,7 +171,7 @@ it('performs CRUD operations through all model services', function () {
     $users->update($student, ['full_name' => 'Budi Updated']);
     $programs->update($program, ['name' => 'General English Updated']);
     $classes->update($courseClass, ['status' => 'ongoing']);
-    $registrations->uploadPaymentProof($registration, UploadedFile::fake()->create('proof.jpg', 1, 'image/jpeg'));
+    $registrations->update($registration, ['payment_gateway_id' => 'MID-CRUD-001']);
     $registrations->markAsPaid($registration, 550000, 'qris');
     $enrollments->complete($enrollment, '2026-08-15');
     $reportCards->publish($reportCard);
@@ -200,9 +203,9 @@ it('performs CRUD operations through all model services', function () {
     $programs->delete($program);
     $users->delete($student);
 
-    expect($reportCard->fresh())->toBeNull()
-        ->and($reel->fresh())->toBeNull()
-        ->and($content->fresh())->toBeNull()
+    expect(ReportCard::withTrashed()->find($reportCard->id)->trashed())->toBeTrue()
+        ->and(Reel::withTrashed()->find($reel->id)->trashed())->toBeTrue()
+        ->and(Content::withTrashed()->find($content->id)->trashed())->toBeTrue()
         ->and($message->fresh())->toBeNull()
         ->and($log->fresh())->toBeNull()
         ->and(Registration::withTrashed()->find($registration->id)->trashed())->toBeTrue()
@@ -314,9 +317,6 @@ it('handles media lifecycle for file-aware services', function () {
         'applicant_email' => 'media.student@example.test',
         'applicant_phone' => '0812222222',
     ]);
-    $registration = $registrations->uploadPaymentProof($registration, UploadedFile::fake()->create('proof.jpg', 1, 'image/jpeg'));
-    $oldProof = $registration->payment_proof;
-    $registration = $registrations->uploadPaymentProof($registration, UploadedFile::fake()->create('proof-new.jpg', 1, 'image/jpeg'));
     $registrations->assignClass($registration, $courseClass);
     $enrollment = $registrations->createEnrollmentFromRegistration($registration);
 
@@ -352,8 +352,6 @@ it('handles media lifecycle for file-aware services', function () {
 
     expect($student->avatar)->toStartWith('users/avatars/')
         ->and($program->thumbnail)->toStartWith('programs/thumbnails/')
-        ->and($registration->payment_proof)->toStartWith('registrations/payment-proofs/')
-        ->and($oldProof)->toBeIn($this->mediaStorage->deleted)
         ->and($enrollment)->toBeInstanceOf(Enrollment::class)
         ->and($reportCard->pdf_path)->toStartWith('report-cards/pdfs/')
         ->and($reel->video_path)->toStartWith('reels/videos/')
@@ -378,7 +376,6 @@ it('handles media lifecycle for file-aware services', function () {
         $reel->thumbnail_path,
         $content->image,
         $reportCard->pdf_path,
-        $registration->payment_proof,
         $program->thumbnail,
         $student->avatar,
     );

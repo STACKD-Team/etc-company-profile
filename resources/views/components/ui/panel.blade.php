@@ -3,6 +3,7 @@
     'description' => null,
     'icon' => null,
     'iconColor' => 'primary',
+    'iconSize' => 'lg',
     'compact' => false,
     'secondary' => false,
 ])
@@ -12,6 +13,7 @@
     :description="$description"
     :icon="$icon"
     :icon-color="$iconColor"
+    :icon-size="$iconSize"
     :compact="$compact"
     :secondary="$secondary"
     {{ $attributes }}

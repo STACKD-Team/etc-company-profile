@@ -3,34 +3,39 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Student\TableQueryRequest;
 use App\Models\CourseClass;
+use App\Services\StudentPanelService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class ClassController extends Controller
 {
-    public function index(Request $request): View
+    public function index(TableQueryRequest $request, StudentPanelService $panel): View
     {
-        return view('student.classes.index', [
+        $studentId = (int) $request->user()->id;
+
+        return view('pages.student.class.index', [
             'student' => $request->user(),
-            'enrollments' => $request->user()->enrollments()
-                ->with(['courseClass.program', 'courseClass.instructor', 'reportCard'])
-                ->latest('enrolled_at')
-                ->get(),
+            'enrollments' => $panel->paginateClasses($studentId, $request->validated()),
+            'programOptions' => $panel->programOptions($studentId),
+            'classOptions' => $panel->classOptions($studentId),
+            'instructorOptions' => $panel->instructorOptions($studentId),
+            'statusLabels' => $panel->statusLabels(),
         ]);
     }
 
-    public function show(Request $request, CourseClass $class): View
+    public function show(Request $request, CourseClass $class, StudentPanelService $panel): View
     {
-        $enrollment = $request->user()->enrollments()
-            ->with(['courseClass.program', 'courseClass.instructor', 'reportCard'])
-            ->where('class_id', $class->id)
-            ->firstOrFail();
+        abort_if(Gate::forUser($request->user())->inspect('view', $class)->denied(), 404);
 
-        return view('student.classes.show', [
+        $enrollment = $panel->ownedClassEnrollment((int) $request->user()->id, $class);
+
+        return view('pages.student.class.show', [
             'student' => $request->user(),
             'enrollment' => $enrollment,
-            'class' => $class->load(['program', 'instructor']),
+            'class' => $class->load(['program', 'instructor', 'room']),
         ]);
     }
 }

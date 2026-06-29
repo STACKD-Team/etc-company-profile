@@ -10,7 +10,7 @@ class TeamController extends Controller
 {
     public function index(PublicDiscoveryService $discovery): View
     {
-        return view('public.team.index', [
+        return view('pages.public.team.index', [
             'instructors' => $discovery->instructors(),
         ]);
     }

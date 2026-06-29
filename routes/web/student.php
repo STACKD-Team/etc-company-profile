@@ -20,22 +20,34 @@ Route::prefix('student')
             ->name('profile.show');
         Route::put('/profile', [ProfileController::class, 'update'])
             ->name('profile.update');
-        Route::get('/classes', [ClassController::class, 'index'])
+        Route::get('/class', [ClassController::class, 'index'])
             ->name('classes.index');
-        Route::get('/classes/{class}', [ClassController::class, 'show'])
+        Route::get('/class/{class}', [ClassController::class, 'show'])
             ->name('classes.show');
         Route::get('/learning-history', [LearningHistoryController::class, 'index'])
             ->name('learning-history.index');
-        Route::get('/payments', [PaymentController::class, 'index'])
+        Route::get('/payment', [PaymentController::class, 'index'])
             ->name('payments.index');
-        Route::get('/payments/{payment}', [PaymentController::class, 'show'])
+        Route::get('/payment/{payment}', [PaymentController::class, 'show'])
             ->name('payments.show');
-        Route::get('/report-cards', [ReportCardController::class, 'index'])
+        Route::get('/report-card', [ReportCardController::class, 'index'])
             ->name('report-cards.index');
-        Route::get('/report-cards/{reportCard}', [ReportCardController::class, 'show'])
+        Route::get('/report-card/{reportCard}', [ReportCardController::class, 'show'])
             ->name('report-cards.show');
-        Route::get('/report-cards/{reportCard}/download', ReportCardDownloadController::class)
+        Route::get('/report-card/{reportCard}/download', ReportCardDownloadController::class)
             ->name('report-cards.download');
         Route::get('/help', [HelpController::class, 'index'])
             ->name('help.index');
+    });
+
+Route::prefix('student')
+    ->middleware(['auth', 'role:student'])
+    ->group(function (): void {
+        Route::get('/classes', [ClassController::class, 'index']);
+        Route::get('/classes/{class}', [ClassController::class, 'show']);
+        Route::get('/payments', [PaymentController::class, 'index']);
+        Route::get('/payments/{payment}', [PaymentController::class, 'show']);
+        Route::get('/report-cards', [ReportCardController::class, 'index']);
+        Route::get('/report-cards/{reportCard}', [ReportCardController::class, 'show']);
+        Route::get('/report-cards/{reportCard}/download', ReportCardDownloadController::class);
     });

@@ -24,6 +24,7 @@ return new class extends Migration
             $table->boolean('is_published')->nullable()->default(false);
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['is_published', 'published_at'], 'idx_reels_published');
         });

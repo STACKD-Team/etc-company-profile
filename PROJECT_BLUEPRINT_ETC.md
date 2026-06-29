@@ -89,7 +89,7 @@ Catatan penting:
 - Menjadi pengajar kelas.
 - Ditampilkan di halaman team jika `show_on_team_page = 1`.
 - Menjadi Talent pada dokumen rapor.
-- Scope dashboard instructor tidak wajib untuk v1, kecuali project diperluas.
+- Memiliki dashboard untuk melihat profile, class yang diajar, student terkait, dan report card/assessment sesuai policy.
 
 ### 3.3 Prinsip Implementasi
 
@@ -102,7 +102,7 @@ Catatan penting:
 
 ## 4. Database Blueprint
 
-Skema database mengikuti `context/SKEMA_DATABASE_LENGKAP.md`. Total tabel utama: 10.
+Skema database mengikuti `context/SKEMA_DATABASE_LENGKAP.md`. Total tabel utama: 11.
 
 ### 4.1 Ringkasan Tabel
 
@@ -110,12 +110,13 @@ Skema database mengikuti `context/SKEMA_DATABASE_LENGKAP.md`. Total tabel utama:
 | --- | --- |
 | `users` | Akun admin, instructor, dan student, termasuk profil siswa/instructor |
 | `programs` | Master program kursus |
+| `rooms` | Master ruangan/fasilitas belajar |
 | `classes` | Kelas konkret yang berjalan |
 | `registrations` | Pendaftaran online dan data pembayaran |
 | `enrollments` | Riwayat siswa mengikuti kelas |
 | `report_cards` | Rapor akhir pembelajaran |
 | `reels` | Video pendek/reels interaktif |
-| `contents` | CMS polymorphic untuk halaman, galeri, partner, ruangan, setting |
+| `contents` | CMS sederhana untuk galeri, partner, profile, FAQ, dan testimonial |
 | `contact_messages` | Pesan dari form kontak |
 | `chatbot_logs` | Log tanya-jawab chatbot |
 
@@ -124,6 +125,8 @@ Skema database mengikuti `context/SKEMA_DATABASE_LENGKAP.md`. Total tabel utama:
 - `programs` memiliki banyak `classes`.
 - `programs` memiliki banyak `registrations`.
 - `classes` dimiliki oleh `programs` dan opsional memiliki `instructor`.
+- `classes` opsional memiliki `room` dari tabel `rooms`.
+- `rooms` memiliki banyak `classes`.
 - `registrations` opsional terhubung ke `users` dan `classes`, wajib terhubung ke `programs`.
 - `enrollments` menghubungkan `users` student dengan `classes`.
 - `report_cards` satu-satu dengan `enrollments`.
@@ -437,7 +440,7 @@ Referensi: `context/stitch_etc_planet_digital_hub/english_conversation_detail_et
 
 **Fasilitas/Ruangan**
 
-- Diambil dari `contents` type `room`.
+- Diambil dari tabel `rooms`.
 - Tampilkan nama ruangan, kapasitas, fasilitas, dan foto.
 
 **Galeri Kegiatan**
@@ -537,6 +540,7 @@ Halaman wajib:
 - Data instructor.
 - Program.
 - Kelas.
+- Room.
 - Enrollment.
 - Rapor.
 - Reels.
@@ -558,7 +562,7 @@ Fitur utama:
 - Publish rapor ke dashboard siswa.
 - Export laporan rekap siswa sesuai template Excel.
 - Upload dan publish reels.
-- Mengelola halaman, galeri, partner, ruangan, team extra, dan setting.
+- Mengelola profile ETC, galeri, partner, testimonial, FAQ, room, dan setting operasional yang diperlukan.
 
 ## 8. Design System
 
@@ -623,20 +627,24 @@ Distribusi visual:
 
 Gunakan tabel `contents` untuk:
 
-- `page`: halaman statis seperti tentang, FAQ, kebijakan privasi.
 - `gallery`: galeri kegiatan.
 - `partner`: partner/lembaga kerja sama.
-- `room`: fasilitas/ruangan.
-- `team_member_extra`: data tambahan team jika tidak masuk users.
-- `setting`: alamat, kontak, sosial media, rekening, QRIS path, dan konfigurasi umum.
+- `profile`: visi, misi, alamat, telepon, dan informasi umum ETC Padang.
+- `faq`: pertanyaan dan jawaban yang mudah dipakai admin awam.
+- `testimonial`: testimoni dengan rating 1-5.
+
+Gunakan tabel `rooms` untuk:
+
+- fasilitas/ruangan, termasuk nama, deskripsi, kapasitas, dan gambar.
 
 CMS admin harus menyediakan:
 
-- List konten.
+- List konten per tipe.
 - Create/edit/delete atau unpublish.
 - Upload image/images.
 - Display order.
 - Status publish.
+- Form CMS harus memakai field yang mudah dipahami. Contoh FAQ hanya question dan answer; gallery hanya title, description, dan image; testimonial memiliki nama, role/asal, pesan, rating, dan foto bila ada.
 
 ## 10. Reels
 
@@ -735,12 +743,12 @@ Project dianggap sesuai blueprint jika:
 2. Database: migrations sesuai skema, models, relationships, seed awal.
 3. Public website: beranda, program, detail program, kontak, reels read-only.
 4. Registration flow: pilih program, form sesuai fisik, pembayaran, konfirmasi.
-5. Admin registration: list pendaftaran, verifikasi, placement test, assign class.
-6. Student dashboard: profil, kelas, riwayat, pembayaran.
-7. Report cards: CRUD admin, generate template, publish, download siswa.
-8. Excel export: rekap siswa sesuai template.
-9. CMS dan reels management.
-10. Chatbot dan polish responsive.
+5. Source alignment Sprint 3+: sinkronkan route/page convention, schema room, CMS type, dan ownership docs.
+6. Admin operational flow: dashboard, CRUD/RD utama, datatable konsisten, detail card, related table, export modal, dan CMS dropdown.
+7. Rooms dan CMS simplification: tabel `rooms`, `classes.room_id`, CMS profile/gallery/partner/faq/testimonial dengan form ramah admin.
+8. Shared role workflow: admin/instructor/student memakai page pattern yang sama dengan policy dan query scope berbeda.
+9. Report cards dan export dokumen: CRUD/publish, generate template, download siswa, rekap siswa sesuai template.
+10. Integrasi besar setelah flow stabil: Midtrans, Cloudinary, RAG chatbot, Qdrant, dan final polish responsive.
 
 ## 15. Keputusan dan Asumsi
 
@@ -750,4 +758,4 @@ Project dianggap sesuai blueprint jika:
 - Output rapor utama mengikuti contoh `.doc`; PDF boleh menjadi turunan.
 - Output rekap siswa utama adalah `.xlsx`.
 - Template dokumen tidak boleh diganti tanpa persetujuan project owner.
-- Dashboard instructor tidak wajib untuk v1.
+- Dashboard instructor masuk scope flow baru: profile, class, student terkait, dan report card/assessment sesuai policy.

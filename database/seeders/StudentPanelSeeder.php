@@ -7,6 +7,7 @@ use App\Models\Enrollment;
 use App\Models\Program;
 use App\Models\Registration;
 use App\Models\ReportCard;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -89,6 +90,28 @@ class StudentPanelSeeder extends Seeder
             ],
         );
 
+        $hardRockRoom = Room::query()->updateOrCreate(
+            ['name' => 'Hard Rock'],
+            [
+                'description' => 'Room aktif untuk kelas teen speaking.',
+                'capacity' => 12,
+                'facilities' => ['AC', 'Whiteboard', 'Speaking cards'],
+                'is_active' => true,
+                'display_order' => 1,
+            ],
+        );
+
+        $disneylandRoom = Room::query()->updateOrCreate(
+            ['name' => 'Disneyland'],
+            [
+                'description' => 'Room untuk kelas lanjutan dan aktivitas bahasa.',
+                'capacity' => 10,
+                'facilities' => ['AC', 'Learning props', 'Whiteboard'],
+                'is_active' => true,
+                'display_order' => 2,
+            ],
+        );
+
         $activeClass = CourseClass::query()->updateOrCreate(
             [
                 'program_id' => $program->id,
@@ -98,7 +121,7 @@ class StudentPanelSeeder extends Seeder
                 'instructor_id' => $instructor->id,
                 'schedule_days' => 'Tues-Thurs',
                 'schedule_time' => '17.00-18.30',
-                'room' => 'Hard Rock',
+                'room_id' => $hardRockRoom->id,
                 'start_date' => now()->subWeeks(3)->toDateString(),
                 'end_date' => now()->addWeeks(5)->toDateString(),
                 'status' => 'ongoing',
@@ -114,7 +137,7 @@ class StudentPanelSeeder extends Seeder
                 'instructor_id' => $instructor->id,
                 'schedule_days' => 'Mon-Wed',
                 'schedule_time' => '15.00-16.30',
-                'room' => 'Disneyland',
+                'room_id' => $disneylandRoom->id,
                 'start_date' => now()->subMonths(4)->toDateString(),
                 'end_date' => now()->subMonth()->toDateString(),
                 'status' => 'completed',

@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\CourseClass;
 use App\Models\Program;
+use App\Models\ProgramPromotion;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -44,7 +46,25 @@ class DatabaseSeeder extends Seeder
                 'max_students' => 10,
                 'price' => 1200000,
                 'registration_fee' => 200000,
+                'thumbnail' => 'images/pu1-img.jpg',
                 'is_active' => true,
+            ],
+        );
+
+        ProgramPromotion::query()->updateOrCreate(
+            [
+                'program_id' => $englishConversation->id,
+                'title' => 'Early Bird Conversation',
+            ],
+            [
+                'description' => 'Potongan khusus untuk pendaftaran awal kelas conversation.',
+                'discount_type' => 'fixed',
+                'discount_value' => 150000,
+                'starts_at' => now()->subWeek(),
+                'ends_at' => now()->addMonth(),
+                'is_active' => true,
+                'badge_label' => 'Early Bird',
+                'terms' => 'Berlaku untuk kuota pendaftaran awal dan tidak dapat digabung dengan promo lain.',
             ],
         );
 
@@ -63,6 +83,17 @@ class DatabaseSeeder extends Seeder
             ],
         );
 
+        $room = Room::query()->updateOrCreate(
+            ['name' => 'ETC Planet Room 1'],
+            [
+                'description' => 'Room utama untuk kelas conversation reguler.',
+                'capacity' => 12,
+                'facilities' => ['AC', 'Whiteboard', 'Projector'],
+                'is_active' => true,
+                'display_order' => 1,
+            ],
+        );
+
         CourseClass::query()->updateOrCreate(
             [
                 'program_id' => $englishConversation->id,
@@ -72,7 +103,7 @@ class DatabaseSeeder extends Seeder
                 'instructor_id' => $englishInstructor->id,
                 'schedule_days' => 'Senin - Kamis',
                 'schedule_time' => '16:00 - 17:30 WIB',
-                'room' => 'ETC Planet Room 1',
+                'room_id' => $room->id,
                 'start_date' => now()->addWeek()->toDateString(),
                 'status' => 'upcoming',
             ],

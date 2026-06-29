@@ -15,14 +15,17 @@ class PaymentController extends Controller
 
     public function index(Request $request): View
     {
-        return view('admin.payments.index', [
+        return view('pages.admin.payment.index', [
             'payments' => $this->registrationService->paginatePaymentVerifications($request->only([
                 'search',
                 'status',
+                'payment_status',
                 'program_id',
                 'payment_method',
                 'created_from',
                 'created_to',
+                'sort',
+                'direction',
             ]), 12),
             'programs' => Program::query()->orderBy('name')->get(),
         ]);
@@ -30,8 +33,14 @@ class PaymentController extends Controller
 
     public function show(Registration $payment): View
     {
-        return view('admin.payments.show', [
-            'payment' => $payment->load(['user', 'program', 'courseClass']),
+        return view('pages.admin.payment.show', [
+            'payment' => $payment->load([
+                'user',
+                'program',
+                'courseClass',
+                'programPromotion',
+                'midtransNotifications' => fn ($query) => $query->latest('received_at'),
+            ]),
         ]);
     }
 }

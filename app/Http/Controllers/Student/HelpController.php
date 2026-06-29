@@ -10,6 +10,6 @@ class HelpController extends Controller
 {
     public function index(Request $request): View
     {
-        return view('student.help', ['student' => $request->user()]);
+        return view('pages.student.help.index', ['student' => $request->user()]);
     }
 }

@@ -9,6 +9,6 @@ class RegistrationStartController extends Controller
 {
     public function index(): RedirectResponse
     {
-        return redirect()->route('registrations.programs.index');
+        return redirect()->route('public.programs.index');
     }
 }
